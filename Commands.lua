@@ -66,6 +66,67 @@ SLASH_POLYPODE1 = "/polypode"
 SLASH_POLYPODE2 = "/poly"
 SlashCmdList["POLYPODE"] = SlashHandler
 
+-- Messages à l'écran (centre) : erreur en rouge, information en jaune.
+local function ShowError(message)
+	UIErrorsFrame:AddMessage(message, 1, 0.1, 0.1)
+end
+
+local function ShowInfo(message)
+	UIErrorsFrame:AddMessage(message, 1, 0.82, 0)
+end
+
+-- Invite l'équipe sélectionnée et la synchronise (sélection chez les autres Polypode).
+-- Action commune au bouton « Inviter l'équipe » et au raccourci clavier.
+function P.InviteSelectedTeam()
+	local team = P.GetSelectedTeam()
+	local reason = P.GetInviteBlockedReason(team)
+	if reason then
+		ShowError(reason)
+		return
+	end
+	local ok, message = P.InviteTeam(team)
+	if ok then
+		ShowInfo(message)
+	else
+		ShowError(message)
+	end
+	-- Dans tous les cas, partage l'équipe avec les Polypode des membres (et des clients
+	-- connectés), qui la sélectionnent.
+	P.SyncTeam(team, nil, true)
+end
+
+-- Fonctions globales des raccourcis clavier (Bindings.xml), noms imposés par l'API WoW.
+
 function POLYPODE_TOGGLEUI()
 	P.ToggleUI()
+end
+
+-- Se nommer leader de l'équipe sélectionnée (en y entrant si besoin).
+function POLYPODE_SETLEADER()
+	local team = P.GetSelectedTeam()
+	if not team then
+		ShowError("Polypode : aucune équipe sélectionnée.")
+		return
+	end
+	local key = P.GetCharKey()
+	P.AddTeamMember(team, key)
+	P.SetTeamLeader(team, key)
+	P.RefreshUI()
+	ShowInfo("Vous êtes le leader de l'équipe « " .. team .. " ».")
+end
+
+-- Suivre / Assister : la touche est normalement redirigée vers un bouton sécurisé
+-- (UI_Keybinds.lua) et ces fonctions ne sont pas appelées. Elles ne servent que si la
+-- redirection n'est pas encore en place (ex. touche choisie pendant un combat).
+function POLYPODE_FOLLOW()
+	P.UpdateLeaderMacros()
+	ShowError("Polypode : raccourci en cours d'activation, appuyez de nouveau (hors combat).")
+end
+
+function POLYPODE_ASSIST()
+	POLYPODE_FOLLOW()
+end
+
+function POLYPODE_INVITE()
+	P.InviteSelectedTeam()
 end

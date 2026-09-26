@@ -8,6 +8,10 @@ P.debugEnabled = false
 
 BINDING_HEADER_POLYPODE = "Polypode"
 _G["BINDING_NAME_POLYPODE_TOGGLEUI"] = "Polypode: Ouvrir/Fermer l'interface"
+_G["BINDING_NAME_POLYPODE_SETLEADER"] = "Polypode: Se nommer leader de l'équipe"
+_G["BINDING_NAME_POLYPODE_FOLLOW"] = "Polypode: Suivre le leader"
+_G["BINDING_NAME_POLYPODE_ASSIST"] = "Polypode: Assister le leader"
+_G["BINDING_NAME_POLYPODE_INVITE"] = "Polypode: Inviter l'équipe"
 
 P.defaults = {
 	roster = {}, -- [nom-royaume] = { name, realm, class, level, lastSeen }
@@ -332,6 +336,37 @@ function P.SetTeamLeader(teamName, key)
 		P.db.teams[teamName].leader = key
 		TeamChanged(teamName)
 	end
+end
+
+-- Équipe sélectionnée pour ce personnage (P.charDb.selectedTeam), ou nil si aucune ou si
+-- elle n'existe pas (encore) localement.
+function P.GetSelectedTeam()
+	local name = P.charDb and P.charDb.selectedTeam
+	if name and P.db.teams[name] then
+		return name
+	end
+end
+
+-- Raison pour laquelle ce personnage ne peut pas inviter l'équipe, ou nil s'il le peut :
+-- seul le leader de l'équipe invite, et il faut un autre membre que soi. Règle commune au
+-- bouton « Inviter l'équipe » et au raccourci clavier.
+function P.GetInviteBlockedReason(teamName)
+	if not teamName then
+		return "Sélectionnez d'abord une équipe."
+	end
+	local leader = P.GetTeamLeader(teamName)
+	if not leader then
+		return "L'équipe n'a pas de leader : clic gauche sur un de ses personnages pour le désigner."
+	end
+	if leader ~= P.GetCharKey() then
+		return "Seul le leader de l'équipe (" .. leader .. ") peut inviter l'équipe."
+	end
+	for key in pairs(P.GetTeamMembers(teamName) or {}) do
+		if key ~= P.GetCharKey() then
+			return nil
+		end
+	end
+	return "L'équipe ne compte aucun autre membre que vous."
 end
 
 -- Nom à passer aux API qui ciblent un joueur (invitation, chuchotement addon) : "Nom" sur

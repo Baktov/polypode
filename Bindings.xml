@@ -2,4 +2,16 @@
   <Binding name="POLYPODE_TOGGLEUI" header="POLYPODE" category="Polypode">
     POLYPODE_TOGGLEUI()
   </Binding>
+  <Binding name="POLYPODE_SETLEADER" category="Polypode">
+    POLYPODE_SETLEADER()
+  </Binding>
+  <Binding name="POLYPODE_FOLLOW" category="Polypode">
+    POLYPODE_FOLLOW()
+  </Binding>
+  <Binding name="POLYPODE_ASSIST" category="Polypode">
+    POLYPODE_ASSIST()
+  </Binding>
+  <Binding name="POLYPODE_INVITE" category="Polypode">
+    POLYPODE_INVITE()
+  </Binding>
 </Bindings>

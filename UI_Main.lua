@@ -187,25 +187,10 @@ local function CharacterTooltip(key, hints)
 	return lines
 end
 
--- Raison pour laquelle le bouton « Inviter l'équipe » est inactif, ou nil s'il est actif :
--- seul le leader de l'équipe sélectionnée invite, et il faut un autre membre que soi.
+-- Raison pour laquelle le bouton « Inviter l'équipe » est inactif, ou nil s'il est actif
+-- (règle commune avec le raccourci clavier, cf. P.GetInviteBlockedReason).
 local function InviteBlockedReason()
-	if not selectedTeam then
-		return "Sélectionnez d'abord une équipe."
-	end
-	local leader = P.GetTeamLeader(selectedTeam)
-	if not leader then
-		return "L'équipe n'a pas de leader : clic gauche sur un de ses personnages pour le désigner."
-	end
-	if leader ~= P.GetCharKey() then
-		return "Seul le leader de l'équipe (" .. leader .. ") peut inviter l'équipe."
-	end
-	for key in pairs(P.GetTeamMembers(selectedTeam) or {}) do
-		if key ~= P.GetCharKey() then
-			return nil
-		end
-	end
-	return "L'équipe ne compte aucun autre membre que vous."
+	return P.GetInviteBlockedReason(selectedTeam)
 end
 
 -- "Nom-Royaume" coloré selon la classe, puis classe localisée et niveau en gris.
@@ -427,18 +412,7 @@ function P.BuildUI()
 	inviteBtn:SetText("Inviter l'équipe")
 	inviteBtn:SetMotionScriptsWhileDisabled(true) -- infobulle même désactivé
 	inviteBtn:SetScript("OnClick", function()
-		if not selectedTeam then
-			return
-		end
-		local ok, message = P.InviteTeam(selectedTeam)
-		if ok then
-			UIErrorsFrame:AddMessage(message, 1, 0.82, 0)
-		else
-			UIErrorsFrame:AddMessage(message, 1, 0.1, 0.1)
-		end
-		-- Dans tous les cas, partage l'équipe avec les Polypode des membres (et des clients
-		-- connectés), qui la sélectionnent.
-		P.SyncTeam(selectedTeam, nil, true)
+		P.InviteSelectedTeam() -- même action que le raccourci clavier (Commands.lua)
 	end)
 	inviteBtn:SetScript("OnEnter", function(self)
 		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
@@ -520,14 +494,19 @@ function P.BuildUI()
 end
 
 function P.RefreshUI()
+	-- Appelé après toute modification (sélection, équipes, synchro) : les macros des
+	-- raccourcis Suivre/Assister suivent le leader, que la fenêtre soit construite ou non.
+	if P.UpdateLeaderMacros then
+		P.UpdateLeaderMacros()
+	end
+
 	if not ui.frame then
 		return
 	end
 
 	-- Sélection = choix mémorisé, s'il existe localement. Le choix n'est jamais effacé ici :
 	-- une équipe absente au login (synchro pas encore arrivée) sera sélectionnée à sa réception.
-	local saved = P.charDb.selectedTeam
-	selectedTeam = (saved and P.GetTeams()[saved]) and saved or nil
+	selectedTeam = P.GetSelectedTeam()
 
 	SetListData(ui.charPanel, SortedKeyItems(P.GetRoster()))
 

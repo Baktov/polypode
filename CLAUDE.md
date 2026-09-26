@@ -25,8 +25,9 @@ n'ajoute une fonctionnalité que si elle sert directement cet objectif.
 | `UI_Main.lua` | Fenêtre principale redimensionnable (`P.ui.resizeGrip`, taille dans `P.db.mainFrame`), bouton `P.ui.optionsButton` (barre de titre, → `P.OpenOptions`) : `BuildUI`, `RefreshUI`, `ToggleUI`. Trois cadres à liste défilante (`panel.scrollBox`, `panel.scrollBar`, `panel.emptyText`), un tiers de largeur chacun (`LayoutPanels` sur `OnSizeChanged`) : `P.ui.charPanel` (personnages trouvés = roster trié, bouton `P.ui.addTargetButton` « Ajouter la cible » ; avec une équipe sélectionnée, clic gauche = ajout, clic droit = retrait, membres surlignés), `P.ui.teamPanel` (équipes : `P.ui.teamInput` + `P.ui.teamCreateButton` → `P.CreateTeam`, liste triée, clic = sélection mémorisée par personnage dans `P.charDb.selectedTeam` (via la locale `ChooseTeam` ou `P.SelectTeam`), la locale `selectedTeam` en est recalculée par `RefreshUI` (nil si l'équipe manque encore, sans effacer le choix)), `P.ui.memberPanel` (« Personnages de l'équipe » : membres de l'équipe sélectionnée, bouton `P.ui.inviteButton` « Inviter l'équipe » → `P.InviteTeam` + `P.SyncTeam`, actif seulement si le personnage courant est leader de l'équipe (locale `InviteBlockedReason`, aussi affichée dans l'infobulle), clic gauche = leader de l'équipe (surligné), clic droit = retrait) |
 | `UI_Minimap.lua` | Bouton de minimap sans librairie (`P.BuildMinimapButton`, appelé à `PLAYER_LOGIN`), `P.SetMinimapButtonShown`, état dans `P.db.minimap` (`angle`, `hide`) |
 | `UI_Options.lua` | Panneau Options → AddOns via l'API `Settings` (`P.BuildOptions` à `PLAYER_LOGIN`, `P.OpenOptions`) : cases « Afficher l'icône de minimap » (`P.db.minimap.hide`) et « Mode debug » (`P.charDb.debug`, par personnage) |
-| `Commands.lua` | Commande slash `/poly` (`/polypode`) et fonctions globales de keybinding |
-| `Events.lua` | Handlers `ADDON_LOADED`, `PLAYER_LOGIN`, `CHAT_MSG_ADDON` |
+| `UI_Keybinds.lua` | Boutons sécurisés `PolypodeFollowButton` / `PolypodeAssistButton` (macros `/follow`, `/assist` vers le leader de l'équipe sélectionnée), touches redirigées par `SetOverrideBindingClick` ; `P.UpdateLeaderMacros` (appelé par `P.RefreshUI`, au login, sur `UPDATE_BINDINGS`), différé en combat (`P.ApplyPendingKeybinds` sur `PLAYER_REGEN_ENABLED`) |
+| `Commands.lua` | Commande slash `/poly` (`/polypode`), fonctions globales de keybinding `POLYPODE_*` (toggle UI, se nommer leader, suivre/assister en secours, inviter) et `P.InviteSelectedTeam` (commune au bouton et au raccourci) |
+| `Events.lua` | Handlers `ADDON_LOADED`, `PLAYER_LOGIN`, `CHAT_MSG_ADDON`, `UPDATE_BINDINGS`, `PLAYER_REGEN_ENABLED` |
 | `Bindings.xml` | Déclaration XML des raccourcis clavier WoW |
 | `Polypode.toc` | Manifeste — définit l'ordre de chargement des fichiers |
 
@@ -48,7 +49,7 @@ en tête de chaque fichier). Ex. `P.db` (= `PolypodeDB`), `P.charDb` (= `Polypod
 6. **Pas de `print()`** en production — utiliser `P.Debug(msg)`, qui respecte `P.debugEnabled`.
 7. **Messages de sync** : toujours via `P.SYNC_PREFIX`, jamais de préfixe en dur ailleurs.
 8. **UI** : frames créées avec `CreateFrame`, toutes référencées dans `P.ui.*`.
-9. **Ordre de chargement** respecte le `.toc` (`Core → Sync → UI_Skin → UI_Main → UI_Minimap → UI_Options → Commands → Events → Bindings`).
+9. **Ordre de chargement** respecte le `.toc` (`Core → Sync → UI_Skin → UI_Main → UI_Minimap → UI_Options → UI_Keybinds → Commands → Events → Bindings`).
    Ne jamais appeler au niveau fichier (hors fonction) une fonction définie dans un fichier chargé après.
    Les appels **à l'intérieur** d'une fonction peuvent référencer un fichier suivant (résolu à l'exécution).
 10. **Pas de globals parasites** : toute variable de module doit être `local` ou sous `Polypode.`
@@ -103,6 +104,16 @@ Avant d'ajouter une fonctionnalité :
 ---
 
 ## Patterns récurrents
+
+### Ajouter un raccourci clavier
+→ `<Binding name="POLYPODE_X">` dans `Bindings.xml`, libellé `BINDING_NAME_POLYPODE_X` dans `Core.lua`,
+fonction globale `POLYPODE_X()` dans `Commands.lua`. Pour une **action protégée** (suivre, assister,
+cibler, lancer un sort...) : pas d'appel direct ; ajouter une entrée à `secureBindings` dans
+`UI_Keybinds.lua` (bouton `SecureActionButtonTemplate` de type `macro`, touche redirigée par
+`SetOverrideBindingClick`). Le bouton doit être enregistré `RegisterForClicks("AnyUp", "AnyDown")` :
+le modèle Blizzard agit à l'appui ou au relâchement selon le CVar `ActionButtonUseKeyDown` (actif par
+défaut) ; avec seulement `LeftButtonUp`, la macro ne se déclencherait jamais. Aucun `SetAttribute`
+ni `SetOverrideBinding*` en combat : différer (`pendingUpdate`).
 
 ### Ajouter une commande slash
 → Modifier uniquement `Commands.lua`, dans le bloc `elseif sub == "..."` de `SlashHandler`.

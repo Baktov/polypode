@@ -126,6 +126,17 @@ Configurable dans le menu des raccourcis WoW, catégorie **Polypode** :
 | Raccourci | Action |
 |---|---|
 | Polypode: Ouvrir/Fermer l'interface | Basculer la fenêtre principale |
+| Polypode: Se nommer leader de l'équipe | Le personnage courant devient leader de l'équipe sélectionnée (il y entre s'il n'en est pas membre) ; synchronisé avec vos autres Polypode |
+| Polypode: Suivre le leader | Suit (`/follow`) le leader de l'équipe sélectionnée |
+| Polypode: Assister le leader | Assiste (`/assist`) le leader de l'équipe sélectionnée : prend sa cible |
+| Polypode: Inviter l'équipe | Même action que le bouton « Inviter l'équipe » (réservée au leader) |
+
+Toutes les actions portent sur **l'équipe sélectionnée pour ce personnage** (mémorisée, cf.
+Fenêtre principale). « Suivre » et « Assister » sont des actions protégées par WoW : la touche
+est confiée à un bouton sécurisé Blizzard qui exécute la macro, elles fonctionnent donc aussi
+en combat. Seul le changement de leader, d'équipe ou de touche pendant un combat n'est pris
+en compte qu'à la sortie du combat. Sans leader utilisable (pas d'équipe, pas de leader, ou
+vous êtes le leader), la touche affiche un message à l'écran.
 
 ---
 
@@ -174,12 +185,12 @@ vous avez désactivé le skin de Polypode dans ses options).
 
 ## État du projet
 
-Version `0.17.2` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
+Version `0.18.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
 automatique aux annonces, fenêtre redimensionnable à trois listes défilantes (personnages
 trouvés / équipes avec création par saisie et sélection / personnages de l'équipe, ajout
 et retrait de membres au clic, leader par équipe, invitation de toute l'équipe, synchronisation automatique et versionnée des équipes, ajout du joueur ciblé)
 skinnée (EllesmereUI/ElvUI), bouton de minimap (masquable), panneau d'options (accessible par un bouton de la fenêtre),
-commandes, raccourci clavier. Pistes envisagées pour la suite,
+commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, inviter). Pistes envisagées pour la suite,
 à activer seulement si le besoin se confirme (voir la règle de simplicité dans
 `CLAUDE.md`) :
 
