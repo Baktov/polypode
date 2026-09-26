@@ -57,6 +57,21 @@ Configurable dans le menu des raccourcis WoW, catégorie **Polypode** :
 
 ---
 
+## Apparence
+
+La fenêtre s'adapte automatiquement à votre interface, sans configuration :
+
+| Interface détectée | Rendu |
+|---|---|
+| **EllesmereUI** | Style EllesmereUI (fond, bordure, bouton de fermeture) selon votre thème. Désactivable dans EllesmereUI → Blizz UI Enhanced → Blizzard Window Skins → Third-Party Addons (nécessite le module EllesmereUI Blizzard Skin). |
+| **ElvUI** | Style ElvUI (fond et bouton de fermeture). |
+| Aucune | Fond sombre générique. |
+
+Si EllesmereUI et ElvUI sont tous deux chargés, EllesmereUI est prioritaire (sauf si
+vous avez désactivé le skin de Polypode dans ses options).
+
+---
+
 ## État du projet
 
 Version initiale (`0.1.0`) : structure de base fonctionnelle (roster, sync simple,
@@ -67,8 +82,7 @@ fenêtre de liste, commandes, raccourci clavier). Pistes envisagées pour la sui
 - Suivi automatique du leader (`follow`) et assist de cible.
 - Bouton minimap.
 - Invitation automatique du groupe depuis le roster.
-- Compatibilité ElvUI plus poussée pour la fenêtre principale (le hook existe déjà
-  dans `UI_Skin.lua`).
+- Skin des textes de la fenêtre (police EllesmereUI via `S.Font`).
 
 ---
 

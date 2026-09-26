@@ -11,7 +11,7 @@ n'ajoute une fonctionnalité que si elle sert directement cet objectif.
 
 - **Langue du code** : commentaires en français, code (variables/fonctions) en anglais.
 - **Style** : minimaliste, lisible, pas de dépendance externe obligatoire.
-- **Dépendance optionnelle** : ElvUI (skinning via `UI_Skin.lua`), jamais requise pour charger.
+- **Dépendances optionnelles** : EllesmereUI et ElvUI (skinning via `UI_Skin.lua`), jamais requises pour charger.
 
 ---
 
@@ -21,7 +21,7 @@ n'ajoute une fonctionnalité que si elle sert directement cet objectif.
 |---|---|
 | `Core.lua` | Table globale `Polypode` (alias local `P`), SavedVariables, CRUD du roster |
 | `Sync.lua` | Broadcast/réception de messages addon (`C_ChatInfo`) pour annoncer un personnage au groupe/à la guilde |
-| `UI_Skin.lua` | Skinning ElvUI conditionnel |
+| `UI_Skin.lua` | Skinning conditionnel : EllesmereUI (`EllesmereUI.RegisterSkin`, prioritaire) puis ElvUI |
 | `UI_Main.lua` | Fenêtre principale : `BuildUI`, `RefreshUI`, `ToggleUI` |
 | `Commands.lua` | Commande slash `/poly` (`/polypode`) et fonctions globales de keybinding |
 | `Events.lua` | Handlers `ADDON_LOADED`, `PLAYER_LOGIN`, `CHAT_MSG_ADDON` |
@@ -35,7 +35,8 @@ en tête de chaque fichier). Ex. `P.db` (= `PolypodeDB`), `P.charDb` (= `Polypod
 
 ## Conventions de code (à respecter impérativement)
 
-1. **Pas de librairie externe** sauf ElvUI (optionnel, toujours protégé par `if ElvUI then`).
+1. **Pas de librairie externe** sauf ElvUI et EllesmereUI (optionnels, toujours protégés par
+   `if ElvUI then` / `if EllesmereUI and EllesmereUI.RegisterSkin then`).
 2. **Toutes les fonctions publiques** sont attachées à `Polypode` : `function P.MaFonction() end`,
    avec `local P = Polypode` en haut du fichier.
 3. **Les fonctions locales** restent locales à leur fichier (`local function ...`).
@@ -76,8 +77,10 @@ Avant d'ajouter une fonctionnalité :
   `CHAT_MSG_ADDON` dans `Events.lua`**.
 - Si une modification touche l'UI, vérifier la compatibilité **ElvUI** dans `UI_Skin.lua`.
 - Toujours proposer le diff **fichier par fichier**.
-- Après toute modification fonctionnelle, mettre à jour la section correspondante du `README.md`
-  (commandes, raccourcis, fonctionnalités).
+- Après **chaque** modification, sans attendre qu'on le demande :
+  1. mettre à jour la section correspondante du `README.md` (commandes, raccourcis, fonctionnalités, apparence) ;
+  2. mettre à jour ce `CLAUDE.md` si l'architecture, les conventions ou les dépendances changent ;
+  3. commiter puis pousser (`git push`) sur `origin`.
 
 ---
 

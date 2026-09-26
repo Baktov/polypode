@@ -46,8 +46,10 @@ function P.BuildUI()
 
 	local closeBtn = CreateFrame("Button", nil, f, "UIPanelCloseButton")
 	closeBtn:SetPoint("TOPRIGHT", -4, -4)
+	f.CloseButton = closeBtn -- nom attendu par les skins ElvUI/EllesmereUI
 
 	ui.frame = f
+	ui.closeButton = closeBtn
 	ui.rows = {}
 
 	if P.SkinFrame then

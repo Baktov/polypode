@@ -5,6 +5,7 @@
 ## Version: 0.1.0
 ## SavedVariables: PolypodeDB
 ## SavedVariablesPerCharacter: PolypodeCharDB
+## OptionalDeps: EllesmereUI, ElvUI
 
 Core.lua
 Sync.lua
