@@ -22,7 +22,7 @@ n'ajoute une fonctionnalité que si elle sert directement cet objectif.
 | `Core.lua` | Table globale `Polypode` (alias local `P`), SavedVariables, CRUD du roster |
 | `Sync.lua` | Broadcast/réception de messages addon (`C_ChatInfo`), token d'équipe (`P.GetTeamToken`, hash du BattleTag), annonce `HELLO` / réponse `HI` |
 | `UI_Skin.lua` | Skinning conditionnel : EllesmereUI (`EllesmereUI.RegisterSkin`, prioritaire) puis ElvUI. `P.SkinFrame` (fenêtre top-level), `P.SkinPanel` (cadre intérieur), `P.SkinScrollBar` (barre de défilement) |
-| `UI_Main.lua` | Fenêtre principale : `BuildUI`, `RefreshUI`, `ToggleUI`. Deux cadres à liste défilante (`panel.scrollBox`, `panel.scrollBar`, `panel.emptyText`) : `P.ui.charPanel` (personnages trouvés = roster trié) et `P.ui.teamPanel` (équipes gérées, contenu **à définir**, liste vide) |
+| `UI_Main.lua` | Fenêtre principale redimensionnable (`P.ui.resizeGrip`, taille dans `P.db.mainFrame`) : `BuildUI`, `RefreshUI`, `ToggleUI`. Deux cadres à liste défilante (`panel.scrollBox`, `panel.scrollBar`, `panel.emptyText`) : `P.ui.charPanel` (personnages trouvés = roster trié) et `P.ui.teamPanel` (équipes gérées, contenu **à définir**, liste vide) |
 | `UI_Minimap.lua` | Bouton de minimap sans librairie (`P.BuildMinimapButton`, appelé à `PLAYER_LOGIN`), `P.SetMinimapButtonShown`, état dans `P.db.minimap` (`angle`, `hide`) |
 | `UI_Options.lua` | Panneau Options → AddOns via l'API `Settings` (`P.BuildOptions` à `PLAYER_LOGIN`, `P.OpenOptions`) |
 | `Commands.lua` | Commande slash `/poly` (`/polypode`) et fonctions globales de keybinding |
@@ -58,6 +58,11 @@ en tête de chaque fichier). Ex. `P.db` (= `PolypodeDB`), `P.charDb` (= `Polypod
     attendus aujourd'hui. Jamais de pile de lignes à hauteur fixe qui déborde du cadre. Pour une
     liste : `CreateScrollList(panel, formatFn)` + `SetListData(panel, items)` dans `UI_Main.lua`
     (ScrollBox Blizzard virtualisée + `MinimalScrollBar`, skinnée via `P.SkinScrollBar`).
+13. **Fenêtres redimensionnables** : la fenêtre principale se redimensionne (poignée bas-droite,
+    `SetResizeBounds`, taille dans `P.db.mainFrame`). Tout contenu s'ancre en relatif aux bords
+    (pas de largeur fixe calculée) ; trop petite, on tronque sans réorganiser : textes sur une
+    ligne (`SetWordWrap(false)` + ancres gauche/droite). Pas de `SetClipsChildren` sur la fenêtre
+    skinnée (risque de rogner la bordure du skin).
 
 ---
 

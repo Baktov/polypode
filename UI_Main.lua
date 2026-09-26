@@ -4,7 +4,9 @@ local P = Polypode
 local ui = {}
 P.ui = ui
 
-local FRAME_WIDTH, FRAME_HEIGHT = 540, 320
+-- Taille minimale volontairement petite : en dessous du confortable, le contenu est
+-- simplement tronqué (textes coupés sur une ligne, listes réduites), pas réorganisé.
+local MIN_WIDTH, MIN_HEIGHT = 200, 100
 local PANEL_TOP = -36 -- sous la barre de titre
 local PANEL_MARGIN = 12
 local PANEL_GAP = 10
@@ -25,6 +27,9 @@ local function CreatePanel(parent, title)
 
 	panel.header = panel:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 	panel.header:SetPoint("TOPLEFT", 10, -8)
+	panel.header:SetPoint("RIGHT", -10, 0)
+	panel.header:SetJustifyH("LEFT")
+	panel.header:SetWordWrap(false) -- tronqué si la fenêtre est trop étroite
 	panel.header:SetText(title)
 
 	return panel
@@ -59,6 +64,9 @@ local function CreateScrollList(panel, formatFn)
 	-- Texte affiché quand la liste est vide.
 	panel.emptyText = panel:CreateFontString(nil, "OVERLAY", "GameFontDisable")
 	panel.emptyText:SetPoint("TOPLEFT", 10, -HEADER_HEIGHT)
+	panel.emptyText:SetPoint("RIGHT", -10, 0)
+	panel.emptyText:SetJustifyH("LEFT")
+	panel.emptyText:SetWordWrap(false)
 
 	panel.scrollBox = scrollBox
 	panel.scrollBar = scrollBar
@@ -108,9 +116,11 @@ function P.BuildUI()
 	end
 
 	local f = CreateFrame("Frame", "PolypodeMainFrame", UIParent, "BackdropTemplate")
-	f:SetSize(FRAME_WIDTH, FRAME_HEIGHT)
+	f:SetSize(P.db.mainFrame.width, P.db.mainFrame.height)
 	f:SetPoint("CENTER")
 	f:SetMovable(true)
+	f:SetResizable(true)
+	f:SetResizeBounds(MIN_WIDTH, MIN_HEIGHT)
 	f:EnableMouse(true)
 	f:RegisterForDrag("LeftButton")
 	f:SetScript("OnDragStart", f.StartMoving)
@@ -133,22 +143,34 @@ function P.BuildUI()
 	closeBtn:SetPoint("TOPRIGHT", -4, -4)
 	f.CloseButton = closeBtn -- nom attendu par les skins ElvUI/EllesmereUI
 
-	-- Deux cadres côte à côte, de même largeur.
-	local panelWidth = (FRAME_WIDTH - 2 * PANEL_MARGIN - PANEL_GAP) / 2
+	-- Poignée de redimensionnement (coin bas-droit), au-dessus des cadres intérieurs.
+	local grip = CreateFrame("Button", nil, f)
+	grip:SetSize(16, 16)
+	grip:SetPoint("BOTTOMRIGHT", -2, 2)
+	grip:SetFrameLevel(f:GetFrameLevel() + 10)
+	grip:SetNormalTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+	grip:SetHighlightTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
+	grip:SetPushedTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Down")
+	grip:SetScript("OnMouseDown", function()
+		f:StartSizing("BOTTOMRIGHT")
+	end)
+	grip:SetScript("OnMouseUp", function()
+		f:StopMovingOrSizing()
+		P.db.mainFrame.width, P.db.mainFrame.height = f:GetSize()
+	end)
 
+	-- Deux cadres côte à côte, chacun sur une moitié de la fenêtre (suivent le redimensionnement).
 	-- Gauche : personnages trouvés (roster alimenté par la sync).
 	local charPanel = CreatePanel(f, "Personnages trouvés")
 	charPanel:SetPoint("TOPLEFT", PANEL_MARGIN, PANEL_TOP)
-	charPanel:SetPoint("BOTTOMLEFT", PANEL_MARGIN, PANEL_MARGIN)
-	charPanel:SetWidth(panelWidth)
+	charPanel:SetPoint("BOTTOMRIGHT", f, "BOTTOM", -PANEL_GAP / 2, PANEL_MARGIN)
 	CreateScrollList(charPanel, FormatCharacter)
 	charPanel.emptyText:SetText("Aucun personnage trouvé")
 
 	-- Droite : équipes gérées (contenu à définir ; liste défilante prête, vide pour l'instant).
 	local teamPanel = CreatePanel(f, "Équipes gérées")
-	teamPanel:SetPoint("TOPRIGHT", -PANEL_MARGIN, PANEL_TOP)
+	teamPanel:SetPoint("TOPLEFT", f, "TOP", PANEL_GAP / 2, PANEL_TOP)
 	teamPanel:SetPoint("BOTTOMRIGHT", -PANEL_MARGIN, PANEL_MARGIN)
-	teamPanel:SetWidth(panelWidth)
 	CreateScrollList(teamPanel, function(data)
 		return data.name
 	end)
@@ -157,6 +179,7 @@ function P.BuildUI()
 	ui.frame = f
 	ui.title = title
 	ui.closeButton = closeBtn
+	ui.resizeGrip = grip
 	ui.charPanel = charPanel
 	ui.teamPanel = teamPanel
 

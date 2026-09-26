@@ -47,6 +47,10 @@ Ouverte par `/poly ui`, le raccourci clavier ou le bouton de minimap. Deux cadre
 
 Les deux listes défilent (molette ou barre de défilement), sans limite de nombre.
 
+La fenêtre se **redimensionne** par la poignée du coin bas-droit ; les deux cadres se
+partagent la largeur à parts égales et la taille est mémorisée pour le compte. Si la
+fenêtre est très réduite, le contenu est simplement tronqué.
+
 ---
 
 ## Commandes slash (`/poly` ou `/polypode`)
@@ -120,8 +124,8 @@ vous avez désactivé le skin de Polypode dans ses options).
 
 ## État du projet
 
-Version `0.6.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
-automatique aux annonces, fenêtre à deux listes défilantes (personnages trouvés / équipes gérées)
+Version `0.7.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
+automatique aux annonces, fenêtre redimensionnable à deux listes défilantes (personnages trouvés / équipes gérées)
 skinnée (EllesmereUI/ElvUI), bouton de minimap (masquable), panneau d'options,
 commandes, raccourci clavier. Pistes envisagées pour la suite,
 à activer seulement si le besoin se confirme (voir la règle de simplicité dans

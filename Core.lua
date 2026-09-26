@@ -16,6 +16,10 @@ P.defaults = {
 		angle = 225, -- position du bouton autour de la minimap, en degrés (225 = bas gauche)
 		hide = false, -- true : bouton masqué (/poly minimap ou panneau d'options)
 	},
+	mainFrame = {
+		width = 540, -- taille de la fenêtre principale, mémorisée au redimensionnement
+		height = 320,
+	},
 }
 
 P.charDefaults = {
