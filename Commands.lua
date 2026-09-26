@@ -7,7 +7,6 @@ local function PrintHelp()
 	print("  /poly list         — lister les personnages connus")
 	print("  /poly addme        — ajouter le personnage courant au roster")
 	print("  /poly remove <nom-royaume> — retirer un personnage du roster")
-	print("  /poly leader <nom-royaume> — définir le leader")
 	print("  /poly ui           — ouvrir/fermer la fenêtre")
 	print("  /poly minimap      — afficher/masquer l'icône de minimap")
 	print("  /poly options      — ouvrir le panneau d'options")
@@ -26,8 +25,7 @@ local function SlashHandler(msg)
 		local count = 0
 		for key, entry in pairs(roster) do
 			count = count + 1
-			local tag = (P.db.leader == key) and " |cffffd200[leader]|r" or ""
-			print(string.format("  - %s (%s, niv. %s)%s", key, entry.class or "?", entry.level or "?", tag))
+			print(string.format("  - %s (%s, niv. %s)", key, entry.class or "?", entry.level or "?"))
 		end
 		if count == 0 then
 			print("  Aucun personnage enregistré. Utilisez /poly addme")
@@ -43,14 +41,6 @@ local function SlashHandler(msg)
 			print("Polypode: " .. target .. " retiré du roster.")
 		else
 			print("Usage: /poly remove <nom-royaume>")
-		end
-	elseif sub == "leader" then
-		local target = args[2]
-		if target then
-			P.SetLeader(target)
-			print("Polypode: " .. target .. " est maintenant leader.")
-		else
-			print("Usage: /poly leader <nom-royaume>")
 		end
 	elseif sub == "ui" then
 		P.ToggleUI()

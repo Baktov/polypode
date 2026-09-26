@@ -11,7 +11,6 @@ _G["BINDING_NAME_POLYPODE_TOGGLEUI"] = "Polypode: Ouvrir/Fermer l'interface"
 
 P.defaults = {
 	roster = {}, -- [nom-royaume] = { name, realm, class, level, lastSeen }
-	leader = nil, -- clé (nom-royaume) du leader désigné
 	minimap = {
 		angle = 225, -- position du bouton autour de la minimap, en degrés (225 = bas gauche)
 		hide = false, -- true : bouton masqué (/poly minimap ou panneau d'options)
@@ -23,9 +22,7 @@ P.defaults = {
 	teams = {}, -- [nom] = { name, members = { [nom-royaume] = true }, leader = nom-royaume|nil }
 }
 
-P.charDefaults = {
-	role = "member", -- "leader" | "member"
-}
+P.charDefaults = {}
 
 function P.Debug(msg)
 	if P.debugEnabled then
@@ -50,6 +47,11 @@ function P.InitDB()
 	PolypodeCharDB = CopyDefaults(P.charDefaults, PolypodeCharDB or {})
 	P.db = PolypodeDB
 	P.charDb = PolypodeCharDB
+
+	-- Nettoyage : l'ancien leader global (remplacé par un leader par équipe) et le rôle
+	-- par personnage associé ne sont plus utilisés.
+	P.db.leader = nil
+	P.charDb.role = nil
 end
 
 function P.GetCharKey(name, realm)
@@ -86,18 +88,9 @@ end
 
 function P.RemoveCharacter(key)
 	P.db.roster[key] = nil
-	if P.db.leader == key then
-		P.db.leader = nil
-	end
 	-- Un personnage retiré du roster ne reste membre (ni leader) d'aucune équipe.
 	for name in pairs(P.db.teams) do
 		P.RemoveTeamMember(name, key)
-	end
-end
-
-function P.SetLeader(key)
-	if P.db.roster[key] then
-		P.db.leader = key
 	end
 end
 

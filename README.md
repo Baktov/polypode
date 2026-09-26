@@ -4,7 +4,7 @@ Addon World of Warcraft pour **gérer simplement plusieurs personnages joués da
 plusieurs fenêtres WoW sur le même PC** (multiboxing).
 
 Polypode s'inspire de TeamManager, MAMA, EMA et DynamicBoxer, mais vise volontairement
-la simplicité : un roster de vos personnages, un leader désigné, et une synchronisation
+la simplicité : un roster de vos personnages, des équipes avec leur leader, et une synchronisation
 automatique de base entre vos clients — sans configuration complexe.
 
 ---
@@ -30,9 +30,8 @@ automatique de base entre vos clients — sans configuration complexe.
   de votre BattleTag (haché, jamais envoyé en clair). Les autres joueurs de la guilde
   qui utilisent Polypode sont ignorés. Tous vos comptes WoW doivent donc être rattachés
   au **même compte Battle.net**.
-- Vous pouvez désigner un **leader** parmi les personnages du roster — c'est pour
-  l'instant une simple étiquette affichée dans la liste (base pour de futures actions
-  liées au leader : suivi, assist, etc.).
+- Vous regroupez vos personnages en **équipes**, chacune avec son **leader** (voir
+  Fenêtre principale) — base pour de futures actions liées au leader : suivi, assist, etc.
 
 ---
 
@@ -42,7 +41,7 @@ Ouverte par `/poly ui`, le raccourci clavier ou le bouton de minimap. Trois cadr
 
 - **Personnages trouvés** : tous les personnages de votre équipe détectés via les canaux
   (groupe, raid, guilde), triés par nom. Nom en couleur de classe, puis classe et niveau ;
-  `(vous)` marque le personnage courant, `[leader]` le leader désigné.
+  `(vous)` marque le personnage courant.
   Quand une équipe est sélectionnée : **clic gauche** sur un personnage l'ajoute à l'équipe,
   **clic droit** l'en retire ; les membres de l'équipe sont surlignés en doré. Une infobulle au survol donne le nom du personnage, rappelle ces actions, puis liste les équipes dont il fait déjà partie (l'équipe sélectionnée en vert).
 - **Équipes** : saisir un nom dans le champ « Nom de l'équipe » puis valider avec
@@ -53,7 +52,7 @@ Ouverte par `/poly ui`, le raccourci clavier ou le bouton de minimap. Trois cadr
 - **Personnages de l'équipe** : membres de l'équipe sélectionnée, triés par nom, même
   présentation que les personnages trouvés.
   - **Clic gauche** sur un membre : il devient **leader de l'équipe** (surbrillance dorée et
-    `[leader]`). Chaque équipe a son propre leader, distinct du leader global de `/poly leader`.
+    `[leader]`). Chaque équipe a son propre leader.
   - **Clic droit** : retire le membre de l'équipe ; si c'était le leader, l'équipe n'a plus
     de leader.
   - L'infobulle au survol rappelle ces actions et liste les équipes du personnage, avec
@@ -77,7 +76,6 @@ par défaut). Si la fenêtre est très réduite, le contenu est simplement tronq
 | `/poly list` | Lister les personnages connus (roster) |
 | `/poly addme` | Ajouter/réannoncer le personnage courant |
 | `/poly remove <nom-royaume>` | Retirer un personnage du roster |
-| `/poly leader <nom-royaume>` | Désigner le leader |
 | `/poly ui` | Ouvrir/fermer la fenêtre principale |
 | `/poly minimap` | Afficher/masquer l'icône de minimap |
 | `/poly options` | Ouvrir le panneau d'options (Options → AddOns → Polypode) |
@@ -141,7 +139,7 @@ vous avez désactivé le skin de Polypode dans ses options).
 
 ## État du projet
 
-Version `0.11.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
+Version `0.11.1` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
 automatique aux annonces, fenêtre redimensionnable à trois listes défilantes (personnages
 trouvés / équipes avec création par saisie et sélection / personnages de l'équipe, ajout
 et retrait de membres au clic, leader par équipe)

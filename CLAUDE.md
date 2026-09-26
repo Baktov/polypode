@@ -4,8 +4,8 @@
 
 Addon World of Warcraft Retail (Interface 120000) dédié au **multiboxing**.
 Objectif : gérer *simplement* plusieurs personnages joués simultanément dans plusieurs
-fenêtres/clients WoW sur la même machine (roster des personnages, désignation d'un
-leader, synchronisation d'infos de base entre clients). Même famille d'outils que
+fenêtres/clients WoW sur la même machine (roster des personnages, équipes avec un
+leader par équipe — pas de leader global —, synchronisation d'infos de base entre clients). Même famille d'outils que
 TeamManager, MAMA, EMA et DynamicBoxer, mais volontairement plus minimaliste : on
 n'ajoute une fonctionnalité que si elle sert directement cet objectif.
 

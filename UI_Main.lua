@@ -180,8 +180,7 @@ local function CharacterTooltip(key, hints)
 end
 
 -- "Nom-Royaume" coloré selon la classe, puis classe localisée et niveau en gris.
--- teamName (facultatif) : affichage dans une équipe, [leader] désigne alors le leader de
--- cette équipe au lieu du leader global (/poly leader).
+-- teamName (facultatif) : affichage dans une équipe, [leader] marque le leader de cette équipe.
 local function FormatCharacter(data, teamName)
 	local key = data.key
 	local entry = P.GetRoster()[key] or {}
@@ -205,13 +204,7 @@ local function FormatCharacter(data, teamName)
 	if key == P.GetCharKey() then
 		label = label .. " |cff999999(vous)|r"
 	end
-	local leader
-	if teamName then
-		leader = P.GetTeamLeader(teamName)
-	else
-		leader = P.db.leader
-	end
-	if leader == key then
+	if teamName and P.GetTeamLeader(teamName) == key then
 		label = label .. " |cffffd200[leader]|r"
 	end
 	return label
