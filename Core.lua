@@ -35,6 +35,7 @@ P.charDefaults = {
 	assistStartAttack = true, -- raccourci « Assister le leader » : /startattack après /assist
 	autoAcceptQuest = true, -- accepter les quêtes acceptées par le leader (Quests.lua)
 	autoValidateQuest = true, -- valider (continuer + terminer) les quêtes validées par le leader
+	autoSelectGossipQuest = true, -- choisir dans les dialogues de PNJ les quêtes choisies par le leader
 	-- selectedTeam : nom de l'équipe sélectionnée dans la fenêtre (nil par défaut),
 	-- conservé même si l'équipe manque momentanément (cf. UI_Main.lua).
 }

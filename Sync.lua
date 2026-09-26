@@ -330,6 +330,10 @@ function P.OnSyncMessage(message, channel, sender)
 		local questID, choice = strsplit(":", rest or "")
 		P.OnQuestRewardMessage(tonumber(questID), tonumber(choice), sender)
 		return
+	elseif kind == "GQAVAIL" or kind == "GQACTIVE" then
+		-- GQAVAIL / GQACTIVE:token:questID — quête choisie dans un dialogue de PNJ (Quests.lua).
+		P.OnGossipQuestMessage(kind, tonumber(rest), sender)
+		return
 	end
 
 	if kind ~= "HELLO" and kind ~= "HI" then

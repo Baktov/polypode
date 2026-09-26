@@ -23,9 +23,16 @@ local P = Polypode
 --      moins de 10 s ; sinon attente 60 s. Le choix est l'index de la récompense du leader
 --      (0 = pas de choix) : une quête à récompense au choix obligatoire reste à terminer
 --      à la main si l'index ne convient pas.
+-- SÉLECTION DANS LES DIALOGUES DE PNJ (option P.charDb.autoSelectGossipQuest) :
+--   GQAVAIL:token:questID — le leader choisit une quête disponible dans un dialogue de PNJ ;
+--   GQACTIVE:token:questID — il choisit une quête active (à rendre).
+--   Leader : hooks C_GossipInfo.SelectAvailableQuest / SelectActiveQuest (et équivalents
+--   anciens par index). Membre : si un dialogue est ouvert (quête présente dans la liste) ou
+--   l'a été il y a moins de 10 s, il choisit la même quête ; l'acceptation ou la validation
+--   automatique prend ensuite le relais. Pas d'attente si aucun dialogue n'est ouvert.
 -- Les délais de 10 s couvrent les addons de dialogue (DialogueUI, Immersion) qui ferment le
 -- panneau Blizzard alors que le serveur accepte encore la validation.
--- Les deux options sont propres à chaque personnage, des deux côtés (leader et membres).
+-- Les trois options sont propres à chaque personnage, des deux côtés (leader et membres).
 
 local ACCEPT_TIMEOUT = 30 -- secondes d'attente d'une quête à accepter (membre)
 local VALIDATE_TIMEOUT = 60 -- secondes d'attente d'une quête à valider (membre)
@@ -40,6 +47,7 @@ local progressReadyID, progressReadyAt -- dernier panneau de progression vu, et 
 local completeReadyID, completeReadyAt -- dernier panneau de récompenses vu, et quand
 local pendingValidateID -- quête à « continuer » dès que possible
 local pendingRewardID, pendingRewardChoice -- quête à terminer dès que possible, et choix
+local gossipReadyAt -- dernier dialogue de PNJ ouvert (GOSSIP_SHOW)
 
 -- Leader : [type .. questID] = GetTime() de la dernière annonce.
 local lastBroadcast = {}
@@ -50,6 +58,10 @@ end
 
 local function ValidateEnabled()
 	return P.charDb and P.charDb.autoValidateQuest
+end
+
+local function GossipEnabled()
+	return P.charDb and P.charDb.autoSelectGossipQuest
 end
 
 local function IsTeamLeader()
@@ -101,6 +113,13 @@ end
 local function AnnounceReward(questID, choice, reason)
 	if ValidateEnabled() then
 		Announce("QREWARD", questID, choice or 0, reason)
+	end
+end
+
+-- kind : "GQAVAIL" (quête disponible) ou "GQACTIVE" (quête active, à rendre).
+local function AnnounceGossipQuest(kind, questID, reason)
+	if GossipEnabled() then
+		Announce(kind, questID, nil, reason)
 	end
 end
 
@@ -223,6 +242,53 @@ function P.OnQuestRewardMessage(questID, choice, sender)
 	end
 end
 
+-- SÉLECTION DANS LES DIALOGUES (membre) ----------------------------------------------
+
+-- Par type d'annonce : liste des quêtes du dialogue, sélection par questID, et sélection
+-- ancienne par index (si l'API existe).
+local GOSSIP_QUEST_API = {
+	GQAVAIL = {
+		list = C_GossipInfo and C_GossipInfo.GetAvailableQuests,
+		select = C_GossipInfo and C_GossipInfo.SelectAvailableQuest,
+		legacy = SelectGossipAvailableQuest,
+	},
+	GQACTIVE = {
+		list = C_GossipInfo and C_GossipInfo.GetActiveQuests,
+		select = C_GossipInfo and C_GossipInfo.SelectActiveQuest,
+		legacy = SelectGossipActiveQuest,
+	},
+}
+
+-- Réception de GQAVAIL / GQACTIVE (Sync.lua) : choisit la même quête dans le dialogue ouvert.
+function P.OnGossipQuestMessage(kind, questID, sender)
+	local api = GOSSIP_QUEST_API[kind]
+	if not GossipEnabled() or not api or not questID then
+		return
+	end
+	local quests = api.list and api.list() or nil
+	local hasQuests = quests and #quests > 0
+	if not hasQuests and not IsRecent(gossipReadyAt) then
+		P.Debug(kind .. " quête " .. questID .. " ignoré : aucun dialogue ouvert")
+		return
+	end
+	local index
+	for i, info in ipairs(quests or {}) do
+		if info.questID == questID then
+			index = i
+			break
+		end
+	end
+	-- Quête absente de la liste mais dialogue vu récemment (addon de dialogue) : on tente.
+	if (index or not hasQuests) and api.select then
+		api.select(questID)
+		P.Debug("Quête " .. questID .. " choisie dans le dialogue (" .. kind .. ", de "
+			.. tostring(sender) .. ")")
+	elseif index and api.legacy then
+		api.legacy(index)
+		P.Debug("Quête " .. questID .. " choisie dans le dialogue (index " .. index .. ")")
+	end
+end
+
 -- ÉVÉNEMENTS (Events.lua) ------------------------------------------------------------
 
 function P.OnQuestEvent(event, arg1)
@@ -296,6 +362,11 @@ function P.OnQuestEvent(event, arg1)
 	elseif event == "QUEST_FINISHED" then
 		detailQuestID = nil
 		progressQuestID = nil
+
+	elseif event == "GOSSIP_SHOW" then
+		-- Le serveur accepte une sélection pendant quelques secondes, même si un addon de
+		-- dialogue a masqué la fenêtre Blizzard.
+		gossipReadyAt = GetTime()
 	end
 end
 
@@ -330,4 +401,28 @@ if QuestFrameCompleteQuestButton then
 		local choice = QuestInfoFrame and QuestInfoFrame.itemChoice or 0
 		AnnounceReward(CurrentQuestID(), choice, "bouton Terminer")
 	end)
+end
+
+-- Leader : choix d'une quête dans un dialogue de PNJ (clic sur l'icône de quête).
+if C_GossipInfo and C_GossipInfo.SelectAvailableQuest then
+	hooksecurefunc(C_GossipInfo, "SelectAvailableQuest", function(questID)
+		AnnounceGossipQuest("GQAVAIL", questID, "SelectAvailableQuest")
+	end)
+end
+if C_GossipInfo and C_GossipInfo.SelectActiveQuest then
+	hooksecurefunc(C_GossipInfo, "SelectActiveQuest", function(questID)
+		AnnounceGossipQuest("GQACTIVE", questID, "SelectActiveQuest")
+	end)
+end
+-- Équivalents anciens (par index), s'ils existent : questID retrouvé dans la liste.
+for kind, api in pairs(GOSSIP_QUEST_API) do
+	local legacyName = kind == "GQAVAIL" and "SelectGossipAvailableQuest" or "SelectGossipActiveQuest"
+	if api.legacy and api.list then
+		hooksecurefunc(legacyName, function(index)
+			local info = (api.list() or {})[index]
+			if info and info.questID then
+				AnnounceGossipQuest(kind, info.questID, legacyName)
+			end
+		end)
+	end
 end

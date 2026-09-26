@@ -8,8 +8,9 @@ frame:RegisterEvent("ADDON_LOADED")
 frame:RegisterEvent("PLAYER_LOGIN")
 frame:RegisterEvent("UPDATE_BINDINGS") -- touches modifiées dans le panneau Raccourcis
 frame:RegisterEvent("PLAYER_REGEN_ENABLED") -- sortie de combat : mises à jour différées
--- Acceptation et validation automatiques des quêtes (Quests.lua)
+-- Acceptation, validation et sélection (dialogues de PNJ) automatiques des quêtes (Quests.lua)
 local QUEST_EVENTS = {
+	GOSSIP_SHOW = true,
 	QUEST_ACCEPTED = true,
 	QUEST_DETAIL = true,
 	QUEST_DATA_LOAD_RESULT = true,
