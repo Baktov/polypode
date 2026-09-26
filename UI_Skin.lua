@@ -47,3 +47,16 @@ function P.SkinFrame(frame)
 		S:HandleFrame(frame)
 	end
 end
+
+-- Skinne un cadre intérieur (sous-panneau d'une fenêtre). Même priorité que P.SkinFrame.
+function P.SkinPanel(panel)
+	if euiSkin and euiSkin.IsEnabled() then
+		euiSkin.Panel(panel, { inset = true })
+		return
+	end
+
+	-- ElvUI ajoute SetTemplate à tous les frames une fois chargé.
+	if ElvUI and panel.SetTemplate then
+		panel:SetTemplate("Transparent")
+	end
+end

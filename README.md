@@ -36,6 +36,17 @@ automatique de base entre vos clients — sans configuration complexe.
 
 ---
 
+## Fenêtre principale
+
+Ouverte par `/poly ui`, le raccourci clavier ou le bouton de minimap. Deux cadres côte à côte :
+
+- **Personnages trouvés** : tous les personnages de votre équipe détectés via les canaux
+  (groupe, raid, guilde), triés par nom. Nom en couleur de classe, puis classe et niveau ;
+  `(vous)` marque le personnage courant, `[leader]` le leader désigné.
+- **Équipes gérées** : emplacement réservé, contenu à définir dans une prochaine version.
+
+---
+
 ## Commandes slash (`/poly` ou `/polypode`)
 
 | Commande | Description |
@@ -96,8 +107,8 @@ La fenêtre s'adapte automatiquement à votre interface, sans configuration :
 
 | Interface détectée | Rendu |
 |---|---|
-| **EllesmereUI** | Style EllesmereUI (fond, bordure, barre de titre avec titre centré, bouton de fermeture) selon votre thème. Désactivable dans EllesmereUI → Blizz UI Enhanced → Blizzard Window Skins → Third-Party Addons (nécessite le module EllesmereUI Blizzard Skin). |
-| **ElvUI** | Style ElvUI (fond et bouton de fermeture). |
+| **EllesmereUI** | Style EllesmereUI (fond, bordure, barre de titre avec titre centré, cadres intérieurs, bouton de fermeture) selon votre thème. Désactivable dans EllesmereUI → Blizz UI Enhanced → Blizzard Window Skins → Third-Party Addons (nécessite le module EllesmereUI Blizzard Skin). |
+| **ElvUI** | Style ElvUI (fond, cadres intérieurs et bouton de fermeture). |
 | Aucune | Fond sombre générique. |
 
 Si EllesmereUI et ElvUI sont tous deux chargés, EllesmereUI est prioritaire (sauf si
@@ -107,9 +118,10 @@ vous avez désactivé le skin de Polypode dans ses options).
 
 ## État du projet
 
-Version `0.4.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
-automatique aux annonces, fenêtre de liste skinnée (EllesmereUI/ElvUI), bouton de
-minimap (masquable), panneau d'options, commandes, raccourci clavier. Pistes envisagées pour la suite,
+Version `0.5.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
+automatique aux annonces, fenêtre à deux cadres (personnages trouvés / équipes gérées)
+skinnée (EllesmereUI/ElvUI), bouton de minimap (masquable), panneau d'options,
+commandes, raccourci clavier. Pistes envisagées pour la suite,
 à activer seulement si le besoin se confirme (voir la règle de simplicité dans
 `CLAUDE.md`) :
 
@@ -118,6 +130,8 @@ minimap (masquable), panneau d'options, commandes, raccourci clavier. Pistes env
   `P.GetTeamToken()` dans `Sync.lua`).
 - Réannonce à l'entrée en groupe (`GROUP_ROSTER_UPDATE`) pour les personnages sans
   guilde commune connectés avant d'être groupés.
+- **Équipes gérées** : définir ce qu'est une équipe et remplir le cadre de droite.
+- Défilement de la liste des personnages trouvés au-delà d'une dizaine de personnages.
 - Suivi automatique du leader (`follow`) et assist de cible.
 - Invitation automatique du groupe depuis le roster.
 - Skin des textes de la fenêtre (police EllesmereUI via `S.Font`).

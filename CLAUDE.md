@@ -21,8 +21,8 @@ n'ajoute une fonctionnalité que si elle sert directement cet objectif.
 |---|---|
 | `Core.lua` | Table globale `Polypode` (alias local `P`), SavedVariables, CRUD du roster |
 | `Sync.lua` | Broadcast/réception de messages addon (`C_ChatInfo`), token d'équipe (`P.GetTeamToken`, hash du BattleTag), annonce `HELLO` / réponse `HI` |
-| `UI_Skin.lua` | Skinning conditionnel : EllesmereUI (`EllesmereUI.RegisterSkin`, prioritaire) puis ElvUI |
-| `UI_Main.lua` | Fenêtre principale : `BuildUI`, `RefreshUI`, `ToggleUI` |
+| `UI_Skin.lua` | Skinning conditionnel : EllesmereUI (`EllesmereUI.RegisterSkin`, prioritaire) puis ElvUI. `P.SkinFrame` (fenêtre top-level), `P.SkinPanel` (cadre intérieur) |
+| `UI_Main.lua` | Fenêtre principale : `BuildUI`, `RefreshUI`, `ToggleUI`. Deux cadres : `P.ui.charPanel` (personnages trouvés = roster trié) et `P.ui.teamPanel` (équipes gérées, contenu **à définir**, placeholder `P.ui.teamEmptyText`) |
 | `UI_Minimap.lua` | Bouton de minimap sans librairie (`P.BuildMinimapButton`, appelé à `PLAYER_LOGIN`), `P.SetMinimapButtonShown`, état dans `P.db.minimap` (`angle`, `hide`) |
 | `UI_Options.lua` | Panneau Options → AddOns via l'API `Settings` (`P.BuildOptions` à `PLAYER_LOGIN`, `P.OpenOptions`) |
 | `Commands.lua` | Commande slash `/poly` (`/polypode`) et fonctions globales de keybinding |
@@ -103,7 +103,8 @@ par défaut explicite gérée par `CopyDefaults`.
 → Créer dans `UI_Main.lua`, référencer via `P.ui.monWidget`, appeler `P.SkinFrame(widget)`
 si c'est un frame top-level. Exposer le titre en `frame.TitleText` et le bouton de fermeture
 en `frame.CloseButton` : `P.SkinFrame` les retrouve sous ces noms (le skin EllesmereUI recentre
-le titre dans sa barre de titre de 25 px, ElvUI skinne le `CloseButton`).
+le titre dans sa barre de titre de 25 px, ElvUI skinne le `CloseButton`). Un cadre intérieur
+(sous-panneau) se skinne avec `P.SkinPanel(panel)`.
 
 ### Ajouter une option au panneau (Options → AddOns → Polypode)
 → Dans `P.BuildOptions` (`UI_Options.lua`) : `Settings.RegisterProxySetting` avec getter/setter
