@@ -38,6 +38,7 @@ P.charDefaults = {
 	autoSelectGossip = true, -- suivre les dialogues de PNJ du leader (quêtes, options, fermeture)
 	autoSkipCinematic = true, -- passer les cinématiques passées par le leader (Cinematics.lua)
 	autoTaxi = true, -- prendre le vol pris par le leader chez un maître de vol (Taxi.lua)
+	autoEnterInstance = true, -- suivre le leader en gouffre (entrée, sortie) et par portail (Instances.lua)
 	-- selectedTeam : nom de l'équipe sélectionnée dans la fenêtre (nil par défaut),
 	-- conservé même si l'équipe manque momentanément (cf. UI_Main.lua).
 }

@@ -340,6 +340,9 @@ local LEADER_ONLY = {
 	CLOSEUI = true,
 	CINESKIP = true,
 	TAXI = true,
+	DELVEENTER = true,
+	DELVEEXIT = true,
+	INSTENTER = true,
 }
 
 -- Vrai si l'expéditeur (Nom-Royaume du message addon) est la clé de roster key.
@@ -408,6 +411,18 @@ function P.OnSyncMessage(message, channel, sender)
 	elseif kind == "TAXI" then
 		-- TAXI:token:nomDestination — le leader a pris un vol (Taxi.lua).
 		P.OnTaxiMessage(rest, sender)
+		return
+	elseif kind == "DELVEENTER" then
+		-- DELVEENTER:token:palier — le leader entre dans un gouffre (Instances.lua).
+		P.OnDelveEnterMessage(tonumber(rest), sender)
+		return
+	elseif kind == "DELVEEXIT" then
+		-- DELVEEXIT:token — le leader vote la sortie du gouffre (Instances.lua).
+		P.OnDelveExitMessage(sender)
+		return
+	elseif kind == "INSTENTER" then
+		-- INSTENTER:token:portal — le leader entre par un portail d'instance (Instances.lua).
+		P.OnInstanceEnterMessage(rest, sender)
 		return
 	end
 

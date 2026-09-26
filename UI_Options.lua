@@ -165,6 +165,27 @@ function P.BuildOptions()
 		.. "même vol si sa carte de vol est ouverte et qu'il connaît la destination. Sur le leader, "
 		.. "annonce ses vols au groupe. Réglage propre à ce personnage.")
 
+	-- Gouffres (entrée, sortie) et portails d'instance (par personnage, cf. Instances.lua).
+	local instanceSetting = Settings.RegisterProxySetting(
+		category,
+		"POLYPODE_AUTO_ENTER_INSTANCE",
+		Settings.VarType.Boolean,
+		"Entrer automatiquement en instance (gouffre, portail)",
+		Settings.Default.True,
+		function()
+			return P.charDb.autoEnterInstance
+		end,
+		function(value)
+			P.charDb.autoEnterInstance = value
+		end
+	)
+	Settings.CreateCheckbox(category, instanceSetting,
+		"Quand le leader de l'équipe choisit le palier d'un gouffre, ce personnage choisit le même "
+		.. "si sa fenêtre de palier est ouverte ; quand le leader vote la sortie du gouffre, il vote "
+		.. "« Oui » aussi (jusqu'à 30 secondes après) ; quand le leader confirme l'entrée par un "
+		.. "portail d'instance, il confirme aussi. Sur le leader, annonce ces actions au groupe. "
+		.. "Réglage propre à ce personnage.")
+
 	Settings.RegisterAddOnCategory(category)
 	P.optionsCategory = category
 end
