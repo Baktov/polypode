@@ -44,7 +44,8 @@ end
 -- le texte d'une ligne. Remplir avec SetListData(panel, items), items = liste de tables.
 -- top : décalage depuis le haut du cadre (défaut : juste sous l'en-tête).
 -- opts (facultatif) : lignes cliquables (gauche et droit) avec opts.onClick(data, mouseButton) ;
--- opts.isSelected(data) met la ligne en surbrillance.
+-- opts.isSelected(data) met la ligne en surbrillance. opts.tooltip(data) renvoie les lignes
+-- de l'infobulle affichée au survol (la première sert de titre).
 local function CreateScrollList(panel, formatFn, top, opts)
 	top = top or HEADER_HEIGHT
 	opts = opts or {}
@@ -55,6 +56,20 @@ local function CreateScrollList(panel, formatFn, top, opts)
 	local scrollBar = CreateFrame("EventFrame", nil, panel, "MinimalScrollBar")
 	scrollBar:SetPoint("TOPLEFT", scrollBox, "TOPRIGHT", 4, 0)
 	scrollBar:SetPoint("BOTTOMLEFT", scrollBox, "BOTTOMRIGHT", 4, 0)
+
+	-- Infobulle de la ligne survolée, construite depuis la donnée courante de la ligne.
+	local function ShowRowTooltip(row)
+		local lines = opts.tooltip(row.data)
+		GameTooltip:SetOwner(row, "ANCHOR_RIGHT")
+		for i, line in ipairs(lines) do
+			if i == 1 then
+				GameTooltip:AddLine(line)
+			else
+				GameTooltip:AddLine(line, 1, 1, 1)
+			end
+		end
+		GameTooltip:Show()
+	end
 
 	local view = CreateScrollBoxListLinearView()
 	view:SetElementExtent(ROW_HEIGHT)
@@ -76,8 +91,21 @@ local function CreateScrollList(panel, formatFn, top, opts)
 				highlight:SetAllPoints()
 				highlight:SetColorTexture(1, 1, 1, 0.08)
 			end
+
+			if opts.tooltip then
+				row:EnableMouse(true)
+				row:SetScript("OnEnter", ShowRowTooltip)
+				row:SetScript("OnLeave", GameTooltip_Hide)
+			end
 		end
+		row.data = data
 		row.text:SetText(formatFn(data))
+
+		-- Après un clic, la liste est reconstruite sous le curseur : l'infobulle ouverte
+		-- sur cette ligne est rafraîchie pour refléter le nouvel état.
+		if opts.tooltip and GameTooltip:IsOwned(row) then
+			ShowRowTooltip(row)
+		end
 
 		if opts.onClick then
 			row.selected:SetShown(opts.isSelected and opts.isSelected(data) or false)
@@ -227,6 +255,21 @@ function P.BuildUI()
 			local members = P.GetTeamMembers(selectedTeam)
 			return members and members[data.key] or false
 		end,
+		tooltip = function(data)
+			if not selectedTeam then
+				return { data.key, "Sélectionnez d'abord une équipe pour y ajouter ce personnage." }
+			end
+			local members = P.GetTeamMembers(selectedTeam)
+			local status = (members and members[data.key])
+				and "|cff00ff00Membre de l'équipe « " .. selectedTeam .. " »|r"
+				or "|cff999999Pas dans l'équipe « " .. selectedTeam .. " »|r"
+			return {
+				data.key,
+				status,
+				"Clic gauche : ajouter à l'équipe",
+				"Clic droit : retirer de l'équipe",
+			}
+		end,
 	})
 	charPanel.emptyText:SetText("Aucun personnage trouvé")
 
@@ -288,6 +331,9 @@ function P.BuildUI()
 				P.RemoveTeamMember(selectedTeam, data.key)
 				P.RefreshUI()
 			end
+		end,
+		tooltip = function(data)
+			return { data.key, "Clic droit : retirer de l'équipe « " .. (selectedTeam or "") .. " »" }
 		end,
 	})
 
