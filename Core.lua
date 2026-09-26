@@ -105,9 +105,6 @@ function P.AddCharacter(name, realm, class, level)
 		entry.level = level or entry.level
 	end
 
-	-- Un personnage qui s'annonce a Polypode : ce n'est pas (ou plus) un ajout manuel.
-	entry.manual = nil
-
 	-- Un personnage qui s'annonce est bien là : il n'est plus retiré, avec une version plus
 	-- récente que la pierre tombale pour qu'elle ne revienne pas par synchro.
 	if entry.removed then
@@ -142,7 +139,6 @@ function P.AddTargetCharacter()
 	entry.realm = realm
 	entry.class = class
 	entry.level = level and level > 0 and level or entry.level
-	entry.manual = true -- sans Polypode : ne s'annonce pas, toujours affiché dans la liste
 	entry.removed = nil
 	entry.lastSeen = time()
 	CharacterChanged(key)
@@ -187,7 +183,7 @@ end
 -- seulement si sa version est plus récente que la locale. Les équipes ne sont pas
 -- touchées : le client d'origine synchronise lui-même ses équipes modifiées.
 -- Renvoie true si appliqué.
-function P.ApplyCharacterSync(key, updated, removed, manual, name, realm, class, level)
+function P.ApplyCharacterSync(key, updated, removed, name, realm, class, level)
 	local entry = P.db.roster[key]
 	if entry and (entry.updated or 0) >= updated then
 		return false
@@ -199,7 +195,6 @@ function P.ApplyCharacterSync(key, updated, removed, manual, name, realm, class,
 	entry.class = class or entry.class
 	entry.level = level or entry.level
 	entry.removed = removed or nil
-	entry.manual = manual or nil
 	entry.updated = updated
 	entry.lastSeen = entry.lastSeen or time()
 	return true

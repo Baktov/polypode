@@ -53,17 +53,12 @@ automatique de base entre vos clients — sans configuration complexe.
 
 Ouverte par `/poly ui`, le raccourci clavier ou le bouton de minimap. Trois cadres côte à côte :
 
-- **Personnages trouvés** : les personnages **connectés maintenant** — vous, et vos autres
-  Polypode qui ont répondu à l'annonce (groupe, raid, guilde) — plus ceux ajoutés par la
-  cible, triés par nom. Nom en couleur de classe, puis classe et niveau ; `(vous)` marque le
-  personnage courant, `(ajouté)` un personnage ajouté par la cible (sans Polypode, sa
-  connexion ne peut pas être vérifiée, il reste affiché). Les personnages hors ligne restent
-  mémorisés (équipes, invitations) mais n'apparaissent plus dans cette liste.
+- **Personnages trouvés** : tous les personnages de votre équipe détectés via les canaux
+  (groupe, raid, guilde), triés par nom. Nom en couleur de classe, puis classe et niveau ;
+  `(vous)` marque le personnage courant.
   Bouton **Ajouter la cible** (en haut du cadre) : ajoute le joueur ciblé à la liste, même
   s'il n'a pas Polypode (ex. un ami) ; il peut alors rejoindre une équipe et être invité
   avec elle. L'ajout est partagé avec vos autres Polypode connectés.
-  Petit bouton **Actualiser** (à droite) : relance la recherche — la liste est vidée puis
-  se remplit des personnages qui répondent encore ; désactivé 3 secondes après un clic.
   Quand une équipe est sélectionnée : **clic gauche** sur un personnage l'ajoute à l'équipe,
   **clic droit** l'en retire ; les membres de l'équipe sont surlignés en doré. Une infobulle au survol donne le nom du personnage, rappelle ces actions, puis liste les équipes dont il fait déjà partie (l'équipe sélectionnée en vert).
 - **Équipes** : saisir un nom dans le champ « Nom de l'équipe » puis valider avec
@@ -172,10 +167,10 @@ vous avez désactivé le skin de Polypode dans ses options).
 
 ## État du projet
 
-Version `0.16.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
+Version `0.16.1` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
 automatique aux annonces, fenêtre redimensionnable à trois listes défilantes (personnages
 trouvés / équipes avec création par saisie et sélection / personnages de l'équipe, ajout
-et retrait de membres au clic, leader par équipe, invitation de toute l'équipe, synchronisation automatique et versionnée des équipes, ajout du joueur ciblé, liste des connectés actualisable)
+et retrait de membres au clic, leader par équipe, invitation de toute l'équipe, synchronisation automatique et versionnée des équipes, ajout du joueur ciblé)
 skinnée (EllesmereUI/ElvUI), bouton de minimap (masquable), panneau d'options,
 commandes, raccourci clavier. Pistes envisagées pour la suite,
 à activer seulement si le besoin se confirme (voir la règle de simplicité dans

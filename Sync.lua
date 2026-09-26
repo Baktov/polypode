@@ -57,20 +57,9 @@ local THROTTLED = {
 local sendQueue = {}
 local pumping = false
 
--- Personnages connectés, vus pendant la session via HELLO/HI (vidé par P.RefreshOnline) :
--- onlineChars[nom complet de chuchotement] = clé du roster, onlineByKey[clé] = nom complet.
--- Cibles de la synchro automatique (chuchoter un personnage hors ligne provoque une erreur)
--- et contenu de la liste « Personnages trouvés ».
+-- Personnages connectés, vus pendant la session via HELLO/HI : [Nom-Royaume] = true.
+-- Cibles de la synchro automatique (chuchoter un personnage hors ligne provoque une erreur).
 local onlineChars = {}
-local onlineByKey = {}
-
-local function SetOffline(fullName)
-	local key = onlineChars[fullName]
-	if key then
-		onlineByKey[key] = nil
-	end
-	onlineChars[fullName] = nil
-end
 
 -- Chuchotements addon récents : [nom tel qu'affiché par l'erreur] = GetTime() de l'envoi.
 local recentWhispers = {}
@@ -93,10 +82,7 @@ if PLAYER_NOT_FOUND and ChatFrame_AddMessageEventFilter then
 		local name = text and text:match(PLAYER_NOT_FOUND)
 		local sentAt = name and recentWhispers[name]
 		if sentAt and GetTime() - sentAt < WHISPER_ERROR_WINDOW then
-			SetOffline(FullName(name))
-			if P.RefreshUI then
-				P.RefreshUI()
-			end
+			onlineChars[FullName(name)] = nil
 			return true
 		end
 	end)
@@ -151,20 +137,6 @@ function P.SayHello(kind, channel)
 		UnitName("player"), GetRealmName(), class, level), channel)
 end
 
--- Vrai si le personnage est connecté : soi-même, ou vu via HELLO/HI depuis le dernier
--- rafraîchissement.
-function P.IsCharacterOnline(key)
-	return key == P.GetCharKey() or onlineByKey[key] ~= nil
-end
-
--- Relance la recherche des personnages connectés : oublie ceux vus jusqu'ici et renvoie
--- une annonce HELLO ; seuls les clients encore connectés répondent (HI) et réapparaissent.
-function P.RefreshOnline()
-	wipe(onlineChars)
-	wipe(onlineByKey)
-	P.SayHello("HELLO")
-end
-
 -- Taille maximale d'un message addon (octets), imposée par le client WoW.
 local MAX_MESSAGE_LENGTH = 255
 
@@ -192,17 +164,15 @@ end
 -- personnages sans Polypode ne s'annoncent jamais, les autres clients doivent la recevoir.
 -- target : un destinataire précis, sinon les clients connectés.
 -- Format : CHAR:token:version:flag:classe:niveau:nom:royaume
---   flag "A" = actif ajouté à la main (sans Polypode), "P" = actif (Polypode), "R" = retiré ;
---   royaume en dernier (peut contenir des espaces).
+--   flag "A" = actif, "R" = retiré ; royaume en dernier (peut contenir des espaces).
 function P.SyncCharacter(key, target)
 	local token = P.GetTeamToken()
 	local entry = P.db.roster[key]
 	if not token or not entry or not entry.updated or not entry.name or not entry.realm then
 		return
 	end
-	local flag = entry.removed and "R" or (entry.manual and "A" or "P")
-	local message = string.format("CHAR:%s:%d:%s:%s:%s:%s:%s", token, entry.updated, flag,
-		entry.class or "", entry.level or "", entry.name, entry.realm)
+	local message = string.format("CHAR:%s:%d:%s:%s:%s:%s:%s", token, entry.updated,
+		entry.removed and "R" or "A", entry.class or "", entry.level or "", entry.name, entry.realm)
 	for to in pairs(ResolveTargets(target)) do
 		P.Broadcast(message, "WHISPER", to)
 		P.Debug("Personnage " .. key .. " envoyé à " .. to)
@@ -223,11 +193,11 @@ local function OnCharMessage(rest, sender)
 	local version, flag, class, level, name, realm = strsplit(":", rest or "", 6)
 	local updated = tonumber(version)
 	if not updated or not name or name == "" or not realm or realm == ""
-		or (flag ~= "A" and flag ~= "P" and flag ~= "R") then
+		or (flag ~= "A" and flag ~= "R") then
 		return
 	end
 	local key = P.GetCharKey(name, realm)
-	if P.ApplyCharacterSync(key, updated, flag == "R", flag == "A", name, realm,
+	if P.ApplyCharacterSync(key, updated, flag == "R", name, realm,
 		class ~= "" and class or nil, tonumber(level)) then
 		P.Debug("Personnage " .. key .. " reçu de " .. tostring(sender))
 		if P.RefreshUI then
@@ -362,21 +332,19 @@ function P.OnSyncMessage(message, channel, sender)
 		return
 	end
 
-	-- L'expéditeur est connecté : il apparaît dans « Personnages trouvés » et recevra les
-	-- synchros automatiques (enregistré avant le rafraîchissement de la fenêtre).
-	local key = P.AddCharacter(name, realm, class, tonumber(level))
-	local senderName = FullName(sender)
-	onlineChars[senderName] = key
-	onlineByKey[key] = senderName
+	P.AddCharacter(name, realm, class, tonumber(level))
 	if P.RefreshUI then
 		P.RefreshUI()
 	end
-	P.Debug("Roster mis à jour via sync : " .. key .. " (de " .. sender .. ")")
+	P.Debug("Roster mis à jour via sync : " .. name .. "-" .. realm .. " (de " .. sender .. ")")
 
 	-- Répond à une annonce spontanée pour que le nouvel arrivant nous connaisse aussi.
 	if kind == "HELLO" then
 		P.SayHello("HI", channel)
 	end
+
+	-- L'expéditeur est connecté : il recevra les synchros automatiques d'équipes.
+	onlineChars[FullName(sender)] = true
 
 	-- Échange du roster manuel puis des équipes dans les deux sens (HELLO puis HI) : chaque
 	-- client récupère les versions plus récentes de l'autre, même s'il a démarré sur une

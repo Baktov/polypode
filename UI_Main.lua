@@ -16,7 +16,6 @@ local PANEL_GAP = 10
 local HEADER_HEIGHT = 26
 local ROW_HEIGHT = 20
 local INPUT_HEIGHT = 28 -- ligne de saisie (champ + bouton) sous l'en-tête d'un cadre
-local REFRESH_COOLDOWN = 3 -- secondes de désactivation du bouton d'actualisation
 
 -- Cadre intérieur avec un en-tête, skinnable via P.SkinPanel.
 local function CreatePanel(parent, title)
@@ -225,8 +224,6 @@ local function FormatCharacter(data, teamName)
 
 	if key == P.GetCharKey() then
 		label = label .. " |cff999999(vous)|r"
-	elseif entry.manual then
-		label = label .. " |cff999999(ajouté)|r"
 	end
 	if teamName and P.GetTeamLeader(teamName) == key then
 		label = label .. " |cffffd200[leader]|r"
@@ -294,7 +291,7 @@ function P.BuildUI()
 	local addTargetBtn = CreateFrame("Button", nil, charPanel, "UIPanelButtonTemplate")
 	addTargetBtn:SetHeight(22)
 	addTargetBtn:SetPoint("TOPLEFT", 10, -HEADER_HEIGHT + 2)
-	addTargetBtn:SetPoint("RIGHT", -38, 0) -- place du bouton d'actualisation à droite
+	addTargetBtn:SetPoint("RIGHT", -10, 0)
 	addTargetBtn:SetText("Ajouter la cible")
 	addTargetBtn:SetScript("OnClick", function()
 		local ok, result = P.AddTargetCharacter()
@@ -315,35 +312,6 @@ function P.BuildUI()
 		GameTooltip:Show()
 	end)
 	addTargetBtn:SetScript("OnLeave", GameTooltip_Hide)
-
-	-- Petit bouton d'actualisation : relance la recherche des personnages connectés.
-	-- Désactivé quelques secondes après un clic, le temps que les réponses arrivent.
-	local refreshBtn = CreateFrame("Button", nil, charPanel)
-	refreshBtn:SetSize(22, 22)
-	refreshBtn:SetPoint("LEFT", addTargetBtn, "RIGHT", 6, 0)
-	refreshBtn:SetNormalTexture("Interface\\Buttons\\UI-RefreshButton")
-	refreshBtn:SetPushedTexture("Interface\\Buttons\\UI-RefreshButton-Down")
-	refreshBtn:SetHighlightTexture("Interface\\Buttons\\UI-RefreshButton", "ADD")
-	refreshBtn:SetMotionScriptsWhileDisabled(true)
-	refreshBtn:SetScript("OnClick", function(self)
-		P.RefreshOnline()
-		P.RefreshUI()
-		self:Disable()
-		self:GetNormalTexture():SetDesaturated(true)
-		C_Timer.After(REFRESH_COOLDOWN, function()
-			self:Enable()
-			self:GetNormalTexture():SetDesaturated(false)
-		end)
-	end)
-	refreshBtn:SetScript("OnEnter", function(self)
-		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-		GameTooltip:AddLine("Actualiser")
-		GameTooltip:AddLine("Relance la recherche : la liste ne garde que les personnages "
-			.. "connectés qui répondent (vos autres Polypode), plus vous et les personnages "
-			.. "ajoutés par la cible.", 1, 1, 1, true)
-		GameTooltip:Show()
-	end)
-	refreshBtn:SetScript("OnLeave", GameTooltip_Hide)
 
 	-- Clic gauche : ajoute à l'équipe sélectionnée ; clic droit : l'en retire.
 	-- Les membres de l'équipe sélectionnée sont surlignés.
@@ -374,7 +342,7 @@ function P.BuildUI()
 			})
 		end,
 	})
-	charPanel.emptyText:SetText("Aucun personnage connecté trouvé")
+	charPanel.emptyText:SetText("Aucun personnage trouvé")
 
 	-- 2. Équipes : saisie d'un nom + liste des équipes créées.
 	local teamPanel = CreatePanel(f, "Équipes")
@@ -513,7 +481,6 @@ function P.BuildUI()
 	ui.memberPanel = memberPanel
 	ui.inviteButton = inviteBtn
 	ui.addTargetButton = addTargetBtn
-	ui.refreshButton = refreshBtn
 
 	if P.SkinFrame then
 		P.SkinFrame(f)
@@ -537,15 +504,7 @@ function P.RefreshUI()
 		selectedTeam = nil
 	end
 
-	-- Personnages trouvés = connectés maintenant (soi + réponses HELLO/HI depuis la dernière
-	-- actualisation) + ajoutés par la cible (sans Polypode, leur connexion est inconnue).
-	local found = {}
-	for key, entry in pairs(P.GetRoster()) do
-		if entry.manual or P.IsCharacterOnline(key) then
-			found[key] = true
-		end
-	end
-	SetListData(ui.charPanel, SortedKeyItems(found))
+	SetListData(ui.charPanel, SortedKeyItems(P.GetRoster()))
 
 	local teams = {}
 	for name in pairs(P.GetTeams()) do
