@@ -201,7 +201,6 @@ commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, in
   guilde commune connectés avant d'être groupés.
 - **Équipes** : renommer/supprimer une équipe ; usage des équipes (conversion en raid automatique, leader,
   synchronisation des suppressions d'équipe le jour où la suppression existera).
-- Suivi automatique du leader (`follow`) et assist de cible.
 - Invitation automatique du groupe depuis le roster.
 - Skin des textes de la fenêtre (police EllesmereUI via `S.Font`).
 
