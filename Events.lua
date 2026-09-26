@@ -8,11 +8,19 @@ frame:RegisterEvent("ADDON_LOADED")
 frame:RegisterEvent("PLAYER_LOGIN")
 frame:RegisterEvent("UPDATE_BINDINGS") -- touches modifiées dans le panneau Raccourcis
 frame:RegisterEvent("PLAYER_REGEN_ENABLED") -- sortie de combat : mises à jour différées
--- Acceptation automatique des quêtes (Quests.lua)
-frame:RegisterEvent("QUEST_ACCEPTED")
-frame:RegisterEvent("QUEST_DETAIL")
-frame:RegisterEvent("QUEST_DATA_LOAD_RESULT")
-frame:RegisterEvent("QUEST_FINISHED")
+-- Acceptation et validation automatiques des quêtes (Quests.lua)
+local QUEST_EVENTS = {
+	QUEST_ACCEPTED = true,
+	QUEST_DETAIL = true,
+	QUEST_DATA_LOAD_RESULT = true,
+	QUEST_PROGRESS = true,
+	QUEST_COMPLETE = true,
+	QUEST_TURNED_IN = true,
+	QUEST_FINISHED = true,
+}
+for questEvent in pairs(QUEST_EVENTS) do
+	frame:RegisterEvent(questEvent)
+end
 
 frame:SetScript("OnEvent", function(self, event, ...)
 	if event == "ADDON_LOADED" then
@@ -36,8 +44,7 @@ frame:SetScript("OnEvent", function(self, event, ...)
 		end
 	elseif event == "PLAYER_REGEN_ENABLED" then
 		P.ApplyPendingKeybinds()
-	elseif event == "QUEST_ACCEPTED" or event == "QUEST_DETAIL"
-		or event == "QUEST_DATA_LOAD_RESULT" or event == "QUEST_FINISHED" then
+	elseif QUEST_EVENTS[event] then
 		P.OnQuestEvent(event, ...)
 	elseif event == "CHAT_MSG_ADDON" then
 		local prefix, message, channel, sender = ...

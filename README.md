@@ -42,9 +42,9 @@ automatique de base entre vos clients — sans configuration complexe.
   déconnexion, tous doivent donc avoir les mêmes équipes en mémoire.
   Les messages « Aucun joueur nommé … n'est connecté » provoqués par la synchro vers un
   personnage hors ligne sont masqués.
-- **Quêtes** : quand le leader de l'équipe accepte une quête, les autres personnages du groupe
-  l'acceptent automatiquement dès qu'elle leur est proposée (option « Accepter automatiquement
-  les quêtes », voir Options).
+- **Quêtes** : quand le leader de l'équipe accepte ou rend une quête, les autres personnages du
+  groupe l'acceptent ou la rendent aussi, dès que le PNJ leur propose la quête (options « Accepter
+  automatiquement les quêtes » et « Valider automatiquement les quêtes », voir Options).
 - Les **ajouts et retraits manuels de personnages** (bouton « Ajouter la cible »,
   `/poly remove`) sont synchronisés de la même façon, avec la même règle de version : un
   personnage retiré ne réapparaît pas via un client qui l'avait encore (il réapparaît
@@ -170,6 +170,7 @@ fenêtre principale) :
 | Mode debug | Non | Affiche dans le chat les messages de diagnostic (synchro, invitations...). Réglage **par personnage** : on peut l'activer sur une seule fenêtre |
 | Attaquer après l'assistance | Oui | Le raccourci « Assister le leader » lance aussi l'attaque automatique (`/startattack`) sur la cible prise si elle est hostile ; décoché, il prend seulement la cible. Réglage **par personnage** (ex. décoché sur un soigneur) |
 | Accepter automatiquement les quêtes | Oui | Quand le leader de l'équipe accepte une quête, ce personnage l'accepte aussi dès qu'elle lui est proposée (PNJ ouvert, jusqu'à 30 s après). Réglage **par personnage** ; doit être coché sur le leader (qui annonce ses quêtes) et sur les membres |
+| Valider automatiquement les quêtes | Oui | Quand le leader rend une quête (« Continuer » puis « Terminer la quête »), ce personnage la rend aussi avec le **même index de récompense**, dès que le PNJ est ouvert (jusqu'à 60 s après). Une récompense au choix qui ne convient pas reste à choisir à la main. Réglage **par personnage**, à cocher sur le leader et les membres |
 
 ---
 
@@ -190,12 +191,12 @@ vous avez désactivé le skin de Polypode dans ses options).
 
 ## État du projet
 
-Version `0.19.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
+Version `0.20.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
 automatique aux annonces, fenêtre redimensionnable à trois listes défilantes (personnages
 trouvés / équipes avec création par saisie et sélection / personnages de l'équipe, ajout
 et retrait de membres au clic, leader par équipe, invitation de toute l'équipe, synchronisation automatique et versionnée des équipes, ajout du joueur ciblé)
 skinnée (EllesmereUI/ElvUI), bouton de minimap (masquable), panneau d'options (accessible par un bouton de la fenêtre),
-commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, inviter), acceptation automatique des quêtes du leader. Pistes envisagées pour la suite,
+commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, inviter), acceptation et validation automatiques des quêtes du leader. Pistes envisagées pour la suite,
 à activer seulement si le besoin se confirme (voir la règle de simplicité dans
 `CLAUDE.md`) :
 

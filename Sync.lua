@@ -321,6 +321,15 @@ function P.OnSyncMessage(message, channel, sender)
 		-- QACCEPT:token:questID — quête acceptée par le leader (Quests.lua).
 		P.OnQuestAcceptMessage(tonumber(rest), sender)
 		return
+	elseif kind == "QVALIDATE" then
+		-- QVALIDATE:token:questID — le leader a cliqué « Continuer » (Quests.lua).
+		P.OnQuestValidateMessage(tonumber(rest), sender)
+		return
+	elseif kind == "QREWARD" then
+		-- QREWARD:token:questID:choix — le leader a terminé la quête (Quests.lua).
+		local questID, choice = strsplit(":", rest or "")
+		P.OnQuestRewardMessage(tonumber(questID), tonumber(choice), sender)
+		return
 	end
 
 	if kind ~= "HELLO" and kind ~= "HI" then

@@ -86,6 +86,26 @@ function P.BuildOptions()
 		.. "lui est proposée (PNJ ouvert, jusqu'à 30 secondes après). Sur le leader, annonce ses "
 		.. "quêtes acceptées au groupe. Réglage propre à ce personnage.")
 
+	-- Validation automatique des quêtes du leader (par personnage, cf. Quests.lua).
+	local validateSetting = Settings.RegisterProxySetting(
+		category,
+		"POLYPODE_AUTO_VALIDATE_QUEST",
+		Settings.VarType.Boolean,
+		"Valider automatiquement les quêtes",
+		Settings.Default.True,
+		function()
+			return P.charDb.autoValidateQuest
+		end,
+		function(value)
+			P.charDb.autoValidateQuest = value
+		end
+	)
+	Settings.CreateCheckbox(category, validateSetting,
+		"Quand le leader de l'équipe rend une quête (« Continuer » puis « Terminer la quête »), "
+		.. "ce personnage la rend aussi, avec le même choix de récompense, dès que le PNJ est ouvert "
+		.. "(jusqu'à 60 secondes après). Sur le leader, annonce ses validations au groupe. "
+		.. "Réglage propre à ce personnage.")
+
 	Settings.RegisterAddOnCategory(category)
 	P.optionsCategory = category
 end
