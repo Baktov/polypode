@@ -179,6 +179,27 @@ local function CharacterTooltip(key, hints)
 	return lines
 end
 
+-- Raison pour laquelle le bouton « Inviter l'équipe » est inactif, ou nil s'il est actif :
+-- seul le leader de l'équipe sélectionnée invite, et il faut un autre membre que soi.
+local function InviteBlockedReason()
+	if not selectedTeam then
+		return "Sélectionnez d'abord une équipe."
+	end
+	local leader = P.GetTeamLeader(selectedTeam)
+	if not leader then
+		return "L'équipe n'a pas de leader : clic gauche sur un de ses personnages pour le désigner."
+	end
+	if leader ~= P.GetCharKey() then
+		return "Seul le leader de l'équipe (" .. leader .. ") peut inviter l'équipe."
+	end
+	for key in pairs(P.GetTeamMembers(selectedTeam) or {}) do
+		if key ~= P.GetCharKey() then
+			return nil
+		end
+	end
+	return "L'équipe ne compte aucun autre membre que vous."
+end
+
 -- "Nom-Royaume" coloré selon la classe, puis classe localisée et niveau en gris.
 -- teamName (facultatif) : affichage dans une équipe, [leader] marque le leader de cette équipe.
 local function FormatCharacter(data, teamName)
@@ -377,8 +398,10 @@ function P.BuildUI()
 				.. " », sauf vous et ceux déjà groupés.", 1, 1, 1, true)
 			GameTooltip:AddLine("L'équipe (nom, membres, leader) est aussi envoyée aux Polypode "
 				.. "de ses membres.", 1, 1, 1, true)
-		else
-			GameTooltip:AddLine("Sélectionnez d'abord une équipe.", 1, 1, 1, true)
+		end
+		local reason = InviteBlockedReason()
+		if reason then
+			GameTooltip:AddLine(reason, 1, 0.1, 0.1, true)
 		end
 		GameTooltip:Show()
 	end)
@@ -471,16 +494,8 @@ function P.RefreshUI()
 		ui.memberPanel.emptyText:SetText("Clic gauche sur un personnage trouvé pour l'ajouter")
 	end
 
-	-- Actif dès que l'équipe compte un membre autre que soi (l'état du groupe, qui change
-	-- sans rafraîchir la fenêtre, est vérifié au clic par P.InviteTeam).
-	local canInvite = false
-	for key in pairs(members or {}) do
-		if key ~= P.GetCharKey() then
-			canInvite = true
-			break
-		end
-	end
-	ui.inviteButton:SetEnabled(canInvite)
+	-- L'état du groupe, qui change sans rafraîchir la fenêtre, est vérifié au clic par P.InviteTeam.
+	ui.inviteButton:SetEnabled(InviteBlockedReason() == nil)
 end
 
 -- Sélectionne une équipe (ex. reçue par synchro) et rafraîchit la fenêtre si elle existe.

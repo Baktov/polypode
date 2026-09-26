@@ -69,6 +69,9 @@ Ouverte par `/poly ui`, le raccourci clavier ou le bouton de minimap. Trois cadr
     `(leader)` là où il l'est.
   - Bouton **Inviter l'équipe** (en haut du cadre) : invite dans votre groupe tous les
     membres de l'équipe sélectionnée, sauf le personnage courant et ceux déjà groupés.
+    **Actif uniquement sur le client du leader de l'équipe** (grisé sinon, l'infobulle
+    indique pourquoi : pas d'équipe sélectionnée, pas de leader, autre leader, ou aucun
+    autre membre).
     Il faut être seul ou chef du groupe (ou assistant en raid). Un groupe (hors raid) est
     limité à 5 : au-delà, les invitations restantes sont signalées ; convertissez le groupe
     en raid puis cliquez à nouveau. Le bilan s'affiche au centre de l'écran.
@@ -157,7 +160,7 @@ vous avez désactivé le skin de Polypode dans ses options).
 
 ## État du projet
 
-Version `0.14.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
+Version `0.14.1` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
 automatique aux annonces, fenêtre redimensionnable à trois listes défilantes (personnages
 trouvés / équipes avec création par saisie et sélection / personnages de l'équipe, ajout
 et retrait de membres au clic, leader par équipe, invitation de toute l'équipe, synchronisation automatique et versionnée des équipes)
