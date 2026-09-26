@@ -128,7 +128,7 @@ Configurable dans le menu des raccourcis WoW, catégorie **Polypode** :
 | Polypode: Ouvrir/Fermer l'interface | Basculer la fenêtre principale |
 | Polypode: Se nommer leader de l'équipe | Le personnage courant devient leader de l'équipe sélectionnée (il y entre s'il n'en est pas membre) ; synchronisé avec vos autres Polypode |
 | Polypode: Suivre le leader | Suit (`/follow`) le leader de l'équipe sélectionnée |
-| Polypode: Assister le leader | Assiste (`/assist`) le leader de l'équipe sélectionnée : prend sa cible |
+| Polypode: Assister le leader | Assiste (`/assist`) le leader de l'équipe sélectionnée : prend sa cible, puis attaque (`/startattack`) si l'option « Attaquer après l'assistance » est cochée |
 | Polypode: Inviter l'équipe | Même action que le bouton « Inviter l'équipe » (réservée au leader) |
 
 Toutes les actions portent sur **l'équipe sélectionnée pour ce personnage** (mémorisée, cf.
@@ -165,6 +165,7 @@ fenêtre principale) :
 |---|---|---|
 | Afficher l'icône de minimap | Oui | Affiche le bouton Polypode autour de la minimap |
 | Mode debug | Non | Affiche dans le chat les messages de diagnostic (synchro, invitations...). Réglage **par personnage** : on peut l'activer sur une seule fenêtre |
+| Attaquer après l'assistance | Oui | Le raccourci « Assister le leader » lance aussi l'attaque automatique (`/startattack`) sur la cible prise si elle est hostile ; décoché, il prend seulement la cible. Réglage **par personnage** (ex. décoché sur un soigneur) |
 
 ---
 
@@ -185,7 +186,7 @@ vous avez désactivé le skin de Polypode dans ses options).
 
 ## État du projet
 
-Version `0.18.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
+Version `0.18.1` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
 automatique aux annonces, fenêtre redimensionnable à trois listes défilantes (personnages
 trouvés / équipes avec création par saisie et sélection / personnages de l'équipe, ajout
 et retrait de membres au clic, leader par équipe, invitation de toute l'équipe, synchronisation automatique et versionnée des équipes, ajout du joueur ciblé)

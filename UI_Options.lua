@@ -47,6 +47,26 @@ function P.BuildOptions()
 		"Affiche dans le chat les messages de diagnostic de Polypode (synchro, invitations...). "
 		.. "Réglage propre à ce personnage (équivalent de /poly debug).")
 
+	-- Raccourci « Assister le leader » : attaquer ou non la cible prise (par personnage).
+	local startAttackSetting = Settings.RegisterProxySetting(
+		category,
+		"POLYPODE_ASSIST_STARTATTACK",
+		Settings.VarType.Boolean,
+		"Attaquer après l'assistance",
+		Settings.Default.True,
+		function()
+			return P.charDb.assistStartAttack
+		end,
+		function(value)
+			P.charDb.assistStartAttack = value
+			P.UpdateLeaderMacros() -- différé à la sortie du combat si besoin
+		end
+	)
+	Settings.CreateCheckbox(category, startAttackSetting,
+		"Le raccourci « Assister le leader » lance aussi l'attaque automatique (/startattack) sur "
+		.. "la cible prise, si elle est hostile. Décoché : prend seulement la cible du leader. "
+		.. "Réglage propre à ce personnage.")
+
 	Settings.RegisterAddOnCategory(category)
 	P.optionsCategory = category
 end

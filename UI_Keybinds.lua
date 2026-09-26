@@ -36,6 +36,10 @@ local secureBindings = {
 	POLYPODE_ASSIST = {
 		button = CreateSecureMacroButton("PolypodeAssistButton"),
 		macro = function(leaderName)
+			-- /startattack : attaque automatique si la cible est hostile (option par personnage).
+			if P.charDb.assistStartAttack then
+				return "/assist " .. leaderName .. "\n/startattack"
+			end
 			return "/assist " .. leaderName
 		end,
 	},
