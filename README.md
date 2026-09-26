@@ -46,7 +46,10 @@ automatique de base entre vos clients — sans configuration complexe.
   prochain rechargement. Hors canal dédié (guilde, groupe), les comptes inconnus restent ignorés
   sans demande. La liste est partagée entre vos propres clients (pas avec les comptes
   autorisés : pas d'autorisation en cascade) ; `/poly comptes` la montre et
-  `/poly retirer-compte <n°>` retire une autorisation.
+  `/poly retirer-compte <n°>` retire une autorisation. Le bouton **Gestion liste token** (panneau
+  d'options, à droite du canal dédié) ouvre une fenêtre avec la liste des comptes autorisés : au
+  survol, une infobulle liste les personnages connus de chaque compte ; le bouton **Révoquer** à
+  droite retire l'autorisation (synchronisé avec vos autres Polypode). La fenêtre se ferme avec Échap.
 - Vous regroupez vos personnages en **équipes**, chacune avec son **leader** (voir
   Fenêtre principale) — base pour de futures actions liées au leader : suivi, assist, etc.
 - **Les équipes sont synchronisées automatiquement** entre vos clients Polypode connectés :
@@ -204,7 +207,7 @@ fenêtre principale) :
 
 | Option | Défaut | Effet |
 |---|---|---|
-| Canal dédié | vide | Nom du canal de discussion commun à vos comptes (voir Fonctionnement). Aussi modifiable dans la fenêtre principale. Pour tout le compte, synchronisé entre vos clients |
+| Canal dédié | vide | Nom du canal de discussion commun à vos comptes (voir Fonctionnement). Aussi modifiable dans la fenêtre principale. À droite, bouton « Gestion liste token » : liste et révocation des comptes autorisés. Pour tout le compte, synchronisé entre vos clients |
 | Afficher l'icône de minimap | Oui | Affiche le bouton Polypode autour de la minimap |
 | Mode debug | Non | Affiche dans le chat les messages de diagnostic (synchro, invitations...). Réglage **par personnage** : on peut l'activer sur une seule fenêtre |
 | Attaquer après l'assistance | Oui | Le raccourci « Assister le leader » lance aussi l'attaque automatique (`/startattack`) sur la cible prise si elle est hostile ; décoché, il prend seulement la cible. Réglage **par personnage** (ex. décoché sur un soigneur) |
@@ -237,7 +240,7 @@ vous avez désactivé le skin de Polypode dans ses options).
 
 ## État du projet
 
-Version `0.29.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
+Version `0.29.1` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
 automatique aux annonces, fenêtre redimensionnable à trois listes défilantes (personnages
 trouvés / équipes avec création par saisie et sélection / personnages de l'équipe, ajout
 et retrait de membres au clic, leader par équipe, invitation de toute l'équipe, synchronisation automatique et versionnée des équipes, ajout du joueur ciblé)

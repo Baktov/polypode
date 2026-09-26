@@ -8,6 +8,17 @@ P.ChannelSettingMixin = {}
 
 function P.ChannelSettingMixin:OnLoad()
 	P.SetupChannelInput(self.EditBox)
+	self.ManageButton:SetScript("OnClick", function()
+		P.ShowTokensWindow()
+	end)
+	self.ManageButton:SetScript("OnEnter", function(button)
+		GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
+		GameTooltip:AddLine("Gestion liste token")
+		GameTooltip:AddLine("Ouvre la liste des autres comptes Battle.net autorisés sur le canal "
+			.. "dédié, pour voir leurs personnages et révoquer une autorisation.", 1, 1, 1, true)
+		GameTooltip:Show()
+	end)
+	self.ManageButton:SetScript("OnLeave", GameTooltip_Hide)
 end
 
 function P.ChannelSettingMixin:Init()

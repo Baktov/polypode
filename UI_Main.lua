@@ -53,7 +53,8 @@ end
 -- top : décalage depuis le haut du cadre (défaut : juste sous l'en-tête).
 -- opts (facultatif) : lignes cliquables (gauche et droit) avec opts.onClick(data, mouseButton) ;
 -- opts.isSelected(data) met la ligne en surbrillance. opts.tooltip(data) renvoie les lignes
--- de l'infobulle affichée au survol (la première sert de titre).
+-- de l'infobulle affichée au survol (la première sert de titre). opts.button : bouton à
+-- droite de chaque ligne, { text, width, onClick = fn(data), tooltip = texte d'aide }.
 local function CreateScrollList(panel, formatFn, top, opts)
 	top = top or HEADER_HEIGHT
 	opts = opts or {}
@@ -105,9 +106,36 @@ local function CreateScrollList(panel, formatFn, top, opts)
 				row:SetScript("OnEnter", ShowRowTooltip)
 				row:SetScript("OnLeave", GameTooltip_Hide)
 			end
+
+			if opts.button then
+				row.button = CreateFrame("Button", nil, row, "UIPanelButtonTemplate")
+				row.button:SetSize(opts.button.width or 80, ROW_HEIGHT - 2)
+				row.button:SetPoint("RIGHT", -2, 0)
+				row.button:SetText(opts.button.text)
+				row.text:SetPoint("RIGHT", row.button, "LEFT", -6, 0)
+				if opts.button.tooltip then
+					row.button:SetScript("OnEnter", function(self)
+						GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+						GameTooltip:AddLine(opts.button.text)
+						GameTooltip:AddLine(opts.button.tooltip, 1, 1, 1, true)
+						GameTooltip:Show()
+					end)
+					row.button:SetScript("OnLeave", GameTooltip_Hide)
+				end
+				if P.SkinButton then
+					P.SkinButton(row.button)
+				end
+			end
 		end
 		row.data = data
 		row.text:SetText(formatFn(data))
+
+		if opts.button then
+			-- Lignes recyclées : le bouton agit sur la donnée courante de la ligne.
+			row.button:SetScript("OnClick", function()
+				opts.button.onClick(row.data)
+			end)
+		end
 
 		-- Après un clic, la liste est reconstruite sous le curseur : l'infobulle ouverte
 		-- sur cette ligne est rafraîchie pour refléter le nouvel état.
@@ -143,6 +171,11 @@ local function SetListData(panel, items)
 	panel.scrollBox:SetDataProvider(CreateDataProvider(items), ScrollBoxConstants.RetainScrollPosition)
 	panel.emptyText:SetShown(#items == 0)
 end
+
+-- Partagés avec les autres fenêtres (UI_*.lua) : cadre à en-tête et liste défilante.
+P.CreatePanel = CreatePanel
+P.CreateScrollList = CreateScrollList
+P.SetListData = SetListData
 
 -- Transforme un ensemble { [clé] = ... } en items { key = clé } triés par ordre alphabétique,
 -- pour un ordre stable d'un affichage à l'autre.
@@ -552,6 +585,10 @@ function P.RefreshUI()
 	-- raccourcis Suivre/Assister suivent le leader, que la fenêtre soit construite ou non.
 	if P.UpdateLeaderMacros then
 		P.UpdateLeaderMacros()
+	end
+	-- Fenêtre des comptes autorisés (UI_Tokens.lua), si elle est ouverte.
+	if P.RefreshTokensWindow then
+		P.RefreshTokensWindow()
 	end
 
 	if not ui.frame then

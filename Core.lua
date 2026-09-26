@@ -134,8 +134,9 @@ end
 
 -- Ajoute/actualise un personnage dans le roster. Sans argument, enregistre le
 -- personnage courant. Avec class/level fournis, enregistre un personnage distant
--- (reçu via Sync.lua).
-function P.AddCharacter(name, realm, class, level)
+-- (reçu via Sync.lua) ; token : compte Battle.net de ce personnage (entry.token, sert à
+-- lister les personnages d'un compte autorisé).
+function P.AddCharacter(name, realm, class, level, token)
 	name = name or UnitName("player")
 	realm = realm or GetRealmName()
 	local key = P.GetCharKey(name, realm)
@@ -149,6 +150,7 @@ function P.AddCharacter(name, realm, class, level)
 		local _, playerClass = UnitClass("player")
 		entry.class = playerClass
 		entry.level = UnitLevel("player")
+		entry.token = P.GetTeamToken() or entry.token
 	elseif class then
 		entry.class = class
 		entry.level = level or entry.level
@@ -161,8 +163,23 @@ function P.AddCharacter(name, realm, class, level)
 		entry.updated = NextVersion(entry.updated)
 	end
 
+	if token then
+		entry.token = token
+	end
 	entry.lastSeen = time()
 	return key, entry
+end
+
+-- Personnages connus (roster actif) d'un compte, par son token : liste de clés triée.
+function P.GetTokenCharacters(token)
+	local keys = {}
+	for key, entry in pairs(P.GetRoster()) do
+		if entry.token == token then
+			keys[#keys + 1] = key
+		end
+	end
+	table.sort(keys)
+	return keys
 end
 
 -- Ajoute le joueur ciblé au roster (ex. personnage d'un ami, sans Polypode) et le partage

@@ -300,6 +300,9 @@ local function OnTrustMessage(rest, sender)
 	end
 	if P.ApplyTrustSync(trustedToken, updated, flag == "R", label) then
 		P.Debug("Autorisation du compte « " .. tostring(label) .. " » reçue de " .. tostring(sender))
+		if P.RefreshUI then
+			P.RefreshUI()
+		end
 	end
 end
 
@@ -594,7 +597,7 @@ function P.OnSyncMessage(message, channel, sender)
 		return
 	end
 
-	P.AddCharacter(name, realm, class, tonumber(level))
+	P.AddCharacter(name, realm, class, tonumber(level), token)
 	if P.RefreshUI then
 		P.RefreshUI()
 	end
