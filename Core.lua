@@ -1,0 +1,93 @@
+-- Polypode: Core — table globale, SavedVariables, utilitaires, CRUD du roster
+
+Polypode = Polypode or {}
+local P = Polypode
+
+P.SYNC_PREFIX = "POLYPODE"
+P.debugEnabled = false
+
+BINDING_HEADER_POLYPODE = "Polypode"
+_G["BINDING_NAME_POLYPODE_TOGGLEUI"] = "Polypode: Ouvrir/Fermer l'interface"
+
+P.defaults = {
+	roster = {}, -- [nom-royaume] = { name, realm, class, level, lastSeen }
+	leader = nil, -- clé (nom-royaume) du leader désigné
+}
+
+P.charDefaults = {
+	role = "member", -- "leader" | "member"
+}
+
+function P.Debug(msg)
+	if P.debugEnabled then
+		print("|cff33ff99Polypode|r: " .. tostring(msg))
+	end
+end
+
+local function CopyDefaults(src, dst)
+	for k, v in pairs(src) do
+		if type(v) == "table" then
+			dst[k] = dst[k] or {}
+			CopyDefaults(v, dst[k])
+		elseif dst[k] == nil then
+			dst[k] = v
+		end
+	end
+	return dst
+end
+
+function P.InitDB()
+	PolypodeDB = CopyDefaults(P.defaults, PolypodeDB or {})
+	PolypodeCharDB = CopyDefaults(P.charDefaults, PolypodeCharDB or {})
+	P.db = PolypodeDB
+	P.charDb = PolypodeCharDB
+end
+
+function P.GetCharKey(name, realm)
+	name = name or UnitName("player")
+	realm = realm or GetRealmName()
+	return name .. "-" .. realm
+end
+
+-- Ajoute/actualise un personnage dans le roster. Sans argument, enregistre le
+-- personnage courant. Avec class/level fournis, enregistre un personnage distant
+-- (reçu via Sync.lua).
+function P.AddCharacter(name, realm, class, level)
+	name = name or UnitName("player")
+	realm = realm or GetRealmName()
+	local key = P.GetCharKey(name, realm)
+
+	P.db.roster[key] = P.db.roster[key] or {}
+	local entry = P.db.roster[key]
+	entry.name = name
+	entry.realm = realm
+
+	if key == P.GetCharKey() then
+		local _, playerClass = UnitClass("player")
+		entry.class = playerClass
+		entry.level = UnitLevel("player")
+	elseif class then
+		entry.class = class
+		entry.level = level or entry.level
+	end
+
+	entry.lastSeen = time()
+	return key, entry
+end
+
+function P.RemoveCharacter(key)
+	P.db.roster[key] = nil
+	if P.db.leader == key then
+		P.db.leader = nil
+	end
+end
+
+function P.SetLeader(key)
+	if P.db.roster[key] then
+		P.db.leader = key
+	end
+end
+
+function P.GetRoster()
+	return P.db.roster
+end

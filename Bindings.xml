@@ -1,0 +1,5 @@
+<Bindings>
+  <Binding name="POLYPODE_TOGGLEUI" header="POLYPODE" category="Polypode">
+    POLYPODE_TOGGLEUI()
+  </Binding>
+</Bindings>
