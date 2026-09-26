@@ -204,7 +204,7 @@ end
 -- teamName (facultatif) : affichage dans une équipe, [leader] marque le leader de cette équipe.
 local function FormatCharacter(data, teamName)
 	local key = data.key
-	local entry = P.GetRoster()[key] or {}
+	local entry = P.db.roster[key] or {}
 	local label = key
 	local color = entry.class and C_ClassColor and C_ClassColor.GetClassColor(entry.class)
 	if color then
@@ -286,9 +286,36 @@ function P.BuildUI()
 	local charPanel = CreatePanel(f, "Personnages trouvés")
 	charPanel:SetPoint("TOPLEFT", PANEL_MARGIN, PANEL_TOP)
 	charPanel:SetPoint("BOTTOMLEFT", PANEL_MARGIN, PANEL_MARGIN)
+
+	-- Bouton d'ajout du joueur ciblé (personnage sans Polypode, ex. un ami) au roster.
+	local addTargetBtn = CreateFrame("Button", nil, charPanel, "UIPanelButtonTemplate")
+	addTargetBtn:SetHeight(22)
+	addTargetBtn:SetPoint("TOPLEFT", 10, -HEADER_HEIGHT + 2)
+	addTargetBtn:SetPoint("RIGHT", -10, 0)
+	addTargetBtn:SetText("Ajouter la cible")
+	addTargetBtn:SetScript("OnClick", function()
+		local ok, result = P.AddTargetCharacter()
+		if ok then
+			UIErrorsFrame:AddMessage(result .. " ajouté à la liste.", 1, 0.82, 0)
+			P.RefreshUI()
+		else
+			UIErrorsFrame:AddMessage(result, 1, 0.1, 0.1)
+		end
+	end)
+	addTargetBtn:SetScript("OnEnter", function(self)
+		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+		GameTooltip:AddLine("Ajouter la cible")
+		GameTooltip:AddLine("Ajoute le joueur ciblé à la liste des personnages trouvés : il peut "
+			.. "ensuite rejoindre une équipe (clic gauche avec l'équipe sélectionnée) et être "
+			.. "invité avec elle.", 1, 1, 1, true)
+		GameTooltip:AddLine("Partagé avec vos autres Polypode connectés.", 1, 1, 1, true)
+		GameTooltip:Show()
+	end)
+	addTargetBtn:SetScript("OnLeave", GameTooltip_Hide)
+
 	-- Clic gauche : ajoute à l'équipe sélectionnée ; clic droit : l'en retire.
 	-- Les membres de l'équipe sélectionnée sont surlignés.
-	CreateScrollList(charPanel, FormatCharacter, nil, {
+	CreateScrollList(charPanel, FormatCharacter, HEADER_HEIGHT + INPUT_HEIGHT, {
 		onClick = function(data, mouseButton)
 			if not selectedTeam then
 				UIErrorsFrame:AddMessage("Sélectionnez d'abord une équipe.", 1, 0.1, 0.1)
@@ -453,6 +480,7 @@ function P.BuildUI()
 	ui.teamCreateButton = createBtn
 	ui.memberPanel = memberPanel
 	ui.inviteButton = inviteBtn
+	ui.addTargetButton = addTargetBtn
 
 	if P.SkinFrame then
 		P.SkinFrame(f)
@@ -462,6 +490,7 @@ function P.BuildUI()
 		P.SkinEditBox(teamInput)
 		P.SkinButton(createBtn)
 		P.SkinButton(inviteBtn)
+		P.SkinButton(addTargetBtn)
 	end
 end
 

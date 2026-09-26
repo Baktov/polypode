@@ -37,8 +37,12 @@ local function SlashHandler(msg)
 	elseif sub == "remove" then
 		local target = args[2]
 		if target then
-			P.RemoveCharacter(target)
-			print("Polypode: " .. target .. " retiré du roster.")
+			if P.RemoveCharacter(target) then
+				P.RefreshUI()
+				print("Polypode: " .. target .. " retiré du roster.")
+			else
+				print("Polypode: " .. target .. " absent du roster.")
+			end
 		else
 			print("Usage: /poly remove <nom-royaume>")
 		end

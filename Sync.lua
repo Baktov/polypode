@@ -140,6 +140,72 @@ end
 -- Taille maximale d'un message addon (octets), imposée par le client WoW.
 local MAX_MESSAGE_LENGTH = 255
 
+-- Destinataires d'une synchro, en noms complets, soi exclu : target s'il est fourni, sinon
+-- les clients connectés vus pendant la session (onlineChars) plus les clés extraKeys
+-- (Nom-Royaume) éventuelles.
+local function ResolveTargets(target, extraKeys)
+	local targets = {}
+	if target then
+		targets[FullName(target)] = true
+	else
+		for name in pairs(onlineChars) do
+			targets[name] = true
+		end
+		for _, key in ipairs(extraKeys or {}) do
+			local name, realm = strsplit("-", key, 2)
+			targets[FullName(P.GetTargetName({ name = name, realm = realm or "" }))] = true
+		end
+	end
+	targets[FullName(P.GetTargetName({ name = UnitName("player"), realm = GetRealmName() }))] = nil
+	return targets
+end
+
+-- Envoie une entrée de roster ajoutée ou retirée à la main (cible, /poly remove) : les
+-- personnages sans Polypode ne s'annoncent jamais, les autres clients doivent la recevoir.
+-- target : un destinataire précis, sinon les clients connectés.
+-- Format : CHAR:token:version:flag:classe:niveau:nom:royaume
+--   flag "A" = actif, "R" = retiré ; royaume en dernier (peut contenir des espaces).
+function P.SyncCharacter(key, target)
+	local token = P.GetTeamToken()
+	local entry = P.db.roster[key]
+	if not token or not entry or not entry.updated or not entry.name or not entry.realm then
+		return
+	end
+	local message = string.format("CHAR:%s:%d:%s:%s:%s:%s:%s", token, entry.updated,
+		entry.removed and "R" or "A", entry.class or "", entry.level or "", entry.name, entry.realm)
+	for to in pairs(ResolveTargets(target)) do
+		P.Broadcast(message, "WHISPER", to)
+		P.Debug("Personnage " .. key .. " envoyé à " .. to)
+	end
+end
+
+-- Envoie toutes les entrées manuelles du roster (versionnées) à un destinataire.
+function P.SyncAllCharacters(target)
+	for key, entry in pairs(P.db.roster) do
+		if entry.updated then
+			P.SyncCharacter(key, target)
+		end
+	end
+end
+
+-- Réception d'une entrée CHAR (cf. P.SyncCharacter).
+local function OnCharMessage(rest, sender)
+	local version, flag, class, level, name, realm = strsplit(":", rest or "", 6)
+	local updated = tonumber(version)
+	if not updated or not name or name == "" or not realm or realm == ""
+		or (flag ~= "A" and flag ~= "R") then
+		return
+	end
+	local key = P.GetCharKey(name, realm)
+	if P.ApplyCharacterSync(key, updated, flag == "R", name, realm,
+		class ~= "" and class or nil, tonumber(level)) then
+		P.Debug("Personnage " .. key .. " reçu de " .. tostring(sender))
+		if P.RefreshUI then
+			P.RefreshUI()
+		end
+	end
+end
+
 -- Envoie la définition d'une équipe (version, leader, membres, nom) par chuchotement addon :
 -- fiable même hors groupe (ex. invités qui n'ont pas encore accepté).
 -- target : un destinataire précis ; sinon les personnages connectés vus pendant la session
@@ -192,24 +258,7 @@ function P.SyncTeam(teamName, target, select)
 			leader, table.concat(chunk, ","), teamName)
 	end
 
-	-- Destinataires (ensemble de noms complets, soi exclu).
-	local targets = {}
-	if target then
-		targets[FullName(target)] = true
-	else
-		for name in pairs(onlineChars) do
-			targets[name] = true
-		end
-		if select then
-			for _, key in ipairs(keys) do
-				local name, realm = strsplit("-", key, 2)
-				targets[FullName(P.GetTargetName({ name = name, realm = realm or "" }))] = true
-			end
-		end
-	end
-	targets[FullName(P.GetTargetName({ name = UnitName("player"), realm = GetRealmName() }))] = nil
-
-	for to in pairs(targets) do
+	for to in pairs(ResolveTargets(target, select and keys or nil)) do
 		for _, message in ipairs(messages) do
 			P.Broadcast(message, "WHISPER", to)
 		end
@@ -265,6 +314,9 @@ function P.OnSyncMessage(message, channel, sender)
 	if kind == "TEAM" then
 		OnTeamMessage(rest, sender)
 		return
+	elseif kind == "CHAR" then
+		OnCharMessage(rest, sender)
+		return
 	end
 
 	if kind ~= "HELLO" and kind ~= "HI" then
@@ -294,7 +346,9 @@ function P.OnSyncMessage(message, channel, sender)
 	-- L'expéditeur est connecté : il recevra les synchros automatiques d'équipes.
 	onlineChars[FullName(sender)] = true
 
-	-- Échange des équipes dans les deux sens (HELLO puis HI) : chaque client récupère les
-	-- versions plus récentes de l'autre, même s'il a démarré sur une sauvegarde ancienne.
+	-- Échange du roster manuel puis des équipes dans les deux sens (HELLO puis HI) : chaque
+	-- client récupère les versions plus récentes de l'autre, même s'il a démarré sur une
+	-- sauvegarde ancienne. Le roster d'abord : les équipes peuvent y faire référence.
+	P.SyncAllCharacters(sender)
 	P.SyncAllTeams(sender)
 end

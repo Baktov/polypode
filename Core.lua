@@ -62,6 +62,27 @@ function P.GetCharKey(name, realm)
 	return name .. "-" .. realm
 end
 
+-- Version d'une donnée synchronisée : heure serveur (commune à tous les clients), strictement
+-- croissante pour que deux modifications dans la même seconde restent ordonnées.
+local function NextVersion(current)
+	return math.max(GetServerTime(), (current or 0) + 1)
+end
+
+-- ROSTER. Une entrée retirée n'est pas effacée mais marquée removed = true et versionnée
+-- (« pierre tombale ») : la suppression se propage aux autres clients et n'est pas annulée
+-- par un client qui avait encore le personnage. P.GetRoster() ne renvoie que les actives.
+-- updated : version des ajouts/retraits manuels (cible, /poly remove), synchronisés ; les
+-- personnages Polypode s'annoncent eux-mêmes (HELLO) et n'en ont pas besoin.
+
+-- Modification manuelle d'une entrée : nouvelle version puis envoi aux autres Polypode.
+local function CharacterChanged(key)
+	local entry = P.db.roster[key]
+	entry.updated = NextVersion(entry.updated)
+	if P.SyncCharacter then
+		P.SyncCharacter(key)
+	end
+end
+
 -- Ajoute/actualise un personnage dans le roster. Sans argument, enregistre le
 -- personnage courant. Avec class/level fournis, enregistre un personnage distant
 -- (reçu via Sync.lua).
@@ -84,20 +105,99 @@ function P.AddCharacter(name, realm, class, level)
 		entry.level = level or entry.level
 	end
 
+	-- Un personnage qui s'annonce est bien là : il n'est plus retiré, avec une version plus
+	-- récente que la pierre tombale pour qu'elle ne revienne pas par synchro.
+	if entry.removed then
+		entry.removed = nil
+		entry.updated = NextVersion(entry.updated)
+	end
+
 	entry.lastSeen = time()
 	return key, entry
 end
 
+-- Ajoute le joueur ciblé au roster (ex. personnage d'un ami, sans Polypode) et le partage
+-- avec les autres Polypode. Renvoie true et la clé, ou false et un message d'erreur.
+function P.AddTargetCharacter()
+	if not UnitExists("target") or not UnitIsPlayer("target") then
+		return false, "Ciblez d'abord un joueur."
+	end
+	local name, realm = UnitName("target")
+	if not realm or realm == "" then
+		realm = GetRealmName()
+	end
+	local key = P.GetCharKey(name, realm)
+	if P.GetCharacter(key) then
+		return false, key .. " est déjà dans la liste."
+	end
+
+	local entry = P.db.roster[key] or {}
+	P.db.roster[key] = entry
+	local _, class = UnitClass("target")
+	local level = UnitLevel("target")
+	entry.name = name
+	entry.realm = realm
+	entry.class = class
+	entry.level = level and level > 0 and level or entry.level
+	entry.removed = nil
+	entry.lastSeen = time()
+	CharacterChanged(key)
+	return true, key
+end
+
+-- Retire un personnage du roster (pierre tombale synchronisée). Renvoie true si retiré.
 function P.RemoveCharacter(key)
-	P.db.roster[key] = nil
+	local entry = P.GetCharacter(key)
+	if not entry then
+		return false
+	end
+	entry.removed = true
+	CharacterChanged(key)
 	-- Un personnage retiré du roster ne reste membre (ni leader) d'aucune équipe.
 	for name in pairs(P.db.teams) do
 		P.RemoveTeamMember(name, key)
 	end
+	return true
 end
 
+-- Entrée active du roster, ou nil (absente ou retirée).
+function P.GetCharacter(key)
+	local entry = key and P.db.roster[key]
+	if entry and not entry.removed then
+		return entry
+	end
+end
+
+-- Roster actif : { [nom-royaume] = entrée }, sans les personnages retirés.
 function P.GetRoster()
-	return P.db.roster
+	local roster = {}
+	for key, entry in pairs(P.db.roster) do
+		if not entry.removed then
+			roster[key] = entry
+		end
+	end
+	return roster
+end
+
+-- Applique une entrée de roster reçue d'un autre client (Sync.lua), sans la renvoyer :
+-- seulement si sa version est plus récente que la locale. Les équipes ne sont pas
+-- touchées : le client d'origine synchronise lui-même ses équipes modifiées.
+-- Renvoie true si appliqué.
+function P.ApplyCharacterSync(key, updated, removed, name, realm, class, level)
+	local entry = P.db.roster[key]
+	if entry and (entry.updated or 0) >= updated then
+		return false
+	end
+	entry = entry or {}
+	P.db.roster[key] = entry
+	entry.name = name
+	entry.realm = realm
+	entry.class = class or entry.class
+	entry.level = level or entry.level
+	entry.removed = removed or nil
+	entry.updated = updated
+	entry.lastSeen = entry.lastSeen or time()
+	return true
 end
 
 -- Toute modification locale d'une équipe passe par ici : horodatage (heure serveur, commune
@@ -105,9 +205,8 @@ end
 -- partagent le même fichier de sauvegarde (jonctions entre comptes) : chacun le réécrit en
 -- entier à la déconnexion, il faut donc que tous aient la même version en mémoire.
 local function TeamChanged(teamName)
-	-- Strictement croissant : deux modifications dans la même seconde restent ordonnées.
 	local team = P.db.teams[teamName]
-	team.updated = math.max(GetServerTime(), (team.updated or 0) + 1)
+	team.updated = NextVersion(team.updated)
 	if P.SyncTeam then
 		P.SyncTeam(teamName)
 	end
@@ -144,7 +243,7 @@ end
 
 function P.AddTeamMember(teamName, key)
 	local members = P.GetTeamMembers(teamName)
-	if members and P.db.roster[key] and not members[key] then
+	if members and P.GetCharacter(key) and not members[key] then
 		members[key] = true
 		TeamChanged(teamName)
 	end
@@ -235,7 +334,7 @@ end
 function P.GetTeamInvitees(teamName)
 	local invitees = {}
 	for key in pairs(P.GetTeamMembers(teamName) or {}) do
-		local entry = P.db.roster[key]
+		local entry = P.GetCharacter(key)
 		if entry and entry.name and key ~= P.GetCharKey() then
 			local inviteName = P.GetTargetName(entry)
 			if not UnitInParty(inviteName) and not UnitInRaid(inviteName) then

@@ -42,6 +42,10 @@ automatique de base entre vos clients — sans configuration complexe.
   déconnexion, tous doivent donc avoir les mêmes équipes en mémoire.
   Les messages « Aucun joueur nommé … n'est connecté » provoqués par la synchro vers un
   personnage hors ligne sont masqués.
+- Les **ajouts et retraits manuels de personnages** (bouton « Ajouter la cible »,
+  `/poly remove`) sont synchronisés de la même façon, avec la même règle de version : un
+  personnage retiré ne réapparaît pas via un client qui l'avait encore (il réapparaît
+  seulement s'il se reconnecte lui-même avec Polypode).
 
 ---
 
@@ -52,6 +56,9 @@ Ouverte par `/poly ui`, le raccourci clavier ou le bouton de minimap. Trois cadr
 - **Personnages trouvés** : tous les personnages de votre équipe détectés via les canaux
   (groupe, raid, guilde), triés par nom. Nom en couleur de classe, puis classe et niveau ;
   `(vous)` marque le personnage courant.
+  Bouton **Ajouter la cible** (en haut du cadre) : ajoute le joueur ciblé à la liste, même
+  s'il n'a pas Polypode (ex. un ami) ; il peut alors rejoindre une équipe et être invité
+  avec elle. L'ajout est partagé avec vos autres Polypode connectés.
   Quand une équipe est sélectionnée : **clic gauche** sur un personnage l'ajoute à l'équipe,
   **clic droit** l'en retire ; les membres de l'équipe sont surlignés en doré. Une infobulle au survol donne le nom du personnage, rappelle ces actions, puis liste les équipes dont il fait déjà partie (l'équipe sélectionnée en vert).
 - **Équipes** : saisir un nom dans le champ « Nom de l'équipe » puis valider avec
@@ -160,10 +167,10 @@ vous avez désactivé le skin de Polypode dans ses options).
 
 ## État du projet
 
-Version `0.14.1` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
+Version `0.15.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
 automatique aux annonces, fenêtre redimensionnable à trois listes défilantes (personnages
 trouvés / équipes avec création par saisie et sélection / personnages de l'équipe, ajout
-et retrait de membres au clic, leader par équipe, invitation de toute l'équipe, synchronisation automatique et versionnée des équipes)
+et retrait de membres au clic, leader par équipe, invitation de toute l'équipe, synchronisation automatique et versionnée des équipes, ajout du joueur ciblé)
 skinnée (EllesmereUI/ElvUI), bouton de minimap (masquable), panneau d'options,
 commandes, raccourci clavier. Pistes envisagées pour la suite,
 à activer seulement si le besoin se confirme (voir la règle de simplicité dans
