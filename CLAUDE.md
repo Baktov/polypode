@@ -22,7 +22,7 @@ n'ajoute une fonctionnalité que si elle sert directement cet objectif.
 | `Core.lua` | Table globale `Polypode` (alias local `P`), SavedVariables, CRUD du roster, équipes (`P.CreateTeam`, `P.GetTeams`, `P.db.teams[nom] = { name }`) |
 | `Sync.lua` | Broadcast/réception de messages addon (`C_ChatInfo`), token d'équipe (`P.GetTeamToken`, hash du BattleTag), annonce `HELLO` / réponse `HI` |
 | `UI_Skin.lua` | Skinning conditionnel : EllesmereUI (`EllesmereUI.RegisterSkin`, prioritaire) puis ElvUI. `P.SkinFrame` (fenêtre top-level), `P.SkinPanel` (cadre intérieur), `P.SkinScrollBar` (barre de défilement), `P.SkinEditBox` (champ de saisie), `P.SkinButton` (bouton texte) |
-| `UI_Main.lua` | Fenêtre principale redimensionnable (`P.ui.resizeGrip`, taille dans `P.db.mainFrame`) : `BuildUI`, `RefreshUI`, `ToggleUI`. Trois cadres à liste défilante (`panel.scrollBox`, `panel.scrollBar`, `panel.emptyText`), un tiers de largeur chacun (`LayoutPanels` sur `OnSizeChanged`) : `P.ui.charPanel` (personnages trouvés = roster trié), `P.ui.teamPanel` (équipes : `P.ui.teamInput` + `P.ui.teamCreateButton` → `P.CreateTeam`, liste triée), `P.ui.memberPanel` (« Personnages », contenu **à définir**, liste vide) |
+| `UI_Main.lua` | Fenêtre principale redimensionnable (`P.ui.resizeGrip`, taille dans `P.db.mainFrame`) : `BuildUI`, `RefreshUI`, `ToggleUI`. Trois cadres à liste défilante (`panel.scrollBox`, `panel.scrollBar`, `panel.emptyText`), un tiers de largeur chacun (`LayoutPanels` sur `OnSizeChanged`) : `P.ui.charPanel` (personnages trouvés = roster trié), `P.ui.teamPanel` (équipes : `P.ui.teamInput` + `P.ui.teamCreateButton` → `P.CreateTeam`, liste triée, clic = sélection dans la locale `selectedTeam`, session uniquement), `P.ui.memberPanel` (« Personnages de l'équipe », contenu **à définir**, liste vide) |
 | `UI_Minimap.lua` | Bouton de minimap sans librairie (`P.BuildMinimapButton`, appelé à `PLAYER_LOGIN`), `P.SetMinimapButtonShown`, état dans `P.db.minimap` (`angle`, `hide`) |
 | `UI_Options.lua` | Panneau Options → AddOns via l'API `Settings` (`P.BuildOptions` à `PLAYER_LOGIN`, `P.OpenOptions`) |
 | `Commands.lua` | Commande slash `/poly` (`/polypode`) et fonctions globales de keybinding |
@@ -56,7 +56,9 @@ en tête de chaque fichier). Ex. `P.db` (= `PolypodeDB`), `P.charDb` (= `Polypod
 12. **Prérequis de toute évolution UI : tout contenu de taille variable défile, sans limite.**
     Chaque nouveau panneau, liste ou fenêtre doit pouvoir défiler, même si peu d'éléments sont
     attendus aujourd'hui. Jamais de pile de lignes à hauteur fixe qui déborde du cadre. Pour une
-    liste : `CreateScrollList(panel, formatFn)` + `SetListData(panel, items)` dans `UI_Main.lua`
+    liste : `CreateScrollList(panel, formatFn [, top, opts])` + `SetListData(panel, items)` dans `UI_Main.lua`
+    (`opts.onClick(data)` rend les lignes cliquables, `opts.isSelected(data)` les surligne ; les lignes
+    étant recyclées, tout état visuel se recalcule dans l'initializer, jamais stocké sur la ligne)
     (ScrollBox Blizzard virtualisée + `MinimalScrollBar`, skinnée via `P.SkinScrollBar`).
 13. **Fenêtres redimensionnables** : la fenêtre principale se redimensionne (poignée bas-droite,
     `SetResizeBounds`, taille dans `P.db.mainFrame`). Tout contenu s'ancre en relatif aux bords

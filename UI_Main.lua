@@ -4,6 +4,9 @@ local P = Polypode
 local ui = {}
 P.ui = ui
 
+-- Nom de l'équipe sélectionnée dans le cadre « Équipes » (session uniquement).
+local selectedTeam
+
 -- Taille minimale volontairement petite : en dessous du confortable, le contenu est
 -- simplement tronqué (textes coupés sur une ligne, listes réduites), pas réorganisé.
 local MIN_WIDTH, MIN_HEIGHT = 200, 100
@@ -40,8 +43,11 @@ end
 -- seules les lignes visibles existent, recyclées au défilement). formatFn(data) renvoie
 -- le texte d'une ligne. Remplir avec SetListData(panel, items), items = liste de tables.
 -- top : décalage depuis le haut du cadre (défaut : juste sous l'en-tête).
-local function CreateScrollList(panel, formatFn, top)
+-- opts (facultatif) : lignes cliquables avec opts.onClick(data) ; opts.isSelected(data)
+-- met la ligne en surbrillance.
+local function CreateScrollList(panel, formatFn, top, opts)
 	top = top or HEADER_HEIGHT
+	opts = opts or {}
 	local scrollBox = CreateFrame("Frame", nil, panel, "WowScrollBoxList")
 	scrollBox:SetPoint("TOPLEFT", 10, -top)
 	scrollBox:SetPoint("BOTTOMRIGHT", -22, 8)
@@ -52,15 +58,33 @@ local function CreateScrollList(panel, formatFn, top)
 
 	local view = CreateScrollBoxListLinearView()
 	view:SetElementExtent(ROW_HEIGHT)
-	view:SetElementInitializer("Frame", function(row, data)
+	view:SetElementInitializer(opts.onClick and "Button" or "Frame", function(row, data)
 		if not row.text then
 			row.text = row:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-			row.text:SetPoint("LEFT")
-			row.text:SetPoint("RIGHT")
+			row.text:SetPoint("LEFT", 4, 0)
+			row.text:SetPoint("RIGHT", -4, 0)
 			row.text:SetJustifyH("LEFT")
 			row.text:SetWordWrap(false)
+
+			if opts.onClick then
+				-- Fond doré de la ligne sélectionnée, voile clair au survol.
+				row.selected = row:CreateTexture(nil, "BACKGROUND")
+				row.selected:SetAllPoints()
+				row.selected:SetColorTexture(1, 0.82, 0, 0.25)
+				local highlight = row:CreateTexture(nil, "HIGHLIGHT")
+				highlight:SetAllPoints()
+				highlight:SetColorTexture(1, 1, 1, 0.08)
+			end
 		end
 		row.text:SetText(formatFn(data))
+
+		if opts.onClick then
+			row.selected:SetShown(opts.isSelected and opts.isSelected(data) or false)
+			-- Les lignes sont recyclées : le script est rebranché sur la donnée courante.
+			row:SetScript("OnClick", function()
+				opts.onClick(data)
+			end)
+		end
 	end)
 	ScrollUtil.InitScrollBoxListWithScrollBar(scrollBox, scrollBar, view)
 
@@ -207,11 +231,19 @@ function P.BuildUI()
 
 	CreateScrollList(teamPanel, function(data)
 		return data.name
-	end, HEADER_HEIGHT + INPUT_HEIGHT)
+	end, HEADER_HEIGHT + INPUT_HEIGHT, {
+		onClick = function(data)
+			selectedTeam = data.name
+			P.RefreshUI()
+		end,
+		isSelected = function(data)
+			return data.name == selectedTeam
+		end,
+	})
 	teamPanel.emptyText:SetText("Aucune équipe")
 
 	-- 3. Personnages (contenu à définir ; liste défilante prête, vide pour l'instant).
-	local memberPanel = CreatePanel(f, "Personnages")
+	local memberPanel = CreatePanel(f, "Personnages de l'équipe")
 	memberPanel:SetPoint("TOPLEFT", teamPanel, "TOPRIGHT", PANEL_GAP, 0)
 	memberPanel:SetPoint("BOTTOMRIGHT", -PANEL_MARGIN, PANEL_MARGIN)
 	CreateScrollList(memberPanel, function(data)
@@ -272,6 +304,10 @@ function P.RefreshUI()
 	table.sort(teams, function(a, b)
 		return a.name < b.name
 	end)
+	-- Oublie une sélection devenue invalide (équipe absente de la liste).
+	if selectedTeam and not P.GetTeams()[selectedTeam] then
+		selectedTeam = nil
+	end
 	SetListData(ui.teamPanel, teams)
 
 	SetListData(ui.memberPanel, {})
