@@ -7,11 +7,11 @@ P.SYNC_PREFIX = "POLYPODE"
 P.debugEnabled = false
 
 BINDING_HEADER_POLYPODE = "Polypode"
-_G["BINDING_NAME_POLYPODE_TOGGLEUI"] = "Polypode: Ouvrir/Fermer l'interface"
-_G["BINDING_NAME_POLYPODE_SETLEADER"] = "Polypode: Se nommer leader de l'équipe"
-_G["BINDING_NAME_POLYPODE_FOLLOW"] = "Polypode: Suivre le leader"
-_G["BINDING_NAME_POLYPODE_ASSIST"] = "Polypode: Assister le leader"
-_G["BINDING_NAME_POLYPODE_INVITE"] = "Polypode: Inviter l'équipe"
+_G["BINDING_NAME_POLYPODE_TOGGLEUI"] = "Ouvrir/Fermer l'interface"
+_G["BINDING_NAME_POLYPODE_SETLEADER"] = "Se nommer leader de l'équipe"
+_G["BINDING_NAME_POLYPODE_FOLLOW"] = "Suivre le leader"
+_G["BINDING_NAME_POLYPODE_ASSIST"] = "Assister le leader"
+_G["BINDING_NAME_POLYPODE_INVITE"] = "Inviter l'équipe"
 
 P.defaults = {
 	roster = {}, -- [nom-royaume] = { name, realm, class, level, lastSeen }
