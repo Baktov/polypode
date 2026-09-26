@@ -151,6 +151,31 @@ local function SortedKeyItems(set)
 	return items
 end
 
+-- Lignes d'infobulle d'un personnage : nom, rappels des clics (hints), puis ses équipes
+-- (l'équipe sélectionnée en vert).
+local function CharacterTooltip(key, hints)
+	local lines = { key }
+	for _, hint in ipairs(hints) do
+		lines[#lines + 1] = hint
+	end
+	lines[#lines + 1] = " "
+
+	local teams = P.GetCharacterTeams(key)
+	if #teams == 0 then
+		lines[#lines + 1] = "|cff999999Dans aucune équipe|r"
+	else
+		lines[#lines + 1] = "|cffffd200Équipes :|r"
+		for _, name in ipairs(teams) do
+			if name == selectedTeam then
+				lines[#lines + 1] = "  |cff00ff00" .. name .. "|r"
+			else
+				lines[#lines + 1] = "  " .. name
+			end
+		end
+	end
+	return lines
+end
+
 -- "Nom-Royaume" coloré selon la classe, puis classe localisée et niveau en gris.
 local function FormatCharacter(data)
 	local key = data.key
@@ -257,18 +282,12 @@ function P.BuildUI()
 		end,
 		tooltip = function(data)
 			if not selectedTeam then
-				return { data.key, "Sélectionnez d'abord une équipe pour y ajouter ce personnage." }
+				return CharacterTooltip(data.key, { "Sélectionnez d'abord une équipe pour y ajouter ce personnage." })
 			end
-			local members = P.GetTeamMembers(selectedTeam)
-			local status = (members and members[data.key])
-				and "|cff00ff00Membre de l'équipe « " .. selectedTeam .. " »|r"
-				or "|cff999999Pas dans l'équipe « " .. selectedTeam .. " »|r"
-			return {
-				data.key,
-				status,
-				"Clic gauche : ajouter à l'équipe",
-				"Clic droit : retirer de l'équipe",
-			}
+			return CharacterTooltip(data.key, {
+				"Clic gauche : ajouter à l'équipe « " .. selectedTeam .. " »",
+				"Clic droit : retirer de l'équipe « " .. selectedTeam .. " »",
+			})
 		end,
 	})
 	charPanel.emptyText:SetText("Aucun personnage trouvé")
@@ -333,7 +352,7 @@ function P.BuildUI()
 			end
 		end,
 		tooltip = function(data)
-			return { data.key, "Clic droit : retirer de l'équipe « " .. (selectedTeam or "") .. " »" }
+			return CharacterTooltip(data.key, { "Clic droit : retirer de l'équipe « " .. (selectedTeam or "") .. " »" })
 		end,
 	})
 

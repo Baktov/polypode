@@ -142,6 +142,18 @@ function P.AddTeamMember(teamName, key)
 	end
 end
 
+-- Noms des équipes dont le personnage est membre, triés par ordre alphabétique.
+function P.GetCharacterTeams(key)
+	local names = {}
+	for name, team in pairs(P.db.teams) do
+		if team.members and team.members[key] then
+			names[#names + 1] = name
+		end
+	end
+	table.sort(names)
+	return names
+end
+
 function P.RemoveTeamMember(teamName, key)
 	local members = P.GetTeamMembers(teamName)
 	if members then
