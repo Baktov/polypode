@@ -127,6 +127,25 @@ function P.BuildOptions()
 		.. "validation automatique prend ensuite le relais. Sur le leader, annonce ses choix au "
 		.. "groupe. Réglage propre à ce personnage.")
 
+	-- Cinématiques passées par le leader (par personnage, cf. Cinematics.lua).
+	local cinematicSetting = Settings.RegisterProxySetting(
+		category,
+		"POLYPODE_AUTO_SKIP_CINEMATIC",
+		Settings.VarType.Boolean,
+		"Passer automatiquement les cinématiques",
+		Settings.Default.True,
+		function()
+			return P.charDb.autoSkipCinematic
+		end,
+		function(value)
+			P.charDb.autoSkipCinematic = value
+		end
+	)
+	Settings.CreateCheckbox(category, cinematicSetting,
+		"Quand le leader de l'équipe passe une cinématique ou une vidéo, ce personnage la passe "
+		.. "aussi (dès qu'elle s'affiche, jusqu'à 15 secondes après). Sur le leader, annonce ses "
+		.. "cinématiques passées au groupe. Réglage propre à ce personnage.")
+
 	Settings.RegisterAddOnCategory(category)
 	P.optionsCategory = category
 end

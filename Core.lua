@@ -36,6 +36,7 @@ P.charDefaults = {
 	autoAcceptQuest = true, -- accepter les quêtes acceptées par le leader (Quests.lua)
 	autoValidateQuest = true, -- valider (continuer + terminer) les quêtes validées par le leader
 	autoSelectGossip = true, -- suivre les dialogues de PNJ du leader (quêtes, options, fermeture)
+	autoSkipCinematic = true, -- passer les cinématiques passées par le leader (Cinematics.lua)
 	-- selectedTeam : nom de l'équipe sélectionnée dans la fenêtre (nil par défaut),
 	-- conservé même si l'équipe manque momentanément (cf. UI_Main.lua).
 }
@@ -356,6 +357,12 @@ function P.GetSelectedTeam()
 	if name and P.db.teams[name] then
 		return name
 	end
+end
+
+-- Vrai si ce personnage est le leader de son équipe sélectionnée.
+function P.IsTeamLeader()
+	local team = P.GetSelectedTeam()
+	return team ~= nil and P.GetTeamLeader(team) == P.GetCharKey()
 end
 
 -- Raison pour laquelle ce personnage ne peut pas inviter l'équipe, ou nil s'il le peut :

@@ -62,9 +62,6 @@ local pendingValidateID -- quête à « continuer » dès que possible
 local pendingRewardID, pendingRewardChoice -- quête à terminer dès que possible, et choix
 local gossipReadyAt -- dernier dialogue de PNJ ouvert (GOSSIP_SHOW)
 
--- Leader : [type .. questID] = GetTime() de la dernière annonce.
-local lastBroadcast = {}
-
 local function AcceptEnabled()
 	return P.charDb and P.charDb.autoAcceptQuest
 end
@@ -77,11 +74,6 @@ local function GossipEnabled()
 	return P.charDb and P.charDb.autoSelectGossip
 end
 
-local function IsTeamLeader()
-	local team = P.GetSelectedTeam()
-	return team and P.GetTeamLeader(team) == P.GetCharKey()
-end
-
 local function CurrentQuestID()
 	return GetQuestID and GetQuestID() or 0
 end
@@ -90,34 +82,13 @@ local function IsRecent(at)
 	return at and GetTime() - at < READY_WINDOW
 end
 
--- Leader : envoie « kind:token:fields » au groupe/raid, une seule fois par fenêtre de
--- dédoublonnage (window secondes) pour une même clé, quel que soit le nombre de
--- déclencheurs. fields : champs après le token (peut être vide).
-local function Send(kind, fields, dedupKey, window, reason)
-	if not IsTeamLeader() or not IsInGroup() then
-		return
-	end
-	local now = GetTime()
-	if lastBroadcast[dedupKey] and now - lastBroadcast[dedupKey] < window then
-		return
-	end
-	local token = P.GetTeamToken()
-	if not token then
-		return
-	end
-	lastBroadcast[dedupKey] = now
-	local message = kind .. ":" .. token .. (fields ~= "" and (":" .. fields) or "")
-	P.Broadcast(message, IsInRaid() and "RAID" or "PARTY")
-	P.Debug(kind .. " " .. fields .. " annoncé au groupe (" .. reason .. ")")
-end
-
 -- Leader : annonce une action de quête (kind = QACCEPT, QVALIDATE, QREWARD, GQAVAIL,
 -- GQACTIVE). extra : champ supplémentaire (choix de récompense).
 local function Announce(kind, questID, extra, reason)
 	if not questID or questID == 0 then
 		return
 	end
-	Send(kind, questID .. (extra and (":" .. extra) or ""), kind .. questID, BROADCAST_DEDUP, reason)
+	P.BroadcastLeaderAction(kind, questID .. (extra and (":" .. extra) or ""), kind .. questID, BROADCAST_DEDUP, reason)
 end
 
 local function AnnounceAccept(questID, reason)
@@ -348,7 +319,7 @@ local function AnnounceGossipOption(gossipOptionID, orderIndex, reason)
 		return
 	end
 	local fields = (gossipOptionID or 0) .. ":" .. (orderIndex or "")
-	Send("GOSSIP", fields, "GOSSIP" .. fields, GOSSIP_DEDUP, reason)
+	P.BroadcastLeaderAction("GOSSIP", fields, "GOSSIP" .. fields, GOSSIP_DEDUP, reason)
 end
 
 -- Réception de GOSSIP (Sync.lua) : choisit la même option dans le dialogue ouvert.
@@ -439,7 +410,7 @@ local function TryHookDialogueUIClose()
 	end
 	frame:HookScript("OnHide", function()
 		if GossipEnabled() then
-			Send("CLOSEUI", "", "CLOSEUI", CLOSE_DEDUP, "fermeture de DialogueUI")
+			P.BroadcastLeaderAction("CLOSEUI", "", "CLOSEUI", CLOSE_DEDUP, "fermeture de DialogueUI")
 		end
 	end)
 	closeHookInstalled = true

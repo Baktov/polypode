@@ -22,6 +22,16 @@ local QUEST_EVENTS = {
 for questEvent in pairs(QUEST_EVENTS) do
 	frame:RegisterEvent(questEvent)
 end
+-- Passage automatique des cinématiques (Cinematics.lua)
+local CINEMATIC_EVENTS = {
+	CINEMATIC_START = true,
+	PLAY_MOVIE = true,
+	CINEMATIC_STOP = true,
+	STOP_MOVIE = true,
+}
+for cinematicEvent in pairs(CINEMATIC_EVENTS) do
+	frame:RegisterEvent(cinematicEvent)
+end
 
 frame:SetScript("OnEvent", function(self, event, ...)
 	if event == "ADDON_LOADED" then
@@ -47,6 +57,8 @@ frame:SetScript("OnEvent", function(self, event, ...)
 		P.ApplyPendingKeybinds()
 	elseif QUEST_EVENTS[event] then
 		P.OnQuestEvent(event, ...)
+	elseif CINEMATIC_EVENTS[event] then
+		P.OnCinematicEvent(event)
 	elseif event == "CHAT_MSG_ADDON" then
 		local prefix, message, channel, sender = ...
 		if prefix == P.SYNC_PREFIX then

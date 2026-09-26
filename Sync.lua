@@ -137,6 +137,31 @@ function P.SayHello(kind, channel)
 		UnitName("player"), GetRealmName(), class, level), channel)
 end
 
+-- ACTIONS DU LEADER (Quests.lua, Cinematics.lua) : le leader de l'équipe sélectionnée
+-- annonce au groupe/raid une action que les membres rejouent (cf. LEADER_ONLY).
+-- Envoie « kind:token:fields » une seule fois par fenêtre de dédoublonnage (window secondes)
+-- pour une même clé, quel que soit le nombre de déclencheurs (hooks, événements).
+-- fields : champs après le token (peut être vide) ; reason : origine, pour le debug.
+local lastLeaderAction = {} -- [dedupKey] = GetTime() du dernier envoi
+
+function P.BroadcastLeaderAction(kind, fields, dedupKey, window, reason)
+	if not P.IsTeamLeader() or not IsInGroup() then
+		return
+	end
+	local now = GetTime()
+	if lastLeaderAction[dedupKey] and now - lastLeaderAction[dedupKey] < window then
+		return
+	end
+	local token = P.GetTeamToken()
+	if not token then
+		return
+	end
+	lastLeaderAction[dedupKey] = now
+	local message = kind .. ":" .. token .. (fields ~= "" and (":" .. fields) or "")
+	P.Broadcast(message, IsInRaid() and "RAID" or "PARTY")
+	P.Debug(kind .. " " .. fields .. " annoncé au groupe (" .. reason .. ")")
+end
+
 -- Taille maximale d'un message addon (octets), imposée par le client WoW.
 local MAX_MESSAGE_LENGTH = 255
 
@@ -313,6 +338,7 @@ local LEADER_ONLY = {
 	GQACTIVE = true,
 	GOSSIP = true,
 	CLOSEUI = true,
+	CINESKIP = true,
 }
 
 -- Vrai si l'expéditeur (Nom-Royaume du message addon) est la clé de roster key.
@@ -373,6 +399,10 @@ function P.OnSyncMessage(message, channel, sender)
 	elseif kind == "CLOSEUI" then
 		-- CLOSEUI:token — le leader a fermé son DialogueUI (Quests.lua).
 		P.OnDialogCloseMessage(sender)
+		return
+	elseif kind == "CINESKIP" then
+		-- CINESKIP:token:kind — le leader a passé une cinématique (Cinematics.lua).
+		P.OnCinematicSkipMessage(rest, sender)
 		return
 	end
 
