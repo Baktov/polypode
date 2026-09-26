@@ -45,6 +45,8 @@ automatique de base entre vos clients — sans configuration complexe.
 | `/poly remove <nom-royaume>` | Retirer un personnage du roster |
 | `/poly leader <nom-royaume>` | Désigner le leader |
 | `/poly ui` | Ouvrir/fermer la fenêtre principale |
+| `/poly minimap` | Afficher/masquer l'icône de minimap |
+| `/poly options` | Ouvrir le panneau d'options (Options → AddOns → Polypode) |
 | `/poly debug` | Activer/désactiver les messages de debug |
 | `/poly` (sans argument) | Afficher l'aide |
 
@@ -73,6 +75,19 @@ Un bouton en forme de **main** est placé autour de la minimap :
 Avec **EllesmereUI Minimap**, le bouton est rangé automatiquement dans le tiroir de
 boutons d'EllesmereUI, qui gère alors sa position.
 
+Pour masquer ou réafficher le bouton : `/poly minimap`, ou la case correspondante dans
+le panneau d'options. Le choix est mémorisé pour le compte.
+
+---
+
+## Options
+
+Panneau dans **Options → AddOns → Polypode** (ou `/poly options`) :
+
+| Option | Défaut | Effet |
+|---|---|---|
+| Afficher l'icône de minimap | Oui | Affiche le bouton Polypode autour de la minimap |
+
 ---
 
 ## Apparence
@@ -92,9 +107,9 @@ vous avez désactivé le skin de Polypode dans ses options).
 
 ## État du projet
 
-Version `0.3.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
+Version `0.4.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
 automatique aux annonces, fenêtre de liste skinnée (EllesmereUI/ElvUI), bouton de
-minimap, commandes, raccourci clavier. Pistes envisagées pour la suite,
+minimap (masquable), panneau d'options, commandes, raccourci clavier. Pistes envisagées pour la suite,
 à activer seulement si le besoin se confirme (voir la règle de simplicité dans
 `CLAUDE.md`) :
 

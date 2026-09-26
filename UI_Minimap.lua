@@ -95,4 +95,22 @@ function P.BuildMinimapButton()
 
 	UpdatePosition(b)
 	P.ui.minimapButton = b
+	if P.db.minimap.hide then
+		b:Hide()
+	end
+end
+
+-- Affiche/masque le bouton et mémorise le choix. Show()/Hide() explicites (et non
+-- SetShown) : EllesmereUIMinimap les intercepte pour retirer le bouton de son tiroir.
+function P.SetMinimapButtonShown(show)
+	P.db.minimap.hide = not show
+	local b = P.ui.minimapButton
+	if not b then
+		return
+	end
+	if show then
+		b:Show()
+	else
+		b:Hide()
+	end
 end

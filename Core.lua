@@ -14,6 +14,7 @@ P.defaults = {
 	leader = nil, -- clé (nom-royaume) du leader désigné
 	minimap = {
 		angle = 225, -- position du bouton autour de la minimap, en degrés (225 = bas gauche)
+		hide = false, -- true : bouton masqué (/poly minimap ou panneau d'options)
 	},
 }
 

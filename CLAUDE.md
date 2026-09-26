@@ -23,7 +23,8 @@ n'ajoute une fonctionnalité que si elle sert directement cet objectif.
 | `Sync.lua` | Broadcast/réception de messages addon (`C_ChatInfo`), token d'équipe (`P.GetTeamToken`, hash du BattleTag), annonce `HELLO` / réponse `HI` |
 | `UI_Skin.lua` | Skinning conditionnel : EllesmereUI (`EllesmereUI.RegisterSkin`, prioritaire) puis ElvUI |
 | `UI_Main.lua` | Fenêtre principale : `BuildUI`, `RefreshUI`, `ToggleUI` |
-| `UI_Minimap.lua` | Bouton de minimap sans librairie (`P.BuildMinimapButton`, appelé à `PLAYER_LOGIN`), angle dans `P.db.minimap.angle` |
+| `UI_Minimap.lua` | Bouton de minimap sans librairie (`P.BuildMinimapButton`, appelé à `PLAYER_LOGIN`), `P.SetMinimapButtonShown`, état dans `P.db.minimap` (`angle`, `hide`) |
+| `UI_Options.lua` | Panneau Options → AddOns via l'API `Settings` (`P.BuildOptions` à `PLAYER_LOGIN`, `P.OpenOptions`) |
 | `Commands.lua` | Commande slash `/poly` (`/polypode`) et fonctions globales de keybinding |
 | `Events.lua` | Handlers `ADDON_LOADED`, `PLAYER_LOGIN`, `CHAT_MSG_ADDON` |
 | `Bindings.xml` | Déclaration XML des raccourcis clavier WoW |
@@ -46,7 +47,7 @@ en tête de chaque fichier). Ex. `P.db` (= `PolypodeDB`), `P.charDb` (= `Polypod
 6. **Pas de `print()`** en production — utiliser `P.Debug(msg)`, qui respecte `P.debugEnabled`.
 7. **Messages de sync** : toujours via `P.SYNC_PREFIX`, jamais de préfixe en dur ailleurs.
 8. **UI** : frames créées avec `CreateFrame`, toutes référencées dans `P.ui.*`.
-9. **Ordre de chargement** respecte le `.toc` (`Core → Sync → UI_Skin → UI_Main → UI_Minimap → Commands → Events → Bindings`).
+9. **Ordre de chargement** respecte le `.toc` (`Core → Sync → UI_Skin → UI_Main → UI_Minimap → UI_Options → Commands → Events → Bindings`).
    Ne jamais appeler au niveau fichier (hors fonction) une fonction définie dans un fichier chargé après.
    Les appels **à l'intérieur** d'une fonction peuvent référencer un fichier suivant (résolu à l'exécution).
 10. **Pas de globals parasites** : toute variable de module doit être `local` ou sous `Polypode.`
@@ -103,6 +104,13 @@ par défaut explicite gérée par `CopyDefaults`.
 si c'est un frame top-level. Exposer le titre en `frame.TitleText` et le bouton de fermeture
 en `frame.CloseButton` : `P.SkinFrame` les retrouve sous ces noms (le skin EllesmereUI recentre
 le titre dans sa barre de titre de 25 px, ElvUI skinne le `CloseButton`).
+
+### Ajouter une option au panneau (Options → AddOns → Polypode)
+→ Dans `P.BuildOptions` (`UI_Options.lua`) : `Settings.RegisterProxySetting` avec getter/setter
+qui lisent/écrivent `P.db` (valeur par défaut dans `P.defaults`, `Core.lua`), puis
+`Settings.CreateCheckbox`. Le proxy garde la case synchronisée si une commande slash change
+la même valeur. Si l'option pilote un frame, passer par une fonction `P.Set...` commune au
+setter et à la commande slash (ex. `P.SetMinimapButtonShown`).
 
 ### Envoyer un message de synchronisation
 → Utiliser `P.Broadcast(message, channel)` défini dans `Sync.lua`. Format de message :

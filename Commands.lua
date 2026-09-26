@@ -9,6 +9,8 @@ local function PrintHelp()
 	print("  /poly remove <nom-royaume> — retirer un personnage du roster")
 	print("  /poly leader <nom-royaume> — définir le leader")
 	print("  /poly ui           — ouvrir/fermer la fenêtre")
+	print("  /poly minimap      — afficher/masquer l'icône de minimap")
+	print("  /poly options      — ouvrir le panneau d'options")
 	print("  /poly debug        — activer/désactiver le mode debug")
 end
 
@@ -52,6 +54,12 @@ local function SlashHandler(msg)
 		end
 	elseif sub == "ui" then
 		P.ToggleUI()
+	elseif sub == "minimap" then
+		local show = P.db.minimap.hide
+		P.SetMinimapButtonShown(show)
+		print("Polypode: icône de minimap " .. (show and "affichée" or "masquée"))
+	elseif sub == "options" then
+		P.OpenOptions()
 	elseif sub == "debug" then
 		P.debugEnabled = not P.debugEnabled
 		print("Polypode: debug " .. (P.debugEnabled and "activé" or "désactivé"))
