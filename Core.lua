@@ -20,7 +20,7 @@ P.defaults = {
 		width = 720, -- taille de la fenêtre principale, mémorisée au redimensionnement
 		height = 320,
 	},
-	teams = {}, -- [nom] = { name, members = { [nom-royaume] = true } } ; créées depuis la fenêtre
+	teams = {}, -- [nom] = { name, members = { [nom-royaume] = true }, leader = nom-royaume|nil }
 }
 
 P.charDefaults = {
@@ -89,11 +89,9 @@ function P.RemoveCharacter(key)
 	if P.db.leader == key then
 		P.db.leader = nil
 	end
-	-- Un personnage retiré du roster ne reste membre d'aucune équipe.
-	for _, team in pairs(P.db.teams) do
-		if team.members then
-			team.members[key] = nil
-		end
+	-- Un personnage retiré du roster ne reste membre (ni leader) d'aucune équipe.
+	for name in pairs(P.db.teams) do
+		P.RemoveTeamMember(name, key)
 	end
 end
 
@@ -154,9 +152,28 @@ function P.GetCharacterTeams(key)
 	return names
 end
 
+-- Retire un membre ; s'il était leader de l'équipe, l'équipe n'a plus de leader.
 function P.RemoveTeamMember(teamName, key)
 	local members = P.GetTeamMembers(teamName)
 	if members then
 		members[key] = nil
+		local team = P.db.teams[teamName]
+		if team.leader == key then
+			team.leader = nil
+		end
+	end
+end
+
+-- Leader d'une équipe (clé nom-royaume), ou nil.
+function P.GetTeamLeader(teamName)
+	local team = teamName and P.db.teams[teamName]
+	return team and team.leader
+end
+
+-- Désigne le leader d'une équipe ; il doit en être membre.
+function P.SetTeamLeader(teamName, key)
+	local members = P.GetTeamMembers(teamName)
+	if members and members[key] then
+		P.db.teams[teamName].leader = key
 	end
 end

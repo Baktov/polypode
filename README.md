@@ -51,8 +51,16 @@ Ouverte par `/poly ui`, le raccourci clavier ou le bouton de minimap. Trois cadr
   en rouge à l'écran. **Échap** quitte le champ. **Cliquer** sur une équipe la sélectionne
   (surbrillance dorée) ; la sélection n'est pas mémorisée entre deux sessions.
 - **Personnages de l'équipe** : membres de l'équipe sélectionnée, triés par nom, même
-  présentation que les personnages trouvés ; **clic droit** sur un membre le retire de l'équipe (rappelé par une infobulle au survol, qui liste aussi ses équipes). Les équipes et leurs membres sont mémorisés
-  pour le compte ; un personnage retiré du roster (`/poly remove`) quitte aussi ses équipes.
+  présentation que les personnages trouvés.
+  - **Clic gauche** sur un membre : il devient **leader de l'équipe** (surbrillance dorée et
+    `[leader]`). Chaque équipe a son propre leader, distinct du leader global de `/poly leader`.
+  - **Clic droit** : retire le membre de l'équipe ; si c'était le leader, l'équipe n'a plus
+    de leader.
+  - L'infobulle au survol rappelle ces actions et liste les équipes du personnage, avec
+    `(leader)` là où il l'est.
+
+  Les équipes, leurs membres et leur leader sont mémorisés pour le compte ; un personnage
+  retiré du roster (`/poly remove`) quitte aussi ses équipes.
 
 Les trois listes défilent (molette ou barre de défilement), sans limite de nombre.
 
@@ -133,10 +141,10 @@ vous avez désactivé le skin de Polypode dans ses options).
 
 ## État du projet
 
-Version `0.10.3` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
+Version `0.11.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
 automatique aux annonces, fenêtre redimensionnable à trois listes défilantes (personnages
 trouvés / équipes avec création par saisie et sélection / personnages de l'équipe, ajout
-et retrait de membres au clic)
+et retrait de membres au clic, leader par équipe)
 skinnée (EllesmereUI/ElvUI), bouton de minimap (masquable), panneau d'options,
 commandes, raccourci clavier. Pistes envisagées pour la suite,
 à activer seulement si le besoin se confirme (voir la règle de simplicité dans

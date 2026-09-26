@@ -152,7 +152,7 @@ local function SortedKeyItems(set)
 end
 
 -- Lignes d'infobulle d'un personnage : nom, rappels des clics (hints), puis ses équipes
--- (l'équipe sélectionnée en vert).
+-- (l'équipe sélectionnée en vert, « (leader) » là où il est leader).
 local function CharacterTooltip(key, hints)
 	local lines = { key }
 	for _, hint in ipairs(hints) do
@@ -166,18 +166,23 @@ local function CharacterTooltip(key, hints)
 	else
 		lines[#lines + 1] = "|cffffd200Équipes :|r"
 		for _, name in ipairs(teams) do
+			local line = name
 			if name == selectedTeam then
-				lines[#lines + 1] = "  |cff00ff00" .. name .. "|r"
-			else
-				lines[#lines + 1] = "  " .. name
+				line = "|cff00ff00" .. name .. "|r"
 			end
+			if P.GetTeamLeader(name) == key then
+				line = line .. " |cffffd200(leader)|r"
+			end
+			lines[#lines + 1] = "  " .. line
 		end
 	end
 	return lines
 end
 
 -- "Nom-Royaume" coloré selon la classe, puis classe localisée et niveau en gris.
-local function FormatCharacter(data)
+-- teamName (facultatif) : affichage dans une équipe, [leader] désigne alors le leader de
+-- cette équipe au lieu du leader global (/poly leader).
+local function FormatCharacter(data, teamName)
 	local key = data.key
 	local entry = P.GetRoster()[key] or {}
 	local label = key
@@ -200,7 +205,13 @@ local function FormatCharacter(data)
 	if key == P.GetCharKey() then
 		label = label .. " |cff999999(vous)|r"
 	end
-	if P.db.leader == key then
+	local leader
+	if teamName then
+		leader = P.GetTeamLeader(teamName)
+	else
+		leader = P.db.leader
+	end
+	if leader == key then
 		label = label .. " |cffffd200[leader]|r"
 	end
 	return label
@@ -344,15 +355,30 @@ function P.BuildUI()
 	local memberPanel = CreatePanel(f, "Personnages de l'équipe")
 	memberPanel:SetPoint("TOPLEFT", teamPanel, "TOPRIGHT", PANEL_GAP, 0)
 	memberPanel:SetPoint("BOTTOMRIGHT", -PANEL_MARGIN, PANEL_MARGIN)
-	CreateScrollList(memberPanel, FormatCharacter, nil, {
+	-- Clic gauche : leader de l'équipe (surligné) ; clic droit : retire le personnage.
+	CreateScrollList(memberPanel, function(data)
+		return FormatCharacter(data, selectedTeam)
+	end, nil, {
 		onClick = function(data, mouseButton)
-			if mouseButton == "RightButton" and selectedTeam then
-				P.RemoveTeamMember(selectedTeam, data.key)
-				P.RefreshUI()
+			if not selectedTeam then
+				return
 			end
+			if mouseButton == "RightButton" then
+				P.RemoveTeamMember(selectedTeam, data.key)
+			else
+				P.SetTeamLeader(selectedTeam, data.key)
+			end
+			P.RefreshUI()
+		end,
+		isSelected = function(data)
+			return P.GetTeamLeader(selectedTeam) == data.key
 		end,
 		tooltip = function(data)
-			return CharacterTooltip(data.key, { "Clic droit : retirer de l'équipe « " .. (selectedTeam or "") .. " »" })
+			local team = selectedTeam or ""
+			return CharacterTooltip(data.key, {
+				"Clic gauche : définir comme leader de l'équipe « " .. team .. " »",
+				"Clic droit : retirer de l'équipe « " .. team .. " »",
+			})
 		end,
 	})
 
