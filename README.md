@@ -51,7 +51,9 @@ automatique de base entre vos clients — sans configuration complexe.
 
 ## Fenêtre principale
 
-Ouverte par `/poly ui`, le raccourci clavier ou le bouton de minimap. Trois cadres côte à côte :
+Ouverte par `/poly ui`, le raccourci clavier ou le bouton de minimap. Le bouton **Options** (en haut
+à gauche de la barre de titre) ouvre directement le panneau d'options de Polypode. Trois cadres
+côte à côte :
 
 - **Personnages trouvés** : tous les personnages de votre équipe détectés via les canaux
   (groupe, raid, guilde), triés par nom. Nom en couleur de classe, puis classe et niveau ;
@@ -142,7 +144,8 @@ le panneau d'options. Le choix est mémorisé pour le compte.
 
 ## Options
 
-Panneau dans **Options → AddOns → Polypode** (ou `/poly options`) :
+Panneau dans **Options → AddOns → Polypode** (ou `/poly options`, ou le bouton **Options** de la
+fenêtre principale) :
 
 | Option | Défaut | Effet |
 |---|---|---|
@@ -167,11 +170,11 @@ vous avez désactivé le skin de Polypode dans ses options).
 
 ## État du projet
 
-Version `0.16.1` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
+Version `0.17.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
 automatique aux annonces, fenêtre redimensionnable à trois listes défilantes (personnages
 trouvés / équipes avec création par saisie et sélection / personnages de l'équipe, ajout
 et retrait de membres au clic, leader par équipe, invitation de toute l'équipe, synchronisation automatique et versionnée des équipes, ajout du joueur ciblé)
-skinnée (EllesmereUI/ElvUI), bouton de minimap (masquable), panneau d'options,
+skinnée (EllesmereUI/ElvUI), bouton de minimap (masquable), panneau d'options (accessible par un bouton de la fenêtre),
 commandes, raccourci clavier. Pistes envisagées pour la suite,
 à activer seulement si le besoin se confirme (voir la règle de simplicité dans
 `CLAUDE.md`) :

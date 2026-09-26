@@ -264,6 +264,22 @@ function P.BuildUI()
 	closeBtn:SetPoint("TOPRIGHT", -4, -4)
 	f.CloseButton = closeBtn -- nom attendu par les skins ElvUI/EllesmereUI
 
+	-- Bouton Options (barre de titre, à gauche) : ouvre Options > AddOns > Polypode.
+	local optionsBtn = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
+	optionsBtn:SetSize(70, 20)
+	optionsBtn:SetPoint("TOPLEFT", 6, -3)
+	optionsBtn:SetText("Options")
+	optionsBtn:SetScript("OnClick", function()
+		P.OpenOptions()
+	end)
+	optionsBtn:SetScript("OnEnter", function(self)
+		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+		GameTooltip:AddLine("Options")
+		GameTooltip:AddLine("Ouvre les options de Polypode (Options > AddOns > Polypode).", 1, 1, 1, true)
+		GameTooltip:Show()
+	end)
+	optionsBtn:SetScript("OnLeave", GameTooltip_Hide)
+
 	-- Poignée de redimensionnement (coin bas-droit), au-dessus des cadres intérieurs.
 	local grip = CreateFrame("Button", nil, f)
 	grip:SetSize(16, 16)
@@ -473,6 +489,7 @@ function P.BuildUI()
 	ui.frame = f
 	ui.title = title
 	ui.closeButton = closeBtn
+	ui.optionsButton = optionsBtn
 	ui.resizeGrip = grip
 	ui.charPanel = charPanel
 	ui.teamPanel = teamPanel
@@ -491,6 +508,7 @@ function P.BuildUI()
 		P.SkinButton(createBtn)
 		P.SkinButton(inviteBtn)
 		P.SkinButton(addTargetBtn)
+		P.SkinButton(optionsBtn)
 	end
 end
 
