@@ -278,10 +278,18 @@ function P.BuildUI()
 	teamPanel.emptyText:SetText("Aucune équipe")
 
 	-- 3. Personnages de l'équipe sélectionnée (texte vide renseigné par RefreshUI).
+	-- Clic droit : retire le personnage de l'équipe (clic gauche sans effet).
 	local memberPanel = CreatePanel(f, "Personnages de l'équipe")
 	memberPanel:SetPoint("TOPLEFT", teamPanel, "TOPRIGHT", PANEL_GAP, 0)
 	memberPanel:SetPoint("BOTTOMRIGHT", -PANEL_MARGIN, PANEL_MARGIN)
-	CreateScrollList(memberPanel, FormatCharacter)
+	CreateScrollList(memberPanel, FormatCharacter, nil, {
+		onClick = function(data, mouseButton)
+			if mouseButton == "RightButton" and selectedTeam then
+				P.RemoveTeamMember(selectedTeam, data.key)
+				P.RefreshUI()
+			end
+		end,
+	})
 
 	local function LayoutPanels()
 		local width = (f:GetWidth() - 2 * PANEL_MARGIN - 2 * PANEL_GAP) / 3
