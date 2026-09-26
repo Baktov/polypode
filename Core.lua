@@ -12,6 +12,9 @@ _G["BINDING_NAME_POLYPODE_TOGGLEUI"] = "Polypode: Ouvrir/Fermer l'interface"
 P.defaults = {
 	roster = {}, -- [nom-royaume] = { name, realm, class, level, lastSeen }
 	leader = nil, -- clé (nom-royaume) du leader désigné
+	minimap = {
+		angle = 225, -- position du bouton autour de la minimap, en degrés (225 = bas gauche)
+	},
 }
 
 P.charDefaults = {

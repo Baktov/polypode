@@ -18,6 +18,7 @@ frame:SetScript("OnEvent", function(self, event, ...)
 		P.RegisterComm()
 		self:RegisterEvent("CHAT_MSG_ADDON")
 		P.SayHello()
+		P.BuildMinimapButton()
 		P.Debug("Personnage enregistré : " .. key)
 	elseif event == "CHAT_MSG_ADDON" then
 		local prefix, message, channel, sender = ...

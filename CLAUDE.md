@@ -23,6 +23,7 @@ n'ajoute une fonctionnalité que si elle sert directement cet objectif.
 | `Sync.lua` | Broadcast/réception de messages addon (`C_ChatInfo`), token d'équipe (`P.GetTeamToken`, hash du BattleTag), annonce `HELLO` / réponse `HI` |
 | `UI_Skin.lua` | Skinning conditionnel : EllesmereUI (`EllesmereUI.RegisterSkin`, prioritaire) puis ElvUI |
 | `UI_Main.lua` | Fenêtre principale : `BuildUI`, `RefreshUI`, `ToggleUI` |
+| `UI_Minimap.lua` | Bouton de minimap sans librairie (`P.BuildMinimapButton`, appelé à `PLAYER_LOGIN`), angle dans `P.db.minimap.angle` |
 | `Commands.lua` | Commande slash `/poly` (`/polypode`) et fonctions globales de keybinding |
 | `Events.lua` | Handlers `ADDON_LOADED`, `PLAYER_LOGIN`, `CHAT_MSG_ADDON` |
 | `Bindings.xml` | Déclaration XML des raccourcis clavier WoW |
@@ -45,7 +46,7 @@ en tête de chaque fichier). Ex. `P.db` (= `PolypodeDB`), `P.charDb` (= `Polypod
 6. **Pas de `print()`** en production — utiliser `P.Debug(msg)`, qui respecte `P.debugEnabled`.
 7. **Messages de sync** : toujours via `P.SYNC_PREFIX`, jamais de préfixe en dur ailleurs.
 8. **UI** : frames créées avec `CreateFrame`, toutes référencées dans `P.ui.*`.
-9. **Ordre de chargement** respecte le `.toc` (`Core → Sync → UI_Skin → UI_Main → Commands → Events → Bindings`).
+9. **Ordre de chargement** respecte le `.toc` (`Core → Sync → UI_Skin → UI_Main → UI_Minimap → Commands → Events → Bindings`).
    Ne jamais appeler au niveau fichier (hors fonction) une fonction définie dans un fichier chargé après.
    Les appels **à l'intérieur** d'une fonction peuvent référencer un fichier suivant (résolu à l'exécution).
 10. **Pas de globals parasites** : toute variable de module doit être `local` ou sous `Polypode.`
@@ -125,7 +126,9 @@ signature exacte plutôt que de deviner. Deux sources, par ordre de préférence
 - ❌ Variables globales hors `Polypode.*` (sauf bindings `POLYPODE_*`/`BINDING_*`).
 - ❌ `C_ChatInfo.SendAddonMessage` appelé directement hors `Sync.lua`.
 - ❌ Hard-coder le préfixe `"POLYPODE"` ailleurs que dans `P.SYNC_PREFIX`.
-- ❌ Créer des frames hors de `UI_Main.lua` (ou d'un futur `UI_*.lua` dédié).
+- ❌ Créer des frames hors de `UI_Main.lua` (ou d'un `UI_*.lua` dédié, ex. `UI_Minimap.lua`).
+- ❌ Renommer `PolypodeMinimapButton` ou lui donner un nom finissant par un chiffre : les addons
+  de minimap (EllesmereUIMinimap, WindTools) détectent les boutons par leur nom.
 - ❌ Modifier `Polypode.toc` sans vérifier les dépendances inter-fichiers.
 - ❌ Ajouter une fonctionnalité "juste au cas où" qui ne sert pas l'objectif du projet
   (cf. Règle de simplicité ci-dessus).

@@ -62,6 +62,19 @@ Configurable dans le menu des raccourcis WoW, catégorie **Polypode** :
 
 ---
 
+## Bouton de minimap
+
+Un bouton en forme de **main** est placé autour de la minimap :
+
+- **Clic gauche** : ouvrir/fermer la fenêtre Polypode.
+- **Glisser** : déplacer le bouton autour de la minimap (position mémorisée pour le compte).
+  Fonctionne avec une minimap ronde ou carrée (ElvUI).
+
+Avec **EllesmereUI Minimap**, le bouton est rangé automatiquement dans le tiroir de
+boutons d'EllesmereUI, qui gère alors sa position.
+
+---
+
 ## Apparence
 
 La fenêtre s'adapte automatiquement à votre interface, sans configuration :
@@ -79,9 +92,9 @@ vous avez désactivé le skin de Polypode dans ses options).
 
 ## État du projet
 
-Version `0.2.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
-automatique aux annonces, fenêtre de liste skinnée (EllesmereUI/ElvUI), commandes,
-raccourci clavier. Pistes envisagées pour la suite,
+Version `0.3.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
+automatique aux annonces, fenêtre de liste skinnée (EllesmereUI/ElvUI), bouton de
+minimap, commandes, raccourci clavier. Pistes envisagées pour la suite,
 à activer seulement si le besoin se confirme (voir la règle de simplicité dans
 `CLAUDE.md`) :
 
@@ -91,7 +104,6 @@ raccourci clavier. Pistes envisagées pour la suite,
 - Réannonce à l'entrée en groupe (`GROUP_ROSTER_UPDATE`) pour les personnages sans
   guilde commune connectés avant d'être groupés.
 - Suivi automatique du leader (`follow`) et assist de cible.
-- Bouton minimap.
 - Invitation automatique du groupe depuis le roster.
 - Skin des textes de la fenêtre (police EllesmereUI via `S.Font`).
 
