@@ -186,6 +186,47 @@ function P.BuildOptions()
 		.. "portail d'instance, il confirme aussi. Sur le leader, annonce ces actions au groupe. "
 		.. "Réglage propre à ce personnage.")
 
+	-- Leader : volume envoyé à l'équipe par le raccourci « Envoyer le volume à l'équipe ».
+	local volumeSetting = Settings.RegisterProxySetting(
+		category,
+		"POLYPODE_SENT_VOLUME",
+		Settings.VarType.Number,
+		"Volume envoyé",
+		50,
+		function()
+			return P.charDb.sentVolume
+		end,
+		function(value)
+			P.charDb.sentVolume = math.floor(value + 0.5) -- entier, pour le message envoyé
+		end
+	)
+	local volumeOptions = Settings.CreateSliderOptions(0, 100, 5)
+	volumeOptions:SetLabelFormatter(MinimalSliderWithSteppersMixin.Label.Right, function(value)
+		return string.format("%d %%", value)
+	end)
+	Settings.CreateSlider(category, volumeSetting, volumeOptions,
+		"Volume principal (en %) que le raccourci « Envoyer le volume à l'équipe » applique aux "
+		.. "autres membres quand ce personnage est le leader. Réglage propre à ce personnage.")
+
+	-- Membre : appliquer le volume et la coupure du son envoyés par le leader (cf. Sound.lua).
+	local followSoundSetting = Settings.RegisterProxySetting(
+		category,
+		"POLYPODE_FOLLOW_LEADER_SOUND",
+		Settings.VarType.Boolean,
+		"Suivre le son du leader",
+		Settings.Default.True,
+		function()
+			return P.charDb.followLeaderSound
+		end,
+		function(value)
+			P.charDb.followLeaderSound = value
+		end
+	)
+	Settings.CreateCheckbox(category, followSoundSetting,
+		"Applique à ce personnage le volume envoyé par le leader de l'équipe et la coupure ou le "
+		.. "rétablissement du son (raccourcis du leader). Décoché : ce client garde son propre son. "
+		.. "Réglage propre à ce personnage.")
+
 	Settings.RegisterAddOnCategory(category)
 	P.optionsCategory = category
 end

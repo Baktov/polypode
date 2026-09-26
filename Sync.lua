@@ -343,6 +343,8 @@ local LEADER_ONLY = {
 	DELVEENTER = true,
 	DELVEEXIT = true,
 	INSTENTER = true,
+	VOLUME = true,
+	SOUND = true,
 }
 
 -- Vrai si l'expéditeur (Nom-Royaume du message addon) est la clé de roster key.
@@ -423,6 +425,14 @@ function P.OnSyncMessage(message, channel, sender)
 	elseif kind == "INSTENTER" then
 		-- INSTENTER:token:portal — le leader entre par un portail d'instance (Instances.lua).
 		P.OnInstanceEnterMessage(rest, sender)
+		return
+	elseif kind == "VOLUME" then
+		-- VOLUME:token:pourcentage — volume principal envoyé par le leader (Sound.lua).
+		P.OnVolumeMessage(tonumber(rest), sender)
+		return
+	elseif kind == "SOUND" then
+		-- SOUND:token:0|1 — son coupé / rétabli par le leader (Sound.lua).
+		P.OnSoundMessage(rest, sender)
 		return
 	end
 

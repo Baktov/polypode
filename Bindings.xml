@@ -14,4 +14,10 @@
   <Binding name="POLYPODE_INVITE" category="Polypode">
     POLYPODE_INVITE()
   </Binding>
+  <Binding name="POLYPODE_SENDVOLUME" category="Polypode">
+    POLYPODE_SENDVOLUME()
+  </Binding>
+  <Binding name="POLYPODE_TOGGLESOUND" category="Polypode">
+    POLYPODE_TOGGLESOUND()
+  </Binding>
 </Bindings>

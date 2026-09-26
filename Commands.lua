@@ -130,3 +130,12 @@ end
 function POLYPODE_INVITE()
 	P.InviteSelectedTeam()
 end
+
+-- Son de l'équipe, piloté par le leader (Sound.lua).
+function POLYPODE_SENDVOLUME()
+	P.SendTeamVolume()
+end
+
+function POLYPODE_TOGGLESOUND()
+	P.ToggleTeamSound()
+end

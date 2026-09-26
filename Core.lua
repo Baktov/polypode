@@ -12,6 +12,8 @@ _G["BINDING_NAME_POLYPODE_SETLEADER"] = "Se nommer leader de l'équipe"
 _G["BINDING_NAME_POLYPODE_FOLLOW"] = "Suivre le leader"
 _G["BINDING_NAME_POLYPODE_ASSIST"] = "Assister le leader"
 _G["BINDING_NAME_POLYPODE_INVITE"] = "Inviter l'équipe"
+_G["BINDING_NAME_POLYPODE_SENDVOLUME"] = "Envoyer le volume à l'équipe"
+_G["BINDING_NAME_POLYPODE_TOGGLESOUND"] = "Couper/rétablir le son de l'équipe"
 
 P.defaults = {
 	roster = {}, -- [nom-royaume] = { name, realm, class, level, lastSeen }
@@ -39,6 +41,8 @@ P.charDefaults = {
 	autoSkipCinematic = true, -- passer les cinématiques passées par le leader (Cinematics.lua)
 	autoTaxi = true, -- prendre le vol pris par le leader chez un maître de vol (Taxi.lua)
 	autoEnterInstance = true, -- suivre le leader en gouffre (entrée, sortie) et par portail (Instances.lua)
+	sentVolume = 50, -- leader : volume (%) envoyé à l'équipe par raccourci (Sound.lua)
+	followLeaderSound = true, -- membre : appliquer le volume / la coupure du son du leader
 	-- selectedTeam : nom de l'équipe sélectionnée dans la fenêtre (nil par défaut),
 	-- conservé même si l'équipe manque momentanément (cf. UI_Main.lua).
 }
