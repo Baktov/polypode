@@ -19,7 +19,9 @@ P.defaults = {
 		width = 720, -- taille de la fenêtre principale, mémorisée au redimensionnement
 		height = 320,
 	},
-	teams = {}, -- [nom] = { name, members = { [nom-royaume] = true }, leader = nom-royaume|nil }
+	-- [nom] = { name, members = { [nom-royaume] = true }, leader = nom-royaume|nil,
+	--          updated = heure serveur de la dernière modification (synchro) }
+	teams = {},
 }
 
 P.charDefaults = {}
@@ -98,6 +100,19 @@ function P.GetRoster()
 	return P.db.roster
 end
 
+-- Toute modification locale d'une équipe passe par ici : horodatage (heure serveur, commune
+-- à tous les clients) puis envoi aux autres Polypode. Indispensable quand plusieurs clients
+-- partagent le même fichier de sauvegarde (jonctions entre comptes) : chacun le réécrit en
+-- entier à la déconnexion, il faut donc que tous aient la même version en mémoire.
+local function TeamChanged(teamName)
+	-- Strictement croissant : deux modifications dans la même seconde restent ordonnées.
+	local team = P.db.teams[teamName]
+	team.updated = math.max(GetServerTime(), (team.updated or 0) + 1)
+	if P.SyncTeam then
+		P.SyncTeam(teamName)
+	end
+end
+
 -- Crée une équipe. Renvoie true, ou false et un message d'erreur à afficher.
 function P.CreateTeam(name)
 	name = strtrim(name or "")
@@ -108,6 +123,7 @@ function P.CreateTeam(name)
 		return false, "L'équipe « " .. name .. " » existe déjà."
 	end
 	P.db.teams[name] = { name = name, members = {} }
+	TeamChanged(name)
 	return true
 end
 
@@ -128,8 +144,9 @@ end
 
 function P.AddTeamMember(teamName, key)
 	local members = P.GetTeamMembers(teamName)
-	if members and P.db.roster[key] then
+	if members and P.db.roster[key] and not members[key] then
 		members[key] = true
+		TeamChanged(teamName)
 	end
 end
 
@@ -148,12 +165,13 @@ end
 -- Retire un membre ; s'il était leader de l'équipe, l'équipe n'a plus de leader.
 function P.RemoveTeamMember(teamName, key)
 	local members = P.GetTeamMembers(teamName)
-	if members then
+	if members and members[key] then
 		members[key] = nil
 		local team = P.db.teams[teamName]
 		if team.leader == key then
 			team.leader = nil
 		end
+		TeamChanged(teamName)
 	end
 end
 
@@ -163,29 +181,42 @@ function P.GetTeamLeader(teamName)
 	return team and team.leader
 end
 
--- Applique une définition d'équipe reçue d'un autre client (Sync.lua). Crée l'équipe si
--- besoin ; reset = true vide d'abord ses membres (premier fragment d'une synchro).
--- Les membres sont pris tels quels, même absents du roster local.
-function P.ApplyTeamSync(teamName, reset, leader, memberKeys)
+-- Horodatage de la dernière modification d'une équipe (0 si inconnu : équipe antérieure
+-- à la synchro automatique).
+function P.GetTeamUpdated(teamName)
+	local team = teamName and P.db.teams[teamName]
+	return team and team.updated or 0
+end
+
+-- Applique une définition d'équipe reçue d'un autre client (Sync.lua), sans la renvoyer.
+-- reset = true : premier fragment d'une version ; appliqué seulement si cette version est
+-- plus récente que la version locale (une copie ancienne n'écrase jamais une récente) : les
+-- membres sont remplacés. reset = false : fragment suivant ; appliqué seulement si la
+-- version locale est celle du premier fragment (les membres s'ajoutent).
+-- Les membres sont pris tels quels, même absents du roster local. Renvoie true si appliqué.
+function P.ApplyTeamSync(teamName, updated, reset, leader, memberKeys)
 	local team = P.db.teams[teamName]
-	if not team then
-		team = { name = teamName, members = {} }
+	if reset then
+		if team and P.GetTeamUpdated(teamName) >= updated then
+			return false
+		end
+		team = { name = teamName, members = {}, leader = leader, updated = updated }
 		P.db.teams[teamName] = team
-	end
-	if reset or not team.members then
-		team.members = {}
+	elseif not team or team.updated ~= updated then
+		return false
 	end
 	for _, key in ipairs(memberKeys) do
 		team.members[key] = true
 	end
-	team.leader = leader
+	return true
 end
 
 -- Désigne le leader d'une équipe ; il doit en être membre.
 function P.SetTeamLeader(teamName, key)
 	local members = P.GetTeamMembers(teamName)
-	if members and members[key] then
+	if members and members[key] and P.db.teams[teamName].leader ~= key then
 		P.db.teams[teamName].leader = key
+		TeamChanged(teamName)
 	end
 end
 

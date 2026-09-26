@@ -365,8 +365,9 @@ function P.BuildUI()
 		else
 			UIErrorsFrame:AddMessage(message, 1, 0.1, 0.1)
 		end
-		-- Dans tous les cas, partage l'équipe avec les Polypode des membres.
-		P.SyncTeam(selectedTeam)
+		-- Dans tous les cas, partage l'équipe avec les Polypode des membres (et des clients
+		-- connectés), qui la sélectionnent.
+		P.SyncTeam(selectedTeam, nil, true)
 	end)
 	inviteBtn:SetScript("OnEnter", function(self)
 		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")

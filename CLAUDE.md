@@ -19,8 +19,8 @@ n'ajoute une fonctionnalité que si elle sert directement cet objectif.
 
 | Fichier | Rôle |
 |---|---|
-| `Core.lua` | Table globale `Polypode` (alias local `P`), SavedVariables, CRUD du roster, équipes (`P.CreateTeam`, `P.GetTeams`, `P.GetTeamMembers`, `P.AddTeamMember`, `P.RemoveTeamMember`, `P.GetCharacterTeams(key)`, `P.GetTeamLeader`, `P.SetTeamLeader` (leader = membre, effacé à son retrait), `P.GetTargetName(entry)`, `P.GetTeamInvitees`, `P.InviteTeam`, `P.ApplyTeamSync` (invitation via `C_PartyInfo.InviteUnit`, nom court de royaume, limite de 5 hors raid) ; `P.db.teams[nom] = { name, members = { [nom-royaume] = true }, leader }`, `members` créé à la volée pour les anciennes équipes ; `P.RemoveCharacter` retire aussi le perso des équipes) |
-| `Sync.lua` | Broadcast/réception de messages addon (`C_ChatInfo`), token d'équipe (`P.GetTeamToken`, hash du BattleTag), annonce `HELLO` / réponse `HI`, synchro d'équipe `TEAM` (`P.SyncTeam`, chuchotement aux membres) |
+| `Core.lua` | Table globale `Polypode` (alias local `P`), SavedVariables, CRUD du roster, équipes (`P.CreateTeam`, `P.GetTeams`, `P.GetTeamMembers`, `P.AddTeamMember`, `P.RemoveTeamMember`, `P.GetCharacterTeams(key)`, `P.GetTeamLeader`, `P.SetTeamLeader` (leader = membre, effacé à son retrait), `P.GetTargetName(entry)`, `P.GetTeamInvitees`, `P.InviteTeam`, `P.ApplyTeamSync`, `P.GetTeamUpdated` — toute modification passe par la locale `TeamChanged` (horodatage `updated` + synchro) — (invitation via `C_PartyInfo.InviteUnit`, nom court de royaume, limite de 5 hors raid) ; `P.db.teams[nom] = { name, members = { [nom-royaume] = true }, leader }`, `members` créé à la volée pour les anciennes équipes ; `P.RemoveCharacter` retire aussi le perso des équipes) |
+| `Sync.lua` | Broadcast/réception de messages addon (`C_ChatInfo`), token d'équipe (`P.GetTeamToken`, hash du BattleTag), annonce `HELLO` / réponse `HI`, synchro d'équipe `TEAM` (`P.SyncTeam`, `P.SyncAllTeams`, chuchotement, file d'envoi, filtre d'erreur hors ligne) |
 | `UI_Skin.lua` | Skinning conditionnel : EllesmereUI (`EllesmereUI.RegisterSkin`, prioritaire) puis ElvUI. `P.SkinFrame` (fenêtre top-level), `P.SkinPanel` (cadre intérieur), `P.SkinScrollBar` (barre de défilement), `P.SkinEditBox` (champ de saisie), `P.SkinButton` (bouton texte) |
 | `UI_Main.lua` | Fenêtre principale redimensionnable (`P.ui.resizeGrip`, taille dans `P.db.mainFrame`) : `BuildUI`, `RefreshUI`, `ToggleUI`. Trois cadres à liste défilante (`panel.scrollBox`, `panel.scrollBar`, `panel.emptyText`), un tiers de largeur chacun (`LayoutPanels` sur `OnSizeChanged`) : `P.ui.charPanel` (personnages trouvés = roster trié ; avec une équipe sélectionnée, clic gauche = ajout, clic droit = retrait, membres surlignés), `P.ui.teamPanel` (équipes : `P.ui.teamInput` + `P.ui.teamCreateButton` → `P.CreateTeam`, liste triée, clic = sélection dans la locale `selectedTeam`, session uniquement), `P.ui.memberPanel` (« Personnages de l'équipe » : membres de l'équipe sélectionnée, bouton `P.ui.inviteButton` « Inviter l'équipe » → `P.InviteTeam` + `P.SyncTeam`, clic gauche = leader de l'équipe (surligné), clic droit = retrait) |
 | `UI_Minimap.lua` | Bouton de minimap sans librairie (`P.BuildMinimapButton`, appelé à `PLAYER_LOGIN`), `P.SetMinimapButtonShown`, état dans `P.db.minimap` (`angle`, `hide`) |
@@ -135,10 +135,26 @@ type de réponse distinct (`HELLO` → `HI`) pour ne jamais boucler.
 `P.OnSyncMessage` lit `TYPE:token:reste` (`strsplit(":", message, 3)`) puis dispatche selon le type.
 Messages existants :
 - `HELLO` / `HI` : `TYPE:token:nom:royaume:classe:niveau` (canal groupe/raid/guilde).
-- `TEAM` : `TEAM:token:flag:leader:membre1,membre2,...:nomÉquipe`, envoyé par `P.SyncTeam` en
-  **WHISPER** à chaque membre (clic « Inviter l'équipe »). `flag` = `N` (premier fragment : le
-  destinataire remplace les membres) ou `+` (suite) ; liste découpée pour tenir dans 255 octets ;
-  nom d'équipe en dernier (peut contenir `:`). Réception : `P.ApplyTeamSync` puis `P.SelectTeam`.
+- `TEAM` : `TEAM:token:flag:version:leader:membre1,membre2,...:nomÉquipe`, envoyé par
+  `P.SyncTeam(teamName, target, select)` en **WHISPER**. `flag` = `N` (premier fragment), `S`
+  (premier fragment + sélection chez le destinataire) ou `+` (suite) ; `version` = `team.updated`
+  (heure serveur, strictement croissante par équipe) ; liste découpée pour tenir dans 255 octets ;
+  nom d'équipe en dernier (peut contenir `:`). Réception : `P.ApplyTeamSync` n'applique un premier
+  fragment que si sa version est **plus récente** que la locale, et un `+` que si la version locale
+  est celle du premier fragment. Destinataires : `target`, sinon les clients connectés vus via
+  HELLO/HI pendant la session (`onlineChars`), plus les membres si `select`.
+- Déclencheurs : toute modification d'équipe dans `Core.lua` passe par `TeamChanged` (horodatage +
+  `P.SyncTeam`) ; `P.ApplyTeamSync` n'appelle jamais `TeamChanged` (pas d'écho). À la réception d'un
+  HELLO ou HI, `P.SyncAllTeams(sender)` : échange complet dans les deux sens.
+- Tous les envois passent par une **file** (`P.Broadcast`) : un message à la fois, retenté si le
+  client le rejette pour limite de débit. L'erreur système « joueur non connecté » consécutive à
+  nos chuchotements est filtrée (`CHAT_MSG_SYSTEM`) et retire le personnage de `onlineChars`.
+
+**Environnement de l'utilisateur** : les dossiers `WTF/Account/*/SavedVariables` de ses comptes
+sont des **jonctions vers un seul dossier** (`BAKTOV`). Tous les clients lisent et réécrivent donc
+le même `Polypode.lua` (réécriture complète à chaque déconnexion/reload : le dernier qui écrit
+gagne). Toute donnée persistante modifiable depuis un client doit être synchronisée en mémoire
+vers les autres clients connectés, avec une version pour ne jamais régresser.
 Un message ciblant un joueur passe par `P.Broadcast(message, "WHISPER", P.GetTargetName(entry))`.
 
 ### Référencer l'API Blizzard pour une nouvelle fonctionnalité

@@ -32,6 +32,16 @@ automatique de base entre vos clients — sans configuration complexe.
   au **même compte Battle.net**.
 - Vous regroupez vos personnages en **équipes**, chacune avec son **leader** (voir
   Fenêtre principale) — base pour de futures actions liées au leader : suivi, assist, etc.
+- **Les équipes sont synchronisées automatiquement** entre vos clients Polypode connectés :
+  création, ajout/retrait d'un membre et changement de leader sont envoyés aussitôt aux
+  autres clients, et deux clients qui se découvrent (connexion, reload) échangent toutes
+  leurs équipes. En cas de versions différentes, **la plus récente l'emporte** : un client
+  démarré sur une sauvegarde ancienne ne peut pas écraser une modification plus récente.
+  C'est indispensable si vos comptes partagent le même fichier de sauvegarde (jonctions
+  de dossiers `SavedVariables`) : chaque client réécrit ce fichier en entier à la
+  déconnexion, tous doivent donc avoir les mêmes équipes en mémoire.
+  Les messages « Aucun joueur nommé … n'est connecté » provoqués par la synchro vers un
+  personnage hors ligne sont masqués.
 
 ---
 
@@ -62,11 +72,9 @@ Ouverte par `/poly ui`, le raccourci clavier ou le bouton de minimap. Trois cadr
     Il faut être seul ou chef du groupe (ou assistant en raid). Un groupe (hors raid) est
     limité à 5 : au-delà, les invitations restantes sont signalées ; convertissez le groupe
     en raid puis cliquez à nouveau. Le bilan s'affiche au centre de l'écran.
-    Le même clic **synchronise l'équipe** : son nom, ses membres et son leader sont envoyés
-    au Polypode de chaque membre (sur vos autres comptes), qui crée ou met à jour l'équipe
-    et la sélectionne — ses personnages apparaissent aussitôt dans « Personnages de
-    l'équipe ». La synchro passe par chuchotement addon, donc fonctionne avant même que
-    les invités aient accepté ; elle remplace la composition de l'équipe chez le destinataire.
+    Le même clic envoie aussi l'équipe au Polypode de chaque membre (sur vos autres
+    comptes), qui la **sélectionne** : ses personnages apparaissent aussitôt dans
+    « Personnages de l'équipe », même avant que les invités aient accepté.
 
   Les équipes, leurs membres et leur leader sont mémorisés pour le compte ; un personnage
   retiré du roster (`/poly remove`) quitte aussi ses équipes.
@@ -149,10 +157,10 @@ vous avez désactivé le skin de Polypode dans ses options).
 
 ## État du projet
 
-Version `0.13.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
+Version `0.14.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
 automatique aux annonces, fenêtre redimensionnable à trois listes défilantes (personnages
 trouvés / équipes avec création par saisie et sélection / personnages de l'équipe, ajout
-et retrait de membres au clic, leader par équipe, invitation et synchronisation de toute l'équipe)
+et retrait de membres au clic, leader par équipe, invitation de toute l'équipe, synchronisation automatique et versionnée des équipes)
 skinnée (EllesmereUI/ElvUI), bouton de minimap (masquable), panneau d'options,
 commandes, raccourci clavier. Pistes envisagées pour la suite,
 à activer seulement si le besoin se confirme (voir la règle de simplicité dans
@@ -164,7 +172,7 @@ commandes, raccourci clavier. Pistes envisagées pour la suite,
 - Réannonce à l'entrée en groupe (`GROUP_ROSTER_UPDATE`) pour les personnages sans
   guilde commune connectés avant d'être groupés.
 - **Équipes** : renommer/supprimer une équipe ; usage des équipes (conversion en raid automatique, leader,
-  synchronisation automatique à chaque modification d'une équipe, pas seulement à l'invitation).
+  synchronisation des suppressions d'équipe le jour où la suppression existera).
 - Suivi automatique du leader (`follow`) et assist de cible.
 - Invitation automatique du groupe depuis le roster.
 - Skin des textes de la fenêtre (police EllesmereUI via `S.Font`).
