@@ -33,6 +33,7 @@ P.defaults = {
 P.charDefaults = {
 	debug = false, -- mode debug (/poly debug ou panneau d'options)
 	assistStartAttack = true, -- raccourci « Assister le leader » : /startattack après /assist
+	autoAcceptQuest = true, -- accepter les quêtes acceptées par le leader (Quests.lua)
 	-- selectedTeam : nom de l'équipe sélectionnée dans la fenêtre (nil par défaut),
 	-- conservé même si l'équipe manque momentanément (cf. UI_Main.lua).
 }

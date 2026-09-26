@@ -67,6 +67,25 @@ function P.BuildOptions()
 		.. "la cible prise, si elle est hostile. Décoché : prend seulement la cible du leader. "
 		.. "Réglage propre à ce personnage.")
 
+	-- Acceptation automatique des quêtes du leader (par personnage, cf. Quests.lua).
+	local questSetting = Settings.RegisterProxySetting(
+		category,
+		"POLYPODE_AUTO_ACCEPT_QUEST",
+		Settings.VarType.Boolean,
+		"Accepter automatiquement les quêtes",
+		Settings.Default.True,
+		function()
+			return P.charDb.autoAcceptQuest
+		end,
+		function(value)
+			P.charDb.autoAcceptQuest = value
+		end
+	)
+	Settings.CreateCheckbox(category, questSetting,
+		"Quand le leader de l'équipe accepte une quête, ce personnage l'accepte aussi dès qu'elle "
+		.. "lui est proposée (PNJ ouvert, jusqu'à 30 secondes après). Sur le leader, annonce ses "
+		.. "quêtes acceptées au groupe. Réglage propre à ce personnage.")
+
 	Settings.RegisterAddOnCategory(category)
 	P.optionsCategory = category
 end

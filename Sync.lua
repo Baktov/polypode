@@ -317,6 +317,10 @@ function P.OnSyncMessage(message, channel, sender)
 	elseif kind == "CHAR" then
 		OnCharMessage(rest, sender)
 		return
+	elseif kind == "QACCEPT" then
+		-- QACCEPT:token:questID — quête acceptée par le leader (Quests.lua).
+		P.OnQuestAcceptMessage(tonumber(rest), sender)
+		return
 	end
 
 	if kind ~= "HELLO" and kind ~= "HI" then
