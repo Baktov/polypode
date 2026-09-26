@@ -33,12 +33,20 @@ automatique de base entre vos clients — sans configuration complexe.
   de connexion : vos Polypode se trouvent même sans guilde commune ni groupe, et il est
   prioritaire sur le raid, le groupe et la guilde. Le choix est partagé avec vos autres Polypode
   connectés. Nom : sans espace ni « : », ne commençant pas par un chiffre, 31 caractères au
-  plus ; vide pour désactiver. Les autres joueurs qui rejoindraient le même canal sont ignorés
-  (token BattleTag).
+  plus ; vide pour désactiver.
 - **Seuls vos personnages sont reconnus** : chaque annonce porte un token d'équipe tiré
   de votre BattleTag (haché, jamais envoyé en clair). Les autres joueurs de la guilde
-  qui utilisent Polypode sont ignorés. Tous vos comptes WoW doivent donc être rattachés
-  au **même compte Battle.net**.
+  qui utilisent Polypode sont ignorés.
+- **Autres comptes Battle.net** (multibox avec un second compte Battle.net) : quand un
+  personnage d'un compte inconnu s'annonce sur le **canal dédié**, une fenêtre demande
+  l'autorisation en affichant le canal (nom et numéro), le personnage, sa classe et son niveau.
+  **Autoriser** ajoute ce compte à vos comptes autorisés : il échange alors avec vous comme vos
+  propres comptes (roster, équipes, groupage, actions du leader) ; l'autre compte reçoit la
+  même demande pour vous. **Refuser** (ou Échap) : plus de demande pour ce compte jusqu'au
+  prochain rechargement. Hors canal dédié (guilde, groupe), les comptes inconnus restent ignorés
+  sans demande. La liste est partagée entre vos propres clients (pas avec les comptes
+  autorisés : pas d'autorisation en cascade) ; `/poly comptes` la montre et
+  `/poly retirer-compte <n°>` retire une autorisation.
 - Vous regroupez vos personnages en **équipes**, chacune avec son **leader** (voir
   Fenêtre principale) — base pour de futures actions liées au leader : suivi, assist, etc.
 - **Les équipes sont synchronisées automatiquement** entre vos clients Polypode connectés :
@@ -141,6 +149,8 @@ par défaut). Si la fenêtre est très réduite, le contenu est simplement tronq
 | `/poly ui` | Ouvrir/fermer la fenêtre principale |
 | `/poly minimap` | Afficher/masquer l'icône de minimap |
 | `/poly options` | Ouvrir le panneau d'options (Options → AddOns → Polypode) |
+| `/poly comptes` | Lister les autres comptes Battle.net autorisés (numérotés) |
+| `/poly retirer-compte <n°>` | Retirer l'autorisation d'un compte (numéro donné par `/poly comptes`) |
 | `/poly debug` | Activer/désactiver les messages de debug (mémorisé pour ce personnage, comme la case du panneau d'options) |
 | `/poly` (sans argument) | Afficher l'aide |
 
@@ -227,18 +237,15 @@ vous avez désactivé le skin de Polypode dans ses options).
 
 ## État du projet
 
-Version `0.28.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
+Version `0.29.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
 automatique aux annonces, fenêtre redimensionnable à trois listes défilantes (personnages
 trouvés / équipes avec création par saisie et sélection / personnages de l'équipe, ajout
 et retrait de membres au clic, leader par équipe, invitation de toute l'équipe, synchronisation automatique et versionnée des équipes, ajout du joueur ciblé)
 skinnée (EllesmereUI/ElvUI), bouton de minimap (masquable), panneau d'options (accessible par un bouton de la fenêtre),
-commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, inviter), suivi des dialogues de PNJ (quêtes, options, fermeture de DialogueUI), acceptation et validation automatiques des quêtes du leader, passage automatique des cinématiques, vol automatique chez le maître de vol, entrée et sortie de gouffre et entrée par portail automatiques, volume et coupure du son de l'équipe par le leader, groupage automatique de l'équipe à la connexion, canal dédié commun aux comptes. Pistes envisagées pour la suite,
+commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, inviter), suivi des dialogues de PNJ (quêtes, options, fermeture de DialogueUI), acceptation et validation automatiques des quêtes du leader, passage automatique des cinématiques, vol automatique chez le maître de vol, entrée et sortie de gouffre et entrée par portail automatiques, volume et coupure du son de l'équipe par le leader, groupage automatique de l'équipe à la connexion, canal dédié commun aux comptes, autorisation d'autres comptes Battle.net. Pistes envisagées pour la suite,
 à activer seulement si le besoin se confirme (voir la règle de simplicité dans
 `CLAUDE.md`) :
 
-- `/poly team <nom>` : nom d'équipe commun remplaçant le BattleTag dans le calcul du
-  token, pour multiboxer avec **plusieurs comptes Battle.net** (point d'extension :
-  `P.GetTeamToken()` dans `Sync.lua`).
 - Réannonce à l'entrée en groupe (`GROUP_ROSTER_UPDATE`) pour les personnages sans
   guilde commune connectés avant d'être groupés.
 - **Équipes** : renommer/supprimer une équipe ; usage des équipes (conversion en raid automatique, leader,

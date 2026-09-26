@@ -10,6 +10,8 @@ local function PrintHelp()
 	print("  /poly ui           — ouvrir/fermer la fenêtre")
 	print("  /poly minimap      — afficher/masquer l'icône de minimap")
 	print("  /poly options      — ouvrir le panneau d'options")
+	print("  /poly comptes      — lister les autres comptes Battle.net autorisés")
+	print("  /poly retirer-compte <n°> — retirer l'autorisation d'un compte")
 	print("  /poly debug        — activer/désactiver le mode debug")
 end
 
@@ -54,6 +56,23 @@ local function SlashHandler(msg)
 		print("Polypode: icône de minimap " .. (show and "affichée" or "masquée"))
 	elseif sub == "options" then
 		P.OpenOptions()
+	elseif sub == "comptes" then
+		local list = P.GetTrustedTokens()
+		if #list == 0 then
+			print("Polypode: aucun autre compte autorisé.")
+		else
+			print("Polypode: comptes autorisés (personnage vu à l'autorisation) :")
+			for i, account in ipairs(list) do
+				print(string.format("  %d. %s", i, account.label))
+			end
+		end
+	elseif sub == "retirer-compte" then
+		local account = P.GetTrustedTokens()[tonumber(args[2] or "")]
+		if account and P.UntrustToken(account.token) then
+			print("Polypode: autorisation retirée pour le compte de " .. account.label .. ".")
+		else
+			print("Usage: /poly retirer-compte <n°> (numéro donné par /poly comptes)")
+		end
 	elseif sub == "debug" then
 		P.SetDebug(not P.debugEnabled)
 		print("Polypode: debug " .. (P.debugEnabled and "activé" or "désactivé"))

@@ -23,7 +23,7 @@ local function Hash(str)
 end
 
 -- Token partagé par tous les personnages d'un même compte Battle.net (tous les comptes
--- WoW d'un Battle.net ont le même BattleTag). Point d'extension prévu pour /poly team.
+-- WoW d'un Battle.net ont le même BattleTag). Autres comptes Battle.net : cf. comptes autorisés.
 function P.GetTeamToken()
 	if not teamToken and BNGetInfo then
 		local _, battleTag = BNGetInfo()
@@ -264,6 +264,45 @@ function P.SyncCharacter(key, target)
 	end
 end
 
+-- Messages acceptés seulement de nos propres clients (même token), pas des comptes autorisés.
+local OWN_ACCOUNT_ONLY = {
+	CHANSET = true,
+	TRUST = true,
+}
+
+-- Envoie une autorisation de compte (versionnée) : token précis, ou toutes si nil ; à target,
+-- sinon aux clients connectés. Les comptes autorisés la reçoivent aussi mais l'ignorent
+-- (OWN_ACCOUNT_ONLY).
+-- Format : TRUST:token:version:flag:tokenAutorisé:libellé (flag "A" autorisé, "R" retiré ;
+-- libellé en dernier).
+function P.SyncTrust(trusted, target)
+	local token = P.GetTeamToken()
+	if not token then
+		return
+	end
+	for trustedToken, entry in pairs(P.db.trustedTokens) do
+		if (not trusted or trustedToken == trusted) and entry.updated then
+			local message = string.format("TRUST:%s:%d:%s:%s:%s", token, entry.updated,
+				entry.removed and "R" or "A", trustedToken, entry.label or "")
+			for to in pairs(ResolveTargets(target)) do
+				P.Broadcast(message, "WHISPER", to)
+			end
+		end
+	end
+end
+
+-- Réception de TRUST (de nos propres clients seulement).
+local function OnTrustMessage(rest, sender)
+	local version, flag, trustedToken, label = strsplit(":", rest or "", 4)
+	local updated = tonumber(version)
+	if not updated or not trustedToken or trustedToken == "" or (flag ~= "A" and flag ~= "R") then
+		return
+	end
+	if P.ApplyTrustSync(trustedToken, updated, flag == "R", label) then
+		P.Debug("Autorisation du compte « " .. tostring(label) .. " » reçue de " .. tostring(sender))
+	end
+end
+
 -- Envoie le réglage du canal dédié (s'il a été choisi au moins une fois) par chuchotement :
 -- à target, sinon aux clients connectés. Il passe par les canaux habituels, puisque le
 -- destinataire n'a peut-être pas encore rejoint le nouveau canal.
@@ -444,9 +483,21 @@ end
 function P.OnSyncMessage(message, channel, sender)
 	local kind, token, rest = strsplit(":", message, 3)
 
-	-- Ignore les messages hors équipe (ex. autres joueurs Polypode de la guilde).
-	if not token or token ~= P.GetTeamToken() then
-		P.Debug("Message ignoré (autre équipe) : " .. tostring(sender))
+	-- Token inconnu : sur le canal dédié, une annonce de connexion ouvre une demande
+	-- d'autorisation (autre compte Battle.net de multibox) ; ailleurs (guilde, groupe),
+	-- ignoré sans demande (autres joueurs Polypode de la guilde).
+	if not P.IsTokenTrusted(token) then
+		if channel == "CHANNEL" and (kind == "HELLO" or kind == "HI") and P.PromptTrust then
+			P.PromptTrust(token, message, channel, sender)
+		else
+			P.Debug("Message ignoré (compte non autorisé) : " .. tostring(sender))
+		end
+		return
+	end
+
+	-- Réglages propres à ce compte : seulement de nos propres clients, jamais d'un compte
+	-- autorisé (pas de changement de canal ni d'autorisation en cascade).
+	if OWN_ACCOUNT_ONLY[kind] and token ~= P.GetTeamToken() then
 		return
 	end
 
@@ -470,6 +521,9 @@ function P.OnSyncMessage(message, channel, sender)
 		return
 	elseif kind == "CHANSET" then
 		OnChannelSettingMessage(rest, sender)
+		return
+	elseif kind == "TRUST" then
+		OnTrustMessage(rest, sender)
 		return
 	elseif kind == "QACCEPT" then
 		-- QACCEPT:token:questID — quête acceptée par le leader (Quests.lua).
@@ -558,6 +612,7 @@ function P.OnSyncMessage(message, channel, sender)
 	-- client récupère les versions plus récentes de l'autre, même s'il a démarré sur une
 	-- sauvegarde ancienne. Le roster d'abord : les équipes peuvent y faire référence.
 	P.SyncChannelSetting(sender)
+	P.SyncTrust(nil, sender)
 	P.SyncAllCharacters(sender)
 	P.SyncAllTeams(sender)
 

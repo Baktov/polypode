@@ -34,6 +34,10 @@ P.defaults = {
 		name = "",
 		updated = 0,
 	},
+	-- Autres comptes Battle.net autorisés (multibox à plusieurs comptes Battle.net) :
+	-- [token] = { label = personnage vu à l'autorisation, updated = version, removed = true|nil }.
+	-- Versionné et synchronisé entre les clients de ce compte (pierre tombale au retrait).
+	trustedTokens = {},
 }
 
 -- Par personnage : réglages propres à une fenêtre de multibox (et à l'abri du fichier de
@@ -366,6 +370,77 @@ end
 
 -- Équipe sélectionnée pour ce personnage (P.charDb.selectedTeam), ou nil si aucune ou si
 -- elle n'existe pas (encore) localement.
+-- COMPTES AUTORISÉS ---------------------------------------------------------------------
+
+-- Vrai si les messages portant ce token sont acceptés : le nôtre, ou un compte autorisé.
+function P.IsTokenTrusted(token)
+	if not token then
+		return false
+	end
+	if token == P.GetTeamToken() then
+		return true
+	end
+	local entry = P.db.trustedTokens[token]
+	return entry ~= nil and not entry.removed
+end
+
+-- Comptes autorisés actifs, triés par libellé : liste de { token, label }.
+function P.GetTrustedTokens()
+	local list = {}
+	for token, entry in pairs(P.db.trustedTokens) do
+		if not entry.removed then
+			list[#list + 1] = { token = token, label = entry.label or "?" }
+		end
+	end
+	table.sort(list, function(a, b)
+		return a.label < b.label
+	end)
+	return list
+end
+
+-- Modification locale d'une autorisation : nouvelle version puis envoi aux autres clients.
+local function TrustChanged(token)
+	local entry = P.db.trustedTokens[token]
+	entry.updated = NextVersion(entry.updated)
+	if P.SyncTrust then
+		P.SyncTrust(token)
+	end
+end
+
+-- Autorise un autre compte (token), label : personnage vu à ce moment.
+function P.TrustToken(token, label)
+	local entry = P.db.trustedTokens[token] or {}
+	P.db.trustedTokens[token] = entry
+	entry.label = label
+	entry.removed = nil
+	TrustChanged(token)
+end
+
+-- Retire l'autorisation d'un compte (pierre tombale synchronisée). Renvoie true si retiré.
+function P.UntrustToken(token)
+	local entry = P.db.trustedTokens[token]
+	if not entry or entry.removed then
+		return false
+	end
+	entry.removed = true
+	TrustChanged(token)
+	return true
+end
+
+-- Applique une autorisation reçue d'un autre client de ce compte, si plus récente.
+function P.ApplyTrustSync(token, updated, removed, label)
+	local entry = P.db.trustedTokens[token]
+	if entry and (entry.updated or 0) >= updated then
+		return false
+	end
+	entry = entry or {}
+	P.db.trustedTokens[token] = entry
+	entry.label = label
+	entry.removed = removed or nil
+	entry.updated = updated
+	return true
+end
+
 -- CANAL DÉDIÉ ---------------------------------------------------------------------------
 
 -- Nom du canal dédié ("" si désactivé).
