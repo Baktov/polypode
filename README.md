@@ -86,7 +86,7 @@ côte à côte :
 - **Équipes** : saisir un nom dans le champ « Nom de l'équipe » puis valider avec
   **Entrée** ou le bouton **Créer** : l'équipe est créée et ajoutée à la liste (triée par
   nom, mémorisée pour le compte). Un nom vide ou déjà utilisé est refusé avec un message
-  en rouge à l'écran. **Échap** quitte le champ. **Cliquer** sur une équipe la sélectionne
+  en rouge à l'écran. **Échap** quitte le champ. **Clic gauche** sur une équipe la sélectionne, **clic droit** la désélectionne (plus aucune équipe sélectionnée, rappelé par une infobulle au survol)
   (surbrillance dorée). La sélection est **mémorisée pour chaque personnage** : après une
   déconnexion, une reconnexion ou un reload, la même équipe est sélectionnée, que ce
   personnage en soit le leader ou non (une équipe reçue via « Inviter l'équipe » devient
@@ -217,7 +217,7 @@ vous avez désactivé le skin de Polypode dans ses options).
 
 ## État du projet
 
-Version `0.27.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
+Version `0.27.1` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
 automatique aux annonces, fenêtre redimensionnable à trois listes défilantes (personnages
 trouvés / équipes avec création par saisie et sélection / personnages de l'équipe, ajout
 et retrait de membres au clic, leader par équipe, invitation de toute l'équipe, synchronisation automatique et versionnée des équipes, ajout du joueur ciblé)

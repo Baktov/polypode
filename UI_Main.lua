@@ -387,14 +387,22 @@ function P.BuildUI()
 	teamInput:SetScript("OnEscapePressed", teamInput.ClearFocus)
 	createBtn:SetScript("OnClick", SubmitTeam)
 
+	-- Clic gauche : sélectionne l'équipe ; clic droit : désélectionne (plus aucune équipe).
 	CreateScrollList(teamPanel, function(data)
 		return data.name
 	end, HEADER_HEIGHT + INPUT_HEIGHT, {
-		onClick = function(data)
-			ChooseTeam(data.name)
+		onClick = function(data, mouseButton)
+			if mouseButton == "RightButton" then
+				ChooseTeam(nil)
+			else
+				ChooseTeam(data.name)
+			end
 		end,
 		isSelected = function(data)
 			return data.name == selectedTeam
+		end,
+		tooltip = function(data)
+			return { data.name, "Clic gauche : sélectionner l'équipe", "Clic droit : désélectionner" }
 		end,
 	})
 	teamPanel.emptyText:SetText("Aucune équipe")
