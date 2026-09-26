@@ -1,4 +1,4 @@
--- Polypode: Sync — broadcast et réception des messages addon (annonce du roster)
+-- Polypode: Sync — broadcast et réception des messages addon (annonce du roster, équipes)
 
 local P = Polypode
 
@@ -45,13 +45,15 @@ local function GetBroadcastChannel()
 	return nil
 end
 
-function P.Broadcast(message, channel)
+-- Envoie un message addon. Sans canal : groupe/raid/guilde selon la situation.
+-- channel = "WHISPER" : target est le nom du destinataire (cf. P.GetTargetName).
+function P.Broadcast(message, channel, target)
 	channel = channel or GetBroadcastChannel()
 	if not channel then
 		return
 	end
 	if C_ChatInfo and C_ChatInfo.SendAddonMessage then
-		C_ChatInfo.SendAddonMessage(P.SYNC_PREFIX, message, channel)
+		C_ChatInfo.SendAddonMessage(P.SYNC_PREFIX, message, channel, target)
 	end
 end
 
@@ -70,15 +72,108 @@ function P.SayHello(kind, channel)
 		UnitName("player"), GetRealmName(), class, level), channel)
 end
 
-function P.OnSyncMessage(message, channel, sender)
-	local kind, token, name, realm, class, level = strsplit(":", message)
-	if (kind ~= "HELLO" and kind ~= "HI") or not name or not realm then
+-- Taille maximale d'un message addon (octets), imposée par le client WoW.
+local MAX_MESSAGE_LENGTH = 255
+
+-- Envoie la définition d'une équipe (nom, leader, membres) à chacun de ses membres, par
+-- chuchotement addon : fiable même avant que les invités aient rejoint le groupe.
+-- Format : TEAM:token:flag:leader:membre1,membre2,...:nomÉquipe
+--   flag "N" = premier fragment (le destinataire remplace les membres), "+" = suite ;
+--   le nom d'équipe est en dernier pour pouvoir contenir ":".
+-- Les membres sont découpés en fragments pour respecter MAX_MESSAGE_LENGTH.
+function P.SyncTeam(teamName)
+	local token = P.GetTeamToken()
+	local members = P.GetTeamMembers(teamName)
+	if not token or not members then
+		P.Debug("Synchro d'équipe impossible (BattleTag ou équipe indisponible).")
 		return
 	end
 
-	-- Ignore les personnages hors équipe (ex. autres joueurs Polypode de la guilde).
+	local leader = P.GetTeamLeader(teamName) or ""
+	local keys = {}
+	for key in pairs(members) do
+		keys[#keys + 1] = key
+	end
+	table.sort(keys)
+
+	-- Découpe la liste en fragments tenant dans un message.
+	local chunks, current = {}, {}
+	local function Budget(flag)
+		return MAX_MESSAGE_LENGTH - #("TEAM:" .. token .. ":" .. flag .. ":" .. leader .. "::" .. teamName)
+	end
+	local used = 0
+	for _, key in ipairs(keys) do
+		local cost = #key + (#current > 0 and 1 or 0)
+		if #current > 0 and used + cost > Budget(#chunks == 0 and "N" or "+") then
+			chunks[#chunks + 1] = current
+			current, used = {}, 0
+			cost = #key
+		end
+		current[#current + 1] = key
+		used = used + cost
+	end
+	chunks[#chunks + 1] = current -- au moins un fragment, même vide (équipe sans membre)
+
+	local messages = {}
+	for i, chunk in ipairs(chunks) do
+		messages[i] = string.format("TEAM:%s:%s:%s:%s:%s", token, i == 1 and "N" or "+", leader,
+			table.concat(chunk, ","), teamName)
+	end
+
+	-- Destinataires : tous les membres sauf soi. Un nom de personnage ne contient pas de
+	-- "-", d'où le découpage de la clé Nom-Royaume.
+	for _, key in ipairs(keys) do
+		if key ~= P.GetCharKey() then
+			local name, realm = strsplit("-", key, 2)
+			local target = P.GetTargetName({ name = name, realm = realm })
+			for _, message in ipairs(messages) do
+				P.Broadcast(message, "WHISPER", target)
+			end
+			P.Debug("Équipe « " .. teamName .. " » envoyée à " .. target)
+		end
+	end
+end
+
+-- Réception d'un fragment TEAM (cf. P.SyncTeam) : met à jour l'équipe locale et l'affiche.
+local function OnTeamMessage(rest, sender)
+	local flag, leader, memberList, teamName = strsplit(":", rest, 4)
+	teamName = teamName and strtrim(teamName)
+	-- 32 caractères au plus à la saisie, soit au plus 128 octets en UTF-8.
+	if not teamName or teamName == "" or #teamName > 128 or (flag ~= "N" and flag ~= "+") then
+		return
+	end
+
+	local memberKeys = {}
+	for key in (memberList or ""):gmatch("[^,]+") do
+		memberKeys[#memberKeys + 1] = key
+	end
+	P.ApplyTeamSync(teamName, flag == "N", leader ~= "" and leader or nil, memberKeys)
+
+	if P.SelectTeam then
+		P.SelectTeam(teamName)
+	end
+	P.Debug("Équipe « " .. teamName .. " » reçue de " .. tostring(sender))
+end
+
+function P.OnSyncMessage(message, channel, sender)
+	local kind, token, rest = strsplit(":", message, 3)
+
+	-- Ignore les messages hors équipe (ex. autres joueurs Polypode de la guilde).
 	if not token or token ~= P.GetTeamToken() then
-		P.Debug("Annonce ignorée (autre équipe) : " .. tostring(sender))
+		P.Debug("Message ignoré (autre équipe) : " .. tostring(sender))
+		return
+	end
+
+	if kind == "TEAM" then
+		OnTeamMessage(rest, sender)
+		return
+	end
+
+	if kind ~= "HELLO" and kind ~= "HI" then
+		return
+	end
+	local name, realm, class, level = strsplit(":", rest or "")
+	if not name or not realm then
 		return
 	end
 

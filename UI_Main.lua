@@ -365,6 +365,8 @@ function P.BuildUI()
 		else
 			UIErrorsFrame:AddMessage(message, 1, 0.1, 0.1)
 		end
+		-- Dans tous les cas, partage l'équipe avec les Polypode des membres.
+		P.SyncTeam(selectedTeam)
 	end)
 	inviteBtn:SetScript("OnEnter", function(self)
 		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
@@ -372,6 +374,8 @@ function P.BuildUI()
 		if selectedTeam then
 			GameTooltip:AddLine("Invite dans votre groupe les membres de l'équipe « " .. selectedTeam
 				.. " », sauf vous et ceux déjà groupés.", 1, 1, 1, true)
+			GameTooltip:AddLine("L'équipe (nom, membres, leader) est aussi envoyée aux Polypode "
+				.. "de ses membres.", 1, 1, 1, true)
 		else
 			GameTooltip:AddLine("Sélectionnez d'abord une équipe.", 1, 1, 1, true)
 		end
@@ -476,6 +480,12 @@ function P.RefreshUI()
 		end
 	end
 	ui.inviteButton:SetEnabled(canInvite)
+end
+
+-- Sélectionne une équipe (ex. reçue par synchro) et rafraîchit la fenêtre si elle existe.
+function P.SelectTeam(teamName)
+	selectedTeam = teamName
+	P.RefreshUI()
 end
 
 function P.ToggleUI()

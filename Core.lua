@@ -163,6 +163,24 @@ function P.GetTeamLeader(teamName)
 	return team and team.leader
 end
 
+-- Applique une définition d'équipe reçue d'un autre client (Sync.lua). Crée l'équipe si
+-- besoin ; reset = true vide d'abord ses membres (premier fragment d'une synchro).
+-- Les membres sont pris tels quels, même absents du roster local.
+function P.ApplyTeamSync(teamName, reset, leader, memberKeys)
+	local team = P.db.teams[teamName]
+	if not team then
+		team = { name = teamName, members = {} }
+		P.db.teams[teamName] = team
+	end
+	if reset or not team.members then
+		team.members = {}
+	end
+	for _, key in ipairs(memberKeys) do
+		team.members[key] = true
+	end
+	team.leader = leader
+end
+
 -- Désigne le leader d'une équipe ; il doit en être membre.
 function P.SetTeamLeader(teamName, key)
 	local members = P.GetTeamMembers(teamName)
@@ -171,13 +189,14 @@ function P.SetTeamLeader(teamName, key)
 	end
 end
 
--- Nom à passer à l'API d'invitation : "Nom" sur notre royaume, sinon "Nom-Royaume" avec
--- le royaume sous sa forme courte (sans espaces ni tirets, ex. "ArgentDawn").
-local function GetInviteName(entry)
+-- Nom à passer aux API qui ciblent un joueur (invitation, chuchotement addon) : "Nom" sur
+-- notre royaume, sinon "Nom-Royaume" avec le royaume sous sa forme courte (sans espaces ni
+-- tirets, ex. "ArgentDawn"). entry : entrée du roster.
+function P.GetTargetName(entry)
 	if entry.realm == GetRealmName() then
 		return entry.name
 	end
-	return entry.name .. "-" .. entry.realm:gsub("[%s%-]", "")
+	return entry.name .. "-" .. (entry.realm:gsub("[%s%-]", ""))
 end
 
 -- Membres de l'équipe à inviter : ni le personnage courant, ni ceux déjà dans le groupe.
@@ -187,7 +206,7 @@ function P.GetTeamInvitees(teamName)
 	for key in pairs(P.GetTeamMembers(teamName) or {}) do
 		local entry = P.db.roster[key]
 		if entry and entry.name and key ~= P.GetCharKey() then
-			local inviteName = GetInviteName(entry)
+			local inviteName = P.GetTargetName(entry)
 			if not UnitInParty(inviteName) and not UnitInRaid(inviteName) then
 				invitees[#invitees + 1] = inviteName
 			end

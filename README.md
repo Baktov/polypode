@@ -62,6 +62,11 @@ Ouverte par `/poly ui`, le raccourci clavier ou le bouton de minimap. Trois cadr
     Il faut être seul ou chef du groupe (ou assistant en raid). Un groupe (hors raid) est
     limité à 5 : au-delà, les invitations restantes sont signalées ; convertissez le groupe
     en raid puis cliquez à nouveau. Le bilan s'affiche au centre de l'écran.
+    Le même clic **synchronise l'équipe** : son nom, ses membres et son leader sont envoyés
+    au Polypode de chaque membre (sur vos autres comptes), qui crée ou met à jour l'équipe
+    et la sélectionne — ses personnages apparaissent aussitôt dans « Personnages de
+    l'équipe ». La synchro passe par chuchotement addon, donc fonctionne avant même que
+    les invités aient accepté ; elle remplace la composition de l'équipe chez le destinataire.
 
   Les équipes, leurs membres et leur leader sont mémorisés pour le compte ; un personnage
   retiré du roster (`/poly remove`) quitte aussi ses équipes.
@@ -144,10 +149,10 @@ vous avez désactivé le skin de Polypode dans ses options).
 
 ## État du projet
 
-Version `0.12.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
+Version `0.13.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
 automatique aux annonces, fenêtre redimensionnable à trois listes défilantes (personnages
 trouvés / équipes avec création par saisie et sélection / personnages de l'équipe, ajout
-et retrait de membres au clic, leader par équipe, invitation de toute l'équipe)
+et retrait de membres au clic, leader par équipe, invitation et synchronisation de toute l'équipe)
 skinnée (EllesmereUI/ElvUI), bouton de minimap (masquable), panneau d'options,
 commandes, raccourci clavier. Pistes envisagées pour la suite,
 à activer seulement si le besoin se confirme (voir la règle de simplicité dans
@@ -159,7 +164,7 @@ commandes, raccourci clavier. Pistes envisagées pour la suite,
 - Réannonce à l'entrée en groupe (`GROUP_ROSTER_UPDATE`) pour les personnages sans
   guilde commune connectés avant d'être groupés.
 - **Équipes** : renommer/supprimer une équipe ; usage des équipes (conversion en raid automatique, leader,
-  synchronisation entre clients).
+  synchronisation automatique à chaque modification d'une équipe, pas seulement à l'invitation).
 - Suivi automatique du leader (`follow`) et assist de cible.
 - Invitation automatique du groupe depuis le roster.
 - Skin des textes de la fenêtre (police EllesmereUI via `S.Font`).

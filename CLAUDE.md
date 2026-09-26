@@ -19,10 +19,10 @@ n'ajoute une fonctionnalité que si elle sert directement cet objectif.
 
 | Fichier | Rôle |
 |---|---|
-| `Core.lua` | Table globale `Polypode` (alias local `P`), SavedVariables, CRUD du roster, équipes (`P.CreateTeam`, `P.GetTeams`, `P.GetTeamMembers`, `P.AddTeamMember`, `P.RemoveTeamMember`, `P.GetCharacterTeams(key)`, `P.GetTeamLeader`, `P.SetTeamLeader` (leader = membre, effacé à son retrait), `P.GetTeamInvitees`, `P.InviteTeam` (invitation via `C_PartyInfo.InviteUnit`, nom court de royaume, limite de 5 hors raid) ; `P.db.teams[nom] = { name, members = { [nom-royaume] = true }, leader }`, `members` créé à la volée pour les anciennes équipes ; `P.RemoveCharacter` retire aussi le perso des équipes) |
-| `Sync.lua` | Broadcast/réception de messages addon (`C_ChatInfo`), token d'équipe (`P.GetTeamToken`, hash du BattleTag), annonce `HELLO` / réponse `HI` |
+| `Core.lua` | Table globale `Polypode` (alias local `P`), SavedVariables, CRUD du roster, équipes (`P.CreateTeam`, `P.GetTeams`, `P.GetTeamMembers`, `P.AddTeamMember`, `P.RemoveTeamMember`, `P.GetCharacterTeams(key)`, `P.GetTeamLeader`, `P.SetTeamLeader` (leader = membre, effacé à son retrait), `P.GetTargetName(entry)`, `P.GetTeamInvitees`, `P.InviteTeam`, `P.ApplyTeamSync` (invitation via `C_PartyInfo.InviteUnit`, nom court de royaume, limite de 5 hors raid) ; `P.db.teams[nom] = { name, members = { [nom-royaume] = true }, leader }`, `members` créé à la volée pour les anciennes équipes ; `P.RemoveCharacter` retire aussi le perso des équipes) |
+| `Sync.lua` | Broadcast/réception de messages addon (`C_ChatInfo`), token d'équipe (`P.GetTeamToken`, hash du BattleTag), annonce `HELLO` / réponse `HI`, synchro d'équipe `TEAM` (`P.SyncTeam`, chuchotement aux membres) |
 | `UI_Skin.lua` | Skinning conditionnel : EllesmereUI (`EllesmereUI.RegisterSkin`, prioritaire) puis ElvUI. `P.SkinFrame` (fenêtre top-level), `P.SkinPanel` (cadre intérieur), `P.SkinScrollBar` (barre de défilement), `P.SkinEditBox` (champ de saisie), `P.SkinButton` (bouton texte) |
-| `UI_Main.lua` | Fenêtre principale redimensionnable (`P.ui.resizeGrip`, taille dans `P.db.mainFrame`) : `BuildUI`, `RefreshUI`, `ToggleUI`. Trois cadres à liste défilante (`panel.scrollBox`, `panel.scrollBar`, `panel.emptyText`), un tiers de largeur chacun (`LayoutPanels` sur `OnSizeChanged`) : `P.ui.charPanel` (personnages trouvés = roster trié ; avec une équipe sélectionnée, clic gauche = ajout, clic droit = retrait, membres surlignés), `P.ui.teamPanel` (équipes : `P.ui.teamInput` + `P.ui.teamCreateButton` → `P.CreateTeam`, liste triée, clic = sélection dans la locale `selectedTeam`, session uniquement), `P.ui.memberPanel` (« Personnages de l'équipe » : membres de l'équipe sélectionnée, bouton `P.ui.inviteButton` « Inviter l'équipe » → `P.InviteTeam`, clic gauche = leader de l'équipe (surligné), clic droit = retrait) |
+| `UI_Main.lua` | Fenêtre principale redimensionnable (`P.ui.resizeGrip`, taille dans `P.db.mainFrame`) : `BuildUI`, `RefreshUI`, `ToggleUI`. Trois cadres à liste défilante (`panel.scrollBox`, `panel.scrollBar`, `panel.emptyText`), un tiers de largeur chacun (`LayoutPanels` sur `OnSizeChanged`) : `P.ui.charPanel` (personnages trouvés = roster trié ; avec une équipe sélectionnée, clic gauche = ajout, clic droit = retrait, membres surlignés), `P.ui.teamPanel` (équipes : `P.ui.teamInput` + `P.ui.teamCreateButton` → `P.CreateTeam`, liste triée, clic = sélection dans la locale `selectedTeam`, session uniquement), `P.ui.memberPanel` (« Personnages de l'équipe » : membres de l'équipe sélectionnée, bouton `P.ui.inviteButton` « Inviter l'équipe » → `P.InviteTeam` + `P.SyncTeam`, clic gauche = leader de l'équipe (surligné), clic droit = retrait) |
 | `UI_Minimap.lua` | Bouton de minimap sans librairie (`P.BuildMinimapButton`, appelé à `PLAYER_LOGIN`), `P.SetMinimapButtonShown`, état dans `P.db.minimap` (`angle`, `hide`) |
 | `UI_Options.lua` | Panneau Options → AddOns via l'API `Settings` (`P.BuildOptions` à `PLAYER_LOGIN`, `P.OpenOptions`) |
 | `Commands.lua` | Commande slash `/poly` (`/polypode`) et fonctions globales de keybinding |
@@ -132,6 +132,14 @@ Le 2e champ est **toujours** le token d'équipe (`P.GetTeamToken()`) : `P.OnSync
 tout message dont le token diffère (autres joueurs Polypode de la guilde) et ignore nos propres
 messages (renvoyés par le serveur à l'émetteur). Un message qui appelle une réponse doit avoir un
 type de réponse distinct (`HELLO` → `HI`) pour ne jamais boucler.
+`P.OnSyncMessage` lit `TYPE:token:reste` (`strsplit(":", message, 3)`) puis dispatche selon le type.
+Messages existants :
+- `HELLO` / `HI` : `TYPE:token:nom:royaume:classe:niveau` (canal groupe/raid/guilde).
+- `TEAM` : `TEAM:token:flag:leader:membre1,membre2,...:nomÉquipe`, envoyé par `P.SyncTeam` en
+  **WHISPER** à chaque membre (clic « Inviter l'équipe »). `flag` = `N` (premier fragment : le
+  destinataire remplace les membres) ou `+` (suite) ; liste découpée pour tenir dans 255 octets ;
+  nom d'équipe en dernier (peut contenir `:`). Réception : `P.ApplyTeamSync` puis `P.SelectTeam`.
+Un message ciblant un joueur passe par `P.Broadcast(message, "WHISPER", P.GetTargetName(entry))`.
 
 ### Référencer l'API Blizzard pour une nouvelle fonctionnalité
 → Avant d'implémenter un appel à l'API WoW (frames, events, namespaces `C_*`), vérifier la
