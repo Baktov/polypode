@@ -1,4 +1,4 @@
--- Polypode: Quests — acceptation et validation automatiques des quêtes du leader
+-- Polypode: Quests — quêtes et dialogues de PNJ du leader rejoués par les membres
 
 local P = Polypode
 
@@ -23,21 +23,34 @@ local P = Polypode
 --      moins de 10 s ; sinon attente 60 s. Le choix est l'index de la récompense du leader
 --      (0 = pas de choix) : une quête à récompense au choix obligatoire reste à terminer
 --      à la main si l'index ne convient pas.
--- SÉLECTION DANS LES DIALOGUES DE PNJ (option P.charDb.autoSelectGossipQuest) :
---   GQAVAIL:token:questID — le leader choisit une quête disponible dans un dialogue de PNJ ;
---   GQACTIVE:token:questID — il choisit une quête active (à rendre).
---   Leader : hooks C_GossipInfo.SelectAvailableQuest / SelectActiveQuest (et équivalents
---   anciens par index). Membre : si un dialogue est ouvert (quête présente dans la liste) ou
---   l'a été il y a moins de 10 s, il choisit la même quête ; l'acceptation ou la validation
---   automatique prend ensuite le relais. Pas d'attente si aucun dialogue n'est ouvert.
+-- DIALOGUES DE PNJ (option P.charDb.autoSelectGossip). Membre : n'agit que si un dialogue
+-- est ouvert ou l'a été il y a moins de 10 s (GOSSIP_SHOW) ; pas d'attente sinon.
+--   GQAVAIL:token:questID / GQACTIVE:token:questID — le leader choisit une quête disponible /
+--   active (à rendre) dans le dialogue. Leader : hooks C_GossipInfo.SelectAvailableQuest /
+--   SelectActiveQuest (et équivalents anciens par index). Membre : choisit la même quête ;
+--   l'acceptation ou la validation automatique prend ensuite le relais.
+--   GOSSIP:token:gossipOptionID:orderIndex — le leader choisit une option de dialogue.
+--   Leader : hooks C_GossipInfo.SelectOptionByIndex (clic Blizzard et DialogueUI : l'argument
+--   est l'orderIndex, résolu en gossipOptionID stable), SelectOption, SelectGossipOption.
+--   Membre : SelectOption(gossipOptionID), sinon SelectOptionByIndex(orderIndex) (options
+--   « indice » de DialogueUI sans gossipOptionID), sinon recherche par gossipOptionID, sinon
+--   SelectGossipOption (ancienne API).
+--   CLOSEUI:token — le leader ferme son DialogueUI (Échap, « Au revoir ») : aucun événement
+--   serveur ne le signale et DialogueUI garde la dernière phrase affichée chez le membre.
+--   Leader : OnHide du cadre DialogueUI (retrouvé par sa signature, cf. FindDialogueUIFrame).
+--   Membre : ferme DialogueUI, le dialogue et la quête Blizzard.
 -- Les délais de 10 s couvrent les addons de dialogue (DialogueUI, Immersion) qui ferment le
--- panneau Blizzard alors que le serveur accepte encore la validation.
--- Les trois options sont propres à chaque personnage, des deux côtés (leader et membres).
+-- panneau Blizzard alors que le serveur accepte encore l'action.
+-- Les options sont propres à chaque personnage, des deux côtés (leader et membres).
+-- Sync.lua n'accepte ces messages que du leader de l'équipe sélectionnée, jamais de soi-même
+-- (un message de groupe revient aussi à son expéditeur).
 
 local ACCEPT_TIMEOUT = 30 -- secondes d'attente d'une quête à accepter (membre)
 local VALIDATE_TIMEOUT = 60 -- secondes d'attente d'une quête à valider (membre)
 local READY_WINDOW = 10 -- secondes pendant lesquelles un panneau vu reste utilisable
 local BROADCAST_DEDUP = 5 -- secondes : une même annonce (type + quête) n'est envoyée qu'une fois
+local GOSSIP_DEDUP = 0.5 -- secondes : une option de dialogue peut être rejouée rapidement
+local CLOSE_DEDUP = 2 -- secondes entre deux annonces de fermeture
 
 -- Membre : état des panneaux et actions en attente.
 local detailQuestID -- quête proposée (QUEST_DETAIL), jusqu'à QUEST_FINISHED
@@ -61,7 +74,7 @@ local function ValidateEnabled()
 end
 
 local function GossipEnabled()
-	return P.charDb and P.charDb.autoSelectGossipQuest
+	return P.charDb and P.charDb.autoSelectGossip
 end
 
 local function IsTeamLeader()
@@ -77,25 +90,34 @@ local function IsRecent(at)
 	return at and GetTime() - at < READY_WINDOW
 end
 
--- Leader : annonce une action de quête au groupe (kind = QACCEPT, QVALIDATE ou QREWARD),
--- une seule fois quel que soit le nombre de déclencheurs. extra : champ supplémentaire.
-local function Announce(kind, questID, extra, reason)
-	if not IsTeamLeader() or not IsInGroup() or not questID or questID == 0 then
+-- Leader : envoie « kind:token:fields » au groupe/raid, une seule fois par fenêtre de
+-- dédoublonnage (window secondes) pour une même clé, quel que soit le nombre de
+-- déclencheurs. fields : champs après le token (peut être vide).
+local function Send(kind, fields, dedupKey, window, reason)
+	if not IsTeamLeader() or not IsInGroup() then
 		return
 	end
-	local id = kind .. questID
 	local now = GetTime()
-	if lastBroadcast[id] and now - lastBroadcast[id] < BROADCAST_DEDUP then
+	if lastBroadcast[dedupKey] and now - lastBroadcast[dedupKey] < window then
 		return
 	end
 	local token = P.GetTeamToken()
 	if not token then
 		return
 	end
-	lastBroadcast[id] = now
-	local message = kind .. ":" .. token .. ":" .. questID .. (extra and (":" .. extra) or "")
+	lastBroadcast[dedupKey] = now
+	local message = kind .. ":" .. token .. (fields ~= "" and (":" .. fields) or "")
 	P.Broadcast(message, IsInRaid() and "RAID" or "PARTY")
-	P.Debug(kind .. " quête " .. questID .. " annoncé au groupe (" .. reason .. ")")
+	P.Debug(kind .. " " .. fields .. " annoncé au groupe (" .. reason .. ")")
+end
+
+-- Leader : annonce une action de quête (kind = QACCEPT, QVALIDATE, QREWARD, GQAVAIL,
+-- GQACTIVE). extra : champ supplémentaire (choix de récompense).
+local function Announce(kind, questID, extra, reason)
+	if not questID or questID == 0 then
+		return
+	end
+	Send(kind, questID .. (extra and (":" .. extra) or ""), kind .. questID, BROADCAST_DEDUP, reason)
 end
 
 local function AnnounceAccept(questID, reason)
@@ -289,6 +311,166 @@ function P.OnGossipQuestMessage(kind, questID, sender)
 	end
 end
 
+-- OPTIONS DE DIALOGUE -----------------------------------------------------------------
+
+-- Leader : résout l'argument de C_GossipInfo.SelectOptionByIndex en gossipOptionID stable.
+-- Cet argument est l'orderIndex de l'option (clé de tri du serveur, pas une position) :
+-- recherche par orderIndex, puis par position, puis par position après tri par orderIndex.
+local function ResolveGossipOptionID(orderIndex)
+	local options = orderIndex and C_GossipInfo and C_GossipInfo.GetOptions and C_GossipInfo.GetOptions()
+	if not options then
+		return nil
+	end
+	for _, info in ipairs(options) do
+		if (info.orderIndex or -1) == orderIndex and info.gossipOptionID then
+			return info.gossipOptionID
+		end
+	end
+	if options[orderIndex] and options[orderIndex].gossipOptionID then
+		return options[orderIndex].gossipOptionID
+	end
+	local sorted = {}
+	for _, info in ipairs(options) do
+		sorted[#sorted + 1] = info
+	end
+	table.sort(sorted, function(a, b)
+		return (a.orderIndex or 0) < (b.orderIndex or 0)
+	end)
+	return sorted[orderIndex] and sorted[orderIndex].gossipOptionID
+end
+
+-- Leader : annonce l'option choisie (au moins l'un des deux identifiants).
+local function AnnounceGossipOption(gossipOptionID, orderIndex, reason)
+	if not GossipEnabled() then
+		return
+	end
+	if (not gossipOptionID or gossipOptionID == 0) and not orderIndex then
+		return
+	end
+	local fields = (gossipOptionID or 0) .. ":" .. (orderIndex or "")
+	Send("GOSSIP", fields, "GOSSIP" .. fields, GOSSIP_DEDUP, reason)
+end
+
+-- Réception de GOSSIP (Sync.lua) : choisit la même option dans le dialogue ouvert.
+function P.OnGossipOptionMessage(gossipOptionID, orderIndex, sender)
+	if not GossipEnabled() or not C_GossipInfo then
+		return
+	end
+	gossipOptionID = gossipOptionID or 0
+	local options = C_GossipInfo.GetOptions and C_GossipInfo.GetOptions() or nil
+	local hasOptions = options and #options > 0
+	local frameShown = GossipFrame and GossipFrame:IsShown()
+	if (gossipOptionID == 0 and not orderIndex)
+		or not (hasOptions or IsRecent(gossipReadyAt) or frameShown) then
+		P.Debug("Option de dialogue ignorée : aucun dialogue ouvert")
+		return
+	end
+
+	-- 1. Chemin nominal : identifiant stable, si l'option est présente (ou liste inconnue).
+	if gossipOptionID > 0 and C_GossipInfo.SelectOption then
+		local exists = false
+		for _, info in ipairs(options or {}) do
+			if info.gossipOptionID == gossipOptionID then
+				exists = true
+				break
+			end
+		end
+		if exists or not hasOptions then
+			C_GossipInfo.SelectOption(gossipOptionID, "", false)
+			P.Debug("Option de dialogue " .. gossipOptionID .. " choisie (de " .. tostring(sender) .. ")")
+			return
+		end
+	end
+	-- 2. Options « indice » de DialogueUI sans gossipOptionID : orderIndex, stable côté serveur.
+	if orderIndex and C_GossipInfo.SelectOptionByIndex then
+		C_GossipInfo.SelectOptionByIndex(orderIndex)
+		P.Debug("Option de dialogue choisie par orderIndex " .. orderIndex)
+		return
+	end
+	-- 3. Recherche de l'orderIndex local à partir du gossipOptionID.
+	if gossipOptionID > 0 and hasOptions and C_GossipInfo.SelectOptionByIndex then
+		for _, info in ipairs(options) do
+			if info.gossipOptionID == gossipOptionID then
+				C_GossipInfo.SelectOptionByIndex(info.orderIndex or 0)
+				P.Debug("Option de dialogue choisie par orderIndex local " .. (info.orderIndex or 0))
+				return
+			end
+		end
+	end
+	-- 4. Ancienne API par index.
+	if SelectGossipOption then
+		SelectGossipOption(orderIndex or gossipOptionID)
+		P.Debug("Option de dialogue choisie (ancienne API)")
+	end
+end
+
+-- FERMETURE DE DIALOGUEUI -------------------------------------------------------------
+
+-- Cadre principal de DialogueUI (absent de _G) : reconnu par trois méthodes propres à son
+-- mixin. Mis en cache, nil si DialogueUI n'est pas installé ou pas encore créé.
+local dialogueUIFrame
+local function FindDialogueUIFrame()
+	if dialogueUIFrame then
+		return dialogueUIFrame
+	end
+	if not EnumerateFrames then
+		return nil
+	end
+	local frame = EnumerateFrames()
+	while frame do
+		if frame.HideUI and frame.AcquireAcceptButton and frame.SetSelectedGossipIndex then
+			dialogueUIFrame = frame
+			return frame
+		end
+		frame = EnumerateFrames(frame)
+	end
+end
+
+-- Leader : annonce la fermeture de son DialogueUI (hook OnHide, posé une seule fois dès que
+-- le cadre existe : DialogueUI le crée au premier dialogue).
+local closeHookInstalled = false
+local function TryHookDialogueUIClose()
+	if closeHookInstalled then
+		return
+	end
+	local frame = FindDialogueUIFrame()
+	if not frame then
+		return
+	end
+	frame:HookScript("OnHide", function()
+		if GossipEnabled() then
+			Send("CLOSEUI", "", "CLOSEUI", CLOSE_DEDUP, "fermeture de DialogueUI")
+		end
+	end)
+	closeHookInstalled = true
+	P.Debug("Fermeture de DialogueUI surveillée")
+end
+C_Timer.After(5, TryHookDialogueUIClose)
+
+-- Réception de CLOSEUI (Sync.lua) : ferme DialogueUI et les panneaux Blizzard.
+function P.OnDialogCloseMessage(sender)
+	if not GossipEnabled() then
+		return
+	end
+	local frame = FindDialogueUIFrame()
+	if frame and frame:IsShown() then
+		pcall(frame.HideUI or frame.Hide, frame)
+	end
+	if C_GossipInfo and C_GossipInfo.CloseGossip then
+		C_GossipInfo.CloseGossip()
+	end
+	if CloseQuest then
+		pcall(CloseQuest)
+	end
+	if GossipFrame and GossipFrame:IsShown() then
+		HideUIPanel(GossipFrame)
+	end
+	if QuestFrame and QuestFrame:IsShown() then
+		HideUIPanel(QuestFrame)
+	end
+	P.Debug("Dialogue fermé (fermeture du leader " .. tostring(sender) .. ")")
+end
+
 -- ÉVÉNEMENTS (Events.lua) ------------------------------------------------------------
 
 function P.OnQuestEvent(event, arg1)
@@ -368,6 +550,11 @@ function P.OnQuestEvent(event, arg1)
 		-- dialogue a masqué la fenêtre Blizzard.
 		gossipReadyAt = GetTime()
 	end
+
+	-- DialogueUI crée son cadre au premier dialogue : tentative de hook à chaque ouverture.
+	if (event == "GOSSIP_SHOW" or event == "QUEST_DETAIL") and not closeHookInstalled then
+		C_Timer.After(0.1, TryHookDialogueUIClose)
+	end
 end
 
 -- Filets de sécurité côté leader (addons de dialogue qui détournent les événements).
@@ -414,6 +601,24 @@ if C_GossipInfo and C_GossipInfo.SelectActiveQuest then
 		AnnounceGossipQuest("GQACTIVE", questID, "SelectActiveQuest")
 	end)
 end
+-- Leader : choix d'une option de dialogue. Clic Blizzard et DialogueUI passent par
+-- SelectOptionByIndex(orderIndex) ; SelectOption et SelectGossipOption pour les autres cas.
+if C_GossipInfo and C_GossipInfo.SelectOptionByIndex then
+	hooksecurefunc(C_GossipInfo, "SelectOptionByIndex", function(orderIndex)
+		AnnounceGossipOption(ResolveGossipOptionID(orderIndex), orderIndex, "SelectOptionByIndex")
+	end)
+end
+if C_GossipInfo and C_GossipInfo.SelectOption then
+	hooksecurefunc(C_GossipInfo, "SelectOption", function(gossipOptionID)
+		AnnounceGossipOption(gossipOptionID, nil, "SelectOption")
+	end)
+end
+if SelectGossipOption then
+	hooksecurefunc("SelectGossipOption", function(index)
+		AnnounceGossipOption(ResolveGossipOptionID(index), index, "SelectGossipOption")
+	end)
+end
+
 -- Équivalents anciens (par index), s'ils existent : questID retrouvé dans la liste.
 for kind, api in pairs(GOSSIP_QUEST_API) do
 	local legacyName = kind == "GQAVAIL" and "SelectGossipAvailableQuest" or "SelectGossipActiveQuest"

@@ -106,25 +106,26 @@ function P.BuildOptions()
 		.. "(jusqu'à 60 secondes après). Sur le leader, annonce ses validations au groupe. "
 		.. "Réglage propre à ce personnage.")
 
-	-- Sélection des quêtes dans les dialogues de PNJ (par personnage, cf. Quests.lua).
+	-- Dialogues de PNJ du leader : quêtes, options, fermeture (par personnage, cf. Quests.lua).
 	local gossipSetting = Settings.RegisterProxySetting(
 		category,
-		"POLYPODE_AUTO_SELECT_GOSSIP_QUEST",
+		"POLYPODE_AUTO_SELECT_GOSSIP",
 		Settings.VarType.Boolean,
-		"Choisir automatiquement les quêtes dans les dialogues",
+		"Suivre les dialogues de PNJ du leader",
 		Settings.Default.True,
 		function()
-			return P.charDb.autoSelectGossipQuest
+			return P.charDb.autoSelectGossip
 		end,
 		function(value)
-			P.charDb.autoSelectGossipQuest = value
+			P.charDb.autoSelectGossip = value
 		end
 	)
 	Settings.CreateCheckbox(category, gossipSetting,
-		"Quand le leader de l'équipe choisit une quête dans le dialogue d'un PNJ (quête disponible "
-		.. "ou à rendre), ce personnage choisit la même quête si son dialogue avec le PNJ est ouvert. "
-		.. "L'acceptation ou la validation automatique prend ensuite le relais. Sur le leader, "
-		.. "annonce ses choix au groupe. Réglage propre à ce personnage.")
+		"Quand le leader de l'équipe choisit une quête (disponible ou à rendre) ou une option dans "
+		.. "le dialogue d'un PNJ, ce personnage fait le même choix si son dialogue avec le PNJ est "
+		.. "ouvert ; quand le leader ferme DialogueUI, il le ferme aussi. L'acceptation ou la "
+		.. "validation automatique prend ensuite le relais. Sur le leader, annonce ses choix au "
+		.. "groupe. Réglage propre à ce personnage.")
 
 	Settings.RegisterAddOnCategory(category)
 	P.optionsCategory = category

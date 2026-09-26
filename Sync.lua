@@ -302,6 +302,25 @@ local function OnTeamMessage(rest, sender)
 	end
 end
 
+-- Messages de quête et de dialogue (Quests.lua) : actions que les membres rejouent. Ils ne
+-- sont acceptés que du leader de l'équipe sélectionnée, et jamais de soi-même (un message
+-- de groupe/raid revient aussi à son expéditeur, qui rejouerait sa propre action).
+local LEADER_ONLY = {
+	QACCEPT = true,
+	QVALIDATE = true,
+	QREWARD = true,
+	GQAVAIL = true,
+	GQACTIVE = true,
+	GOSSIP = true,
+	CLOSEUI = true,
+}
+
+-- Vrai si l'expéditeur (Nom-Royaume du message addon) est la clé de roster key.
+local function IsSender(sender, key)
+	local name, realm = strsplit("-", key, 2)
+	return FullName(sender) == FullName(P.GetTargetName({ name = name, realm = realm or "" }))
+end
+
 function P.OnSyncMessage(message, channel, sender)
 	local kind, token, rest = strsplit(":", message, 3)
 
@@ -309,6 +328,18 @@ function P.OnSyncMessage(message, channel, sender)
 	if not token or token ~= P.GetTeamToken() then
 		P.Debug("Message ignoré (autre équipe) : " .. tostring(sender))
 		return
+	end
+
+	if LEADER_ONLY[kind] then
+		local team = P.GetSelectedTeam()
+		local leader = team and P.GetTeamLeader(team)
+		if IsSender(sender, P.GetCharKey()) then
+			return
+		end
+		if not leader or not IsSender(sender, leader) then
+			P.Debug(kind .. " ignoré : " .. tostring(sender) .. " n'est pas le leader de l'équipe sélectionnée")
+			return
+		end
 	end
 
 	if kind == "TEAM" then
@@ -333,6 +364,15 @@ function P.OnSyncMessage(message, channel, sender)
 	elseif kind == "GQAVAIL" or kind == "GQACTIVE" then
 		-- GQAVAIL / GQACTIVE:token:questID — quête choisie dans un dialogue de PNJ (Quests.lua).
 		P.OnGossipQuestMessage(kind, tonumber(rest), sender)
+		return
+	elseif kind == "GOSSIP" then
+		-- GOSSIP:token:gossipOptionID:orderIndex — option de dialogue choisie (Quests.lua).
+		local gossipOptionID, orderIndex = strsplit(":", rest or "")
+		P.OnGossipOptionMessage(tonumber(gossipOptionID), tonumber(orderIndex), sender)
+		return
+	elseif kind == "CLOSEUI" then
+		-- CLOSEUI:token — le leader a fermé son DialogueUI (Quests.lua).
+		P.OnDialogCloseMessage(sender)
 		return
 	end
 

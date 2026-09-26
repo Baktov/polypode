@@ -35,7 +35,7 @@ P.charDefaults = {
 	assistStartAttack = true, -- raccourci « Assister le leader » : /startattack après /assist
 	autoAcceptQuest = true, -- accepter les quêtes acceptées par le leader (Quests.lua)
 	autoValidateQuest = true, -- valider (continuer + terminer) les quêtes validées par le leader
-	autoSelectGossipQuest = true, -- choisir dans les dialogues de PNJ les quêtes choisies par le leader
+	autoSelectGossip = true, -- suivre les dialogues de PNJ du leader (quêtes, options, fermeture)
 	-- selectedTeam : nom de l'équipe sélectionnée dans la fenêtre (nil par défaut),
 	-- conservé même si l'équipe manque momentanément (cf. UI_Main.lua).
 }
@@ -75,6 +75,13 @@ function P.InitDB()
 	-- par personnage associé ne sont plus utilisés.
 	P.db.leader = nil
 	P.charDb.role = nil
+
+	-- Migration : l'option « quêtes dans les dialogues » (v0.21) couvre désormais tous les
+	-- dialogues de PNJ sous un nouveau nom ; le choix déjà fait est conservé.
+	if P.charDb.autoSelectGossipQuest ~= nil then
+		P.charDb.autoSelectGossip = P.charDb.autoSelectGossipQuest
+		P.charDb.autoSelectGossipQuest = nil
+	end
 
 	P.debugEnabled = P.charDb.debug
 end
