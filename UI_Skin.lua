@@ -48,6 +48,23 @@ function P.SkinFrame(frame)
 	end
 end
 
+-- Skinne une barre de défilement MinimalScrollBar. Même priorité que P.SkinFrame.
+function P.SkinScrollBar(scrollBar)
+	if euiSkin and euiSkin.IsEnabled() then
+		euiSkin.ScrollBar(scrollBar)
+		return
+	end
+
+	if not ElvUI then
+		return
+	end
+	local E = unpack(ElvUI)
+	local S = E:GetModule("Skins")
+	if S and S.HandleTrimScrollBar then
+		S:HandleTrimScrollBar(scrollBar)
+	end
+end
+
 -- Skinne un cadre intérieur (sous-panneau d'une fenêtre). Même priorité que P.SkinFrame.
 function P.SkinPanel(panel)
 	if euiSkin and euiSkin.IsEnabled() then

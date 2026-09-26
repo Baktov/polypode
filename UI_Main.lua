@@ -30,23 +30,52 @@ local function CreatePanel(parent, title)
 	return panel
 end
 
-local function CreateRow(parent, index)
-	local row = CreateFrame("Frame", nil, parent)
-	row:SetHeight(ROW_HEIGHT)
-	row:SetPoint("TOPLEFT", 10, -HEADER_HEIGHT - (index - 1) * ROW_HEIGHT)
-	row:SetPoint("RIGHT", -10, 0)
+-- Liste défilante sans limite de taille sous l'en-tête d'un cadre (ScrollBox Blizzard :
+-- seules les lignes visibles existent, recyclées au défilement). formatFn(data) renvoie
+-- le texte d'une ligne. Remplir avec SetListData(panel, items), items = liste de tables.
+local function CreateScrollList(panel, formatFn)
+	local scrollBox = CreateFrame("Frame", nil, panel, "WowScrollBoxList")
+	scrollBox:SetPoint("TOPLEFT", 10, -HEADER_HEIGHT)
+	scrollBox:SetPoint("BOTTOMRIGHT", -22, 8)
 
-	row.text = row:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-	row.text:SetPoint("LEFT")
-	row.text:SetPoint("RIGHT")
-	row.text:SetJustifyH("LEFT")
-	row.text:SetWordWrap(false)
+	local scrollBar = CreateFrame("EventFrame", nil, panel, "MinimalScrollBar")
+	scrollBar:SetPoint("TOPLEFT", scrollBox, "TOPRIGHT", 4, 0)
+	scrollBar:SetPoint("BOTTOMLEFT", scrollBox, "BOTTOMRIGHT", 4, 0)
 
-	return row
+	local view = CreateScrollBoxListLinearView()
+	view:SetElementExtent(ROW_HEIGHT)
+	view:SetElementInitializer("Frame", function(row, data)
+		if not row.text then
+			row.text = row:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+			row.text:SetPoint("LEFT")
+			row.text:SetPoint("RIGHT")
+			row.text:SetJustifyH("LEFT")
+			row.text:SetWordWrap(false)
+		end
+		row.text:SetText(formatFn(data))
+	end)
+	ScrollUtil.InitScrollBoxListWithScrollBar(scrollBox, scrollBar, view)
+
+	-- Texte affiché quand la liste est vide.
+	panel.emptyText = panel:CreateFontString(nil, "OVERLAY", "GameFontDisable")
+	panel.emptyText:SetPoint("TOPLEFT", 10, -HEADER_HEIGHT)
+
+	panel.scrollBox = scrollBox
+	panel.scrollBar = scrollBar
+	if P.SkinScrollBar then
+		P.SkinScrollBar(scrollBar)
+	end
+end
+
+local function SetListData(panel, items)
+	panel.scrollBox:SetDataProvider(CreateDataProvider(items), ScrollBoxConstants.RetainScrollPosition)
+	panel.emptyText:SetShown(#items == 0)
 end
 
 -- "Nom-Royaume" coloré selon la classe, puis classe localisée et niveau en gris.
-local function FormatCharacter(key, entry)
+local function FormatCharacter(data)
+	local key = data.key
+	local entry = P.GetRoster()[key] or {}
 	local label = key
 	local color = entry.class and C_ClassColor and C_ClassColor.GetClassColor(entry.class)
 	if color then
@@ -112,24 +141,24 @@ function P.BuildUI()
 	charPanel:SetPoint("TOPLEFT", PANEL_MARGIN, PANEL_TOP)
 	charPanel:SetPoint("BOTTOMLEFT", PANEL_MARGIN, PANEL_MARGIN)
 	charPanel:SetWidth(panelWidth)
+	CreateScrollList(charPanel, FormatCharacter)
+	charPanel.emptyText:SetText("Aucun personnage trouvé")
 
-	-- Droite : équipes gérées (contenu à définir).
+	-- Droite : équipes gérées (contenu à définir ; liste défilante prête, vide pour l'instant).
 	local teamPanel = CreatePanel(f, "Équipes gérées")
 	teamPanel:SetPoint("TOPRIGHT", -PANEL_MARGIN, PANEL_TOP)
 	teamPanel:SetPoint("BOTTOMRIGHT", -PANEL_MARGIN, PANEL_MARGIN)
 	teamPanel:SetWidth(panelWidth)
-
-	local teamEmpty = teamPanel:CreateFontString(nil, "OVERLAY", "GameFontDisable")
-	teamEmpty:SetPoint("TOPLEFT", 10, -HEADER_HEIGHT)
-	teamEmpty:SetText("Aucune équipe (à définir)")
+	CreateScrollList(teamPanel, function(data)
+		return data.name
+	end)
+	teamPanel.emptyText:SetText("Aucune équipe (à définir)")
 
 	ui.frame = f
 	ui.title = title
 	ui.closeButton = closeBtn
 	ui.charPanel = charPanel
 	ui.teamPanel = teamPanel
-	ui.teamEmptyText = teamEmpty
-	ui.rows = {}
 
 	if P.SkinFrame then
 		P.SkinFrame(f)
@@ -143,24 +172,19 @@ function P.RefreshUI()
 		return
 	end
 
-	for _, row in ipairs(ui.rows) do
-		row:Hide()
-	end
-
 	-- Tri alphabétique pour un ordre stable d'un affichage à l'autre.
-	local roster = P.GetRoster()
 	local keys = {}
-	for key in pairs(roster) do
+	for key in pairs(P.GetRoster()) do
 		keys[#keys + 1] = key
 	end
 	table.sort(keys)
-
-	for index, key in ipairs(keys) do
-		local row = ui.rows[index] or CreateRow(ui.charPanel, index)
-		ui.rows[index] = row
-		row.text:SetText(FormatCharacter(key, roster[key]))
-		row:Show()
+	local items = {}
+	for i, key in ipairs(keys) do
+		items[i] = { key = key }
 	end
+	SetListData(ui.charPanel, items)
+
+	SetListData(ui.teamPanel, {})
 end
 
 function P.ToggleUI()

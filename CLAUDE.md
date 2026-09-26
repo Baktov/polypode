@@ -21,8 +21,8 @@ n'ajoute une fonctionnalité que si elle sert directement cet objectif.
 |---|---|
 | `Core.lua` | Table globale `Polypode` (alias local `P`), SavedVariables, CRUD du roster |
 | `Sync.lua` | Broadcast/réception de messages addon (`C_ChatInfo`), token d'équipe (`P.GetTeamToken`, hash du BattleTag), annonce `HELLO` / réponse `HI` |
-| `UI_Skin.lua` | Skinning conditionnel : EllesmereUI (`EllesmereUI.RegisterSkin`, prioritaire) puis ElvUI. `P.SkinFrame` (fenêtre top-level), `P.SkinPanel` (cadre intérieur) |
-| `UI_Main.lua` | Fenêtre principale : `BuildUI`, `RefreshUI`, `ToggleUI`. Deux cadres : `P.ui.charPanel` (personnages trouvés = roster trié) et `P.ui.teamPanel` (équipes gérées, contenu **à définir**, placeholder `P.ui.teamEmptyText`) |
+| `UI_Skin.lua` | Skinning conditionnel : EllesmereUI (`EllesmereUI.RegisterSkin`, prioritaire) puis ElvUI. `P.SkinFrame` (fenêtre top-level), `P.SkinPanel` (cadre intérieur), `P.SkinScrollBar` (barre de défilement) |
+| `UI_Main.lua` | Fenêtre principale : `BuildUI`, `RefreshUI`, `ToggleUI`. Deux cadres à liste défilante (`panel.scrollBox`, `panel.scrollBar`, `panel.emptyText`) : `P.ui.charPanel` (personnages trouvés = roster trié) et `P.ui.teamPanel` (équipes gérées, contenu **à définir**, liste vide) |
 | `UI_Minimap.lua` | Bouton de minimap sans librairie (`P.BuildMinimapButton`, appelé à `PLAYER_LOGIN`), `P.SetMinimapButtonShown`, état dans `P.db.minimap` (`angle`, `hide`) |
 | `UI_Options.lua` | Panneau Options → AddOns via l'API `Settings` (`P.BuildOptions` à `PLAYER_LOGIN`, `P.OpenOptions`) |
 | `Commands.lua` | Commande slash `/poly` (`/polypode`) et fonctions globales de keybinding |
@@ -53,6 +53,11 @@ en tête de chaque fichier). Ex. `P.db` (= `PolypodeDB`), `P.charDb` (= `Polypod
 10. **Pas de globals parasites** : toute variable de module doit être `local` ou sous `Polypode.`
     (exception : les fonctions de keybinding `POLYPODE_*` et les `BINDING_*`, imposées par l'API WoW).
 11. **Conserver le bloc de commentaire en tête de chaque fichier** (`-- Polypode: NomFichier — rôle`).
+12. **Prérequis de toute évolution UI : tout contenu de taille variable défile, sans limite.**
+    Chaque nouveau panneau, liste ou fenêtre doit pouvoir défiler, même si peu d'éléments sont
+    attendus aujourd'hui. Jamais de pile de lignes à hauteur fixe qui déborde du cadre. Pour une
+    liste : `CreateScrollList(panel, formatFn)` + `SetListData(panel, items)` dans `UI_Main.lua`
+    (ScrollBox Blizzard virtualisée + `MinimalScrollBar`, skinnée via `P.SkinScrollBar`).
 
 ---
 

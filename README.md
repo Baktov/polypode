@@ -45,6 +45,8 @@ Ouverte par `/poly ui`, le raccourci clavier ou le bouton de minimap. Deux cadre
   `(vous)` marque le personnage courant, `[leader]` le leader désigné.
 - **Équipes gérées** : emplacement réservé, contenu à définir dans une prochaine version.
 
+Les deux listes défilent (molette ou barre de défilement), sans limite de nombre.
+
 ---
 
 ## Commandes slash (`/poly` ou `/polypode`)
@@ -118,8 +120,8 @@ vous avez désactivé le skin de Polypode dans ses options).
 
 ## État du projet
 
-Version `0.5.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
-automatique aux annonces, fenêtre à deux cadres (personnages trouvés / équipes gérées)
+Version `0.6.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
+automatique aux annonces, fenêtre à deux listes défilantes (personnages trouvés / équipes gérées)
 skinnée (EllesmereUI/ElvUI), bouton de minimap (masquable), panneau d'options,
 commandes, raccourci clavier. Pistes envisagées pour la suite,
 à activer seulement si le besoin se confirme (voir la règle de simplicité dans
@@ -131,7 +133,6 @@ commandes, raccourci clavier. Pistes envisagées pour la suite,
 - Réannonce à l'entrée en groupe (`GROUP_ROSTER_UPDATE`) pour les personnages sans
   guilde commune connectés avant d'être groupés.
 - **Équipes gérées** : définir ce qu'est une équipe et remplir le cadre de droite.
-- Défilement de la liste des personnages trouvés au-delà d'une dizaine de personnages.
 - Suivi automatique du leader (`follow`) et assist de cible.
 - Invitation automatique du groupe depuis le roster.
 - Skin des textes de la fenêtre (police EllesmereUI via `S.Font`).
