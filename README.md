@@ -49,6 +49,8 @@ automatique de base entre vos clients — sans configuration complexe.
   quêtes », voir Options). Seules les actions du **leader de l'équipe sélectionnée** sont suivies.
 - **Cinématiques** : quand le leader passe une cinématique ou une vidéo, les autres personnages
   du groupe la passent aussi (option « Passer automatiquement les cinématiques »).
+- **Vols** : quand le leader prend un vol chez un maître de vol, les autres personnages du groupe
+  qui ont la carte de vol ouverte prennent le même (option « Prendre automatiquement le vol du leader »).
 - Les **ajouts et retraits manuels de personnages** (bouton « Ajouter la cible »,
   `/poly remove`) sont synchronisés de la même façon, avec la même règle de version : un
   personnage retiré ne réapparaît pas via un client qui l'avait encore (il réapparaît
@@ -177,6 +179,7 @@ fenêtre principale) :
 | Valider automatiquement les quêtes | Oui | Quand le leader rend une quête (« Continuer » puis « Terminer la quête »), ce personnage la rend aussi avec le **même index de récompense**, dès que le PNJ est ouvert (jusqu'à 60 s après). Une récompense au choix qui ne convient pas reste à choisir à la main. Réglage **par personnage**, à cocher sur le leader et les membres |
 | Suivre les dialogues de PNJ du leader | Oui | Quand le leader choisit dans le dialogue d'un PNJ une quête (disponible ou à rendre) ou une option de dialogue, ce personnage fait le même choix si son dialogue avec le PNJ est ouvert ; quand le leader ferme DialogueUI, il le ferme aussi. L'acceptation ou la validation automatique enchaîne. Réglage **par personnage**, à cocher sur le leader et les membres |
 | Passer automatiquement les cinématiques | Oui | Quand le leader passe une cinématique (moteur, scène) ou une vidéo, ce personnage la passe aussi, dès qu'elle s'affiche (jusqu'à 15 s après). Réglage **par personnage**, à cocher sur le leader et les membres |
+| Prendre automatiquement le vol du leader | Oui | Quand le leader prend un vol chez un maître de vol, ce personnage prend le même vol si sa carte de vol est ouverte et qu'il connaît la destination (retrouvée par son nom). Réglage **par personnage**, à cocher sur le leader et les membres |
 
 ---
 
@@ -197,12 +200,12 @@ vous avez désactivé le skin de Polypode dans ses options).
 
 ## État du projet
 
-Version `0.23.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
+Version `0.24.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
 automatique aux annonces, fenêtre redimensionnable à trois listes défilantes (personnages
 trouvés / équipes avec création par saisie et sélection / personnages de l'équipe, ajout
 et retrait de membres au clic, leader par équipe, invitation de toute l'équipe, synchronisation automatique et versionnée des équipes, ajout du joueur ciblé)
 skinnée (EllesmereUI/ElvUI), bouton de minimap (masquable), panneau d'options (accessible par un bouton de la fenêtre),
-commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, inviter), suivi des dialogues de PNJ (quêtes, options, fermeture de DialogueUI), acceptation et validation automatiques des quêtes du leader, passage automatique des cinématiques. Pistes envisagées pour la suite,
+commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, inviter), suivi des dialogues de PNJ (quêtes, options, fermeture de DialogueUI), acceptation et validation automatiques des quêtes du leader, passage automatique des cinématiques, vol automatique chez le maître de vol. Pistes envisagées pour la suite,
 à activer seulement si le besoin se confirme (voir la règle de simplicité dans
 `CLAUDE.md`) :
 

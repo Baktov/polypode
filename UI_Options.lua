@@ -146,6 +146,25 @@ function P.BuildOptions()
 		.. "aussi (dès qu'elle s'affiche, jusqu'à 15 secondes après). Sur le leader, annonce ses "
 		.. "cinématiques passées au groupe. Réglage propre à ce personnage.")
 
+	-- Vol pris par le leader chez un maître de vol (par personnage, cf. Taxi.lua).
+	local taxiSetting = Settings.RegisterProxySetting(
+		category,
+		"POLYPODE_AUTO_TAXI",
+		Settings.VarType.Boolean,
+		"Prendre automatiquement le vol du leader",
+		Settings.Default.True,
+		function()
+			return P.charDb.autoTaxi
+		end,
+		function(value)
+			P.charDb.autoTaxi = value
+		end
+	)
+	Settings.CreateCheckbox(category, taxiSetting,
+		"Quand le leader de l'équipe prend un vol chez un maître de vol, ce personnage prend le "
+		.. "même vol si sa carte de vol est ouverte et qu'il connaît la destination. Sur le leader, "
+		.. "annonce ses vols au groupe. Réglage propre à ce personnage.")
+
 	Settings.RegisterAddOnCategory(category)
 	P.optionsCategory = category
 end

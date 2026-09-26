@@ -37,6 +37,7 @@ P.charDefaults = {
 	autoValidateQuest = true, -- valider (continuer + terminer) les quêtes validées par le leader
 	autoSelectGossip = true, -- suivre les dialogues de PNJ du leader (quêtes, options, fermeture)
 	autoSkipCinematic = true, -- passer les cinématiques passées par le leader (Cinematics.lua)
+	autoTaxi = true, -- prendre le vol pris par le leader chez un maître de vol (Taxi.lua)
 	-- selectedTeam : nom de l'équipe sélectionnée dans la fenêtre (nil par défaut),
 	-- conservé même si l'équipe manque momentanément (cf. UI_Main.lua).
 }

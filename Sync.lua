@@ -339,6 +339,7 @@ local LEADER_ONLY = {
 	GOSSIP = true,
 	CLOSEUI = true,
 	CINESKIP = true,
+	TAXI = true,
 }
 
 -- Vrai si l'expéditeur (Nom-Royaume du message addon) est la clé de roster key.
@@ -403,6 +404,10 @@ function P.OnSyncMessage(message, channel, sender)
 	elseif kind == "CINESKIP" then
 		-- CINESKIP:token:kind — le leader a passé une cinématique (Cinematics.lua).
 		P.OnCinematicSkipMessage(rest, sender)
+		return
+	elseif kind == "TAXI" then
+		-- TAXI:token:nomDestination — le leader a pris un vol (Taxi.lua).
+		P.OnTaxiMessage(rest, sender)
 		return
 	end
 
