@@ -23,8 +23,13 @@ automatique de base entre vos clients — sans configuration complexe.
 - À la connexion, Polypode enregistre automatiquement votre personnage courant dans
   un roster partagé (sauvegardé au niveau du compte).
 - Si vous êtes en groupe, en raid ou dans une guilde commune avec vos autres clients,
-  Polypode annonce votre personnage (nom, classe, niveau) aux autres clients qui ont
-  aussi Polypode chargé : leur roster se met à jour automatiquement.
+  Polypode annonce votre personnage (nom, classe, niveau) à vos autres clients, qui
+  répondent en s'annonçant à leur tour : chaque roster connaît tous les personnages,
+  quel que soit l'ordre de connexion.
+- **Seuls vos personnages sont reconnus** : chaque annonce porte un token d'équipe tiré
+  de votre BattleTag (haché, jamais envoyé en clair). Les autres joueurs de la guilde
+  qui utilisent Polypode sont ignorés. Tous vos comptes WoW doivent donc être rattachés
+  au **même compte Battle.net**.
 - Vous pouvez désigner un **leader** parmi les personnages du roster — c'est pour
   l'instant une simple étiquette affichée dans la liste (base pour de futures actions
   liées au leader : suivi, assist, etc.).
@@ -74,11 +79,17 @@ vous avez désactivé le skin de Polypode dans ses options).
 
 ## État du projet
 
-Version initiale (`0.1.0`) : structure de base fonctionnelle (roster, sync simple,
-fenêtre de liste, commandes, raccourci clavier). Pistes envisagées pour la suite,
+Version `0.2.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
+automatique aux annonces, fenêtre de liste skinnée (EllesmereUI/ElvUI), commandes,
+raccourci clavier. Pistes envisagées pour la suite,
 à activer seulement si le besoin se confirme (voir la règle de simplicité dans
 `CLAUDE.md`) :
 
+- `/poly team <nom>` : nom d'équipe commun remplaçant le BattleTag dans le calcul du
+  token, pour multiboxer avec **plusieurs comptes Battle.net** (point d'extension :
+  `P.GetTeamToken()` dans `Sync.lua`).
+- Réannonce à l'entrée en groupe (`GROUP_ROSTER_UPDATE`) pour les personnages sans
+  guilde commune connectés avant d'être groupés.
 - Suivi automatique du leader (`follow`) et assist de cible.
 - Bouton minimap.
 - Invitation automatique du groupe depuis le roster.

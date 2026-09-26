@@ -20,7 +20,7 @@ n'ajoute une fonctionnalité que si elle sert directement cet objectif.
 | Fichier | Rôle |
 |---|---|
 | `Core.lua` | Table globale `Polypode` (alias local `P`), SavedVariables, CRUD du roster |
-| `Sync.lua` | Broadcast/réception de messages addon (`C_ChatInfo`) pour annoncer un personnage au groupe/à la guilde |
+| `Sync.lua` | Broadcast/réception de messages addon (`C_ChatInfo`), token d'équipe (`P.GetTeamToken`, hash du BattleTag), annonce `HELLO` / réponse `HI` |
 | `UI_Skin.lua` | Skinning conditionnel : EllesmereUI (`EllesmereUI.RegisterSkin`, prioritaire) puis ElvUI |
 | `UI_Main.lua` | Fenêtre principale : `BuildUI`, `RefreshUI`, `ToggleUI` |
 | `Commands.lua` | Commande slash `/poly` (`/polypode`) et fonctions globales de keybinding |
@@ -105,7 +105,11 @@ le titre dans sa barre de titre de 25 px, ElvUI skinne le `CloseButton`).
 
 ### Envoyer un message de synchronisation
 → Utiliser `P.Broadcast(message, channel)` défini dans `Sync.lua`. Format de message :
-`"TYPE:champ1:champ2:..."` (voir `HELLO` comme exemple), parsé avec `strsplit(":", message)`.
+`"TYPE:token:champ1:champ2:..."` (voir `HELLO` comme exemple), parsé avec `strsplit(":", message)`.
+Le 2e champ est **toujours** le token d'équipe (`P.GetTeamToken()`) : `P.OnSyncMessage` rejette
+tout message dont le token diffère (autres joueurs Polypode de la guilde) et ignore nos propres
+messages (renvoyés par le serveur à l'émetteur). Un message qui appelle une réponse doit avoir un
+type de réponse distinct (`HELLO` → `HI`) pour ne jamais boucler.
 
 ### Référencer l'API Blizzard pour une nouvelle fonctionnalité
 → Avant d'implémenter un appel à l'API WoW (frames, events, namespaces `C_*`), vérifier la
