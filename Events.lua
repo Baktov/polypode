@@ -49,6 +49,7 @@ frame:SetScript("OnEvent", function(self, event, ...)
 		P.SayHello()
 		P.BuildMinimapButton()
 		P.BuildOptions()
+		P.JoinSyncChannelLater()
 		P.UpdateLeaderMacros()
 		P.Debug("Personnage enregistré : " .. key)
 	elseif event == "UPDATE_BINDINGS" then

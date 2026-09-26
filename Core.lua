@@ -28,6 +28,12 @@ P.defaults = {
 	-- [nom] = { name, members = { [nom-royaume] = true }, leader = nom-royaume|nil,
 	--          updated = heure serveur de la dernière modification (synchro) }
 	teams = {},
+	-- Canal de discussion dédié aux messages Polypode entre clients (Sync.lua) ; name = ""
+	-- désactivé. Versionné et synchronisé (fichier de compte partagé entre clients).
+	syncChannel = {
+		name = "",
+		updated = 0,
+	},
 }
 
 -- Par personnage : réglages propres à une fenêtre de multibox (et à l'abri du fichier de
@@ -105,6 +111,7 @@ end
 local function NextVersion(current)
 	return math.max(GetServerTime(), (current or 0) + 1)
 end
+P.NextVersion = NextVersion
 
 -- ROSTER. Une entrée retirée n'est pas effacée mais marquée removed = true et versionnée
 -- (« pierre tombale ») : la suppression se propage aux autres clients et n'est pas annulée
@@ -359,6 +366,74 @@ end
 
 -- Équipe sélectionnée pour ce personnage (P.charDb.selectedTeam), ou nil si aucune ou si
 -- elle n'existe pas (encore) localement.
+-- CANAL DÉDIÉ ---------------------------------------------------------------------------
+
+-- Nom du canal dédié ("" si désactivé).
+function P.GetSyncChannelName()
+	return P.db.syncChannel.name or ""
+end
+
+-- Vérifie un nom de canal saisi. Renvoie le nom nettoyé ("" = désactiver), ou nil et un
+-- message d'erreur. Un canal personnalisé WoW : pas d'espace, ne commence pas par un
+-- chiffre (sinon confondu avec un numéro de canal), 31 caractères au plus ; « : » exclu
+-- (séparateur des messages Polypode).
+function P.CheckSyncChannelName(name)
+	name = strtrim(name or "")
+	if name == "" then
+		return ""
+	end
+	if name:find("[%s:]") then
+		return nil, "Nom de canal invalide : pas d'espace ni de « : »."
+	end
+	if name:find("^%d") then
+		return nil, "Nom de canal invalide : il ne doit pas commencer par un chiffre."
+	end
+	if #name > 31 then
+		return nil, "Nom de canal trop long (31 caractères au plus)."
+	end
+	return name
+end
+
+-- Change le canal dédié (saisie locale) : nouvelle version, rejoint le canal et partage le
+-- réglage avec les autres clients. Renvoie true, ou false et un message d'erreur.
+function P.SetSyncChannel(name)
+	local cleaned, err = P.CheckSyncChannelName(name)
+	if not cleaned then
+		return false, err
+	end
+	local setting = P.db.syncChannel
+	if cleaned == setting.name then
+		return true
+	end
+	local previous = setting.name
+	setting.name = cleaned
+	setting.updated = NextVersion(setting.updated)
+	if P.ApplySyncChannel then
+		P.ApplySyncChannel(previous)
+	end
+	if P.SyncChannelSetting then
+		P.SyncChannelSetting()
+	end
+	return true
+end
+
+-- Applique un réglage de canal reçu d'un autre client, s'il est plus récent (sans le
+-- renvoyer). Renvoie true si appliqué.
+function P.ApplyChannelSettingSync(name, updated)
+	local setting = P.db.syncChannel
+	local cleaned = P.CheckSyncChannelName(name)
+	if not cleaned or (setting.updated or 0) >= updated then
+		return false
+	end
+	local previous = setting.name
+	setting.name = cleaned
+	setting.updated = updated
+	if P.ApplySyncChannel then
+		P.ApplySyncChannel(previous)
+	end
+	return true
+end
+
 function P.GetSelectedTeam()
 	local name = P.charDb and P.charDb.selectedTeam
 	if name and P.db.teams[name] then

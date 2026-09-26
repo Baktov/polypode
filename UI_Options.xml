@@ -1,0 +1,33 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+	<!-- Polypode: UI_Options.xml — élément du panneau d'options pour saisir le canal dédié.
+	     Le panneau Settings n'a pas de champ de texte standard : élément personnalisé, ajouté
+	     par Settings.CreateElementInitializer (UI_Options.lua), qui appelle frame:Init.
+	     Méthodes dans Polypode.ChannelSettingMixin (UI_Options.lua, chargé avant) ; libellé
+	     et champ alignés sur les cases à cocher du panneau. -->
+	<Frame name="PolypodeChannelSettingTemplate" virtual="true">
+		<Size y="30"/>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString parentKey="Text" inherits="GameFontNormal" justifyH="LEFT" text="Canal dédié">
+					<Anchors>
+						<Anchor point="LEFT" x="37" y="0"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<EditBox parentKey="EditBox" inherits="InputBoxTemplate">
+				<Size x="180" y="20"/>
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="CENTER" x="-80" y="0"/>
+				</Anchors>
+			</EditBox>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				Mixin(self, Polypode.ChannelSettingMixin)
+				self:OnLoad()
+			</OnLoad>
+		</Scripts>
+	</Frame>
+</Ui>

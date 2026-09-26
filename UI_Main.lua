@@ -224,6 +224,39 @@ local function FormatCharacter(data, teamName)
 	return label
 end
 
+-- Champ de saisie du canal dédié (fenêtre principale et panneau d'options) : Entrée valide,
+-- Échap annule, infobulle d'aide. Validation et synchro dans P.SetSyncChannel (Core.lua).
+function P.SetupChannelInput(editBox)
+	editBox:SetAutoFocus(false)
+	editBox:SetMaxLetters(31)
+	editBox:SetScript("OnEnterPressed", function(self)
+		local ok, err = P.SetSyncChannel(self:GetText())
+		if ok then
+			local name = P.GetSyncChannelName()
+			UIErrorsFrame:AddMessage(name == "" and "Canal dédié désactivé."
+				or "Canal dédié : " .. name .. ".", 1, 0.82, 0)
+			self:ClearFocus()
+			P.RefreshUI()
+		else
+			UIErrorsFrame:AddMessage(err, 1, 0.1, 0.1)
+		end
+	end)
+	editBox:SetScript("OnEscapePressed", function(self)
+		self:SetText(P.GetSyncChannelName())
+		self:ClearFocus()
+	end)
+	editBox:SetScript("OnEnter", function(self)
+		GameTooltip:SetOwner(self, "ANCHOR_BOTTOM")
+		GameTooltip:AddLine("Canal dédié")
+		GameTooltip:AddLine("Canal de discussion commun à vos comptes, rejoint automatiquement et "
+			.. "invisible dans le chat : vos Polypode s'y trouvent à la connexion, même sans guilde "
+			.. "commune ni groupe. Entrée pour valider, vide pour désactiver. Partagé avec vos "
+			.. "autres Polypode connectés.", 1, 1, 1, true)
+		GameTooltip:Show()
+	end)
+	editBox:SetScript("OnLeave", GameTooltip_Hide)
+end
+
 function P.BuildUI()
 	if ui.frame then
 		return
@@ -272,6 +305,16 @@ function P.BuildUI()
 		GameTooltip:Show()
 	end)
 	optionsBtn:SetScript("OnLeave", GameTooltip_Hide)
+
+	-- Canal dédié (barre de titre, à droite de Options) : validé par Entrée, Échap annule.
+	local channelLabel = f:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+	channelLabel:SetPoint("LEFT", optionsBtn, "RIGHT", 10, 0)
+	channelLabel:SetText("Canal :")
+
+	local channelInput = CreateFrame("EditBox", nil, f, "InputBoxTemplate")
+	channelInput:SetSize(110, 18)
+	channelInput:SetPoint("LEFT", channelLabel, "RIGHT", 8, 0) -- 8 : l'art du template déborde à gauche
+	P.SetupChannelInput(channelInput)
 
 	-- Poignée de redimensionnement (coin bas-droit), au-dessus des cadres intérieurs.
 	local grip = CreateFrame("Button", nil, f)
@@ -479,6 +522,8 @@ function P.BuildUI()
 	ui.title = title
 	ui.closeButton = closeBtn
 	ui.optionsButton = optionsBtn
+	ui.channelLabel = channelLabel
+	ui.channelInput = channelInput
 	ui.resizeGrip = grip
 	ui.charPanel = charPanel
 	ui.teamPanel = teamPanel
@@ -498,6 +543,7 @@ function P.BuildUI()
 		P.SkinButton(inviteBtn)
 		P.SkinButton(addTargetBtn)
 		P.SkinButton(optionsBtn)
+		P.SkinEditBox(channelInput)
 	end
 end
 
@@ -515,6 +561,11 @@ function P.RefreshUI()
 	-- Sélection = choix mémorisé, s'il existe localement. Le choix n'est jamais effacé ici :
 	-- une équipe absente au login (synchro pas encore arrivée) sera sélectionnée à sa réception.
 	selectedTeam = P.GetSelectedTeam()
+
+	-- Canal dédié (peut changer par synchro) ; pas pendant une saisie.
+	if not ui.channelInput:HasFocus() then
+		ui.channelInput:SetText(P.GetSyncChannelName())
+	end
 
 	SetListData(ui.charPanel, SortedKeyItems(P.GetRoster()))
 

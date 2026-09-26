@@ -2,6 +2,18 @@
 
 local P = Polypode
 
+-- Élément « Canal dédié » du panneau (modèle PolypodeChannelSettingTemplate, UI_Options.xml).
+-- Mélangé au cadre par son OnLoad ; le panneau appelle Init à chaque affichage de l'élément.
+P.ChannelSettingMixin = {}
+
+function P.ChannelSettingMixin:OnLoad()
+	P.SetupChannelInput(self.EditBox)
+end
+
+function P.ChannelSettingMixin:Init()
+	self.EditBox:SetText(P.GetSyncChannelName())
+end
+
 -- Enregistre la catégorie "Polypode" dans Options > AddOns. Appelé à PLAYER_LOGIN,
 -- une fois P.db disponible.
 function P.BuildOptions()
@@ -9,7 +21,10 @@ function P.BuildOptions()
 		return
 	end
 
-	local category = Settings.RegisterVerticalLayoutCategory("Polypode")
+	local category, layout = Settings.RegisterVerticalLayoutCategory("Polypode")
+
+	-- Canal dédié : champ de texte (élément personnalisé, pas de contrôle Settings standard).
+	layout:AddInitializer(Settings.CreateElementInitializer("PolypodeChannelSettingTemplate", {}))
 
 	-- Proxy : la case lit/écrit P.db via nos fonctions, elle reste donc à jour
 	-- quand l'affichage change par /poly minimap.

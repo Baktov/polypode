@@ -26,6 +26,15 @@ automatique de base entre vos clients — sans configuration complexe.
   Polypode annonce votre personnage (nom, classe, niveau) à vos autres clients, qui
   répondent en s'annonçant à leur tour : chaque roster connaît tous les personnages,
   quel que soit l'ordre de connexion.
+- **Canal dédié** (recommandé) : un nom de canal commun à vos comptes, saisi dans la fenêtre
+  (champ « Canal » à droite du bouton Options) ou dans le panneau d'options. Chaque client le
+  rejoint automatiquement (5 secondes après la connexion, pour ne pas prendre le numéro du canal
+  Général) sans l'afficher dans le chat. Il joue le rôle d'une guilde commune pour les annonces
+  de connexion : vos Polypode se trouvent même sans guilde commune ni groupe, et il est
+  prioritaire sur le raid, le groupe et la guilde. Le choix est partagé avec vos autres Polypode
+  connectés. Nom : sans espace ni « : », ne commençant pas par un chiffre, 31 caractères au
+  plus ; vide pour désactiver. Les autres joueurs qui rejoindraient le même canal sont ignorés
+  (token BattleTag).
 - **Seuls vos personnages sont reconnus** : chaque annonce porte un token d'équipe tiré
   de votre BattleTag (haché, jamais envoyé en clair). Les autres joueurs de la guilde
   qui utilisent Polypode sont ignorés. Tous vos comptes WoW doivent donc être rattachés
@@ -60,7 +69,7 @@ automatique de base entre vos clients — sans configuration complexe.
 - **Groupage automatique** : à la connexion d'un personnage membre d'une équipe, si le leader de
   l'équipe est déjà connecté, il l'invite automatiquement et le personnage accepte (option
   « Groupage automatique de l'équipe »). Même chose quand le leader se connecte après ses membres.
-  Il faut que les deux se voient (guilde commune, ou groupe) et que le leader puisse inviter (seul
+  Il faut que les deux se voient (canal dédié, guilde commune ou groupe) et que le leader puisse inviter (seul
   ou chef du groupe, 5 au plus hors raid).
 - Les **ajouts et retraits manuels de personnages** (bouton « Ajouter la cible »,
   `/poly remove`) sont synchronisés de la même façon, avec la même règle de version : un
@@ -185,6 +194,7 @@ fenêtre principale) :
 
 | Option | Défaut | Effet |
 |---|---|---|
+| Canal dédié | vide | Nom du canal de discussion commun à vos comptes (voir Fonctionnement). Aussi modifiable dans la fenêtre principale. Pour tout le compte, synchronisé entre vos clients |
 | Afficher l'icône de minimap | Oui | Affiche le bouton Polypode autour de la minimap |
 | Mode debug | Non | Affiche dans le chat les messages de diagnostic (synchro, invitations...). Réglage **par personnage** : on peut l'activer sur une seule fenêtre |
 | Attaquer après l'assistance | Oui | Le raccourci « Assister le leader » lance aussi l'attaque automatique (`/startattack`) sur la cible prise si elle est hostile ; décoché, il prend seulement la cible. Réglage **par personnage** (ex. décoché sur un soigneur) |
@@ -217,12 +227,12 @@ vous avez désactivé le skin de Polypode dans ses options).
 
 ## État du projet
 
-Version `0.27.1` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
+Version `0.28.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
 automatique aux annonces, fenêtre redimensionnable à trois listes défilantes (personnages
 trouvés / équipes avec création par saisie et sélection / personnages de l'équipe, ajout
 et retrait de membres au clic, leader par équipe, invitation de toute l'équipe, synchronisation automatique et versionnée des équipes, ajout du joueur ciblé)
 skinnée (EllesmereUI/ElvUI), bouton de minimap (masquable), panneau d'options (accessible par un bouton de la fenêtre),
-commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, inviter), suivi des dialogues de PNJ (quêtes, options, fermeture de DialogueUI), acceptation et validation automatiques des quêtes du leader, passage automatique des cinématiques, vol automatique chez le maître de vol, entrée et sortie de gouffre et entrée par portail automatiques, volume et coupure du son de l'équipe par le leader, groupage automatique de l'équipe à la connexion. Pistes envisagées pour la suite,
+commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, inviter), suivi des dialogues de PNJ (quêtes, options, fermeture de DialogueUI), acceptation et validation automatiques des quêtes du leader, passage automatique des cinématiques, vol automatique chez le maître de vol, entrée et sortie de gouffre et entrée par portail automatiques, volume et coupure du son de l'équipe par le leader, groupage automatique de l'équipe à la connexion, canal dédié commun aux comptes. Pistes envisagées pour la suite,
 à activer seulement si le besoin se confirme (voir la règle de simplicité dans
 `CLAUDE.md`) :
 

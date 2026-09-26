@@ -34,8 +34,60 @@ function P.GetTeamToken()
 	return teamToken
 end
 
+-- CANAL DÉDIÉ : canal de discussion personnalisé (P.db.syncChannel, Core.lua), rejoint par
+-- chaque client et masqué des fenêtres de chat. Les messages addon y passent avec le type
+-- "CHANNEL" et le numéro du canal. Commun aux comptes, il sert comme la guilde pour les
+-- annonces de connexion (HELLO/HI), même hors groupe et hors guilde commune.
+
+local CHANNEL_JOIN_DELAY = 5 -- secondes après la connexion : rejoindre plus tôt peut voler
+-- le numéro 1 au canal Général
+local CHANNEL_HELLO_DELAY = 1 -- secondes entre la demande d'adhésion et l'annonce sur le canal
+
+-- Numéro du canal dédié s'il est rejoint, sinon nil.
+local function SyncChannelIndex()
+	local name = P.db and P.GetSyncChannelName()
+	if not name or name == "" then
+		return nil
+	end
+	local index = GetChannelName(name)
+	return index and index > 0 and index or nil
+end
+
+-- Rejoint le canal dédié (et quitte l'ancien, previous) puis s'y annonce. Appelé à la
+-- connexion (différé) et à chaque changement du réglage (Core.lua).
+function P.ApplySyncChannel(previous)
+	local name = P.GetSyncChannelName()
+	if previous and previous ~= "" and previous ~= name and GetChannelName(previous) > 0 then
+		LeaveChannelByName(previous)
+		P.Debug("Canal dédié quitté : " .. previous)
+	end
+	if name == "" then
+		return
+	end
+	if GetChannelName(name) == 0 then
+		JoinChannelByName(name) -- sans fenêtre de chat : le canal reste invisible
+		P.Debug("Canal dédié rejoint : " .. name)
+	end
+	C_Timer.After(CHANNEL_HELLO_DELAY, function()
+		if SyncChannelIndex() then
+			P.SayHello("HELLO", "CHANNEL")
+		end
+	end)
+end
+
+-- Connexion (Events.lua) : rejoint le canal dédié après le chargement des canaux du jeu.
+function P.JoinSyncChannelLater()
+	C_Timer.After(CHANNEL_JOIN_DELAY, function()
+		P.ApplySyncChannel()
+	end)
+end
+
+-- Canal par défaut des annonces (HELLO/HI) : le canal dédié s'il est rejoint (il réunit
+-- tous les clients, groupés ou non), sinon raid, groupe, guilde.
 local function GetBroadcastChannel()
-	if IsInRaid() then
+	if SyncChannelIndex() then
+		return "CHANNEL"
+	elseif IsInRaid() then
 		return "RAID"
 	elseif IsInGroup() then
 		return "PARTY"
@@ -107,6 +159,14 @@ end
 -- channel = "WHISPER" : target est le nom du destinataire (cf. P.GetTargetName).
 function P.Broadcast(message, channel, target)
 	channel = channel or GetBroadcastChannel()
+	if channel == "CHANNEL" then
+		-- Canal dédié : la cible est son numéro (canal quitté ou pas encore rejoint : rien).
+		target = target or SyncChannelIndex()
+		if not target then
+			return
+		end
+		target = tostring(target)
+	end
 	if not channel or not (C_ChatInfo and C_ChatInfo.SendAddonMessage) then
 		return
 	end
@@ -201,6 +261,34 @@ function P.SyncCharacter(key, target)
 	for to in pairs(ResolveTargets(target)) do
 		P.Broadcast(message, "WHISPER", to)
 		P.Debug("Personnage " .. key .. " envoyé à " .. to)
+	end
+end
+
+-- Envoie le réglage du canal dédié (s'il a été choisi au moins une fois) par chuchotement :
+-- à target, sinon aux clients connectés. Il passe par les canaux habituels, puisque le
+-- destinataire n'a peut-être pas encore rejoint le nouveau canal.
+-- Format : CHANSET:token:version:nom (nom vide = canal désactivé).
+function P.SyncChannelSetting(target)
+	local token = P.GetTeamToken()
+	local setting = P.db.syncChannel
+	if not token or (setting.updated or 0) == 0 then
+		return
+	end
+	local message = string.format("CHANSET:%s:%d:%s", token, setting.updated, setting.name or "")
+	for to in pairs(ResolveTargets(target)) do
+		P.Broadcast(message, "WHISPER", to)
+	end
+end
+
+-- Réception de CHANSET : adopte le canal s'il est plus récent, puis rafraîchit la fenêtre.
+local function OnChannelSettingMessage(rest, sender)
+	local version, name = strsplit(":", rest or "", 2)
+	local updated = tonumber(version)
+	if updated and P.ApplyChannelSettingSync(name or "", updated) then
+		P.Debug("Canal dédié « " .. (name or "") .. " » reçu de " .. tostring(sender))
+		if P.RefreshUI then
+			P.RefreshUI()
+		end
 	end
 end
 
@@ -380,6 +468,9 @@ function P.OnSyncMessage(message, channel, sender)
 	elseif kind == "CHAR" then
 		OnCharMessage(rest, sender)
 		return
+	elseif kind == "CHANSET" then
+		OnChannelSettingMessage(rest, sender)
+		return
 	elseif kind == "QACCEPT" then
 		-- QACCEPT:token:questID — quête acceptée par le leader (Quests.lua).
 		P.OnQuestAcceptMessage(tonumber(rest), sender)
@@ -466,6 +557,7 @@ function P.OnSyncMessage(message, channel, sender)
 	-- Échange du roster manuel puis des équipes dans les deux sens (HELLO puis HI) : chaque
 	-- client récupère les versions plus récentes de l'autre, même s'il a démarré sur une
 	-- sauvegarde ancienne. Le roster d'abord : les équipes peuvent y faire référence.
+	P.SyncChannelSetting(sender)
 	P.SyncAllCharacters(sender)
 	P.SyncAllTeams(sender)
 

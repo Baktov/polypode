@@ -10,8 +10,8 @@ local P = Polypode
 -- Membre : une invitation de groupe venant du leader d'une équipe dont il est membre est
 --   acceptée (AcceptGroup), puis la fenêtre d'invitation est fermée au GROUP_ROSTER_UPDATE
 --   suivant (même méthode qu'EllesmereUIFriends).
--- Les annonces HELLO/HI passent par le canal de groupe, de raid ou de guilde : un personnage
--- connecté hors guilde commune et hors groupe n'est pas vu, donc pas invité.
+-- Les annonces HELLO/HI passent par le canal dédié, sinon le groupe, le raid ou la guilde : un
+-- personnage connecté hors de tous ces canaux n'est pas vu, donc pas invité.
 
 local INVITE_DELAY = 1 -- secondes avant d'inviter (le client qui se connecte finit de charger)
 local INVITE_DEDUP = 10 -- secondes : un même personnage n'est pas réinvité avant ce délai
