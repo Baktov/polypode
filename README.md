@@ -38,18 +38,22 @@ automatique de base entre vos clients — sans configuration complexe.
 
 ## Fenêtre principale
 
-Ouverte par `/poly ui`, le raccourci clavier ou le bouton de minimap. Deux cadres côte à côte :
+Ouverte par `/poly ui`, le raccourci clavier ou le bouton de minimap. Trois cadres côte à côte :
 
 - **Personnages trouvés** : tous les personnages de votre équipe détectés via les canaux
   (groupe, raid, guilde), triés par nom. Nom en couleur de classe, puis classe et niveau ;
   `(vous)` marque le personnage courant, `[leader]` le leader désigné.
-- **Équipes gérées** : emplacement réservé, contenu à définir dans une prochaine version.
+- **Équipes** : saisir un nom dans le champ « Nom de l'équipe » puis valider avec
+  **Entrée** ou le bouton **Créer** : l'équipe est créée et ajoutée à la liste (triée par
+  nom, mémorisée pour le compte). Un nom vide ou déjà utilisé est refusé avec un message
+  en rouge à l'écran. **Échap** quitte le champ.
+- **Personnages** : emplacement réservé, contenu à définir (notion d'équipe en cours).
 
-Les deux listes défilent (molette ou barre de défilement), sans limite de nombre.
+Les trois listes défilent (molette ou barre de défilement), sans limite de nombre.
 
-La fenêtre se **redimensionne** par la poignée du coin bas-droit ; les deux cadres se
-partagent la largeur à parts égales et la taille est mémorisée pour le compte. Si la
-fenêtre est très réduite, le contenu est simplement tronqué.
+La fenêtre se **redimensionne** par la poignée du coin bas-droit ; les trois cadres se
+partagent la largeur à parts égales et la taille est mémorisée pour le compte (720 × 320
+par défaut). Si la fenêtre est très réduite, le contenu est simplement tronqué.
 
 ---
 
@@ -124,8 +128,9 @@ vous avez désactivé le skin de Polypode dans ses options).
 
 ## État du projet
 
-Version `0.7.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
-automatique aux annonces, fenêtre redimensionnable à deux listes défilantes (personnages trouvés / équipes gérées)
+Version `0.8.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
+automatique aux annonces, fenêtre redimensionnable à trois listes défilantes (personnages
+trouvés / équipes avec création par saisie / personnages)
 skinnée (EllesmereUI/ElvUI), bouton de minimap (masquable), panneau d'options,
 commandes, raccourci clavier. Pistes envisagées pour la suite,
 à activer seulement si le besoin se confirme (voir la règle de simplicité dans
@@ -136,7 +141,8 @@ commandes, raccourci clavier. Pistes envisagées pour la suite,
   `P.GetTeamToken()` dans `Sync.lua`).
 - Réannonce à l'entrée en groupe (`GROUP_ROSTER_UPDATE`) pour les personnages sans
   guilde commune connectés avant d'être groupés.
-- **Équipes gérées** : définir ce qu'est une équipe et remplir le cadre de droite.
+- **Équipes** : définir ce que contient une équipe (membres, cadre « Personnages »),
+  renommer/supprimer une équipe.
 - Suivi automatique du leader (`follow`) et assist de cible.
 - Invitation automatique du groupe depuis le roster.
 - Skin des textes de la fenêtre (police EllesmereUI via `S.Font`).

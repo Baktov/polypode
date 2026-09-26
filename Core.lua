@@ -17,9 +17,10 @@ P.defaults = {
 		hide = false, -- true : bouton masqué (/poly minimap ou panneau d'options)
 	},
 	mainFrame = {
-		width = 540, -- taille de la fenêtre principale, mémorisée au redimensionnement
+		width = 720, -- taille de la fenêtre principale, mémorisée au redimensionnement
 		height = 320,
 	},
+	teams = {}, -- [nom] = { name } ; équipes créées depuis la fenêtre principale
 }
 
 P.charDefaults = {
@@ -98,4 +99,21 @@ end
 
 function P.GetRoster()
 	return P.db.roster
+end
+
+-- Crée une équipe. Renvoie true, ou false et un message d'erreur à afficher.
+function P.CreateTeam(name)
+	name = strtrim(name or "")
+	if name == "" then
+		return false, "Nom d'équipe vide."
+	end
+	if P.db.teams[name] then
+		return false, "L'équipe « " .. name .. " » existe déjà."
+	end
+	P.db.teams[name] = { name = name }
+	return true
+end
+
+function P.GetTeams()
+	return P.db.teams
 end

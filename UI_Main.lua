@@ -12,6 +12,7 @@ local PANEL_MARGIN = 12
 local PANEL_GAP = 10
 local HEADER_HEIGHT = 26
 local ROW_HEIGHT = 20
+local INPUT_HEIGHT = 28 -- ligne de saisie (champ + bouton) sous l'en-tête d'un cadre
 
 -- Cadre intérieur avec un en-tête, skinnable via P.SkinPanel.
 local function CreatePanel(parent, title)
@@ -38,9 +39,11 @@ end
 -- Liste défilante sans limite de taille sous l'en-tête d'un cadre (ScrollBox Blizzard :
 -- seules les lignes visibles existent, recyclées au défilement). formatFn(data) renvoie
 -- le texte d'une ligne. Remplir avec SetListData(panel, items), items = liste de tables.
-local function CreateScrollList(panel, formatFn)
+-- top : décalage depuis le haut du cadre (défaut : juste sous l'en-tête).
+local function CreateScrollList(panel, formatFn, top)
+	top = top or HEADER_HEIGHT
 	local scrollBox = CreateFrame("Frame", nil, panel, "WowScrollBoxList")
-	scrollBox:SetPoint("TOPLEFT", 10, -HEADER_HEIGHT)
+	scrollBox:SetPoint("TOPLEFT", 10, -top)
 	scrollBox:SetPoint("BOTTOMRIGHT", -22, 8)
 
 	local scrollBar = CreateFrame("EventFrame", nil, panel, "MinimalScrollBar")
@@ -63,7 +66,7 @@ local function CreateScrollList(panel, formatFn)
 
 	-- Texte affiché quand la liste est vide.
 	panel.emptyText = panel:CreateFontString(nil, "OVERLAY", "GameFontDisable")
-	panel.emptyText:SetPoint("TOPLEFT", 10, -HEADER_HEIGHT)
+	panel.emptyText:SetPoint("TOPLEFT", 10, -top)
 	panel.emptyText:SetPoint("RIGHT", -10, 0)
 	panel.emptyText:SetJustifyH("LEFT")
 	panel.emptyText:SetWordWrap(false)
@@ -159,22 +162,71 @@ function P.BuildUI()
 		P.db.mainFrame.width, P.db.mainFrame.height = f:GetSize()
 	end)
 
-	-- Deux cadres côte à côte, chacun sur une moitié de la fenêtre (suivent le redimensionnement).
-	-- Gauche : personnages trouvés (roster alimenté par la sync).
+	-- Trois cadres côte à côte, chacun sur un tiers de la largeur : les deux premiers
+	-- reçoivent leur largeur au redimensionnement, le dernier s'étire jusqu'au bord droit.
+	-- 1. Personnages trouvés (roster alimenté par la sync).
 	local charPanel = CreatePanel(f, "Personnages trouvés")
 	charPanel:SetPoint("TOPLEFT", PANEL_MARGIN, PANEL_TOP)
-	charPanel:SetPoint("BOTTOMRIGHT", f, "BOTTOM", -PANEL_GAP / 2, PANEL_MARGIN)
+	charPanel:SetPoint("BOTTOMLEFT", PANEL_MARGIN, PANEL_MARGIN)
 	CreateScrollList(charPanel, FormatCharacter)
 	charPanel.emptyText:SetText("Aucun personnage trouvé")
 
-	-- Droite : équipes gérées (contenu à définir ; liste défilante prête, vide pour l'instant).
-	local teamPanel = CreatePanel(f, "Équipes gérées")
-	teamPanel:SetPoint("TOPLEFT", f, "TOP", PANEL_GAP / 2, PANEL_TOP)
-	teamPanel:SetPoint("BOTTOMRIGHT", -PANEL_MARGIN, PANEL_MARGIN)
+	-- 2. Équipes : saisie d'un nom + liste des équipes créées.
+	local teamPanel = CreatePanel(f, "Équipes")
+	teamPanel:SetPoint("TOPLEFT", charPanel, "TOPRIGHT", PANEL_GAP, 0)
+	teamPanel:SetPoint("BOTTOMLEFT", charPanel, "BOTTOMRIGHT", PANEL_GAP, 0)
+
+	local createBtn = CreateFrame("Button", nil, teamPanel, "UIPanelButtonTemplate")
+	createBtn:SetSize(60, 22)
+	createBtn:SetPoint("TOPRIGHT", -10, -HEADER_HEIGHT + 2)
+	createBtn:SetText("Créer")
+
+	local teamInput = CreateFrame("EditBox", nil, teamPanel, "InputBoxInstructionsTemplate")
+	teamInput:SetHeight(20)
+	teamInput:SetPoint("TOPLEFT", 16, -HEADER_HEIGHT + 1) -- 16 : l'art du template déborde à gauche
+	teamInput:SetPoint("RIGHT", createBtn, "LEFT", -8, 0)
+	teamInput:SetAutoFocus(false)
+	teamInput:SetMaxLetters(32)
+	if teamInput.Instructions then
+		teamInput.Instructions:SetText("Nom de l'équipe")
+	end
+
+	-- Valide la saisie (Entrée ou bouton) : crée l'équipe, ou affiche l'erreur à l'écran.
+	local function SubmitTeam()
+		local ok, err = P.CreateTeam(teamInput:GetText())
+		if ok then
+			teamInput:SetText("")
+			P.RefreshUI()
+		else
+			UIErrorsFrame:AddMessage(err, 1, 0.1, 0.1)
+		end
+	end
+	teamInput:SetScript("OnEnterPressed", SubmitTeam)
+	teamInput:SetScript("OnEscapePressed", teamInput.ClearFocus)
+	createBtn:SetScript("OnClick", SubmitTeam)
+
 	CreateScrollList(teamPanel, function(data)
 		return data.name
+	end, HEADER_HEIGHT + INPUT_HEIGHT)
+	teamPanel.emptyText:SetText("Aucune équipe")
+
+	-- 3. Personnages (contenu à définir ; liste défilante prête, vide pour l'instant).
+	local memberPanel = CreatePanel(f, "Personnages")
+	memberPanel:SetPoint("TOPLEFT", teamPanel, "TOPRIGHT", PANEL_GAP, 0)
+	memberPanel:SetPoint("BOTTOMRIGHT", -PANEL_MARGIN, PANEL_MARGIN)
+	CreateScrollList(memberPanel, function(data)
+		return data.name
 	end)
-	teamPanel.emptyText:SetText("Aucune équipe (à définir)")
+	memberPanel.emptyText:SetText("")
+
+	local function LayoutPanels()
+		local width = (f:GetWidth() - 2 * PANEL_MARGIN - 2 * PANEL_GAP) / 3
+		width = math.max(width, 1)
+		charPanel:SetWidth(width)
+		teamPanel:SetWidth(width)
+	end
+	f:SetScript("OnSizeChanged", LayoutPanels)
+	LayoutPanels()
 
 	ui.frame = f
 	ui.title = title
@@ -182,11 +234,17 @@ function P.BuildUI()
 	ui.resizeGrip = grip
 	ui.charPanel = charPanel
 	ui.teamPanel = teamPanel
+	ui.teamInput = teamInput
+	ui.teamCreateButton = createBtn
+	ui.memberPanel = memberPanel
 
 	if P.SkinFrame then
 		P.SkinFrame(f)
 		P.SkinPanel(charPanel)
 		P.SkinPanel(teamPanel)
+		P.SkinPanel(memberPanel)
+		P.SkinEditBox(teamInput)
+		P.SkinButton(createBtn)
 	end
 end
 
@@ -207,7 +265,16 @@ function P.RefreshUI()
 	end
 	SetListData(ui.charPanel, items)
 
-	SetListData(ui.teamPanel, {})
+	local teams = {}
+	for name in pairs(P.GetTeams()) do
+		teams[#teams + 1] = { name = name }
+	end
+	table.sort(teams, function(a, b)
+		return a.name < b.name
+	end)
+	SetListData(ui.teamPanel, teams)
+
+	SetListData(ui.memberPanel, {})
 end
 
 function P.ToggleUI()

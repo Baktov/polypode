@@ -20,15 +20,33 @@ if EllesmereUI and EllesmereUI.RegisterSkin then
 	end)
 end
 
--- Skinne un frame top-level. Priorité à EllesmereUI (l'utilisateur a laissé le skin
--- activé), sinon ElvUI, sinon on garde le backdrop générique de UI_Main.lua.
--- Le bouton de fermeture est attendu dans frame.CloseButton (convention ElvUI/Blizzard),
--- le titre dans frame.TitleText.
-function P.SkinFrame(frame)
+-- Façade EllesmereUI si son skin est actif pour Polypode, sinon nil.
+local function GetEUISkin()
 	if euiSkin and euiSkin.IsEnabled() then
-		euiSkin.Shell(frame)
+		return euiSkin
+	end
+end
+
+-- Module Skins d'ElvUI s'il est chargé, sinon nil.
+local function GetElvSkins()
+	if not ElvUI then
+		return
+	end
+	local E = unpack(ElvUI)
+	return E:GetModule("Skins")
+end
+
+-- Toutes les fonctions suivantes : priorité à EllesmereUI (l'utilisateur a laissé le skin
+-- activé), sinon ElvUI, sinon on garde l'apparence générique de UI_Main.lua.
+
+-- Skinne un frame top-level. Le bouton de fermeture est attendu dans frame.CloseButton
+-- (convention ElvUI/Blizzard), le titre dans frame.TitleText.
+function P.SkinFrame(frame)
+	local eui = GetEUISkin()
+	if eui then
+		eui.Shell(frame)
 		if frame.CloseButton then
-			euiSkin.CloseButton(frame.CloseButton)
+			eui.CloseButton(frame.CloseButton)
 		end
 		-- Centre le titre verticalement dans la barre de titre du Shell.
 		if frame.TitleText then
@@ -38,42 +56,65 @@ function P.SkinFrame(frame)
 		return
 	end
 
-	if not ElvUI then
-		return
-	end
-	local E = unpack(ElvUI)
-	local S = E:GetModule("Skins")
+	local S = GetElvSkins()
 	if S and S.HandleFrame then
 		S:HandleFrame(frame)
 	end
 end
 
--- Skinne une barre de défilement MinimalScrollBar. Même priorité que P.SkinFrame.
+-- Skinne une barre de défilement MinimalScrollBar.
 function P.SkinScrollBar(scrollBar)
-	if euiSkin and euiSkin.IsEnabled() then
-		euiSkin.ScrollBar(scrollBar)
+	local eui = GetEUISkin()
+	if eui then
+		eui.ScrollBar(scrollBar)
 		return
 	end
 
-	if not ElvUI then
-		return
-	end
-	local E = unpack(ElvUI)
-	local S = E:GetModule("Skins")
+	local S = GetElvSkins()
 	if S and S.HandleTrimScrollBar then
 		S:HandleTrimScrollBar(scrollBar)
 	end
 end
 
--- Skinne un cadre intérieur (sous-panneau d'une fenêtre). Même priorité que P.SkinFrame.
+-- Skinne un cadre intérieur (sous-panneau d'une fenêtre).
 function P.SkinPanel(panel)
-	if euiSkin and euiSkin.IsEnabled() then
-		euiSkin.Panel(panel, { inset = true })
+	local eui = GetEUISkin()
+	if eui then
+		eui.Panel(panel, { inset = true })
 		return
 	end
 
 	-- ElvUI ajoute SetTemplate à tous les frames une fois chargé.
 	if ElvUI and panel.SetTemplate then
 		panel:SetTemplate("Transparent")
+	end
+end
+
+-- Skinne un champ de saisie (EditBox, ex. InputBoxInstructionsTemplate).
+function P.SkinEditBox(editBox)
+	local eui = GetEUISkin()
+	if eui then
+		eui.EditBox(editBox)
+		return
+	end
+
+	local S = GetElvSkins()
+	if S and S.HandleEditBox then
+		S:HandleEditBox(editBox)
+	end
+end
+
+-- Skinne un bouton texte (ex. UIPanelButtonTemplate).
+function P.SkinButton(button)
+	local eui = GetEUISkin()
+	if eui then
+		eui.Button(button)
+		eui.WhiteButtonLabel(button)
+		return
+	end
+
+	local S = GetElvSkins()
+	if S and S.HandleButton then
+		S:HandleButton(button)
 	end
 end

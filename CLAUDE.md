@@ -19,10 +19,10 @@ n'ajoute une fonctionnalité que si elle sert directement cet objectif.
 
 | Fichier | Rôle |
 |---|---|
-| `Core.lua` | Table globale `Polypode` (alias local `P`), SavedVariables, CRUD du roster |
+| `Core.lua` | Table globale `Polypode` (alias local `P`), SavedVariables, CRUD du roster, équipes (`P.CreateTeam`, `P.GetTeams`, `P.db.teams[nom] = { name }`) |
 | `Sync.lua` | Broadcast/réception de messages addon (`C_ChatInfo`), token d'équipe (`P.GetTeamToken`, hash du BattleTag), annonce `HELLO` / réponse `HI` |
-| `UI_Skin.lua` | Skinning conditionnel : EllesmereUI (`EllesmereUI.RegisterSkin`, prioritaire) puis ElvUI. `P.SkinFrame` (fenêtre top-level), `P.SkinPanel` (cadre intérieur), `P.SkinScrollBar` (barre de défilement) |
-| `UI_Main.lua` | Fenêtre principale redimensionnable (`P.ui.resizeGrip`, taille dans `P.db.mainFrame`) : `BuildUI`, `RefreshUI`, `ToggleUI`. Deux cadres à liste défilante (`panel.scrollBox`, `panel.scrollBar`, `panel.emptyText`) : `P.ui.charPanel` (personnages trouvés = roster trié) et `P.ui.teamPanel` (équipes gérées, contenu **à définir**, liste vide) |
+| `UI_Skin.lua` | Skinning conditionnel : EllesmereUI (`EllesmereUI.RegisterSkin`, prioritaire) puis ElvUI. `P.SkinFrame` (fenêtre top-level), `P.SkinPanel` (cadre intérieur), `P.SkinScrollBar` (barre de défilement), `P.SkinEditBox` (champ de saisie), `P.SkinButton` (bouton texte) |
+| `UI_Main.lua` | Fenêtre principale redimensionnable (`P.ui.resizeGrip`, taille dans `P.db.mainFrame`) : `BuildUI`, `RefreshUI`, `ToggleUI`. Trois cadres à liste défilante (`panel.scrollBox`, `panel.scrollBar`, `panel.emptyText`), un tiers de largeur chacun (`LayoutPanels` sur `OnSizeChanged`) : `P.ui.charPanel` (personnages trouvés = roster trié), `P.ui.teamPanel` (équipes : `P.ui.teamInput` + `P.ui.teamCreateButton` → `P.CreateTeam`, liste triée), `P.ui.memberPanel` (« Personnages », contenu **à définir**, liste vide) |
 | `UI_Minimap.lua` | Bouton de minimap sans librairie (`P.BuildMinimapButton`, appelé à `PLAYER_LOGIN`), `P.SetMinimapButtonShown`, état dans `P.db.minimap` (`angle`, `hide`) |
 | `UI_Options.lua` | Panneau Options → AddOns via l'API `Settings` (`P.BuildOptions` à `PLAYER_LOGIN`, `P.OpenOptions`) |
 | `Commands.lua` | Commande slash `/poly` (`/polypode`) et fonctions globales de keybinding |
