@@ -109,7 +109,7 @@ par défaut). Si la fenêtre est très réduite, le contenu est simplement tronq
 | `/poly ui` | Ouvrir/fermer la fenêtre principale |
 | `/poly minimap` | Afficher/masquer l'icône de minimap |
 | `/poly options` | Ouvrir le panneau d'options (Options → AddOns → Polypode) |
-| `/poly debug` | Activer/désactiver les messages de debug |
+| `/poly debug` | Activer/désactiver les messages de debug (mémorisé pour ce personnage, comme la case du panneau d'options) |
 | `/poly` (sans argument) | Afficher l'aide |
 
 Le nom d'un personnage dans le roster est au format `Nom-Royaume` (ex. `Arthas-Hyjal`).
@@ -150,6 +150,7 @@ fenêtre principale) :
 | Option | Défaut | Effet |
 |---|---|---|
 | Afficher l'icône de minimap | Oui | Affiche le bouton Polypode autour de la minimap |
+| Mode debug | Non | Affiche dans le chat les messages de diagnostic (synchro, invitations...). Réglage **par personnage** : on peut l'activer sur une seule fenêtre |
 
 ---
 
@@ -170,7 +171,7 @@ vous avez désactivé le skin de Polypode dans ses options).
 
 ## État du projet
 
-Version `0.17.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
+Version `0.17.1` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
 automatique aux annonces, fenêtre redimensionnable à trois listes défilantes (personnages
 trouvés / équipes avec création par saisie et sélection / personnages de l'équipe, ajout
 et retrait de membres au clic, leader par équipe, invitation de toute l'équipe, synchronisation automatique et versionnée des équipes, ajout du joueur ciblé)

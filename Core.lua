@@ -24,12 +24,23 @@ P.defaults = {
 	teams = {},
 }
 
-P.charDefaults = {}
+-- Par personnage : réglages propres à une fenêtre de multibox (et à l'abri du fichier de
+-- compte partagé entre clients, cf. CLAUDE.md).
+P.charDefaults = {
+	debug = false, -- mode debug (/poly debug ou panneau d'options)
+}
 
 function P.Debug(msg)
 	if P.debugEnabled then
 		print("|cff33ff99Polypode|r: " .. tostring(msg))
 	end
+end
+
+-- Active/désactive le mode debug et mémorise le choix pour ce personnage.
+-- P.debugEnabled reste la valeur lue par P.Debug (utilisable avant P.InitDB).
+function P.SetDebug(enabled)
+	P.debugEnabled = enabled and true or false
+	P.charDb.debug = P.debugEnabled
 end
 
 local function CopyDefaults(src, dst)
@@ -54,6 +65,8 @@ function P.InitDB()
 	-- par personnage associé ne sont plus utilisés.
 	P.db.leader = nil
 	P.charDb.role = nil
+
+	P.debugEnabled = P.charDb.debug
 end
 
 function P.GetCharKey(name, realm)

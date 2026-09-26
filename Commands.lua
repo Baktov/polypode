@@ -55,7 +55,7 @@ local function SlashHandler(msg)
 	elseif sub == "options" then
 		P.OpenOptions()
 	elseif sub == "debug" then
-		P.debugEnabled = not P.debugEnabled
+		P.SetDebug(not P.debugEnabled)
 		print("Polypode: debug " .. (P.debugEnabled and "activé" or "désactivé"))
 	else
 		PrintHelp()

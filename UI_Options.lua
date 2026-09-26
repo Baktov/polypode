@@ -29,6 +29,24 @@ function P.BuildOptions()
 	Settings.CreateCheckbox(category, minimapSetting,
 		"Affiche le bouton Polypode autour de la minimap (équivalent de /poly minimap).")
 
+	-- Mode debug, par personnage (P.charDb.debug) ; même valeur que /poly debug.
+	local debugSetting = Settings.RegisterProxySetting(
+		category,
+		"POLYPODE_DEBUG",
+		Settings.VarType.Boolean,
+		"Mode debug",
+		Settings.Default.False,
+		function()
+			return P.debugEnabled
+		end,
+		function(value)
+			P.SetDebug(value)
+		end
+	)
+	Settings.CreateCheckbox(category, debugSetting,
+		"Affiche dans le chat les messages de diagnostic de Polypode (synchro, invitations...). "
+		.. "Réglage propre à ce personnage (équivalent de /poly debug).")
+
 	Settings.RegisterAddOnCategory(category)
 	P.optionsCategory = category
 end
