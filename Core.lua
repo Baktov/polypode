@@ -170,3 +170,60 @@ function P.SetTeamLeader(teamName, key)
 		P.db.teams[teamName].leader = key
 	end
 end
+
+-- Nom à passer à l'API d'invitation : "Nom" sur notre royaume, sinon "Nom-Royaume" avec
+-- le royaume sous sa forme courte (sans espaces ni tirets, ex. "ArgentDawn").
+local function GetInviteName(entry)
+	if entry.realm == GetRealmName() then
+		return entry.name
+	end
+	return entry.name .. "-" .. entry.realm:gsub("[%s%-]", "")
+end
+
+-- Membres de l'équipe à inviter : ni le personnage courant, ni ceux déjà dans le groupe.
+-- Renvoie une liste de noms d'invitation triée.
+function P.GetTeamInvitees(teamName)
+	local invitees = {}
+	for key in pairs(P.GetTeamMembers(teamName) or {}) do
+		local entry = P.db.roster[key]
+		if entry and entry.name and key ~= P.GetCharKey() then
+			local inviteName = GetInviteName(entry)
+			if not UnitInParty(inviteName) and not UnitInRaid(inviteName) then
+				invitees[#invitees + 1] = inviteName
+			end
+		end
+	end
+	table.sort(invitees)
+	return invitees
+end
+
+-- Invite dans le groupe les membres de l'équipe (cf. P.GetTeamInvitees). En groupe (hors
+-- raid), les invitations sont limitées aux places libres des 5.
+-- Renvoie true et un message de bilan, ou false et un message d'erreur.
+function P.InviteTeam(teamName)
+	if IsInGroup() and not UnitIsGroupLeader("player")
+		and not (IsInRaid() and UnitIsGroupAssistant("player")) then
+		return false, "Seul le chef du groupe peut inviter."
+	end
+
+	local invitees = P.GetTeamInvitees(teamName)
+	if #invitees == 0 then
+		return false, "Aucun membre de l'équipe à inviter."
+	end
+
+	local slots = #invitees
+	if not IsInRaid() then
+		slots = math.min(slots, 5 - math.max(GetNumGroupMembers(), 1))
+	end
+	for i = 1, slots do
+		C_PartyInfo.InviteUnit(invitees[i])
+		P.Debug("Invitation : " .. invitees[i])
+	end
+
+	local message = slots .. " invitation(s) envoyée(s)."
+	if slots < #invitees then
+		message = message .. " Groupe complet : convertissez-le en raid puis réinvitez les "
+			.. (#invitees - slots) .. " restant(s)."
+	end
+	return true, message
+end

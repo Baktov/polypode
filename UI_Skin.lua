@@ -104,12 +104,12 @@ function P.SkinEditBox(editBox)
 	end
 end
 
--- Skinne un bouton texte (ex. UIPanelButtonTemplate).
+-- Skinne un bouton texte (ex. UIPanelButtonTemplate). Libellé blanc, gris si désactivé.
 function P.SkinButton(button)
 	local eui = GetEUISkin()
 	if eui then
 		eui.Button(button)
-		eui.WhiteButtonLabel(button)
+		eui.StateButtonLabel(button)
 		return
 	end
 

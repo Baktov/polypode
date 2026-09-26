@@ -57,6 +57,11 @@ Ouverte par `/poly ui`, le raccourci clavier ou le bouton de minimap. Trois cadr
     de leader.
   - L'infobulle au survol rappelle ces actions et liste les équipes du personnage, avec
     `(leader)` là où il l'est.
+  - Bouton **Inviter l'équipe** (en haut du cadre) : invite dans votre groupe tous les
+    membres de l'équipe sélectionnée, sauf le personnage courant et ceux déjà groupés.
+    Il faut être seul ou chef du groupe (ou assistant en raid). Un groupe (hors raid) est
+    limité à 5 : au-delà, les invitations restantes sont signalées ; convertissez le groupe
+    en raid puis cliquez à nouveau. Le bilan s'affiche au centre de l'écran.
 
   Les équipes, leurs membres et leur leader sont mémorisés pour le compte ; un personnage
   retiré du roster (`/poly remove`) quitte aussi ses équipes.
@@ -139,10 +144,10 @@ vous avez désactivé le skin de Polypode dans ses options).
 
 ## État du projet
 
-Version `0.11.1` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
+Version `0.12.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
 automatique aux annonces, fenêtre redimensionnable à trois listes défilantes (personnages
 trouvés / équipes avec création par saisie et sélection / personnages de l'équipe, ajout
-et retrait de membres au clic, leader par équipe)
+et retrait de membres au clic, leader par équipe, invitation de toute l'équipe)
 skinnée (EllesmereUI/ElvUI), bouton de minimap (masquable), panneau d'options,
 commandes, raccourci clavier. Pistes envisagées pour la suite,
 à activer seulement si le besoin se confirme (voir la règle de simplicité dans
@@ -153,7 +158,7 @@ commandes, raccourci clavier. Pistes envisagées pour la suite,
   `P.GetTeamToken()` dans `Sync.lua`).
 - Réannonce à l'entrée en groupe (`GROUP_ROSTER_UPDATE`) pour les personnages sans
   guilde commune connectés avant d'être groupés.
-- **Équipes** : renommer/supprimer une équipe ; usage des équipes (invitation, leader,
+- **Équipes** : renommer/supprimer une équipe ; usage des équipes (conversion en raid automatique, leader,
   synchronisation entre clients).
 - Suivi automatique du leader (`follow`) et assist de cible.
 - Invitation automatique du groupe depuis le roster.

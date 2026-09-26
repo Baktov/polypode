@@ -344,14 +344,45 @@ function P.BuildUI()
 	teamPanel.emptyText:SetText("Aucune équipe")
 
 	-- 3. Personnages de l'équipe sélectionnée (texte vide renseigné par RefreshUI).
-	-- Clic droit : retire le personnage de l'équipe (clic gauche sans effet).
 	local memberPanel = CreatePanel(f, "Personnages de l'équipe")
 	memberPanel:SetPoint("TOPLEFT", teamPanel, "TOPRIGHT", PANEL_GAP, 0)
 	memberPanel:SetPoint("BOTTOMRIGHT", -PANEL_MARGIN, PANEL_MARGIN)
+
+	-- Bouton d'invitation de toute l'équipe (état actif géré par RefreshUI).
+	local inviteBtn = CreateFrame("Button", nil, memberPanel, "UIPanelButtonTemplate")
+	inviteBtn:SetHeight(22)
+	inviteBtn:SetPoint("TOPLEFT", 10, -HEADER_HEIGHT + 2)
+	inviteBtn:SetPoint("RIGHT", -10, 0)
+	inviteBtn:SetText("Inviter l'équipe")
+	inviteBtn:SetMotionScriptsWhileDisabled(true) -- infobulle même désactivé
+	inviteBtn:SetScript("OnClick", function()
+		if not selectedTeam then
+			return
+		end
+		local ok, message = P.InviteTeam(selectedTeam)
+		if ok then
+			UIErrorsFrame:AddMessage(message, 1, 0.82, 0)
+		else
+			UIErrorsFrame:AddMessage(message, 1, 0.1, 0.1)
+		end
+	end)
+	inviteBtn:SetScript("OnEnter", function(self)
+		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+		GameTooltip:AddLine("Inviter l'équipe")
+		if selectedTeam then
+			GameTooltip:AddLine("Invite dans votre groupe les membres de l'équipe « " .. selectedTeam
+				.. " », sauf vous et ceux déjà groupés.", 1, 1, 1, true)
+		else
+			GameTooltip:AddLine("Sélectionnez d'abord une équipe.", 1, 1, 1, true)
+		end
+		GameTooltip:Show()
+	end)
+	inviteBtn:SetScript("OnLeave", GameTooltip_Hide)
+
 	-- Clic gauche : leader de l'équipe (surligné) ; clic droit : retire le personnage.
 	CreateScrollList(memberPanel, function(data)
 		return FormatCharacter(data, selectedTeam)
-	end, nil, {
+	end, HEADER_HEIGHT + INPUT_HEIGHT, {
 		onClick = function(data, mouseButton)
 			if not selectedTeam then
 				return
@@ -393,6 +424,7 @@ function P.BuildUI()
 	ui.teamInput = teamInput
 	ui.teamCreateButton = createBtn
 	ui.memberPanel = memberPanel
+	ui.inviteButton = inviteBtn
 
 	if P.SkinFrame then
 		P.SkinFrame(f)
@@ -401,6 +433,7 @@ function P.BuildUI()
 		P.SkinPanel(memberPanel)
 		P.SkinEditBox(teamInput)
 		P.SkinButton(createBtn)
+		P.SkinButton(inviteBtn)
 	end
 end
 
@@ -432,6 +465,17 @@ function P.RefreshUI()
 	else
 		ui.memberPanel.emptyText:SetText("Clic gauche sur un personnage trouvé pour l'ajouter")
 	end
+
+	-- Actif dès que l'équipe compte un membre autre que soi (l'état du groupe, qui change
+	-- sans rafraîchir la fenêtre, est vérifié au clic par P.InviteTeam).
+	local canInvite = false
+	for key in pairs(members or {}) do
+		if key ~= P.GetCharKey() then
+			canInvite = true
+			break
+		end
+	end
+	ui.inviteButton:SetEnabled(canInvite)
 end
 
 function P.ToggleUI()
