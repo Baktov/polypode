@@ -43,8 +43,8 @@ end
 -- seules les lignes visibles existent, recyclées au défilement). formatFn(data) renvoie
 -- le texte d'une ligne. Remplir avec SetListData(panel, items), items = liste de tables.
 -- top : décalage depuis le haut du cadre (défaut : juste sous l'en-tête).
--- opts (facultatif) : lignes cliquables avec opts.onClick(data) ; opts.isSelected(data)
--- met la ligne en surbrillance.
+-- opts (facultatif) : lignes cliquables (gauche et droit) avec opts.onClick(data, mouseButton) ;
+-- opts.isSelected(data) met la ligne en surbrillance.
 local function CreateScrollList(panel, formatFn, top, opts)
 	top = top or HEADER_HEIGHT
 	opts = opts or {}
@@ -67,6 +67,7 @@ local function CreateScrollList(panel, formatFn, top, opts)
 			row.text:SetWordWrap(false)
 
 			if opts.onClick then
+				row:RegisterForClicks("LeftButtonUp", "RightButtonUp")
 				-- Fond doré de la ligne sélectionnée, voile clair au survol.
 				row.selected = row:CreateTexture(nil, "BACKGROUND")
 				row.selected:SetAllPoints()
@@ -81,8 +82,8 @@ local function CreateScrollList(panel, formatFn, top, opts)
 		if opts.onClick then
 			row.selected:SetShown(opts.isSelected and opts.isSelected(data) or false)
 			-- Les lignes sont recyclées : le script est rebranché sur la donnée courante.
-			row:SetScript("OnClick", function()
-				opts.onClick(data)
+			row:SetScript("OnClick", function(_, mouseButton)
+				opts.onClick(data, mouseButton)
 			end)
 		end
 	end)
@@ -105,6 +106,21 @@ end
 local function SetListData(panel, items)
 	panel.scrollBox:SetDataProvider(CreateDataProvider(items), ScrollBoxConstants.RetainScrollPosition)
 	panel.emptyText:SetShown(#items == 0)
+end
+
+-- Transforme un ensemble { [clé] = ... } en items { key = clé } triés par ordre alphabétique,
+-- pour un ordre stable d'un affichage à l'autre.
+local function SortedKeyItems(set)
+	local keys = {}
+	for key in pairs(set) do
+		keys[#keys + 1] = key
+	end
+	table.sort(keys)
+	local items = {}
+	for i, key in ipairs(keys) do
+		items[i] = { key = key }
+	end
+	return items
 end
 
 -- "Nom-Royaume" coloré selon la classe, puis classe localisée et niveau en gris.
@@ -192,7 +208,26 @@ function P.BuildUI()
 	local charPanel = CreatePanel(f, "Personnages trouvés")
 	charPanel:SetPoint("TOPLEFT", PANEL_MARGIN, PANEL_TOP)
 	charPanel:SetPoint("BOTTOMLEFT", PANEL_MARGIN, PANEL_MARGIN)
-	CreateScrollList(charPanel, FormatCharacter)
+	-- Clic gauche : ajoute à l'équipe sélectionnée ; clic droit : l'en retire.
+	-- Les membres de l'équipe sélectionnée sont surlignés.
+	CreateScrollList(charPanel, FormatCharacter, nil, {
+		onClick = function(data, mouseButton)
+			if not selectedTeam then
+				UIErrorsFrame:AddMessage("Sélectionnez d'abord une équipe.", 1, 0.1, 0.1)
+				return
+			end
+			if mouseButton == "RightButton" then
+				P.RemoveTeamMember(selectedTeam, data.key)
+			else
+				P.AddTeamMember(selectedTeam, data.key)
+			end
+			P.RefreshUI()
+		end,
+		isSelected = function(data)
+			local members = P.GetTeamMembers(selectedTeam)
+			return members and members[data.key] or false
+		end,
+	})
 	charPanel.emptyText:SetText("Aucun personnage trouvé")
 
 	-- 2. Équipes : saisie d'un nom + liste des équipes créées.
@@ -242,14 +277,11 @@ function P.BuildUI()
 	})
 	teamPanel.emptyText:SetText("Aucune équipe")
 
-	-- 3. Personnages (contenu à définir ; liste défilante prête, vide pour l'instant).
+	-- 3. Personnages de l'équipe sélectionnée (texte vide renseigné par RefreshUI).
 	local memberPanel = CreatePanel(f, "Personnages de l'équipe")
 	memberPanel:SetPoint("TOPLEFT", teamPanel, "TOPRIGHT", PANEL_GAP, 0)
 	memberPanel:SetPoint("BOTTOMRIGHT", -PANEL_MARGIN, PANEL_MARGIN)
-	CreateScrollList(memberPanel, function(data)
-		return data.name
-	end)
-	memberPanel.emptyText:SetText("")
+	CreateScrollList(memberPanel, FormatCharacter)
 
 	local function LayoutPanels()
 		local width = (f:GetWidth() - 2 * PANEL_MARGIN - 2 * PANEL_GAP) / 3
@@ -285,17 +317,12 @@ function P.RefreshUI()
 		return
 	end
 
-	-- Tri alphabétique pour un ordre stable d'un affichage à l'autre.
-	local keys = {}
-	for key in pairs(P.GetRoster()) do
-		keys[#keys + 1] = key
+	-- Oublie une sélection devenue invalide (équipe absente de la liste).
+	if selectedTeam and not P.GetTeams()[selectedTeam] then
+		selectedTeam = nil
 	end
-	table.sort(keys)
-	local items = {}
-	for i, key in ipairs(keys) do
-		items[i] = { key = key }
-	end
-	SetListData(ui.charPanel, items)
+
+	SetListData(ui.charPanel, SortedKeyItems(P.GetRoster()))
 
 	local teams = {}
 	for name in pairs(P.GetTeams()) do
@@ -304,13 +331,15 @@ function P.RefreshUI()
 	table.sort(teams, function(a, b)
 		return a.name < b.name
 	end)
-	-- Oublie une sélection devenue invalide (équipe absente de la liste).
-	if selectedTeam and not P.GetTeams()[selectedTeam] then
-		selectedTeam = nil
-	end
 	SetListData(ui.teamPanel, teams)
 
-	SetListData(ui.memberPanel, {})
+	local members = P.GetTeamMembers(selectedTeam)
+	SetListData(ui.memberPanel, SortedKeyItems(members or {}))
+	if not members then
+		ui.memberPanel.emptyText:SetText("Sélectionnez une équipe")
+	else
+		ui.memberPanel.emptyText:SetText("Clic gauche sur un personnage trouvé pour l'ajouter")
+	end
 end
 
 function P.ToggleUI()

@@ -20,7 +20,7 @@ P.defaults = {
 		width = 720, -- taille de la fenêtre principale, mémorisée au redimensionnement
 		height = 320,
 	},
-	teams = {}, -- [nom] = { name } ; équipes créées depuis la fenêtre principale
+	teams = {}, -- [nom] = { name, members = { [nom-royaume] = true } } ; créées depuis la fenêtre
 }
 
 P.charDefaults = {
@@ -89,6 +89,12 @@ function P.RemoveCharacter(key)
 	if P.db.leader == key then
 		P.db.leader = nil
 	end
+	-- Un personnage retiré du roster ne reste membre d'aucune équipe.
+	for _, team in pairs(P.db.teams) do
+		if team.members then
+			team.members[key] = nil
+		end
+	end
 end
 
 function P.SetLeader(key)
@@ -110,10 +116,35 @@ function P.CreateTeam(name)
 	if P.db.teams[name] then
 		return false, "L'équipe « " .. name .. " » existe déjà."
 	end
-	P.db.teams[name] = { name = name }
+	P.db.teams[name] = { name = name, members = {} }
 	return true
 end
 
 function P.GetTeams()
 	return P.db.teams
+end
+
+-- Membres d'une équipe : ensemble { [nom-royaume] = true }, ou nil si l'équipe n'existe pas.
+-- Les équipes créées avant l'ajout des membres reçoivent un ensemble vide.
+function P.GetTeamMembers(teamName)
+	local team = teamName and P.db.teams[teamName]
+	if not team then
+		return nil
+	end
+	team.members = team.members or {}
+	return team.members
+end
+
+function P.AddTeamMember(teamName, key)
+	local members = P.GetTeamMembers(teamName)
+	if members and P.db.roster[key] then
+		members[key] = true
+	end
+end
+
+function P.RemoveTeamMember(teamName, key)
+	local members = P.GetTeamMembers(teamName)
+	if members then
+		members[key] = nil
+	end
 end

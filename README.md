@@ -43,12 +43,16 @@ Ouverte par `/poly ui`, le raccourci clavier ou le bouton de minimap. Trois cadr
 - **Personnages trouvés** : tous les personnages de votre équipe détectés via les canaux
   (groupe, raid, guilde), triés par nom. Nom en couleur de classe, puis classe et niveau ;
   `(vous)` marque le personnage courant, `[leader]` le leader désigné.
+  Quand une équipe est sélectionnée : **clic gauche** sur un personnage l'ajoute à l'équipe,
+  **clic droit** l'en retire ; les membres de l'équipe sont surlignés en doré.
 - **Équipes** : saisir un nom dans le champ « Nom de l'équipe » puis valider avec
   **Entrée** ou le bouton **Créer** : l'équipe est créée et ajoutée à la liste (triée par
   nom, mémorisée pour le compte). Un nom vide ou déjà utilisé est refusé avec un message
   en rouge à l'écran. **Échap** quitte le champ. **Cliquer** sur une équipe la sélectionne
   (surbrillance dorée) ; la sélection n'est pas mémorisée entre deux sessions.
-- **Personnages de l'équipe** : emplacement réservé, contenu à définir (notion d'équipe en cours).
+- **Personnages de l'équipe** : membres de l'équipe sélectionnée, triés par nom, même
+  présentation que les personnages trouvés. Les équipes et leurs membres sont mémorisés
+  pour le compte ; un personnage retiré du roster (`/poly remove`) quitte aussi ses équipes.
 
 Les trois listes défilent (molette ou barre de défilement), sans limite de nombre.
 
@@ -129,9 +133,10 @@ vous avez désactivé le skin de Polypode dans ses options).
 
 ## État du projet
 
-Version `0.9.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
+Version `0.10.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
 automatique aux annonces, fenêtre redimensionnable à trois listes défilantes (personnages
-trouvés / équipes avec création par saisie et sélection / personnages de l'équipe)
+trouvés / équipes avec création par saisie et sélection / personnages de l'équipe, ajout
+et retrait de membres au clic)
 skinnée (EllesmereUI/ElvUI), bouton de minimap (masquable), panneau d'options,
 commandes, raccourci clavier. Pistes envisagées pour la suite,
 à activer seulement si le besoin se confirme (voir la règle de simplicité dans
@@ -142,9 +147,8 @@ commandes, raccourci clavier. Pistes envisagées pour la suite,
   `P.GetTeamToken()` dans `Sync.lua`).
 - Réannonce à l'entrée en groupe (`GROUP_ROSTER_UPDATE`) pour les personnages sans
   guilde commune connectés avant d'être groupés.
-- **Équipes** : définir ce que contient une équipe (membres, affichés dans le cadre
-  « Personnages de l'équipe » pour l'équipe sélectionnée),
-  renommer/supprimer une équipe.
+- **Équipes** : renommer/supprimer une équipe ; usage des équipes (invitation, leader,
+  synchronisation entre clients).
 - Suivi automatique du leader (`follow`) et assist de cible.
 - Invitation automatique du groupe depuis le roster.
 - Skin des textes de la fenêtre (police EllesmereUI via `S.Font`).
