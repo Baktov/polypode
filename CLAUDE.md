@@ -99,7 +99,9 @@ par défaut explicite gérée par `CopyDefaults`.
 
 ### Ajouter un widget UI
 → Créer dans `UI_Main.lua`, référencer via `P.ui.monWidget`, appeler `P.SkinFrame(widget)`
-si c'est un frame top-level.
+si c'est un frame top-level. Exposer le titre en `frame.TitleText` et le bouton de fermeture
+en `frame.CloseButton` : `P.SkinFrame` les retrouve sous ces noms (le skin EllesmereUI recentre
+le titre dans sa barre de titre de 25 px, ElvUI skinne le `CloseButton`).
 
 ### Envoyer un message de synchronisation
 → Utiliser `P.Broadcast(message, channel)` défini dans `Sync.lua`. Format de message :

@@ -43,12 +43,14 @@ function P.BuildUI()
 	local title = f:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
 	title:SetPoint("TOP", 0, -14)
 	title:SetText("Polypode")
+	f.TitleText = title -- repositionné par UI_Skin.lua selon le skin
 
 	local closeBtn = CreateFrame("Button", nil, f, "UIPanelCloseButton")
 	closeBtn:SetPoint("TOPRIGHT", -4, -4)
 	f.CloseButton = closeBtn -- nom attendu par les skins ElvUI/EllesmereUI
 
 	ui.frame = f
+	ui.title = title
 	ui.closeButton = closeBtn
 	ui.rows = {}
 

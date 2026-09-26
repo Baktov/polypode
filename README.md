@@ -63,7 +63,7 @@ La fenêtre s'adapte automatiquement à votre interface, sans configuration :
 
 | Interface détectée | Rendu |
 |---|---|
-| **EllesmereUI** | Style EllesmereUI (fond, bordure, bouton de fermeture) selon votre thème. Désactivable dans EllesmereUI → Blizz UI Enhanced → Blizzard Window Skins → Third-Party Addons (nécessite le module EllesmereUI Blizzard Skin). |
+| **EllesmereUI** | Style EllesmereUI (fond, bordure, barre de titre avec titre centré, bouton de fermeture) selon votre thème. Désactivable dans EllesmereUI → Blizz UI Enhanced → Blizzard Window Skins → Third-Party Addons (nécessite le module EllesmereUI Blizzard Skin). |
 | **ElvUI** | Style ElvUI (fond et bouton de fermeture). |
 | Aucune | Fond sombre générique. |
 
