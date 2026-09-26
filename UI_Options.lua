@@ -227,6 +227,25 @@ function P.BuildOptions()
 		.. "rétablissement du son (raccourcis du leader). Décoché : ce client garde son propre son. "
 		.. "Réglage propre à ce personnage.")
 
+	-- Groupage automatique de l'équipe à la connexion (par personnage, cf. AutoGroup.lua).
+	local autoGroupSetting = Settings.RegisterProxySetting(
+		category,
+		"POLYPODE_AUTO_GROUP",
+		Settings.VarType.Boolean,
+		"Groupage automatique de l'équipe",
+		Settings.Default.True,
+		function()
+			return P.charDb.autoGroup
+		end,
+		function(value)
+			P.charDb.autoGroup = value
+		end
+	)
+	Settings.CreateCheckbox(category, autoGroupSetting,
+		"Leader : invite automatiquement dans son groupe les membres de l'équipe qui se connectent "
+		.. "(ou déjà connectés quand il se connecte). Membre : accepte automatiquement l'invitation "
+		.. "de groupe du leader d'une de ses équipes. Réglage propre à ce personnage.")
+
 	Settings.RegisterAddOnCategory(category)
 	P.optionsCategory = category
 end

@@ -57,6 +57,11 @@ automatique de base entre vos clients — sans configuration complexe.
 - **Son de l'équipe** : le leader règle le volume principal des autres fenêtres ou coupe / rétablit
   leur son par raccourci clavier (options « Volume envoyé » et « Suivre le son du leader »). Son
   propre son ne change pas.
+- **Groupage automatique** : à la connexion d'un personnage membre d'une équipe, si le leader de
+  l'équipe est déjà connecté, il l'invite automatiquement et le personnage accepte (option
+  « Groupage automatique de l'équipe »). Même chose quand le leader se connecte après ses membres.
+  Il faut que les deux se voient (guilde commune, ou groupe) et que le leader puisse inviter (seul
+  ou chef du groupe, 5 au plus hors raid).
 - Les **ajouts et retraits manuels de personnages** (bouton « Ajouter la cible »,
   `/poly remove`) sont synchronisés de la même façon, avec la même règle de version : un
   personnage retiré ne réapparaît pas via un client qui l'avait encore (il réapparaît
@@ -191,6 +196,7 @@ fenêtre principale) :
 | Entrer automatiquement en instance (gouffre, portail) | Oui | Quand le leader choisit le palier d'un gouffre, ce personnage choisit le même si sa fenêtre de palier est ouverte ; quand le leader vote la sortie du gouffre, il vote « Oui » aussi (jusqu'à 30 s après) ; quand le leader confirme l'entrée par un portail d'instance, il confirme aussi. Réglage **par personnage**, à cocher sur le leader et les membres |
 | Volume envoyé | 50 % | Curseur de 0 à 100 % par pas de 5 %. Sur le leader : volume principal appliqué aux autres membres par le raccourci « Envoyer le volume à l'équipe ». Réglage **par personnage** |
 | Suivre le son du leader | Oui | Applique à ce personnage le volume envoyé par le leader et la coupure / le rétablissement du son. Décoché : ce client garde son propre son. Réglage **par personnage** |
+| Groupage automatique de l'équipe | Oui | Leader : invite automatiquement dans son groupe les membres de son équipe sélectionnée qui se connectent, ou déjà connectés quand il se connecte lui-même. Membre : accepte automatiquement l'invitation de groupe du leader d'une de ses équipes. Réglage **par personnage** |
 
 ---
 
@@ -211,12 +217,12 @@ vous avez désactivé le skin de Polypode dans ses options).
 
 ## État du projet
 
-Version `0.26.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
+Version `0.27.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
 automatique aux annonces, fenêtre redimensionnable à trois listes défilantes (personnages
 trouvés / équipes avec création par saisie et sélection / personnages de l'équipe, ajout
 et retrait de membres au clic, leader par équipe, invitation de toute l'équipe, synchronisation automatique et versionnée des équipes, ajout du joueur ciblé)
 skinnée (EllesmereUI/ElvUI), bouton de minimap (masquable), panneau d'options (accessible par un bouton de la fenêtre),
-commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, inviter), suivi des dialogues de PNJ (quêtes, options, fermeture de DialogueUI), acceptation et validation automatiques des quêtes du leader, passage automatique des cinématiques, vol automatique chez le maître de vol, entrée et sortie de gouffre et entrée par portail automatiques, volume et coupure du son de l'équipe par le leader. Pistes envisagées pour la suite,
+commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, inviter), suivi des dialogues de PNJ (quêtes, options, fermeture de DialogueUI), acceptation et validation automatiques des quêtes du leader, passage automatique des cinématiques, vol automatique chez le maître de vol, entrée et sortie de gouffre et entrée par portail automatiques, volume et coupure du son de l'équipe par le leader, groupage automatique de l'équipe à la connexion. Pistes envisagées pour la suite,
 à activer seulement si le besoin se confirme (voir la règle de simplicité dans
 `CLAUDE.md`) :
 

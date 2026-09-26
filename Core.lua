@@ -43,6 +43,7 @@ P.charDefaults = {
 	autoEnterInstance = true, -- suivre le leader en gouffre (entrée, sortie) et par portail (Instances.lua)
 	sentVolume = 50, -- leader : volume (%) envoyé à l'équipe par raccourci (Sound.lua)
 	followLeaderSound = true, -- membre : appliquer le volume / la coupure du son du leader
+	autoGroup = true, -- inviter (leader) / accepter (membre) l'équipe à la connexion (AutoGroup.lua)
 	-- selectedTeam : nom de l'équipe sélectionnée dans la fenêtre (nil par défaut),
 	-- conservé même si l'équipe manque momentanément (cf. UI_Main.lua).
 }

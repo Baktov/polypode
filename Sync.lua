@@ -468,4 +468,7 @@ function P.OnSyncMessage(message, channel, sender)
 	-- sauvegarde ancienne. Le roster d'abord : les équipes peuvent y faire référence.
 	P.SyncAllCharacters(sender)
 	P.SyncAllTeams(sender)
+
+	-- Leader : invite automatiquement ce personnage s'il est membre de l'équipe (AutoGroup.lua).
+	P.OnTeamCharacterOnline(P.GetCharKey(name, realm))
 end

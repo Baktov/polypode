@@ -32,6 +32,9 @@ local CINEMATIC_EVENTS = {
 for cinematicEvent in pairs(CINEMATIC_EVENTS) do
 	frame:RegisterEvent(cinematicEvent)
 end
+-- Groupage automatique de l'équipe (AutoGroup.lua)
+frame:RegisterEvent("PARTY_INVITE_REQUEST")
+frame:RegisterEvent("GROUP_ROSTER_UPDATE")
 
 frame:SetScript("OnEvent", function(self, event, ...)
 	if event == "ADDON_LOADED" then
@@ -59,6 +62,8 @@ frame:SetScript("OnEvent", function(self, event, ...)
 		P.OnQuestEvent(event, ...)
 	elseif CINEMATIC_EVENTS[event] then
 		P.OnCinematicEvent(event)
+	elseif event == "PARTY_INVITE_REQUEST" or event == "GROUP_ROSTER_UPDATE" then
+		P.OnGroupEvent(event, ...)
 	elseif event == "CHAT_MSG_ADDON" then
 		local prefix, message, channel, sender = ...
 		if prefix == P.SYNC_PREFIX then
