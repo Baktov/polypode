@@ -28,6 +28,8 @@ P.defaults = {
 -- compte partagé entre clients, cf. CLAUDE.md).
 P.charDefaults = {
 	debug = false, -- mode debug (/poly debug ou panneau d'options)
+	-- selectedTeam : nom de l'équipe sélectionnée dans la fenêtre (nil par défaut),
+	-- conservé même si l'équipe manque momentanément (cf. UI_Main.lua).
 }
 
 function P.Debug(msg)

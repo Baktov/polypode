@@ -5,7 +5,15 @@ local ui = {}
 P.ui = ui
 
 -- Nom de l'équipe sélectionnée dans le cadre « Équipes » (session uniquement).
+-- Recalculé par RefreshUI depuis le choix mémorisé pour ce personnage (P.charDb.selectedTeam),
+-- nil tant que l'équipe mémorisée n'existe pas localement (ex. pas encore reçue par synchro).
 local selectedTeam
+
+-- Mémorise l'équipe choisie pour ce personnage (conservée au reload/reconnexion) et l'affiche.
+local function ChooseTeam(teamName)
+	P.charDb.selectedTeam = teamName
+	P.RefreshUI()
+end
 
 -- Taille minimale volontairement petite : en dessous du confortable, le contenu est
 -- simplement tronqué (textes coupés sur une ligne, listes réduites), pas réorganisé.
@@ -398,8 +406,7 @@ function P.BuildUI()
 		return data.name
 	end, HEADER_HEIGHT + INPUT_HEIGHT, {
 		onClick = function(data)
-			selectedTeam = data.name
-			P.RefreshUI()
+			ChooseTeam(data.name)
 		end,
 		isSelected = function(data)
 			return data.name == selectedTeam
@@ -517,10 +524,10 @@ function P.RefreshUI()
 		return
 	end
 
-	-- Oublie une sélection devenue invalide (équipe absente de la liste).
-	if selectedTeam and not P.GetTeams()[selectedTeam] then
-		selectedTeam = nil
-	end
+	-- Sélection = choix mémorisé, s'il existe localement. Le choix n'est jamais effacé ici :
+	-- une équipe absente au login (synchro pas encore arrivée) sera sélectionnée à sa réception.
+	local saved = P.charDb.selectedTeam
+	selectedTeam = (saved and P.GetTeams()[saved]) and saved or nil
 
 	SetListData(ui.charPanel, SortedKeyItems(P.GetRoster()))
 
@@ -545,10 +552,10 @@ function P.RefreshUI()
 	ui.inviteButton:SetEnabled(InviteBlockedReason() == nil)
 end
 
--- Sélectionne une équipe (ex. reçue par synchro) et rafraîchit la fenêtre si elle existe.
+-- Sélectionne une équipe (ex. reçue par synchro via « Inviter l'équipe ») : le choix est
+-- mémorisé pour ce personnage comme un clic, et la fenêtre rafraîchie si elle existe.
 function P.SelectTeam(teamName)
-	selectedTeam = teamName
-	P.RefreshUI()
+	ChooseTeam(teamName)
 end
 
 function P.ToggleUI()
