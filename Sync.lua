@@ -135,6 +135,9 @@ if PLAYER_NOT_FOUND and ChatFrame_AddMessageEventFilter then
 		local sentAt = name and recentWhispers[name]
 		if sentAt and GetTime() - sentAt < WHISPER_ERROR_WINDOW then
 			onlineChars[FullName(name)] = nil
+			if P.RefreshUI then
+				P.RefreshUI() -- « Personnages disponibles » : passe parmi les déconnectés
+			end
 			return true
 		end
 	end)

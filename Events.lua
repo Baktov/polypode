@@ -91,6 +91,10 @@ frame:SetScript("OnEvent", function(self, event, ...)
 	elseif event == "AUTOFOLLOW_BEGIN" or event == "AUTOFOLLOW_END" then
 		P.OnFollowEvent(event, ...)
 	elseif event == "PARTY_INVITE_REQUEST" or event == "GROUP_ROSTER_UPDATE" then
+		-- Fenêtre ouverte : présence des personnages du groupe (Personnages disponibles).
+		if event == "GROUP_ROSTER_UPDATE" and P.ui.frame and P.ui.frame:IsShown() then
+			P.RefreshUI()
+		end
 		P.OnGroupEvent(event, ...)
 	elseif event == "CHAT_MSG_ADDON" then
 		local prefix, message, channel, sender = ...

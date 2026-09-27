@@ -282,13 +282,19 @@ end
 
 -- Transforme un ensemble { [clé] = ... } en items { key = clé } triés par ordre alphabétique
 -- (AlphaKey, puis clé brute en cas d'égalité), pour un ordre stable d'un affichage à l'autre.
-local function SortedKeyItems(set)
-	local keys, sortKeys = {}, {}
+-- isFirst(key) (facultatif) : les clés pour lesquelles il est vrai passent en tête (ordre
+-- alphabétique conservé dans chaque groupe) ; sa valeur est gardée dans item.first.
+local function SortedKeyItems(set, isFirst)
+	local keys, sortKeys, first = {}, {}, {}
 	for key in pairs(set) do
 		keys[#keys + 1] = key
 		sortKeys[key] = AlphaKey(key)
+		first[key] = isFirst and isFirst(key) or false
 	end
 	table.sort(keys, function(x, y)
+		if first[x] ~= first[y] then
+			return first[x]
+		end
 		if sortKeys[x] ~= sortKeys[y] then
 			return sortKeys[x] < sortKeys[y]
 		end
@@ -296,9 +302,26 @@ local function SortedKeyItems(set)
 	end)
 	local items = {}
 	for i, key in ipairs(keys) do
-		items[i] = { key = key }
+		items[i] = { key = key, first = first[key] }
 	end
 	return items
+end
+
+-- Vrai si le personnage est connecté : soi-même, un Polypode annoncé pendant la session
+-- (P.IsCharacterOnline), ou un membre connecté de notre groupe (même sans Polypode).
+local function IsConnected(key)
+	if key == P.GetCharKey() or P.IsCharacterOnline(key) then
+		return true
+	end
+	local entry = P.GetCharacter(key)
+	if entry and entry.name then
+		local name = P.GetTargetName(entry)
+		if UnitInParty(name) or UnitInRaid(name) then
+			local connected = UnitIsConnected(name)
+			return not (issecretvalue and issecretvalue(connected)) and connected == true
+		end
+	end
+	return false
 end
 
 -- Lignes d'infobulle d'un personnage : nom, rappels des clics (hints), puis ses équipes
@@ -576,13 +599,19 @@ function P.BuildUI()
 			return members and members[data.key] or false
 		end,
 		tooltip = function(data)
+			local presence = data.first and "|cff40ff40Connecté|r" or "|cff999999Déconnecté (ou pas vu cette session)|r"
 			if not selectedTeam then
-				return CharacterTooltip(data.key, { "Sélectionnez d'abord une équipe pour y ajouter ce personnage." })
+				return CharacterTooltip(data.key, { presence, "Sélectionnez d'abord une équipe pour y ajouter ce personnage." })
 			end
 			return CharacterTooltip(data.key, {
+				presence,
 				"Clic gauche : ajouter à l'équipe « " .. selectedTeam .. " »",
 				"Clic droit : retirer de l'équipe « " .. selectedTeam .. " »",
 			})
+		end,
+		-- Personnages déconnectés légèrement grisés (connectés en tête, cf. RefreshUI).
+		decorate = function(row, data)
+			row:SetAlpha(data.first and 1 or 0.55)
 		end,
 	})
 	charPanel.emptyText:SetText("Aucun personnage disponible")
@@ -798,7 +827,8 @@ function P.RefreshUI()
 		ui.channelInput:SetText(P.GetSyncChannelName())
 	end
 
-	SetListData(ui.charPanel, SortedKeyItems(P.GetRoster()))
+	-- Connectés en tête, puis déconnectés ; ordre alphabétique dans chaque groupe.
+	SetListData(ui.charPanel, SortedKeyItems(P.GetRoster(), IsConnected))
 
 	local teams = {}
 	for name in pairs(P.GetTeams()) do

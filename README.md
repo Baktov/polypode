@@ -120,8 +120,10 @@ Ouverte par `/poly ui`, le raccourci clavier ou le bouton de minimap. Le bouton 
 côte à côte :
 
 - **Personnages disponibles** : tous les personnages de votre équipe détectés via les canaux
-  (groupe, raid, guilde), triés par ordre alphabétique (sans tenir compte des accents ni des
-  majuscules). Nom en couleur de classe, puis classe et niveau ;
+  (groupe, raid, guilde). Les personnages **connectés** viennent en tête, puis les déconnectés,
+  **légèrement grisés** ; ordre alphabétique dans chaque groupe (sans tenir compte des accents ni
+  des majuscules). Connecté = vous, un personnage dont le Polypode s'est annoncé pendant la
+  session, ou un membre connecté de votre groupe (même sans Polypode) ; l'infobulle l'indique. Nom en couleur de classe, puis classe et niveau ;
   `(vous)` marque le personnage courant.
   Bouton **Ajouter la cible** (en haut du cadre) : ajoute le joueur ciblé à la liste, même
   s'il n'a pas Polypode (ex. un ami) ; il peut alors rejoindre une équipe et être invité
@@ -357,7 +359,7 @@ vous avez désactivé le skin de Polypode dans ses options).
 
 ## État du projet
 
-Version `0.43.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
+Version `0.43.1` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
 automatique aux annonces, fenêtre redimensionnable à trois listes défilantes (personnages
 disponibles / équipes avec création par saisie, sélection, renommage et suppression / personnages de l'équipe, ajout
 et retrait de membres au clic, leader par équipe, invitation de toute l'équipe, synchronisation automatique et versionnée des équipes, ajout du joueur ciblé, barre flottante de l'équipe sélectionnée)
