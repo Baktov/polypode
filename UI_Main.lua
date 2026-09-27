@@ -15,6 +15,52 @@ local function ChooseTeam(teamName)
 	P.RefreshUI()
 end
 
+-- Fenêtre de saisie du nouveau nom d'une équipe (Ctrl + clic gauche dans « Équipes »).
+-- data = ancien nom. Une erreur (nom vide, déjà pris...) garde la fenêtre ouverte.
+local RENAME_POPUP = "POLYPODE_RENAME_TEAM"
+
+local function PopupEditBox(popup)
+	return popup.GetEditBox and popup:GetEditBox() or popup.editBox
+end
+
+local function SubmitRename(popup, oldName)
+	local ok, result = P.RenameTeam(oldName, PopupEditBox(popup):GetText())
+	if not ok then
+		UIErrorsFrame:AddMessage(result, 1, 0.1, 0.1)
+		return true -- reste ouverte
+	end
+	UIErrorsFrame:AddMessage("Équipe « " .. oldName .. " » renommée en « " .. result .. " ».", 1, 0.82, 0)
+	P.RefreshUI()
+end
+
+StaticPopupDialogs[RENAME_POPUP] = {
+	text = "Nouveau nom de l'équipe « %s » :",
+	button1 = "Renommer",
+	button2 = "Annuler",
+	hasEditBox = true,
+	maxLetters = 32,
+	OnShow = function(self, oldName)
+		local editBox = PopupEditBox(self)
+		editBox:SetText(oldName or "")
+		editBox:HighlightText()
+		editBox:SetFocus()
+	end,
+	OnAccept = SubmitRename,
+	EditBoxOnEnterPressed = function(editBox, oldName)
+		local popup = editBox:GetParent()
+		if not SubmitRename(popup, oldName) then
+			popup:Hide()
+		end
+	end,
+	EditBoxOnEscapePressed = function(editBox)
+		editBox:GetParent():Hide()
+	end,
+	timeout = 0,
+	whileDead = true,
+	hideOnEscape = true,
+	preferredIndex = 3,
+}
+
 -- Taille minimale volontairement petite : en dessous du confortable, le contenu est
 -- simplement tronqué (textes coupés sur une ligne, listes réduites), pas réorganisé.
 local MIN_WIDTH, MIN_HEIGHT = 200, 100
@@ -536,13 +582,15 @@ function P.BuildUI()
 	createBtn:SetScript("OnClick", SubmitTeam)
 
 	-- Clic gauche : sélectionne l'équipe ; clic droit : désélectionne (plus aucune équipe) ;
-	-- Maj + clic gauche : supprime l'équipe (synchronisé).
+	-- Maj + clic gauche : supprime l'équipe (synchronisé) ; Ctrl + clic gauche : la renomme.
 	-- Glisser : sélectionne l'équipe et la sort en barre flottante (UI_TeamBar.lua).
 	CreateScrollList(teamPanel, function(data)
 		return data.name
 	end, HEADER_HEIGHT + INPUT_HEIGHT, {
 		onClick = function(data, mouseButton)
-			if mouseButton == "LeftButton" and IsShiftKeyDown() then
+			if mouseButton == "LeftButton" and IsControlKeyDown() then
+				StaticPopup_Show(RENAME_POPUP, data.name, nil, data.name)
+			elseif mouseButton == "LeftButton" and IsShiftKeyDown() then
 				if P.DeleteTeam(data.name) then
 					UIErrorsFrame:AddMessage("Équipe « " .. data.name .. " » supprimée.", 1, 0.82, 0)
 					if P.charDb.selectedTeam == data.name then
@@ -565,6 +613,7 @@ function P.BuildUI()
 				data.name,
 				"Clic gauche : sélectionner l'équipe",
 				"Clic droit : désélectionner",
+				"Ctrl + clic gauche : renommer l'équipe",
 				"Maj + clic gauche : supprimer l'équipe",
 				"Glisser : sélectionner et afficher en barre flottante",
 			}

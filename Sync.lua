@@ -531,14 +531,16 @@ end
 -- select : le destinataire sélectionne l'équipe dans sa fenêtre.
 -- Format : TEAM:token:flag:version:leader:membre1,membre2,...:nomÉquipe
 --   flag "N" = premier fragment, "S" = premier fragment + sélection, "+" = suite,
---   "D" = équipe supprimée (pierre tombale, un seul message sans leader ni membres) ;
+--   "D" = équipe supprimée (pierre tombale, un seul message sans membres ; le champ leader
+--   porte le nouveau nom si elle a été renommée) ;
 --   version = heure serveur de la dernière modification (la plus récente l'emporte) ;
 --   le nom d'équipe est en dernier pour pouvoir contenir ":".
 -- Les membres sont découpés en fragments pour respecter MAX_MESSAGE_LENGTH.
 function P.SyncTeam(teamName, target, select)
 	local token = P.GetTeamToken()
 	if token and P.IsTeamRemoved(teamName) then
-		local message = string.format("TEAM:%s:D:%d:::%s", token, P.GetTeamUpdated(teamName), teamName)
+		local message = string.format("TEAM:%s:D:%d:%s::%s", token, P.GetTeamUpdated(teamName),
+			P.db.teams[teamName].renamedTo or "", teamName)
 		for to in pairs(ResolveTargets(target)) do
 			P.Broadcast(message, "WHISPER", to)
 		end

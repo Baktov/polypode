@@ -299,13 +299,27 @@ end
 
 -- Crée une équipe (ou recrée une équipe supprimée, avec une version plus récente que sa
 -- pierre tombale). Renvoie true, ou false et un message d'erreur à afficher.
-function P.CreateTeam(name)
+-- Vérifie un nom d'équipe saisi. Renvoie le nom nettoyé, ou nil et un message d'erreur.
+-- « : » exclu : le nouveau nom d'une équipe renommée voyage dans un champ de message TEAM.
+local function CheckTeamName(name)
 	name = strtrim(name or "")
 	if name == "" then
-		return false, "Nom d'équipe vide."
+		return nil, "Nom d'équipe vide."
+	end
+	if name:find(":", 1, true) then
+		return nil, "Nom d'équipe invalide : pas de « : »."
 	end
 	if ActiveTeam(name) then
-		return false, "L'équipe « " .. name .. " » existe déjà."
+		return nil, "L'équipe « " .. name .. " » existe déjà."
+	end
+	return name
+end
+
+function P.CreateTeam(name)
+	local err
+	name, err = CheckTeamName(name)
+	if not name then
+		return false, err
 	end
 	local old = P.db.teams[name]
 	P.db.teams[name] = { name = name, members = {}, updated = old and old.updated }
@@ -322,6 +336,37 @@ function P.DeleteTeam(teamName)
 	P.db.teams[teamName] = { name = teamName, members = {}, removed = true, updated = old.updated }
 	TeamChanged(teamName)
 	return true
+end
+
+-- Renomme une équipe : recréée sous le nouveau nom (membres et leader conservés), l'ancien
+-- nom devient une pierre tombale qui retient le nouveau (renamedTo) : les personnages qui
+-- l'avaient sélectionnée suivent le renommage (P.GetSelectedTeam), même reçu plus tard par
+-- synchro. Renvoie true et le nouveau nom, ou false et un message d'erreur.
+function P.RenameTeam(oldName, newName)
+	local team = ActiveTeam(oldName)
+	if not team then
+		return false, "Équipe introuvable."
+	end
+	if strtrim(newName or "") == oldName then
+		return false, "Le nom n'a pas changé."
+	end
+	local err
+	newName, err = CheckTeamName(newName)
+	if not newName then
+		return false, err
+	end
+	local previous = P.db.teams[newName] -- pierre tombale éventuelle : sa version est dépassée
+	local members = {}
+	for key in pairs(team.members or {}) do
+		members[key] = true
+	end
+	P.db.teams[newName] = { name = newName, members = members, leader = team.leader,
+		updated = previous and previous.updated }
+	TeamChanged(newName)
+	P.db.teams[oldName] = { name = oldName, members = {}, removed = true, renamedTo = newName,
+		updated = team.updated }
+	TeamChanged(oldName)
+	return true, newName
 end
 
 -- Vrai si l'équipe est une pierre tombale (supprimée), pour la synchro.
@@ -404,14 +449,20 @@ end
 -- membres sont remplacés. reset = false : fragment suivant ; appliqué seulement si la
 -- version locale est celle du premier fragment (les membres s'ajoutent).
 -- Les membres sont pris tels quels, même absents du roster local. removed = true : pierre
--- tombale (équipe supprimée), en un seul fragment. Renvoie true si appliqué.
+-- tombale (équipe supprimée), en un seul fragment ; leader porte alors le nouveau nom si
+-- l'équipe a été renommée (renamedTo). Renvoie true si appliqué.
 function P.ApplyTeamSync(teamName, updated, reset, leader, memberKeys, removed)
 	local team = P.db.teams[teamName]
 	if reset then
 		if team and P.GetTeamUpdated(teamName) >= updated then
 			return false
 		end
-		team = { name = teamName, members = {}, leader = leader, updated = updated, removed = removed or nil }
+		team = { name = teamName, members = {}, updated = updated }
+		if removed then
+			team.removed, team.renamedTo = true, leader
+		else
+			team.leader = leader
+		end
 		P.db.teams[teamName] = team
 	elseif not team or team.removed or team.updated ~= updated then
 		return false
@@ -572,9 +623,19 @@ function P.ApplyChannelSettingSync(name, updated)
 	return true
 end
 
+-- Une équipe sélectionnée puis renommée (ici ou sur un autre client) est suivie sous son
+-- nouveau nom, et le choix mémorisé mis à jour.
 function P.GetSelectedTeam()
 	local name = P.charDb and P.charDb.selectedTeam
+	for _ = 1, 10 do -- chaîne de renommages, bornée
+		local team = name and P.db.teams[name]
+		if not team or not team.removed or not team.renamedTo then
+			break
+		end
+		name = team.renamedTo
+	end
 	if ActiveTeam(name) then
+		P.charDb.selectedTeam = name
 		return name
 	end
 end
