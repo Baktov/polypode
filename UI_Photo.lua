@@ -6,11 +6,12 @@ local P = Polypode
 -- du groupe (soi compris) apparaît en pied, côte à côte. Options (clic droit sur le bouton,
 -- P.TogglePhotoOptions ; P.charDb.photo, par personnage) :
 --   hideUI — masquer l'interface (UIParent, comme Alt + Z) ;
---   background — fond : voile sombre en dégradé (""), un écran de chargement de WoW (nom de
---     fichier ; BACKGROUNDS : chemins et recadrages repris de l'addon Details!, aucune API ne les
---     liste) ou l'illustration d'un donjon / raid du guide de l'aventurier (identifiant de
---     fichier, lu par EJ_GetInstanceByIndex pour chaque extension, recadré sur sa zone utile et
---     étendu à l'écran sans déformation ; pas les gouffres, absents du guide) ;
+--   background — fond : voile sombre en dégradé (""), un écran de chargement de WoW
+--     (« ls:fichier » ; P.PHOTO_LOADING_SCREENS, UI_PhotoBackgrounds.lua : aucune API ne les
+--     liste) ou l'illustration d'un donjon / raid du guide de l'aventurier (« lore:fichier » /
+--     « bg:fichier », lu par EJ_GetInstanceByIndex pour chaque extension ; pas les gouffres,
+--     absents du guide). Toute image est recadrée sur sa zone utile puis étendue à l'écran sans
+--     déformation (CoverTexCoord) ;
 --   showName — nom sous chaque personnage, en couleur de classe ;
 --   showDetails — classe, spécialisation, niveau et niveau d'objet sous le nom (spé et niveau
 --     d'objet des autres membres : état envoyé par leur Polypode, STATUS dans Sync.lua).
@@ -24,37 +25,13 @@ local MAX_MODELS = 10 -- au-delà (grand raid), seuls les premiers membres sont 
 local HINT_DURATION = 4 -- secondes d'affichage du rappel « Échap »
 local ZOOM_STEP = 0.1 -- variation de la distance de caméra par cran de molette
 local ZOOM_MIN, ZOOM_MAX = 0.3, 3 -- distance de caméra (1 = en pied)
-local LOADING_SCREENS = "Interface\\Glues\\LoadingScreens\\"
-
--- Écrans de chargement proposés en fond : { libellé, fichier, recadrage (bandes retirées) }.
-local BACKGROUNDS = {
-	{ "Goulet des Chanteguerres", "LoadScreenWarsongGulch", { 0, 1, 121 / 512, 484 / 512 } },
-	{ "Bassin Arathi", "LoadscreenArathiBasin", { 0, 1, 126 / 512, 430 / 512 } },
-	{ "Vallée d'Alterac", "LoadScreenPvpBattleground", { 0, 1, 127 / 512, 500 / 512 } },
-	{ "L'Œil du cyclone", "LoadScreenNetherBattlegrounds", { 0, 1, 142 / 512, 466 / 512 } },
-	{ "Rivage des Anciens", "LoadScreenNorthrendBG", { 0, 1, 302 / 1024, 879 / 1024 } },
-	{ "Île des Conquérants", "LOADSCREENISLEOFCONQUEST", { 0, 1, 297 / 1024, 878 / 1024 } },
-	{ "Bataille de Gilnéas", "LoadScreenGilneasBG2", { 0, 1, 281 / 1024, 878 / 1024 } },
-	{ "Pics-Jumeaux", "LoadScreenTwinPeaksBG", { 0, 1, 294 / 1024, 876 / 1024 } },
-	{ "Mines d'Éclargent", "LoadScreenSilvershardMines", { 0, 1, 251 / 1024, 840 / 1024 } },
-	{ "Temple de Kotmogu", "LoadScreenValleyofPower", { 0, 1, 257 / 1024, 839 / 1024 } },
-	{ "Gorge du Vent-Profond", "LoadScreen_GoldRush", { 0, 1, 264 / 1024, 840 / 1024 } },
-	{ "Arène des Tranchantes", "LoadScreenBladesEdgeArena", { 0, 1, 0.29296875, 0.9375 } },
-	{ "Arène des égouts de Dalaran", "LoadScreenDalaranSewersArena", { 0, 1, 0.29296875, 0.857421875 } },
-	{ "Cercle des Épreuves (Nagrand)", "LoadScreenNagrandArenaBattlegrounds", { 0, 1, 0.341796875, 1 } },
-	{ "Ruines de Lordaeron", "LoadScreenRuinsofLordaeronBattlegrounds", { 0, 1, 0.341796875, 1 } },
-	{ "Arène de Tol'vir", "LoadScreenTolvirArena", { 0, 1, 0.29296875, 0.857421875 } },
-	{ "Pic du Tigre", "LoadingScreen_Shadowpan_bg", { 0, 1, 0.29296875, 0.857421875 } },
-	{ "Chute de Crin-de-Frêne (Val'sharah)", "LoadingScreen_ArenaValSharah_wide", { 0, 1, 0.29296875, 0.857421875 } },
-	{ "Bastion du Freux", "LoadingScreen_BlackrookHoldArena_wide", { 0, 1, 0.29296875, 0.857421875 } },
-}
-
 -- Zone utile des illustrations du guide dans leur texture 512 × 512 (recadrages du guide,
--- Blizzard_EncounterJournal.xml) : { u0, u1, v0, v1, largeur, hauteur en pixels }.
+-- Blizzard_EncounterJournal.xml) : { u0, u1, v0, v1, proportions largeur / hauteur }.
 local JOURNAL_REGIONS = {
-	lore = { 0, 0.76171875, 0, 0.65625, 390, 336 }, -- loreBG (image de présentation)
-	bg = { 0, 0.76953125, 0, 0.830078125, 394, 425 }, -- dungeonBG (fond des boss)
+	lore = { 0, 0.76171875, 0, 0.65625, 390 / 336 }, -- loreBG (image de présentation)
+	bg = { 0, 0.76953125, 0, 0.830078125, 394 / 425 }, -- dungeonBG (fond des boss)
 }
+local SCREEN_RATIO = 16 / 9 -- un écran de chargement s'affiche en 16:9, quelle que soit sa texture
 
 local frame, hint, shade, background, optionsFrame
 local models = {} -- modèles recyclés : { model, label, details }
@@ -62,14 +39,6 @@ local hidUI -- l'interface a été masquée par le mode photo (à réafficher en
 
 local function PhotoSettings()
 	return P.charDb.photo
-end
-
-local function FindBackground(file)
-	for _, bg in ipairs(BACKGROUNDS) do
-		if bg[2] == file then
-			return bg
-		end
-	end
 end
 
 -- Donjons et raids du guide de l'aventurier, par extension (la plus récente d'abord) :
@@ -241,24 +210,42 @@ local function GetModel(i)
 	return models[i]
 end
 
--- Illustration du guide : « lore:fichier » ou « bg:fichier » (un nombre seul : ancien réglage,
--- fond des boss). Renvoie le fichier et sa zone utile, ou nil.
-local function JournalImage(value)
+-- Écran de chargement « ls:fichier » : { u0, u1, v0, v1, proportions } de sa zone utile, ou nil.
+local function LoadingScreenRegion(file)
+	for _, group in ipairs(P.PHOTO_LOADING_SCREENS) do
+		for _, item in ipairs(group.items) do
+			if item[2] == file then
+				local u0, u1, v0, v1 = item[3] or 0, item[4] or 1, item[5] or 0, item[6] or 1
+				return { u0, u1, v0, v1, SCREEN_RATIO * (u1 - u0) / (v1 - v0) }
+			end
+		end
+	end
+end
+
+-- Image de fond choisie : fichier et zone utile, ou nil (voile seul). Valeurs « ls:fichier »
+-- (écran de chargement), « lore:fichier » / « bg:fichier » (guide ; un nombre seul : ancien
+-- réglage, fond des boss). Les anciens noms d'écrans de chargement donnent nil.
+local function BackgroundImage(value)
 	if type(value) == "number" then
 		return value, JOURNAL_REGIONS.bg
 	end
 	local kind, file = tostring(value):match("^(%a+):(%d+)$")
-	if kind and JOURNAL_REGIONS[kind] then
-		return tonumber(file), JOURNAL_REGIONS[kind]
+	file = tonumber(file)
+	if kind == "ls" then
+		local region = LoadingScreenRegion(file)
+		if region then
+			return file, region
+		end
+	elseif kind and JOURNAL_REGIONS[kind] then
+		return file, JOURNAL_REGIONS[kind]
 	end
 end
 
 -- Remplit l'écran avec la zone utile d'une image sans la déformer : agrandie jusqu'à couvrir
 -- l'écran, le surplus (haut et bas, ou côtés) est coupé au centre.
 local function CoverTexCoord(region)
-	local u0, u1, v0, v1, pixelWidth, pixelHeight = unpack(region)
+	local u0, u1, v0, v1, imageRatio = unpack(region)
 	local screenRatio = frame:GetWidth() / frame:GetHeight()
-	local imageRatio = pixelWidth / pixelHeight
 	if imageRatio < screenRatio then
 		local keep = (v1 - v0) * imageRatio / screenRatio
 		local middle = (v0 + v1) / 2
@@ -272,17 +259,10 @@ local function CoverTexCoord(region)
 end
 
 local function ApplyBackground()
-	local value = PhotoSettings().background
-	local bg = FindBackground(value)
-	local journalFile, journalRegion = JournalImage(value)
-	if bg or journalFile then
-		if bg then
-			background:SetTexture(LOADING_SCREENS .. bg[2])
-			background:SetTexCoord(unpack(bg[3]))
-		else
-			background:SetTexture(journalFile) -- illustration du guide de l'aventurier
-			background:SetTexCoord(CoverTexCoord(journalRegion))
-		end
+	local file, region = BackgroundImage(PhotoSettings().background)
+	if file then
+		background:SetTexture(file)
+		background:SetTexCoord(CoverTexCoord(region))
 		background:Show()
 		shade:SetGradient("VERTICAL", CreateColor(0, 0, 0, 0.6), CreateColor(0, 0, 0, 0))
 	else
@@ -464,10 +444,23 @@ local function BuildOptions()
 	dropdown:SetupMenu(function(_, root)
 		root:SetScrollMode(360)
 		root:CreateRadio("Voile sombre (sans image)", IsSelected, SetSelected, "")
+		-- Écrans de chargement par extension ; sur WoW Forever, son groupe vient en premier.
 		local loading = root:CreateButton("Écrans de chargement")
-		loading:SetScrollMode(320)
-		for _, bg in ipairs(BACKGROUNDS) do
-			loading:CreateRadio(bg[1], IsSelected, SetSelected, bg[2])
+		local isForever = (select(4, GetBuildInfo()) or 0) >= 16000 and (select(4, GetBuildInfo()) or 0) < 20000
+		local groups = {}
+		for _, group in ipairs(P.PHOTO_LOADING_SCREENS) do
+			if isForever and group.name == "WoW Forever" then
+				table.insert(groups, 1, group)
+			else
+				groups[#groups + 1] = group
+			end
+		end
+		for _, group in ipairs(groups) do
+			local groupMenu = loading:CreateButton(group.name)
+			groupMenu:SetScrollMode(320)
+			for _, item in ipairs(group.items) do
+				groupMenu:CreateRadio(item[1], IsSelected, SetSelected, "ls:" .. item[2])
+			end
 		end
 		for _, tier in ipairs(JournalTiers()) do
 			local tierMenu = root:CreateButton(tier.name)
