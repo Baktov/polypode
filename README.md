@@ -178,6 +178,10 @@ rien n'est sélectionné.
 - **Clic gauche** : invite l'équipe dans votre groupe, exactement comme le bouton **Inviter
   l'équipe** de la fenêtre principale (réservé au leader de l'équipe ; sinon un message rouge
   explique pourquoi, rappelé dans l'infobulle).
+- **État des membres** : à droite de chaque personnage, un libellé indique s'il est **hors
+  groupe**, **hors ligne**, **déconnecté**, **mort** ou **loin** (hors de portée), et une fine
+  **barre de vie** verte souligne chaque membre groupé. La ligne d'un personnage hors ligne ou
+  déconnecté est estompée. Mis à jour en continu tant que la liste est dépliée.
 - **Détails** (option « Barre d'équipe : niveau, niveau d'objet et progression », cochée par
   défaut) : à gauche de chaque personnage, son **niveau** (doré), le **% d'avancement** dans ce
   niveau (gris, masqué au niveau maximum) et son **niveau d'objet** équipé (bleu), puis son nom
@@ -312,7 +316,7 @@ vous avez désactivé le skin de Polypode dans ses options).
 
 ## État du projet
 
-Version `0.38.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
+Version `0.39.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
 automatique aux annonces, fenêtre redimensionnable à trois listes défilantes (personnages
 disponibles / équipes avec création par saisie, sélection, renommage et suppression / personnages de l'équipe, ajout
 et retrait de membres au clic, leader par équipe, invitation de toute l'équipe, synchronisation automatique et versionnée des équipes, ajout du joueur ciblé, barre flottante de l'équipe sélectionnée)

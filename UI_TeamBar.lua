@@ -247,6 +247,77 @@ local function ToggleLocked()
 	P.RefreshTeamBar()
 end
 
+-- ÉTAT DES MEMBRES : pour chaque ligne, un libellé à droite (hors groupe, hors ligne,
+-- déconnecté, mort, loin) et, pour un membre groupé, une fine barre de vie au bas de la
+-- ligne. Lu directement sur l'unité du groupe (FindGroupUnit), rafraîchi 3 fois par seconde
+-- tant que la liste est dépliée. Depuis WoW 12, certaines valeurs (vie en combat...) peuvent
+-- être secrètes : la vie ne passe que par la barre (SetValue les accepte), les booléens
+-- secrets sont traités comme inconnus.
+local STATE_REFRESH = 0.3 -- secondes entre deux rafraîchissements de l'état des lignes
+
+-- Valeur utilisable par l'addon, ou nil si WoW l'a rendue secrète.
+local function Known(value)
+	if issecretvalue and issecretvalue(value) then
+		return nil
+	end
+	return value
+end
+
+-- Libellé d'état (couleur incluse) et opacité de la ligne d'un membre ; unit : son unité de
+-- groupe, ou nil s'il n'est pas groupé.
+local function MemberState(key, unit)
+	if not unit then
+		if P.IsCharacterOnline(key) then
+			return "|cff999999hors groupe|r", 1
+		end
+		return "|cff777777hors ligne|r", 0.5
+	end
+	if Known(UnitIsConnected(unit)) == false then
+		return "|cff777777déconnecté|r", 0.5
+	end
+	if Known(UnitIsDeadOrGhost(unit)) then
+		return "|cffff4040mort|r", 1
+	end
+	if unit ~= "player" then
+		local inRange, checked = UnitInRange(unit)
+		if Known(checked) and Known(inRange) == false then
+			return "|cffff9900loin|r", 0.7
+		end
+	end
+	return "", 1
+end
+
+-- Habillage d'une ligne (opts.decorate de P.CreateScrollList) : libellé d'état à droite du
+-- nom, barre de vie en bas pour un membre groupé et connecté.
+local function DecorateRow(row, data)
+	if not row.stateText then
+		row.stateText = row:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+		row.stateText:SetPoint("RIGHT", -4, 0)
+		row.stateText:SetJustifyH("RIGHT")
+		row.text:SetPoint("RIGHT", row.stateText, "LEFT", -4, 0)
+
+		row.health = CreateFrame("StatusBar", nil, row)
+		row.health:SetPoint("BOTTOMLEFT", 4, 1)
+		row.health:SetPoint("BOTTOMRIGHT", -4, 1)
+		row.health:SetHeight(2)
+		row.health:SetStatusBarTexture("Interface\\Buttons\\WHITE8X8")
+		row.health:SetStatusBarColor(0.2, 0.9, 0.2)
+	end
+
+	local unit = FindGroupUnit(data.key)
+	local label, alpha = MemberState(data.key, unit)
+	row.stateText:SetText(label)
+	row:SetAlpha(alpha)
+
+	if unit and Known(UnitIsConnected(unit)) ~= false then
+		row.health:SetMinMaxValues(0, UnitHealthMax(unit))
+		row.health:SetValue(UnitHealth(unit))
+		row.health:Show()
+	else
+		row.health:Hide()
+	end
+end
+
 -- Maj + clic : envoie la disposition de la barre (position, largeur, hauteur de la liste,
 -- pliage) aux membres de l'équipe connectés, en % de la taille de l'écran pour s'adapter à
 -- des fenêtres de tailles différentes (P.SyncTeamBarLayout, Sync.lua).
@@ -381,8 +452,25 @@ local function Build()
 		tooltip = function(data)
 			return P.CharacterTooltip(data.key, StatusLines(data.key))
 		end,
+		decorate = DecorateRow,
 	})
 	listPanel:Hide()
+
+	-- État des membres (vie, portée, mort...) rafraîchi tant que la liste est affichée
+	-- (OnUpdate ne tourne que sur un cadre visible).
+	local sinceRefresh = 0
+	listPanel:SetScript("OnUpdate", function(_, elapsed)
+		sinceRefresh = sinceRefresh + elapsed
+		if sinceRefresh < STATE_REFRESH then
+			return
+		end
+		sinceRefresh = 0
+		listPanel.scrollBox:ForEachFrame(function(row)
+			if row.data then
+				DecorateRow(row, row.data)
+			end
+		end)
+	end)
 
 	-- Poignée de redimensionnement, au-dessus de la liste (placée par LayoutGrip).
 	grip = CreateFrame("Button", nil, bar)

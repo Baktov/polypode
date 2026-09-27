@@ -104,6 +104,8 @@ end
 -- ou nil. opts.button : bouton à
 -- droite de chaque ligne, { text, width, onClick = fn(data), tooltip = texte d'aide }.
 -- opts.onDragStart(data) : appelé quand on commence à glisser une ligne (clic gauche maintenu).
+-- opts.decorate(row, data) : habillage supplémentaire d'une ligne, appelé à chaque affichage
+-- (lignes recyclées : tout se recalcule ici).
 -- opts.inset : marge gauche et droite de la liste dans le cadre (défaut 10). La barre de
 -- défilement n'apparaît (et ne prend de place à droite) que si la liste déborde.
 local function CreateScrollList(panel, formatFn, top, opts)
@@ -195,6 +197,9 @@ local function CreateScrollList(panel, formatFn, top, opts)
 		end
 		row.data = data
 		row.text:SetText(formatFn(data))
+		if opts.decorate then
+			opts.decorate(row, data)
+		end
 
 		if opts.button then
 			-- Lignes recyclées : le bouton agit sur la donnée courante de la ligne.
