@@ -186,6 +186,11 @@ rien n'est sélectionné.
   cette session), l'infobulle montre ce que la liste sait (niveau, classe, dernière connexion). Au-delà de 8 personnages, la liste défile. Elle s'ouvre
   sous la barre, ou au-dessus si la barre est trop près du bas de l'écran.
 - **Glisser** : déplace la barre.
+- **Maj + clic** : envoie la position et la taille de la barre (et son pliage) aux autres
+  personnages connectés de l'équipe. Chez ceux dont la barre est **masquée**, elle s'affiche au
+  même endroit et à la même taille, proportionnellement à la taille de leur écran (fenêtres de
+  tailles différentes) ; une barre déjà affichée garde sa place. L'équipe est aussi sélectionnée
+  chez ceux qui n'en avaient pas.
 - **Poignée du coin** (en bas à droite de la barre, ou de la liste dépliée) : redimensionne la
   barre en largeur et, liste dépliée, la hauteur de la liste (qui défile au-delà).
 - **Alt + clic** : **fige** la barre (position et taille : plus de déplacement, poignée masquée,
@@ -297,7 +302,7 @@ vous avez désactivé le skin de Polypode dans ses options).
 
 ## État du projet
 
-Version `0.35.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
+Version `0.36.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
 automatique aux annonces, fenêtre redimensionnable à trois listes défilantes (personnages
 disponibles / équipes avec création par saisie, sélection et suppression / personnages de l'équipe, ajout
 et retrait de membres au clic, leader par équipe, invitation de toute l'équipe, synchronisation automatique et versionnée des équipes, ajout du joueur ciblé, barre flottante de l'équipe sélectionnée)

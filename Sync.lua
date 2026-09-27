@@ -384,6 +384,48 @@ function P.IsCharacterOnline(key)
 		and onlineChars[FullName(P.GetTargetName(entry))] == true
 end
 
+-- DISPOSITION DE LA BARRE FLOTTANTE (UI_TeamBar.lua, Maj + clic) : envoyée en WHISPER aux
+-- membres connectés (ou groupés) de l'équipe, qui l'appliquent si leur barre est masquée.
+-- Format : BARPOS:token:gauche:haut:largeur:hauteurListe:déplié:nomÉquipe — valeurs en % de
+-- l'écran (hauteurListe vide = automatique, déplié 1/0), nom d'équipe en dernier.
+-- Renvoie le nombre de destinataires.
+function P.SyncTeamBarLayout(teamName, layout)
+	local token = P.GetTeamToken()
+	if not token then
+		return 0
+	end
+	local message = string.format("BARPOS:%s:%.2f:%.2f:%.2f:%s:%d:%s", token, layout.left, layout.top,
+		layout.width, layout.listHeight and string.format("%.2f", layout.listHeight) or "",
+		layout.expanded and 1 or 0, teamName)
+	local sent = 0
+	for key in pairs(P.GetTeamMembers(teamName) or {}) do
+		local entry = P.GetCharacter(key)
+		if entry and entry.name and key ~= P.GetCharKey() then
+			local name = P.GetTargetName(entry)
+			if P.IsCharacterOnline(key) or UnitInParty(name) or UnitInRaid(name) then
+				P.Broadcast(message, "WHISPER", name)
+				sent = sent + 1
+			end
+		end
+	end
+	return sent
+end
+
+local function OnTeamBarLayoutMessage(rest)
+	local left, top, width, listHeight, expanded, teamName = strsplit(":", rest or "", 6)
+	left, top, width = tonumber(left), tonumber(top), tonumber(width)
+	if not left or not top or not width or not teamName or teamName == "" or not P.ApplyTeamBarLayout then
+		return
+	end
+	P.ApplyTeamBarLayout(teamName, {
+		left = left,
+		top = top,
+		width = width,
+		listHeight = tonumber(listHeight),
+		expanded = expanded == "1",
+	})
+end
+
 -- Messages acceptés seulement de nos propres clients (même token), pas des comptes autorisés.
 local OWN_ACCOUNT_ONLY = {
 	CHANSET = true,
@@ -655,6 +697,9 @@ function P.OnSyncMessage(message, channel, sender)
 		return
 	elseif kind == "STATUS" then
 		OnStatusMessage(rest)
+		return
+	elseif kind == "BARPOS" then
+		OnTeamBarLayoutMessage(rest)
 		return
 	elseif kind == "CHANSET" then
 		OnChannelSettingMessage(rest, sender)

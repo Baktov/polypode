@@ -247,6 +247,31 @@ local function ToggleLocked()
 	P.RefreshTeamBar()
 end
 
+-- Maj + clic : envoie la disposition de la barre (position, largeur, hauteur de la liste,
+-- pliage) aux membres de l'équipe connectés, en % de la taille de l'écran pour s'adapter à
+-- des fenêtres de tailles différentes (P.SyncTeamBarLayout, Sync.lua).
+local function ShareLayout()
+	local team = P.GetSelectedTeam()
+	if not team then
+		UIErrorsFrame:AddMessage("Sélectionnez d'abord une équipe.", 1, 0.1, 0.1)
+		return
+	end
+	local screenWidth, screenHeight = UIParent:GetWidth(), UIParent:GetHeight()
+	local state = P.charDb.teamBar
+	local sent = P.SyncTeamBarLayout(team, {
+		left = bar:GetLeft() / screenWidth * 100,
+		top = bar:GetTop() / screenHeight * 100,
+		width = bar:GetWidth() / screenWidth * 100,
+		listHeight = state.listHeight and state.listHeight / screenHeight * 100,
+		expanded = state.expanded,
+	})
+	if sent > 0 then
+		UIErrorsFrame:AddMessage("Position de la barre envoyée à " .. sent .. " personnage(s) de l'équipe.", 1, 0.82, 0)
+	else
+		UIErrorsFrame:AddMessage("Aucun autre personnage de l'équipe connecté.", 1, 0.1, 0.1)
+	end
+end
+
 local function ShowBarTooltip(self)
 	GameTooltip:SetOwner(self, "ANCHOR_TOP")
 	GameTooltip:AddLine(P.GetSelectedTeam() or "Aucune équipe sélectionnée")
@@ -264,6 +289,8 @@ local function ShowBarTooltip(self)
 		GameTooltip:AddLine("Poignée du coin : redimensionner", 1, 1, 1)
 		GameTooltip:AddLine("Alt + clic : figer la position et la taille", 1, 1, 1)
 	end
+	GameTooltip:AddLine("Maj + clic : envoyer cette position et cette taille aux personnages de "
+		.. "l'équipe dont la barre est masquée", 1, 1, 1, true)
 	GameTooltip:AddLine("Croix : masquer (glisser une équipe hors de la fenêtre Polypode pour "
 		.. "la réafficher)", 1, 1, 1, true)
 	GameTooltip:Show()
@@ -294,6 +321,8 @@ local function Build()
 		if mouseButton == "LeftButton" and not dragged then
 			if IsAltKeyDown() then
 				ToggleLocked()
+			elseif IsShiftKeyDown() then
+				ShareLayout()
 			else
 				P.InviteSelectedTeam() -- même action que le bouton de la fenêtre (Commands.lua)
 			end
@@ -413,6 +442,35 @@ function P.RefreshTeamBar()
 	listPanel:SetShown(state.expanded)
 	LayoutGrip()
 	bar:Show()
+end
+
+-- Disposition reçue d'un autre personnage de l'équipe (Sync.lua, message BARPOS), en % de
+-- l'écran : appliquée seulement si la barre est masquée ici (une barre affichée garde sa
+-- place). L'équipe envoyée est sélectionnée si aucune ne l'est.
+function P.ApplyTeamBarLayout(teamName, layout)
+	local state = P.charDb.teamBar
+	if state.shown then
+		P.Debug("Position de barre reçue ignorée : barre déjà affichée")
+		return
+	end
+	local screenWidth, screenHeight = UIParent:GetWidth(), UIParent:GetHeight()
+	state.point, state.relativePoint = "TOPLEFT", "BOTTOMLEFT"
+	state.x = layout.left / 100 * screenWidth
+	state.y = layout.top / 100 * screenHeight
+	state.width = Clamp(layout.width / 100 * screenWidth, MIN_WIDTH, MAX_WIDTH)
+	state.listHeight = layout.listHeight
+		and Clamp(layout.listHeight / 100 * screenHeight, MIN_LIST_HEIGHT, MAX_LIST_HEIGHT) or nil
+	state.expanded = layout.expanded
+	state.shown = true
+	if not P.GetSelectedTeam() and P.GetTeams()[teamName] then
+		P.SelectTeam(teamName) -- rafraîchit aussi la barre (P.RefreshUI)
+	end
+	if not bar then
+		Build() -- place la barre à la position mémorisée
+	else
+		RestorePosition()
+	end
+	P.RefreshTeamBar()
 end
 
 -- Début du glisser d'une équipe hors du cadre « Équipes » : la barre apparaît sous le curseur
