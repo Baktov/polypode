@@ -9,8 +9,8 @@ local P = Polypode
 --   background — fond : voile sombre en dégradé (""), un écran de chargement de WoW (nom de
 --     fichier ; BACKGROUNDS : chemins et recadrages repris de l'addon Details!, aucune API ne les
 --     liste) ou l'illustration d'un donjon / raid du guide de l'aventurier (identifiant de
---     fichier, lu par EJ_GetInstanceByIndex pour chaque extension ; pas les gouffres, absents
---     du guide) ;
+--     fichier, lu par EJ_GetInstanceByIndex pour chaque extension, recadré sur sa zone utile et
+--     étendu à l'écran sans déformation ; pas les gouffres, absents du guide) ;
 --   showName — nom sous chaque personnage, en couleur de classe ;
 --   showDetails — classe, spécialisation, niveau et niveau d'objet sous le nom (spé et niveau
 --     d'objet des autres membres : état envoyé par leur Polypode, STATUS dans Sync.lua).
@@ -47,6 +47,13 @@ local BACKGROUNDS = {
 	{ "Pic du Tigre", "LoadingScreen_Shadowpan_bg", { 0, 1, 0.29296875, 0.857421875 } },
 	{ "Chute de Crin-de-Frêne (Val'sharah)", "LoadingScreen_ArenaValSharah_wide", { 0, 1, 0.29296875, 0.857421875 } },
 	{ "Bastion du Freux", "LoadingScreen_BlackrookHoldArena_wide", { 0, 1, 0.29296875, 0.857421875 } },
+}
+
+-- Zone utile des illustrations du guide dans leur texture 512 × 512 (recadrages du guide,
+-- Blizzard_EncounterJournal.xml) : { u0, u1, v0, v1, largeur, hauteur en pixels }.
+local JOURNAL_REGIONS = {
+	lore = { 0, 0.76171875, 0, 0.65625, 390, 336 }, -- loreBG (image de présentation)
+	bg = { 0, 0.76953125, 0, 0.830078125, 394, 425 }, -- dungeonBG (fond des boss)
 }
 
 local frame, hint, shade, background, optionsFrame
@@ -90,8 +97,15 @@ local function JournalTiers()
 				if not instanceID then
 					break
 				end
-				local image = (bgImage and bgImage ~= 0) and bgImage or loreImage
-				if name and image and image ~= 0 then
+				-- Illustration de présentation (plus large, donc moins recadrée), sinon fond des
+				-- boss ; valeur « type:fichier » (cf. JOURNAL_REGIONS).
+				local image
+				if loreImage and loreImage ~= 0 then
+					image = "lore:" .. loreImage
+				elseif bgImage and bgImage ~= 0 then
+					image = "bg:" .. bgImage
+				end
+				if name and image then
 					list[#list + 1] = { name = name, image = image }
 				end
 				index = index + 1
@@ -227,16 +241,47 @@ local function GetModel(i)
 	return models[i]
 end
 
+-- Illustration du guide : « lore:fichier » ou « bg:fichier » (un nombre seul : ancien réglage,
+-- fond des boss). Renvoie le fichier et sa zone utile, ou nil.
+local function JournalImage(value)
+	if type(value) == "number" then
+		return value, JOURNAL_REGIONS.bg
+	end
+	local kind, file = tostring(value):match("^(%a+):(%d+)$")
+	if kind and JOURNAL_REGIONS[kind] then
+		return tonumber(file), JOURNAL_REGIONS[kind]
+	end
+end
+
+-- Remplit l'écran avec la zone utile d'une image sans la déformer : agrandie jusqu'à couvrir
+-- l'écran, le surplus (haut et bas, ou côtés) est coupé au centre.
+local function CoverTexCoord(region)
+	local u0, u1, v0, v1, pixelWidth, pixelHeight = unpack(region)
+	local screenRatio = frame:GetWidth() / frame:GetHeight()
+	local imageRatio = pixelWidth / pixelHeight
+	if imageRatio < screenRatio then
+		local keep = (v1 - v0) * imageRatio / screenRatio
+		local middle = (v0 + v1) / 2
+		v0, v1 = middle - keep / 2, middle + keep / 2
+	else
+		local keep = (u1 - u0) * screenRatio / imageRatio
+		local middle = (u0 + u1) / 2
+		u0, u1 = middle - keep / 2, middle + keep / 2
+	end
+	return u0, u1, v0, v1
+end
+
 local function ApplyBackground()
 	local value = PhotoSettings().background
 	local bg = FindBackground(value)
-	if bg or type(value) == "number" then
+	local journalFile, journalRegion = JournalImage(value)
+	if bg or journalFile then
 		if bg then
 			background:SetTexture(LOADING_SCREENS .. bg[2])
 			background:SetTexCoord(unpack(bg[3]))
 		else
-			background:SetTexture(value) -- illustration du guide de l'aventurier
-			background:SetTexCoord(0, 1, 0, 1)
+			background:SetTexture(journalFile) -- illustration du guide de l'aventurier
+			background:SetTexCoord(CoverTexCoord(journalRegion))
 		end
 		background:Show()
 		shade:SetGradient("VERTICAL", CreateColor(0, 0, 0, 0.6), CreateColor(0, 0, 0, 0))

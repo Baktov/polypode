@@ -266,7 +266,8 @@ la croix pour fermer) :
   bataille et arènes : Goulet des Chanteguerres, Bassin Arathi, Vallée d'Alterac, Pic du
   Tigre...) ou l'**illustration d'un donjon ou d'un raid** du guide de l'aventurier, rangés par
   extension puis « Donjons » / « Raids » (liste lue dans le guide, donc toujours à jour ; les
-  gouffres n'y figurent pas) ;
+  gouffres n'y figurent pas). L'illustration remplit tout l'écran sans être déformée (le haut et
+  le bas sont légèrement coupés) ; petite à l'origine, elle y apparaît un peu floue ;
 - **Afficher le nom des personnages** (oui par défaut), en couleur de classe ;
 - **Afficher classe, spé, niveau et niveau d'objet** (oui par défaut) sous le nom. La spé et le
   niveau d'objet des autres membres viennent de leur Polypode (absents sinon).
@@ -384,7 +385,7 @@ vous avez désactivé le skin de Polypode dans ses options).
 
 ## État du projet
 
-Version `0.45.3` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
+Version `0.45.4` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
 automatique aux annonces, fenêtre redimensionnable à trois listes défilantes (personnages
 disponibles / équipes avec création par saisie, sélection, renommage et suppression / personnages de l'équipe, ajout
 et retrait de membres au clic, leader par équipe, invitation de toute l'équipe, synchronisation automatique et versionnée des équipes, ajout du joueur ciblé, barre flottante de l'équipe sélectionnée)
