@@ -54,6 +54,7 @@ P.charDefaults = {
 	sentVolume = 50, -- leader : volume (%) envoyé à l'équipe par raccourci (Sound.lua)
 	followLeaderSound = true, -- membre : appliquer le volume / la coupure du son du leader
 	autoGroup = true, -- inviter (leader) / accepter (membre) l'équipe à la connexion (AutoGroup.lua)
+	followAlert = true, -- alerte du leader quand un membre ne le suit plus (Follow.lua)
 	-- Barre flottante de l'équipe sélectionnée (UI_TeamBar.lua) : affichée, liste dépliée,
 	-- figée (Alt + clic) ; position (point, relativePoint, x, y), largeur (width) et hauteur
 	-- de la liste (listHeight, sinon automatique) ajoutées au premier placement / redimensionnement.

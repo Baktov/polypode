@@ -44,6 +44,9 @@ local STATUS_EVENTS = {
 for statusEvent in pairs(STATUS_EVENTS) do
 	frame:RegisterEvent(statusEvent)
 end
+-- Alerte « ne suit plus » (Follow.lua)
+frame:RegisterEvent("AUTOFOLLOW_BEGIN")
+frame:RegisterEvent("AUTOFOLLOW_END")
 -- Groupage automatique de l'équipe (AutoGroup.lua)
 frame:RegisterEvent("PARTY_INVITE_REQUEST")
 frame:RegisterEvent("GROUP_ROSTER_UPDATE")
@@ -80,6 +83,8 @@ frame:SetScript("OnEvent", function(self, event, ...)
 		end
 	elseif CINEMATIC_EVENTS[event] then
 		P.OnCinematicEvent(event)
+	elseif event == "AUTOFOLLOW_BEGIN" or event == "AUTOFOLLOW_END" then
+		P.OnFollowEvent(event, ...)
 	elseif event == "PARTY_INVITE_REQUEST" or event == "GROUP_ROSTER_UPDATE" then
 		P.OnGroupEvent(event, ...)
 	elseif event == "CHAT_MSG_ADDON" then

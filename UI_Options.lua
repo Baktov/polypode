@@ -272,6 +272,26 @@ function P.BuildOptions()
 		.. "(ou déjà connectés quand il se connecte). Membre : accepte automatiquement l'invitation "
 		.. "de groupe du leader d'une de ses équipes. Réglage propre à ce personnage.")
 
+	-- Alerte « ne suit plus » (par personnage, cf. Follow.lua).
+	local followAlertSetting = Settings.RegisterProxySetting(
+		category,
+		"POLYPODE_FOLLOW_ALERT",
+		Settings.VarType.Boolean,
+		"Alerte quand un membre ne suit plus",
+		Settings.Default.True,
+		function()
+			return P.charDb.followAlert
+		end,
+		function(value)
+			P.charDb.followAlert = value
+		end
+	)
+	Settings.CreateCheckbox(category, followAlertSetting,
+		"Membre : quand il arrête de suivre le leader de l'équipe (obstacle, saut, distance, "
+		.. "mouvement manuel...), il le signale au leader. Leader : affiche « X ne vous suit plus. » "
+		.. "à l'écran avec un son d'alerte. Réglage propre à ce personnage, à cocher sur le leader "
+		.. "et les membres.")
+
 	-- Détails des membres dans la barre flottante d'équipe (par personnage, UI_TeamBar.lua).
 	local teamBarDetailsSetting = Settings.RegisterProxySetting(
 		category,

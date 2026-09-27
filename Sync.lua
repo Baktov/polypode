@@ -703,6 +703,13 @@ function P.OnSyncMessage(message, channel, sender)
 	elseif kind == "BARPOS" then
 		OnTeamBarLayoutMessage(rest)
 		return
+	elseif kind == "FOLLOWEND" then
+		-- FOLLOWEND:token:nom-royaume — un membre ne suit plus le leader (Follow.lua) ; le
+		-- personnage annoncé doit être l'expéditeur.
+		if rest and IsSender(sender, rest) then
+			P.OnFollowEndMessage(rest)
+		end
+		return
 	elseif kind == "CHANSET" then
 		OnChannelSettingMessage(rest, sender)
 		return
