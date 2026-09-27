@@ -624,6 +624,12 @@ function P.OnSyncMessage(message, channel, sender)
 		-- QACCEPT:token:questID — quête acceptée par le leader (Quests.lua).
 		P.OnQuestAcceptMessage(tonumber(rest), sender)
 		return
+	elseif kind == "QSTATE" then
+		-- QSTATE:token:questID:état:nom-royaume — un membre dit au leader s'il a la quête
+		-- (HAVE, NEED, OK), pour le partage automatique (Quests.lua). Pas réservé au leader.
+		local questID, state, key = strsplit(":", rest or "", 3)
+		P.OnQuestStateMessage(tonumber(questID), state, key)
+		return
 	elseif kind == "QVALIDATE" then
 		-- QVALIDATE:token:questID — le leader a cliqué « Continuer » (Quests.lua).
 		P.OnQuestValidateMessage(tonumber(rest), sender)

@@ -70,6 +70,13 @@ automatique de base entre vos clients — sans configuration complexe.
   groupe font de même dès que le PNJ leur propose la même chose (options « Suivre les dialogues
   de PNJ du leader », « Accepter automatiquement les quêtes » et « Valider automatiquement les
   quêtes », voir Options). Seules les actions du **leader de l'équipe sélectionnée** sont suivies.
+- **Partage automatique des quêtes** : quand le leader accepte une quête que des membres groupés
+  de l'équipe n'ont pas prise (PNJ non ouvert chez eux, quête déclenchée par un objet...), il la
+  **partage** automatiquement quelques secondes après, et les membres l'acceptent. Un message
+  s'affiche à l'écran du leader si la quête n'est pas partageable (à prendre au PNJ), ou si des
+  membres ne l'ont toujours pas 15 secondes après (hors de portée, journal plein, prérequis,
+  option décochée ou personnage sans Polypode). Les expéditions et objectifs bonus, acceptés
+  en entrant dans leur zone, ne sont pas concernés.
 - **Cinématiques** : quand le leader passe une cinématique ou une vidéo, les autres personnages
   du groupe la passent aussi (option « Passer automatiquement les cinématiques »).
 - **Vols** : quand le leader prend un vol chez un maître de vol, les autres personnages du groupe
@@ -254,7 +261,7 @@ fenêtre principale) :
 | Afficher l'icône de minimap | Oui | Affiche le bouton Polypode autour de la minimap |
 | Mode debug | Non | Affiche dans le chat les messages de diagnostic (synchro, invitations...). Réglage **par personnage** : on peut l'activer sur une seule fenêtre |
 | Attaquer après l'assistance | Oui | Le raccourci « Assister le leader » lance aussi l'attaque automatique (`/startattack`) sur la cible prise si elle est hostile ; décoché, il prend seulement la cible. Réglage **par personnage** (ex. décoché sur un soigneur) |
-| Accepter automatiquement les quêtes | Oui | Quand le leader de l'équipe accepte une quête, ce personnage l'accepte aussi dès qu'elle lui est proposée (PNJ ouvert, jusqu'à 30 s après). Réglage **par personnage** ; doit être coché sur le leader (qui annonce ses quêtes) et sur les membres |
+| Accepter automatiquement les quêtes | Oui | Quand le leader de l'équipe accepte une quête, ce personnage l'accepte aussi dès qu'elle lui est proposée (PNJ ouvert ou quête partagée, jusqu'à 30 s après). Sur le leader, active aussi le partage automatique aux membres qui n'ont pas la quête, avec un message à l'écran en cas d'échec. Réglage **par personnage** ; doit être coché sur le leader (qui annonce et partage ses quêtes) et sur les membres |
 | Valider automatiquement les quêtes | Oui | Quand le leader rend une quête (« Continuer » puis « Terminer la quête »), ce personnage la rend aussi avec le **même index de récompense**, dès que le PNJ est ouvert (jusqu'à 60 s après). Une récompense au choix qui ne convient pas reste à choisir à la main. Réglage **par personnage**, à cocher sur le leader et les membres |
 | Suivre les dialogues de PNJ du leader | Oui | Quand le leader choisit dans le dialogue d'un PNJ une quête (disponible ou à rendre) ou une option de dialogue, ce personnage fait le même choix si son dialogue avec le PNJ est ouvert ; quand le leader ferme DialogueUI, il le ferme aussi. L'acceptation ou la validation automatique enchaîne. Réglage **par personnage**, à cocher sur le leader et les membres |
 | Passer automatiquement les cinématiques | Oui | Quand le leader passe une cinématique (moteur, scène) ou une vidéo, ce personnage la passe aussi, dès qu'elle s'affiche (jusqu'à 15 s après). Réglage **par personnage**, à cocher sur le leader et les membres |
@@ -283,12 +290,12 @@ vous avez désactivé le skin de Polypode dans ses options).
 
 ## État du projet
 
-Version `0.33.2` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
+Version `0.34.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
 automatique aux annonces, fenêtre redimensionnable à trois listes défilantes (personnages
 disponibles / équipes avec création par saisie, sélection et suppression / personnages de l'équipe, ajout
 et retrait de membres au clic, leader par équipe, invitation de toute l'équipe, synchronisation automatique et versionnée des équipes, ajout du joueur ciblé, barre flottante de l'équipe sélectionnée)
 skinnée (EllesmereUI/ElvUI), bouton de minimap (masquable), panneau d'options (accessible par un bouton de la fenêtre),
-commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, inviter), suivi des dialogues de PNJ (quêtes, options, fermeture de DialogueUI), acceptation et validation automatiques des quêtes du leader, passage automatique des cinématiques, vol automatique chez le maître de vol, entrée et sortie de gouffre et entrée par portail automatiques, volume et coupure du son de l'équipe par le leader, groupage automatique de l'équipe à la connexion, canal dédié commun aux comptes, autorisation d'autres comptes Battle.net. Pistes envisagées pour la suite,
+commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, inviter), suivi des dialogues de PNJ (quêtes, options, fermeture de DialogueUI), acceptation, partage et validation automatiques des quêtes du leader, passage automatique des cinématiques, vol automatique chez le maître de vol, entrée et sortie de gouffre et entrée par portail automatiques, volume et coupure du son de l'équipe par le leader, groupage automatique de l'équipe à la connexion, canal dédié commun aux comptes, autorisation d'autres comptes Battle.net. Pistes envisagées pour la suite,
 à activer seulement si le besoin se confirme (voir la règle de simplicité dans
 `CLAUDE.md`) :
 

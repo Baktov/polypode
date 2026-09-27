@@ -11,6 +11,14 @@ local P = Polypode
 --   Leader : QUEST_ACCEPTED, plus hooks AcceptQuest() et bouton « Accepter ».
 --   Membre : quête proposée (QUEST_DETAIL) → RequestLoadQuestByID → QUEST_DATA_LOAD_RESULT
 --   → AcceptQuest() ; sinon attente 30 s.
+-- PARTAGE (même option, sur le leader) — message QSTATE:token:questID:état:nom-royaume
+--   Membre : 1,5 s après QACCEPT, dit au leader (chuchotement) s'il a la quête (HAVE) ou non
+--   (NEED), puis OK quand il l'accepte.
+--   Leader : 4 s après avoir accepté, partage la quête (QuestLogPushQuest) si un membre groupé
+--   de l'équipe ne l'a pas (ou n'a pas répondu) ; le membre l'accepte par le flux ci-dessus
+--   (le partage ouvre QUEST_DETAIL). Message à l'écran du leader si la quête n'est pas
+--   partageable, ou si des membres ne l'ont toujours pas 15 s après. Expéditions et objectifs
+--   bonus (acceptés en entrant dans la zone) exclus.
 --
 -- VALIDATION (option P.charDb.autoValidateQuest), en deux étapes :
 --   1. QVALIDATE:token:questID — le leader clique « Continuer » (panneau de progression).
@@ -51,6 +59,9 @@ local READY_WINDOW = 10 -- secondes pendant lesquelles un panneau vu reste utili
 local BROADCAST_DEDUP = 5 -- secondes : une même annonce (type + quête) n'est envoyée qu'une fois
 local GOSSIP_DEDUP = 0.5 -- secondes : une option de dialogue peut être rejouée rapidement
 local CLOSE_DEDUP = 2 -- secondes entre deux annonces de fermeture
+local STATE_CHECK_DELAY = 1.5 -- secondes (membre) avant de dire au leader s'il a la quête
+local SHARE_DELAY = 4 -- secondes (leader) avant de partager la quête aux membres qui ne l'ont pas
+local REPORT_DELAY = 15 -- secondes (leader) avant de signaler les membres sans la quête
 
 -- Membre : état des panneaux et actions en attente.
 local detailQuestID -- quête proposée (QUEST_DETAIL), jusqu'à QUEST_FINISHED
@@ -61,6 +72,8 @@ local completeReadyID, completeReadyAt -- dernier panneau de récompenses vu, et
 local pendingValidateID -- quête à « continuer » dès que possible
 local pendingRewardID, pendingRewardChoice -- quête à terminer dès que possible, et choix
 local gossipReadyAt -- dernier dialogue de PNJ ouvert (GOSSIP_SHOW)
+local reportTo = {} -- membre : [questID] = leader à qui rendre compte (partage)
+local shareTracks = {} -- leader : [questID] = { expected = { [clé] = nom }, state = { [clé] = état } }
 
 local function AcceptEnabled()
 	return P.charDb and P.charDb.autoAcceptQuest
@@ -140,12 +153,36 @@ local function ExpireAccept(questID)
 	end)
 end
 
+local function HasQuest(questID)
+	return C_QuestLog and C_QuestLog.GetLogIndexForQuestID
+		and C_QuestLog.GetLogIndexForQuestID(questID) ~= nil or false
+end
+
+-- Membre : dit au leader qui a annoncé la quête si on l'a (HAVE), pas (NEED), ou vient de
+-- l'accepter (OK).
+local function ReportQuestState(questID, state)
+	local leader = reportTo[questID]
+	local token = P.GetTeamToken()
+	if leader and token then
+		P.Broadcast(string.format("QSTATE:%s:%d:%s:%s", token, questID, state, P.GetCharKey()), "WHISPER", leader)
+	end
+end
+
 -- Réception de QACCEPT (Sync.lua).
 function P.OnQuestAcceptMessage(questID, sender)
 	if not AcceptEnabled() then
 		return
 	end
 	questID = questID or 0
+	if questID > 0 then
+		reportTo[questID] = sender
+		C_Timer.After(STATE_CHECK_DELAY, function()
+			ReportQuestState(questID, HasQuest(questID) and "HAVE" or "NEED")
+		end)
+		C_Timer.After(ACCEPT_TIMEOUT, function()
+			reportTo[questID] = nil
+		end)
+	end
 	P.Debug("Quête " .. questID .. " acceptée par " .. tostring(sender))
 	if detailQuestID and (questID == 0 or detailQuestID == questID) then
 		StartAccept(detailQuestID)
@@ -155,6 +192,99 @@ function P.OnQuestAcceptMessage(questID, sender)
 	end
 	if pendingAcceptID then
 		ExpireAccept(pendingAcceptID)
+	end
+end
+
+-- PARTAGE (leader) ------------------------------------------------------------------
+
+local function QuestTitle(questID)
+	local title = C_QuestLog and C_QuestLog.GetTitleForQuestID and C_QuestLog.GetTitleForQuestID(questID)
+	return title or ("n° " .. questID)
+end
+
+local function ShowLeaderInfo(text)
+	UIErrorsFrame:AddMessage(text, 1, 0.6, 0)
+	P.Debug(text)
+end
+
+-- Membres de l'équipe sélectionnée présents dans le groupe (soi exclu) : { [clé] = nom }.
+local function GroupedTeamMembers()
+	local members = {}
+	for key in pairs(P.GetTeamMembers(P.GetSelectedTeam()) or {}) do
+		local entry = P.GetCharacter(key)
+		if entry and entry.name and key ~= P.GetCharKey() then
+			local name = P.GetTargetName(entry)
+			if UnitInParty(name) or UnitInRaid(name) then
+				members[key] = entry.name
+			end
+		end
+	end
+	return members
+end
+
+-- Noms triés des membres suivis qui n'ont pas (encore) la quête, ou n'ont pas répondu.
+local function MissingMembers(track)
+	local names = {}
+	for key, name in pairs(track.expected) do
+		local state = track.state[key]
+		if state ~= "HAVE" and state ~= "OK" then
+			names[#names + 1] = name
+		end
+	end
+	table.sort(names)
+	return names
+end
+
+-- Leader : suit une quête qu'il vient d'accepter, la partage aux membres qui ne l'ont pas,
+-- puis signale ceux qui ne l'ont toujours pas.
+local function StartShareTracking(questID)
+	if not questID or questID == 0 or shareTracks[questID] or not AcceptEnabled()
+		or not IsInGroup() or not P.IsTeamLeader() then
+		return
+	end
+	if C_QuestLog and ((C_QuestLog.IsQuestTask and C_QuestLog.IsQuestTask(questID))
+		or (C_QuestLog.IsWorldQuest and C_QuestLog.IsWorldQuest(questID))) then
+		return
+	end
+	local expected = GroupedTeamMembers()
+	if next(expected) == nil then
+		return
+	end
+	local track = { expected = expected, state = {} }
+	shareTracks[questID] = track
+
+	C_Timer.After(SHARE_DELAY, function()
+		local missing = MissingMembers(track)
+		if #missing == 0 then
+			return
+		end
+		if HasQuest(questID) and C_QuestLog.IsPushableQuest and C_QuestLog.IsPushableQuest(questID)
+			and IsInGroup() and QuestLogPushQuest then
+			C_QuestLog.SetSelectedQuest(questID)
+			QuestLogPushQuest()
+			P.Debug("Quête " .. questID .. " partagée (manquante : " .. table.concat(missing, ", ") .. ")")
+		else
+			track.reported = true
+			ShowLeaderInfo("Quête « " .. QuestTitle(questID) .. " » non partageable : à prendre "
+				.. "au PNJ pour " .. table.concat(missing, ", ") .. ".")
+		end
+	end)
+
+	C_Timer.After(REPORT_DELAY, function()
+		shareTracks[questID] = nil
+		local missing = MissingMembers(track)
+		if not track.reported and #missing > 0 then
+			ShowLeaderInfo("Quête « " .. QuestTitle(questID) .. " » non acceptée (ou sans "
+				.. "confirmation) par " .. table.concat(missing, ", ") .. ".")
+		end
+	end)
+end
+
+-- Réception de QSTATE (Sync.lua) : état d'un membre pour une quête suivie par le leader.
+function P.OnQuestStateMessage(questID, state, key)
+	local track = questID and shareTracks[questID]
+	if track and key and track.expected[key] then
+		track.state[key] = state
 	end
 end
 
@@ -447,6 +577,11 @@ end
 function P.OnQuestEvent(event, arg1)
 	if event == "QUEST_ACCEPTED" then
 		AnnounceAccept(arg1, "QUEST_ACCEPTED")
+		StartShareTracking(arg1)
+		-- Membre : confirme au leader l'acceptation d'une quête qu'il a annoncée.
+		if arg1 and reportTo[arg1] then
+			ReportQuestState(arg1, "OK")
+		end
 
 	elseif event == "QUEST_DETAIL" then
 		local questID = CurrentQuestID()
