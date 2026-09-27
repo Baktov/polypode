@@ -462,6 +462,23 @@ function P.BuildUI()
 	end)
 	optionsBtn:SetScript("OnLeave", GameTooltip_Hide)
 
+	-- Bouton Photo (barre de titre, à gauche de la croix) : mode photo (UI_Photo.lua).
+	local photoBtn = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
+	photoBtn:SetSize(60, 20)
+	photoBtn:SetPoint("RIGHT", closeBtn, "LEFT", -4, 0)
+	photoBtn:SetText("Photo")
+	photoBtn:SetScript("OnClick", function()
+		P.StartPhotoMode()
+	end)
+	photoBtn:SetScript("OnEnter", function(self)
+		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+		GameTooltip:AddLine("Photo")
+		GameTooltip:AddLine("Masque l'interface et affiche en pied, côte à côte, chaque membre du "
+			.. "groupe. Échap pour revenir au jeu. Hors combat seulement.", 1, 1, 1, true)
+		GameTooltip:Show()
+	end)
+	photoBtn:SetScript("OnLeave", GameTooltip_Hide)
+
 	-- Canal dédié (barre de titre, à droite de Options) : validé par Entrée, Échap annule.
 	local channelLabel = f:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
 	channelLabel:SetPoint("LEFT", optionsBtn, "RIGHT", 10, 0)
@@ -702,6 +719,7 @@ function P.BuildUI()
 	ui.title = title
 	ui.closeButton = closeBtn
 	ui.optionsButton = optionsBtn
+	ui.photoButton = photoBtn
 	ui.channelLabel = channelLabel
 	ui.channelInput = channelInput
 	ui.resizeGrip = grip
@@ -723,6 +741,7 @@ function P.BuildUI()
 		P.SkinButton(inviteBtn)
 		P.SkinButton(addTargetBtn)
 		P.SkinButton(optionsBtn)
+		P.SkinButton(photoBtn)
 		P.SkinEditBox(channelInput)
 	end
 end

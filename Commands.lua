@@ -10,6 +10,7 @@ local function PrintHelp()
 	print("  /poly ui           — ouvrir/fermer la fenêtre")
 	print("  /poly minimap      — afficher/masquer l'icône de minimap")
 	print("  /poly options      — ouvrir le panneau d'options")
+	print("  /poly photo        — mode photo (membres du groupe en pied, Échap pour revenir)")
 	print("  /poly comptes      — lister les autres comptes Battle.net autorisés")
 	print("  /poly retirer-compte <n°> — retirer l'autorisation d'un compte")
 	print("  /poly debug        — activer/désactiver le mode debug")
@@ -56,6 +57,8 @@ local function SlashHandler(msg)
 		print("Polypode: icône de minimap " .. (show and "affichée" or "masquée"))
 	elseif sub == "options" then
 		P.OpenOptions()
+	elseif sub == "photo" then
+		P.StartPhotoMode()
 	elseif sub == "comptes" then
 		local list = P.GetTrustedTokens()
 		if #list == 0 then
