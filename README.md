@@ -255,8 +255,19 @@ ne sont pas listés. Échap ferme la fenêtre.
 ## Mode photo
 
 Le bouton **Photo** (barre de titre de la fenêtre principale, à gauche de la croix) ou
-`/poly photo` masque toute l'interface et affiche **en pied, côte à côte**, chaque membre du
-groupe (vous compris, 10 au plus), avec son nom en couleur de classe, sur un voile sombre.
+`/poly photo` affiche **en pied, côte à côte**, chaque membre du groupe (vous compris, 10 au
+plus).
+
+Un **clic droit** sur le bouton ouvre ses options (mémorisées pour chaque personnage ; Échap ou
+la croix pour fermer) :
+
+- **Masquer l'interface** (oui par défaut) ;
+- **Fond** : voile sombre en dégradé (par défaut) ou un **écran de chargement** de WoW, choisi
+  dans une liste (champs de bataille et arènes : Goulet des Chanteguerres, Bassin Arathi, Vallée
+  d'Alterac, Pic du Tigre...) ;
+- **Afficher le nom des personnages** (oui par défaut), en couleur de classe ;
+- **Afficher classe, spé, niveau et niveau d'objet** (oui par défaut) sous le nom. La spé et le
+  niveau d'objet des autres membres viennent de leur Polypode (absents sinon).
 **Échap** revient au jeu ; **Impr. écran** fait une capture comme d'habitude. Hors combat
 seulement : le mode photo se ferme de lui-même à l'entrée en combat. WoW n'affiche le modèle
 d'un membre que s'il est à proximité (sinon « hors de vue »).
@@ -368,7 +379,7 @@ vous avez désactivé le skin de Polypode dans ses options).
 
 ## État du projet
 
-Version `0.44.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
+Version `0.45.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
 automatique aux annonces, fenêtre redimensionnable à trois listes défilantes (personnages
 disponibles / équipes avec création par saisie, sélection, renommage et suppression / personnages de l'équipe, ajout
 et retrait de membres au clic, leader par équipe, invitation de toute l'équipe, synchronisation automatique et versionnée des équipes, ajout du joueur ciblé, barre flottante de l'équipe sélectionnée)

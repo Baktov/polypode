@@ -490,14 +490,21 @@ function P.BuildUI()
 	photoBtn:SetSize(60, 20)
 	photoBtn:SetPoint("RIGHT", closeBtn, "LEFT", -4, 0)
 	photoBtn:SetText("Photo")
-	photoBtn:SetScript("OnClick", function()
-		P.StartPhotoMode()
+	photoBtn:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+	photoBtn:SetScript("OnClick", function(self, mouseButton)
+		if mouseButton == "RightButton" then
+			P.TogglePhotoOptions(self)
+		else
+			P.StartPhotoMode()
+		end
 	end)
 	photoBtn:SetScript("OnEnter", function(self)
 		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
 		GameTooltip:AddLine("Photo")
-		GameTooltip:AddLine("Masque l'interface et affiche en pied, côte à côte, chaque membre du "
-			.. "groupe. Échap pour revenir au jeu. Hors combat seulement.", 1, 1, 1, true)
+		GameTooltip:AddLine("Clic gauche : affiche en pied, côte à côte, chaque membre du groupe "
+			.. "(interface masquée selon les options). Échap pour revenir au jeu. Hors combat "
+			.. "seulement.", 1, 1, 1, true)
+		GameTooltip:AddLine("Clic droit : options (interface, fond, nom, détails)", 1, 1, 1, true)
 		GameTooltip:Show()
 	end)
 	photoBtn:SetScript("OnLeave", GameTooltip_Hide)
