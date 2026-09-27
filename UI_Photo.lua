@@ -6,8 +6,11 @@ local P = Polypode
 -- du groupe (soi compris) apparaît en pied, côte à côte. Options (clic droit sur le bouton,
 -- P.TogglePhotoOptions ; P.charDb.photo, par personnage) :
 --   hideUI — masquer l'interface (UIParent, comme Alt + Z) ;
---   background — fond : voile sombre en dégradé ("") ou un écran de chargement de WoW
---     (BACKGROUNDS : chemins et recadrages repris de l'addon Details!, aucune API ne les liste) ;
+--   background — fond : voile sombre en dégradé (""), un écran de chargement de WoW (nom de
+--     fichier ; BACKGROUNDS : chemins et recadrages repris de l'addon Details!, aucune API ne les
+--     liste) ou l'illustration d'un donjon / raid du guide de l'aventurier (identifiant de
+--     fichier, lu par EJ_GetInstanceByIndex pour chaque extension ; pas les gouffres, absents
+--     du guide) ;
 --   showName — nom sous chaque personnage, en couleur de classe ;
 --   showDetails — classe, spécialisation, niveau et niveau d'objet sous le nom (spé et niveau
 --     d'objet des autres membres : état envoyé par leur Polypode, STATUS dans Sync.lua).
@@ -58,6 +61,48 @@ local function FindBackground(file)
 			return bg
 		end
 	end
+end
+
+-- Donjons et raids du guide de l'aventurier, par extension (la plus récente d'abord) :
+-- { { name, dungeons = { { name, image } }, raids = { ... } } }. Construit une fois par
+-- session ; l'extension affichée dans le guide est rétablie ensuite. Vide si le guide
+-- n'existe pas (client sans EJ_*).
+local journalTiers
+local function JournalTiers()
+	if journalTiers then
+		return journalTiers
+	end
+	journalTiers = {}
+	if not (EJ_GetNumTiers and EJ_SelectTier and EJ_GetTierInfo and EJ_GetInstanceByIndex) then
+		return journalTiers
+	end
+	local previous = EJ_GetCurrentTier and EJ_GetCurrentTier()
+	for tier = EJ_GetNumTiers(), 1, -1 do
+		EJ_SelectTier(tier)
+		local entry = { name = EJ_GetTierInfo(tier) or ("Extension " .. tier), dungeons = {}, raids = {} }
+		for _, isRaid in ipairs({ false, true }) do
+			local list = isRaid and entry.raids or entry.dungeons
+			local index = 1
+			while true do
+				local instanceID, name, _, bgImage, _, loreImage = EJ_GetInstanceByIndex(index, isRaid)
+				if not instanceID then
+					break
+				end
+				local image = (bgImage and bgImage ~= 0) and bgImage or loreImage
+				if name and image and image ~= 0 then
+					list[#list + 1] = { name = name, image = image }
+				end
+				index = index + 1
+			end
+		end
+		if #entry.dungeons > 0 or #entry.raids > 0 then
+			journalTiers[#journalTiers + 1] = entry
+		end
+	end
+	if previous then
+		EJ_SelectTier(previous)
+	end
+	return journalTiers
 end
 
 -- Unités du groupe dans l'ordre du groupe, soi en premier hors raid.
@@ -165,10 +210,16 @@ local function GetModel(i)
 end
 
 local function ApplyBackground()
-	local bg = FindBackground(PhotoSettings().background)
-	if bg then
-		background:SetTexture(LOADING_SCREENS .. bg[2])
-		background:SetTexCoord(unpack(bg[3]))
+	local value = PhotoSettings().background
+	local bg = FindBackground(value)
+	if bg or type(value) == "number" then
+		if bg then
+			background:SetTexture(LOADING_SCREENS .. bg[2])
+			background:SetTexCoord(unpack(bg[3]))
+		else
+			background:SetTexture(value) -- illustration du guide de l'aventurier
+			background:SetTexCoord(0, 1, 0, 1)
+		end
 		background:Show()
 		shade:SetGradient("VERTICAL", CreateColor(0, 0, 0, 0.6), CreateColor(0, 0, 0, 0))
 	else
@@ -339,11 +390,29 @@ local function BuildOptions()
 	local function SetSelected(file)
 		PhotoSettings().background = file
 	end
+	-- Sous-menus : écrans de chargement, puis donjons et raids du guide par extension.
+	local function AddRadios(menu, items)
+		menu:SetScrollMode(320)
+		for _, item in ipairs(items) do
+			menu:CreateRadio(item.name, IsSelected, SetSelected, item.image)
+		end
+	end
 	dropdown:SetupMenu(function(_, root)
-		root:SetScrollMode(320)
+		root:SetScrollMode(360)
 		root:CreateRadio("Voile sombre (sans image)", IsSelected, SetSelected, "")
+		local loading = root:CreateButton("Écrans de chargement")
+		loading:SetScrollMode(320)
 		for _, bg in ipairs(BACKGROUNDS) do
-			root:CreateRadio(bg[1], IsSelected, SetSelected, bg[2])
+			loading:CreateRadio(bg[1], IsSelected, SetSelected, bg[2])
+		end
+		for _, tier in ipairs(JournalTiers()) do
+			local tierMenu = root:CreateButton(tier.name)
+			if #tier.dungeons > 0 then
+				AddRadios(tierMenu:CreateButton("Donjons"), tier.dungeons)
+			end
+			if #tier.raids > 0 then
+				AddRadios(tierMenu:CreateButton("Raids"), tier.raids)
+			end
 		end
 	end)
 
