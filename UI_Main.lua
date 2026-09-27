@@ -189,14 +189,38 @@ P.CreatePanel = CreatePanel
 P.CreateScrollList = CreateScrollList
 P.SetListData = SetListData
 
--- Transforme un ensemble { [clé] = ... } en items { key = clé } triés par ordre alphabétique,
--- pour un ordre stable d'un affichage à l'autre.
+-- Lettres accentuées (UTF-8) ramenées à leur lettre de base minuscule pour le tri alphabétique.
+local ACCENT_BASES = {
+	a = "àáâãäåÀÁÂÃÄÅ", c = "çÇ", e = "èéêëÈÉÊË", i = "ìíîïÌÍÎÏ", n = "ñÑ",
+	o = "òóôõöøÒÓÔÕÖØ", u = "ùúûüÙÚÛÜ", y = "ýÿÝ", ae = "æÆ", oe = "œŒ", ss = "ß",
+}
+local ACCENT_MAP = {}
+for base, letters in pairs(ACCENT_BASES) do
+	for letter in letters:gmatch("[\195\197][\128-\191]") do
+		ACCENT_MAP[letter] = base
+	end
+end
+
+-- Clé de tri alphabétique : sans accents ni distinction de casse (le tri brut des octets
+-- placerait les minuscules et les initiales accentuées après Z).
+local function AlphaKey(text)
+	return (text:gsub("[\195\197][\128-\191]", ACCENT_MAP):lower())
+end
+
+-- Transforme un ensemble { [clé] = ... } en items { key = clé } triés par ordre alphabétique
+-- (AlphaKey, puis clé brute en cas d'égalité), pour un ordre stable d'un affichage à l'autre.
 local function SortedKeyItems(set)
-	local keys = {}
+	local keys, sortKeys = {}, {}
 	for key in pairs(set) do
 		keys[#keys + 1] = key
+		sortKeys[key] = AlphaKey(key)
 	end
-	table.sort(keys)
+	table.sort(keys, function(x, y)
+		if sortKeys[x] ~= sortKeys[y] then
+			return sortKeys[x] < sortKeys[y]
+		end
+		return x < y
+	end)
 	local items = {}
 	for i, key in ipairs(keys) do
 		items[i] = { key = key }
@@ -383,8 +407,8 @@ function P.BuildUI()
 
 	-- Trois cadres côte à côte, chacun sur un tiers de la largeur : les deux premiers
 	-- reçoivent leur largeur au redimensionnement, le dernier s'étire jusqu'au bord droit.
-	-- 1. Personnages trouvés (roster alimenté par la sync).
-	local charPanel = CreatePanel(f, "Personnages trouvés")
+	-- 1. Personnages disponibles (roster alimenté par la sync).
+	local charPanel = CreatePanel(f, "Personnages disponibles")
 	charPanel:SetPoint("TOPLEFT", PANEL_MARGIN, PANEL_TOP)
 	charPanel:SetPoint("BOTTOMLEFT", PANEL_MARGIN, PANEL_MARGIN)
 
@@ -406,7 +430,7 @@ function P.BuildUI()
 	addTargetBtn:SetScript("OnEnter", function(self)
 		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
 		GameTooltip:AddLine("Ajouter la cible")
-		GameTooltip:AddLine("Ajoute le joueur ciblé à la liste des personnages trouvés : il peut "
+		GameTooltip:AddLine("Ajoute le joueur ciblé à la liste des personnages disponibles : il peut "
 			.. "ensuite rejoindre une équipe (clic gauche avec l'équipe sélectionnée) et être "
 			.. "invité avec elle.", 1, 1, 1, true)
 		GameTooltip:AddLine("Partagé avec vos autres Polypode connectés.", 1, 1, 1, true)
@@ -443,7 +467,7 @@ function P.BuildUI()
 			})
 		end,
 	})
-	charPanel.emptyText:SetText("Aucun personnage trouvé")
+	charPanel.emptyText:SetText("Aucun personnage disponible")
 
 	-- 2. Équipes : saisie d'un nom + liste des équipes créées.
 	local teamPanel = CreatePanel(f, "Équipes")
@@ -661,7 +685,7 @@ function P.RefreshUI()
 	if not members then
 		ui.memberPanel.emptyText:SetText("Sélectionnez une équipe")
 	else
-		ui.memberPanel.emptyText:SetText("Clic gauche sur un personnage trouvé pour l'ajouter")
+		ui.memberPanel.emptyText:SetText("Clic gauche sur un personnage disponible pour l'ajouter")
 	end
 
 	-- L'état du groupe, qui change sans rafraîchir la fenêtre, est vérifié au clic par P.InviteTeam.
