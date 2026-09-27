@@ -54,11 +54,13 @@ P.charDefaults = {
 	sentVolume = 50, -- leader : volume (%) envoyé à l'équipe par raccourci (Sound.lua)
 	followLeaderSound = true, -- membre : appliquer le volume / la coupure du son du leader
 	autoGroup = true, -- inviter (leader) / accepter (membre) l'équipe à la connexion (AutoGroup.lua)
-	-- Barre flottante de l'équipe sélectionnée (UI_TeamBar.lua) : affichée, liste dépliée ;
-	-- position (point, relativePoint, x, y) ajoutée au premier placement.
+	-- Barre flottante de l'équipe sélectionnée (UI_TeamBar.lua) : affichée, liste dépliée,
+	-- figée (Alt + clic) ; position (point, relativePoint, x, y), largeur (width) et hauteur
+	-- de la liste (listHeight, sinon automatique) ajoutées au premier placement / redimensionnement.
 	teamBar = {
 		shown = false,
 		expanded = false,
+		locked = false,
 	},
 	-- selectedTeam : nom de l'équipe sélectionnée dans la fenêtre (nil par défaut),
 	-- conservé même si l'équipe manque momentanément (cf. UI_Main.lua).
