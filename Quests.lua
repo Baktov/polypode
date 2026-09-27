@@ -572,9 +572,31 @@ function P.OnDialogCloseMessage(sender)
 	P.Debug("Dialogue fermé (fermeture du leader " .. tostring(sender) .. ")")
 end
 
+-- JOURNAL (fenêtre « Quêtes de l'équipe », QLOG dans Sync.lua) ------------------------
+
+-- Quêtes du journal du personnage joué : { [questID] = true }, sans en-têtes, quêtes cachées,
+-- expéditions ni objectifs bonus.
+function P.GetOwnQuestIDs()
+	local ids = {}
+	for i = 1, C_QuestLog.GetNumQuestLogEntries() do
+		local info = C_QuestLog.GetInfo(i)
+		if info and not info.isHeader and not info.isHidden and not info.isTask
+			and info.questID and info.questID > 0
+			and not (C_QuestLog.IsWorldQuest and C_QuestLog.IsWorldQuest(info.questID)) then
+			ids[info.questID] = true
+		end
+	end
+	return ids
+end
+
 -- ÉVÉNEMENTS (Events.lua) ------------------------------------------------------------
 
 function P.OnQuestEvent(event, arg1)
+	-- Journal modifié : envoyé aux autres clients (différé, Sync.lua).
+	if event == "QUEST_ACCEPTED" or event == "QUEST_TURNED_IN" or event == "QUEST_REMOVED" then
+		P.ScheduleQuestLog()
+	end
+
 	if event == "QUEST_ACCEPTED" then
 		AnnounceAccept(arg1, "QUEST_ACCEPTED")
 		StartShareTracking(arg1)
@@ -601,6 +623,10 @@ function P.OnQuestEvent(event, arg1)
 		end
 
 	elseif event == "QUEST_DATA_LOAD_RESULT" then
+		-- Titre d'une quête d'un autre personnage chargé (fenêtre « Quêtes de l'équipe »).
+		if P.RefreshTeamQuests then
+			P.RefreshTeamQuests()
+		end
 		if arg1 and arg1 == pendingAcceptID then
 			pendingAcceptID = nil
 			if AcceptEnabled() then

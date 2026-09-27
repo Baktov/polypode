@@ -384,6 +384,106 @@ function P.IsCharacterOnline(key)
 		and onlineChars[FullName(P.GetTargetName(entry))] == true
 end
 
+-- JOURNAUX DE QUÊTES (fenêtre « Quêtes de l'équipe », UI_TeamQuests.lua) : chaque client
+-- envoie la liste de ses quêtes (identifiants, P.GetOwnQuestIDs) aux clients connectés à
+-- chaque rencontre (HELLO/HI) et quand elle change ; gardée en mémoire (session).
+-- Format : QLOG:token:flag:envoi:nom-royaume:id1,id2,... — flag N = premier fragment (remplace
+-- la liste), + = suite ; envoi = numéro d'envoi de l'expéditeur, pour rattacher les fragments.
+local questLogs = {} -- [nom-royaume] = { seq, ids = { [questID] = true } }
+local questLogSeq = 0
+local questLogPending
+local lastQuestLogSent -- dernière liste envoyée aux clients connectés
+
+-- Envoie le journal : à target (rencontre), sinon aux clients connectés s'il a changé depuis
+-- le dernier envoi (une expédition acceptée en entrant dans sa zone ne le change pas).
+function P.SendQuestLog(target)
+	local token = P.GetTeamToken()
+	if not token then
+		return
+	end
+	local ids = {}
+	for questID in pairs(P.GetOwnQuestIDs()) do
+		ids[#ids + 1] = tostring(questID)
+	end
+	table.sort(ids)
+	if not target then
+		local list = table.concat(ids, ",")
+		if list == lastQuestLogSent then
+			return
+		end
+		lastQuestLogSent = list
+	end
+	questLogSeq = questLogSeq + 1
+
+	local key = P.GetCharKey()
+	local budget = MAX_MESSAGE_LENGTH - #string.format("QLOG:%s:N:%d:%s:", token, questLogSeq, key)
+	local chunks, current, used = {}, {}, 0
+	for _, id in ipairs(ids) do
+		local cost = #id + (#current > 0 and 1 or 0)
+		if #current > 0 and used + cost > budget then
+			chunks[#chunks + 1] = current
+			current, used, cost = {}, 0, #id
+		end
+		current[#current + 1] = id
+		used = used + cost
+	end
+	chunks[#chunks + 1] = current -- au moins un fragment, même vide (journal vide)
+
+	for to in pairs(ResolveTargets(target)) do
+		for i, chunk in ipairs(chunks) do
+			P.Broadcast(string.format("QLOG:%s:%s:%d:%s:%s", token, i == 1 and "N" or "+", questLogSeq,
+				key, table.concat(chunk, ",")), "WHISPER", to)
+		end
+	end
+end
+
+-- Journal modifié (quête acceptée, rendue, abandonnée ; Quests.lua) : envoi différé de 2 s,
+-- puis mise à jour de la fenêtre « Quêtes de l'équipe ».
+function P.ScheduleQuestLog()
+	if questLogPending then
+		return
+	end
+	questLogPending = true
+	C_Timer.After(2, function()
+		questLogPending = nil
+		P.SendQuestLog()
+		if P.RefreshTeamQuests then
+			P.RefreshTeamQuests()
+		end
+	end)
+end
+
+-- Réception d'un fragment QLOG (expéditeur déjà vérifié par P.OnSyncMessage).
+local function OnQuestLogMessage(rest)
+	local flag, seq, key, list = strsplit(":", rest or "", 4)
+	seq = tonumber(seq)
+	if not seq or not key or key == "" then
+		return
+	end
+	local log = questLogs[key]
+	if flag == "N" then
+		log = { seq = seq, ids = {} }
+		questLogs[key] = log
+	elseif flag ~= "+" or not log or log.seq ~= seq then
+		return
+	end
+	for id in (list or ""):gmatch("%d+") do
+		log.ids[tonumber(id)] = true
+	end
+	if P.RefreshTeamQuests then
+		P.RefreshTeamQuests()
+	end
+end
+
+-- Quêtes d'un personnage : { [questID] = true }, lues en direct pour le personnage joué, sinon
+-- dernier journal reçu pendant la session (nil si aucun).
+function P.GetCharacterQuests(key)
+	if key == P.GetCharKey() then
+		return P.GetOwnQuestIDs()
+	end
+	return questLogs[key] and questLogs[key].ids
+end
+
 -- DISPOSITION DE LA BARRE FLOTTANTE (UI_TeamBar.lua, Maj + clic) : envoyée en WHISPER aux
 -- membres connectés (ou groupés) de l'équipe, qui l'appliquent si leur barre est masquée.
 -- Format : BARPOS:token:gauche:haut:largeur:hauteurListe:déplié:nomÉquipe — valeurs en % de
@@ -703,6 +803,14 @@ function P.OnSyncMessage(message, channel, sender)
 	elseif kind == "BARPOS" then
 		OnTeamBarLayoutMessage(rest)
 		return
+	elseif kind == "QLOG" then
+		-- QLOG:token:flag:envoi:nom-royaume:ids — journal de quêtes ; le personnage annoncé doit
+		-- être l'expéditeur.
+		local _, _, key = strsplit(":", rest or "", 4)
+		if key and IsSender(sender, key) then
+			OnQuestLogMessage(rest)
+		end
+		return
 	elseif kind == "FOLLOWEND" then
 		-- FOLLOWEND:token:nom-royaume — un membre ne suit plus le leader (Follow.lua) ; le
 		-- personnage annoncé doit être l'expéditeur.
@@ -813,6 +921,7 @@ function P.OnSyncMessage(message, channel, sender)
 	P.SyncAllCharacters(sender)
 	P.SyncAllTeams(sender)
 	P.SendStatus(sender)
+	P.SendQuestLog(sender)
 
 	-- Leader : invite automatiquement ce personnage s'il est membre de l'équipe (AutoGroup.lua).
 	P.OnTeamCharacterOnline(P.GetCharKey(name, realm))

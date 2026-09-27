@@ -18,6 +18,7 @@ local QUEST_EVENTS = {
 	QUEST_PROGRESS = true,
 	QUEST_COMPLETE = true,
 	QUEST_TURNED_IN = true,
+	QUEST_REMOVED = true,
 	QUEST_FINISHED = true,
 }
 for questEvent in pairs(QUEST_EVENTS) do

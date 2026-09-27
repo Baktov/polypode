@@ -479,6 +479,24 @@ function P.BuildUI()
 	end)
 	photoBtn:SetScript("OnLeave", GameTooltip_Hide)
 
+	-- Bouton Quêtes (barre de titre, à gauche de Photo) : quêtes du leader manquantes chez les
+	-- membres (UI_TeamQuests.lua).
+	local questsBtn = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
+	questsBtn:SetSize(60, 20)
+	questsBtn:SetPoint("RIGHT", photoBtn, "LEFT", -4, 0)
+	questsBtn:SetText("Quêtes")
+	questsBtn:SetScript("OnClick", function()
+		P.ToggleTeamQuests()
+	end)
+	questsBtn:SetScript("OnEnter", function(self)
+		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+		GameTooltip:AddLine("Quêtes de l'équipe")
+		GameTooltip:AddLine("Liste les quêtes du leader de l'équipe sélectionnée et, pour chacune, "
+			.. "les membres qui ne l'ont pas.", 1, 1, 1, true)
+		GameTooltip:Show()
+	end)
+	questsBtn:SetScript("OnLeave", GameTooltip_Hide)
+
 	-- Canal dédié (barre de titre, à droite de Options) : validé par Entrée, Échap annule.
 	local channelLabel = f:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
 	channelLabel:SetPoint("LEFT", optionsBtn, "RIGHT", 10, 0)
@@ -720,6 +738,7 @@ function P.BuildUI()
 	ui.closeButton = closeBtn
 	ui.optionsButton = optionsBtn
 	ui.photoButton = photoBtn
+	ui.questsButton = questsBtn
 	ui.channelLabel = channelLabel
 	ui.channelInput = channelInput
 	ui.resizeGrip = grip
@@ -742,6 +761,7 @@ function P.BuildUI()
 		P.SkinButton(addTargetBtn)
 		P.SkinButton(optionsBtn)
 		P.SkinButton(photoBtn)
+		P.SkinButton(questsBtn)
 		P.SkinEditBox(channelInput)
 	end
 end
@@ -755,6 +775,10 @@ function P.RefreshUI()
 	-- Barre flottante de l'équipe sélectionnée (UI_TeamBar.lua), si elle est affichée.
 	if P.RefreshTeamBar then
 		P.RefreshTeamBar()
+	end
+	-- Fenêtre des quêtes de l'équipe (UI_TeamQuests.lua), si elle est ouverte.
+	if P.RefreshTeamQuests then
+		P.RefreshTeamQuests()
 	end
 	-- Fenêtre des comptes autorisés (UI_Tokens.lua), si elle est ouverte.
 	if P.RefreshTokensWindow then

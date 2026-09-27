@@ -11,6 +11,7 @@ local function PrintHelp()
 	print("  /poly minimap      — afficher/masquer l'icône de minimap")
 	print("  /poly options      — ouvrir le panneau d'options")
 	print("  /poly photo        — mode photo (membres du groupe en pied, Échap pour revenir)")
+	print("  /poly quetes       — quêtes du leader manquantes chez les membres de l'équipe")
 	print("  /poly comptes      — lister les autres comptes Battle.net autorisés")
 	print("  /poly retirer-compte <n°> — retirer l'autorisation d'un compte")
 	print("  /poly debug        — activer/désactiver le mode debug")
@@ -59,6 +60,8 @@ local function SlashHandler(msg)
 		P.OpenOptions()
 	elseif sub == "photo" then
 		P.StartPhotoMode()
+	elseif sub == "quetes" or sub == "quêtes" then
+		P.ToggleTeamQuests()
 	elseif sub == "comptes" then
 		local list = P.GetTrustedTokens()
 		if #list == 0 then
