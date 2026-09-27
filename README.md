@@ -102,7 +102,7 @@ et serveurs séparés) : chaque mode a ses propres équipes.
 - **Alerte « ne suit plus »** (option) : quand un membre arrête de suivre le leader de l'équipe
   (`/follow` ou raccourci « Suivre le leader » interrompu par un obstacle, un saut, la distance,
   un déplacement manuel...), le leader voit « X ne vous suit plus. » à l'écran avec un son
-  d'alerte.
+  d'alerte. Relancer « Suivre le leader » sur un membre qui le suit déjà ne déclenche pas d'alerte.
 - Les **ajouts et retraits manuels de personnages** (bouton « Ajouter la cible »,
   `/poly remove`) sont synchronisés de la même façon, avec la même règle de version : un
   personnage retiré ne réapparaît pas via un client qui l'avait encore (il réapparaît
@@ -354,7 +354,7 @@ vous avez désactivé le skin de Polypode dans ses options).
 
 ## État du projet
 
-Version `0.42.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
+Version `0.42.1` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
 automatique aux annonces, fenêtre redimensionnable à trois listes défilantes (personnages
 disponibles / équipes avec création par saisie, sélection, renommage et suppression / personnages de l'équipe, ajout
 et retrait de membres au clic, leader par équipe, invitation de toute l'équipe, synchronisation automatique et versionnée des équipes, ajout du joueur ciblé, barre flottante de l'équipe sélectionnée)

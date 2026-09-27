@@ -4,13 +4,15 @@ local P = Polypode
 
 -- Membre : le suivi automatique (/follow, raccourci « Suivre le leader ») commence avec
 -- AUTOFOLLOW_BEGIN (nom suivi) et s'arrête avec AUTOFOLLOW_END (obstacle, saut, distance,
--- mouvement manuel...). S'il suivait le leader de son équipe sélectionnée, il le lui dit :
+-- mouvement manuel...). S'il suivait le leader de son équipe sélectionnée et que le suivi n'a
+-- pas repris 0,5 s après (relance de /follow pendant un suivi), il le lui dit :
 --   FOLLOWEND:token:nom-royaume — chuchotement au leader.
 -- Leader : affiche « X ne vous suit plus. » à l'écran avec un son d'alerte, si X est membre
 -- de son équipe sélectionnée. Option P.charDb.followAlert (par personnage), à cocher sur le
 -- leader et les membres.
 
 local ALERT_DEDUP = 3 -- secondes entre deux alertes pour un même membre
+local END_CONFIRM_DELAY = 0.5 -- secondes sans reprise du suivi avant de signaler son arrêt
 
 local followedName -- membre : nom suivi (AUTOFOLLOW_BEGIN), jusqu'à AUTOFOLLOW_END
 local lastAlert = {} -- leader : [clé] = GetTime() de la dernière alerte
@@ -38,16 +40,24 @@ function P.OnFollowEvent(event, name)
 	local followed = followedName
 	followedName = nil
 	local entry = LeaderEntry()
-	local token = P.GetTeamToken()
-	if not IsEnabled() or not followed or not entry or not entry.name or not token then
+	if not IsEnabled() or not followed or not entry or not entry.name then
 		return
 	end
 	-- Nom suivi, avec ou sans royaume selon WoW : comparé sur le seul nom du personnage.
 	if strsplit("-", followed) ~= entry.name then
 		return
 	end
-	P.Broadcast("FOLLOWEND:" .. token .. ":" .. P.GetCharKey(), "WHISPER", P.GetTargetName(entry))
-	P.Debug("Fin du suivi de " .. entry.name .. " signalée au leader")
+	-- Relancer /follow alors qu'on suit déjà (raccourci « Suivre le leader ») produit
+	-- AUTOFOLLOW_END suivi aussitôt d'AUTOFOLLOW_BEGIN : l'arrêt n'est signalé que si le suivi
+	-- n'a pas repris après END_CONFIRM_DELAY.
+	C_Timer.After(END_CONFIRM_DELAY, function()
+		local token = P.GetTeamToken()
+		if followedName or not token then
+			return
+		end
+		P.Broadcast("FOLLOWEND:" .. token .. ":" .. P.GetCharKey(), "WHISPER", P.GetTargetName(entry))
+		P.Debug("Fin du suivi de " .. entry.name .. " signalée au leader")
+	end)
 end
 
 -- LEADER --------------------------------------------------------------------------------
