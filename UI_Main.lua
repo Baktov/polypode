@@ -320,11 +320,18 @@ function P.SetupChannelInput(editBox)
 	end)
 	editBox:SetScript("OnEnter", function(self)
 		GameTooltip:SetOwner(self, "ANCHOR_BOTTOM")
-		GameTooltip:AddLine("Canal dédié")
-		GameTooltip:AddLine("Canal de discussion commun à vos comptes, rejoint automatiquement et "
-			.. "invisible dans le chat : vos Polypode s'y trouvent à la connexion, même sans guilde "
-			.. "commune ni groupe. Entrée pour valider, vide pour désactiver. Partagé avec vos "
-			.. "autres Polypode connectés.", 1, 1, 1, true)
+		GameTooltip:AddLine("Canal dédié (optionnel)")
+		GameTooltip:AddLine("Le plus simple : grouper vos personnages à la première connexion. "
+			.. "Vos Polypode se trouvent alors par le groupe (ou par une guilde commune), sans "
+			.. "rien régler ici.", 1, 1, 1, true)
+		GameTooltip:AddLine(" ")
+		GameTooltip:AddLine("Le canal dédié sert dans les autres cas : plusieurs comptes WoW ou "
+			.. "Battle.net, personnages sans guilde commune, pas encore groupés. C'est un canal de "
+			.. "discussion commun à vos comptes, rejoint automatiquement et invisible dans le chat, "
+			.. "où vos Polypode se trouvent dès la connexion.", 1, 1, 1, true)
+		GameTooltip:AddLine(" ")
+		GameTooltip:AddLine("Entrée pour valider, vide pour désactiver. Partagé avec vos autres "
+			.. "Polypode connectés.", 0.8, 0.8, 0.8, true)
 		GameTooltip:Show()
 	end)
 	editBox:SetScript("OnLeave", GameTooltip_Hide)

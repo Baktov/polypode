@@ -26,7 +26,10 @@ automatique de base entre vos clients — sans configuration complexe.
   Polypode annonce votre personnage (nom, classe, niveau) à vos autres clients, qui
   répondent en s'annonçant à leur tour : chaque roster connaît tous les personnages,
   quel que soit l'ordre de connexion.
-- **Canal dédié** (recommandé) : un nom de canal commun à vos comptes, saisi dans la fenêtre
+- **Canal dédié** (optionnel) : le plus simple reste de grouper vos personnages à la première
+  connexion (ou d'avoir une guilde commune), sans rien régler. Le canal dédié sert dans les autres
+  cas : plusieurs comptes WoW ou Battle.net, personnages sans guilde commune, pas encore groupés.
+  C'est un nom de canal commun à vos comptes, saisi dans la fenêtre
   (champ « Canal » à droite du bouton Options) ou dans le panneau d'options. Chaque client le
   rejoint automatiquement (5 secondes après la connexion, pour ne pas prendre le numéro du canal
   Général) sans l'afficher dans le chat. Il joue le rôle d'une guilde commune pour les annonces
@@ -236,7 +239,7 @@ fenêtre principale) :
 
 | Option | Défaut | Effet |
 |---|---|---|
-| Canal dédié | vide | Nom du canal de discussion commun à vos comptes (voir Fonctionnement). Aussi modifiable dans la fenêtre principale. À droite, bouton « Gestion liste token » : liste et révocation des comptes autorisés. Pour tout le compte, synchronisé entre vos clients |
+| Canal dédié | vide | Optionnel : nom du canal de discussion commun à vos comptes, utile sans groupe ni guilde commune (voir Fonctionnement ; l'infobulle du champ le rappelle). Aussi modifiable dans la fenêtre principale. À droite, bouton « Gestion liste token » : liste et révocation des comptes autorisés. Pour tout le compte, synchronisé entre vos clients |
 | Afficher l'icône de minimap | Oui | Affiche le bouton Polypode autour de la minimap |
 | Mode debug | Non | Affiche dans le chat les messages de diagnostic (synchro, invitations...). Réglage **par personnage** : on peut l'activer sur une seule fenêtre |
 | Attaquer après l'assistance | Oui | Le raccourci « Assister le leader » lance aussi l'attaque automatique (`/startattack`) sur la cible prise si elle est hostile ; décoché, il prend seulement la cible. Réglage **par personnage** (ex. décoché sur un soigneur) |
@@ -269,7 +272,7 @@ vous avez désactivé le skin de Polypode dans ses options).
 
 ## État du projet
 
-Version `0.32.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
+Version `0.32.1` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
 automatique aux annonces, fenêtre redimensionnable à trois listes défilantes (personnages
 disponibles / équipes avec création par saisie, sélection et suppression / personnages de l'équipe, ajout
 et retrait de membres au clic, leader par équipe, invitation de toute l'équipe, synchronisation automatique et versionnée des équipes, ajout du joueur ciblé, barre flottante de l'équipe sélectionnée)
