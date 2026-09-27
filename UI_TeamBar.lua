@@ -4,7 +4,8 @@ local P = Polypode
 
 -- Une équipe glissée hors du cadre « Équipes » de la fenêtre principale devient la sélection
 -- et s'affiche dans une petite barre posée où on la lâche (P.StartTeamBarDrag). La barre
--- montre toujours l'équipe sélectionnée pour ce personnage : clic droit = déplier / replier
+-- montre toujours l'équipe sélectionnée pour ce personnage : clic gauche = inviter l'équipe
+-- (P.InviteSelectedTeam, comme le bouton de la fenêtre), clic droit = déplier / replier
 -- la liste défilante de ses membres, glisser = déplacer, poignée = redimensionner (largeur,
 -- et hauteur de la liste dépliée), Alt + clic = figer / libérer (position et taille),
 -- croix = masquer. État par personnage (chaque fenêtre de multibox a son écran) dans
@@ -224,6 +225,11 @@ end
 local function ShowBarTooltip(self)
 	GameTooltip:SetOwner(self, "ANCHOR_TOP")
 	GameTooltip:AddLine(P.GetSelectedTeam() or "Aucune équipe sélectionnée")
+	GameTooltip:AddLine("Clic gauche : inviter l'équipe (comme le bouton « Inviter l'équipe »)", 1, 1, 1)
+	local reason = P.GetInviteBlockedReason(P.GetSelectedTeam())
+	if reason then
+		GameTooltip:AddLine(reason, 1, 0.1, 0.1, true)
+	end
 	GameTooltip:AddLine("Clic droit : déplier / replier la liste des personnages", 1, 1, 1)
 	if P.charDb.teamBar.locked then
 		GameTooltip:AddLine("Barre figée (position et taille)", 1, 0.82, 0)
@@ -260,8 +266,12 @@ local function Build()
 		-- Le relâchement qui termine un déplacement n'est pas un clic.
 		local dragged = self.dragging
 		self.dragging = nil
-		if mouseButton == "LeftButton" and IsAltKeyDown() and not dragged then
-			ToggleLocked()
+		if mouseButton == "LeftButton" and not dragged then
+			if IsAltKeyDown() then
+				ToggleLocked()
+			else
+				P.InviteSelectedTeam() -- même action que le bouton de la fenêtre (Commands.lua)
+			end
 		elseif mouseButton == "RightButton" then
 			local state = P.charDb.teamBar
 			state.expanded = not state.expanded
