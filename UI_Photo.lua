@@ -14,14 +14,16 @@ local P = Polypode
 --   showName — nom sous chaque personnage, en couleur de classe ;
 --   showDetails — classe, spécialisation, niveau et niveau d'objet sous le nom (spé et niveau
 --     d'objet des autres membres : état envoyé par leur Polypode, STATUS dans Sync.lua).
--- Échap revient au jeu (P.StopPhotoMode) ; les autres touches passent au jeu (Impr. écran
--- pour la capture). Hors combat seulement : UIParent ne peut pas être masqué / réaffiché en
+-- Molette sur un modèle : zoom avant / arrière. Échap revient au jeu (P.StopPhotoMode) ; les
+-- autres touches passent au jeu (Impr. écran pour la capture). Hors combat seulement : UIParent ne peut pas être masqué / réaffiché en
 -- combat, le mode photo se ferme donc à l'entrée en combat (PLAYER_REGEN_DISABLED, avant le
 -- verrouillage). Le cadre n'a pas de parent, pour rester visible quand UIParent est masqué.
 -- WoW n'affiche le modèle d'un membre que s'il est visible (à proximité).
 
 local MAX_MODELS = 10 -- au-delà (grand raid), seuls les premiers membres sont affichés
 local HINT_DURATION = 4 -- secondes d'affichage du rappel « Échap »
+local ZOOM_STEP = 0.1 -- variation de la distance de caméra par cran de molette
+local ZOOM_MIN, ZOOM_MAX = 0.3, 3 -- distance de caméra (1 = en pied)
 local LOADING_SCREENS = "Interface\\Glues\\LoadingScreens\\"
 
 -- Écrans de chargement proposés en fond : { libellé, fichier, recadrage (bandes retirées) }.
@@ -180,7 +182,8 @@ local function Build()
 
 	hint = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightLarge")
 	hint:SetPoint("TOP", 0, -30)
-	hint:SetText("Mode photo — Échap pour revenir au jeu, Impr. écran pour une capture")
+	hint:SetText("Mode photo — molette sur un personnage pour zoomer, Échap pour revenir au jeu, "
+		.. "Impr. écran pour une capture")
 
 	-- Échap ferme le mode photo et n'atteint pas le jeu (pas de menu) ; les autres touches
 	-- passent au jeu.
@@ -200,6 +203,13 @@ end
 local function GetModel(i)
 	if not models[i] then
 		local model = CreateFrame("PlayerModel", nil, frame)
+		-- Molette sur le modèle : zoom avant / arrière (distance de caméra), remis en pied à
+		-- chaque ouverture du mode photo.
+		model:EnableMouseWheel(true)
+		model:SetScript("OnMouseWheel", function(self, delta)
+			self.zoom = math.max(ZOOM_MIN, math.min(ZOOM_MAX, (self.zoom or 1) - delta * ZOOM_STEP))
+			self:SetCamDistanceScale(self.zoom)
+		end)
 		local label = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalHuge")
 		label:SetWordWrap(false)
 		local details = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
@@ -245,6 +255,7 @@ local function LayoutModels()
 		model:ClearModel()
 		model:SetUnit(unit)
 		model:SetPortraitZoom(0) -- en pied, pas en portrait
+		model.zoom = 1
 		model:SetCamDistanceScale(1)
 		model:Show()
 
