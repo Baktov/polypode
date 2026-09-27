@@ -16,6 +16,13 @@ automatique de base entre vos clients — sans configuration complexe.
 2. Activer l'addon dans l'écran de sélection de personnage (AddOns).
 3. Répéter sur chaque fenêtre/client WoW que vous utilisez pour multiboxer.
 
+**WoW Forever** (actuellement le dossier `_classic_beta_`) est aussi pris en charge : ce mode
+tourne sur le même moteur que Retail (12.1) avec le contenu d'origine. Copier (ou relier par une
+jonction) le dossier `Polypode` dans `World of Warcraft/_classic_beta_/Interface/AddOns/`. Les
+fonctions liées à du contenu absent de Forever (gouffres, expéditions, spécialisations...) s'y
+désactivent d'elles-mêmes. Les personnages Forever et Retail ne se voient pas entre eux (jeux
+et serveurs séparés) : chaque mode a ses propres équipes.
+
 ---
 
 ## Fonctionnement
@@ -347,7 +354,7 @@ vous avez désactivé le skin de Polypode dans ses options).
 
 ## État du projet
 
-Version `0.41.1` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
+Version `0.42.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
 automatique aux annonces, fenêtre redimensionnable à trois listes défilantes (personnages
 disponibles / équipes avec création par saisie, sélection, renommage et suppression / personnages de l'équipe, ajout
 et retrait de membres au clic, leader par équipe, invitation de toute l'équipe, synchronisation automatique et versionnée des équipes, ajout du joueur ciblé, barre flottante de l'équipe sélectionnée)
