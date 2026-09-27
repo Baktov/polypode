@@ -249,8 +249,8 @@ La fenêtre s'adapte automatiquement à votre interface, sans configuration :
 
 | Interface détectée | Rendu |
 |---|---|
-| **EllesmereUI** | Style EllesmereUI (fond, bordure, barre de titre avec titre centré, cadres intérieurs, bouton de fermeture) selon votre thème. Désactivable dans EllesmereUI → Blizz UI Enhanced → Blizzard Window Skins → Third-Party Addons (nécessite le module EllesmereUI Blizzard Skin). |
-| **ElvUI** | Style ElvUI (fond, cadres intérieurs et bouton de fermeture). |
+| **EllesmereUI** | Style EllesmereUI (fond, bordure, barre de titre avec titre centré, cadres intérieurs, boutons de fermeture — y compris la croix de la barre flottante d'équipe) selon votre thème. Désactivable dans EllesmereUI → Blizz UI Enhanced → Blizzard Window Skins → Third-Party Addons (nécessite le module EllesmereUI Blizzard Skin). |
+| **ElvUI** | Style ElvUI (fond, cadres intérieurs et boutons de fermeture). |
 | Aucune | Fond sombre générique. |
 
 Si EllesmereUI et ElvUI sont tous deux chargés, EllesmereUI est prioritaire (sauf si
@@ -260,7 +260,7 @@ vous avez désactivé le skin de Polypode dans ses options).
 
 ## État du projet
 
-Version `0.30.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
+Version `0.30.1` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
 automatique aux annonces, fenêtre redimensionnable à trois listes défilantes (personnages
 trouvés / équipes avec création par saisie et sélection / personnages de l'équipe, ajout
 et retrait de membres au clic, leader par équipe, invitation de toute l'équipe, synchronisation automatique et versionnée des équipes, ajout du joueur ciblé, barre flottante de l'équipe sélectionnée)

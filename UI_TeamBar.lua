@@ -115,6 +115,7 @@ local function Build()
 
 	P.SkinPanel(bar)
 	P.SkinPanel(listPanel)
+	P.SkinCloseButton(closeBtn)
 
 	RestorePosition()
 end

@@ -46,7 +46,7 @@ function P.SkinFrame(frame)
 	if eui then
 		eui.Shell(frame)
 		if frame.CloseButton then
-			eui.CloseButton(frame.CloseButton)
+			P.SkinCloseButton(frame.CloseButton)
 		end
 		-- Centre le titre verticalement dans la barre de titre du Shell.
 		if frame.TitleText then
@@ -59,6 +59,21 @@ function P.SkinFrame(frame)
 	local S = GetElvSkins()
 	if S and S.HandleFrame then
 		S:HandleFrame(frame)
+	end
+end
+
+-- Skinne un bouton de fermeture (UIPanelCloseButton) hors fenêtre top-level, ex. la croix
+-- de la barre flottante d'équipe. EllesmereUI : croix plate, sans changer taille ni ancrage.
+function P.SkinCloseButton(button)
+	local eui = GetEUISkin()
+	if eui then
+		eui.CloseButton(button)
+		return
+	end
+
+	local S = GetElvSkins()
+	if S and S.HandleCloseButton then
+		S:HandleCloseButton(button)
 	end
 end
 
