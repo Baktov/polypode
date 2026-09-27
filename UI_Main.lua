@@ -55,6 +55,7 @@ end
 -- opts.isSelected(data) met la ligne en surbrillance. opts.tooltip(data) renvoie les lignes
 -- de l'infobulle affichée au survol (la première sert de titre). opts.button : bouton à
 -- droite de chaque ligne, { text, width, onClick = fn(data), tooltip = texte d'aide }.
+-- opts.onDragStart(data) : appelé quand on commence à glisser une ligne (clic gauche maintenu).
 local function CreateScrollList(panel, formatFn, top, opts)
 	top = top or HEADER_HEIGHT
 	opts = opts or {}
@@ -101,6 +102,11 @@ local function CreateScrollList(panel, formatFn, top, opts)
 				highlight:SetColorTexture(1, 1, 1, 0.08)
 			end
 
+			if opts.onDragStart then
+				row:EnableMouse(true)
+				row:RegisterForDrag("LeftButton")
+			end
+
 			if opts.tooltip then
 				row:EnableMouse(true)
 				row:SetScript("OnEnter", ShowRowTooltip)
@@ -141,6 +147,12 @@ local function CreateScrollList(panel, formatFn, top, opts)
 		-- sur cette ligne est rafraîchie pour refléter le nouvel état.
 		if opts.tooltip and GameTooltip:IsOwned(row) then
 			ShowRowTooltip(row)
+		end
+
+		if opts.onDragStart then
+			row:SetScript("OnDragStart", function()
+				opts.onDragStart(data)
+			end)
 		end
 
 		if opts.onClick then
@@ -256,6 +268,10 @@ local function FormatCharacter(data, teamName)
 	end
 	return label
 end
+
+-- Partagés avec la barre flottante d'équipe (UI_TeamBar.lua).
+P.SortedKeyItems = SortedKeyItems
+P.FormatCharacter = FormatCharacter
 
 -- Champ de saisie du canal dédié (fenêtre principale et panneau d'options) : Entrée valide,
 -- Échap annule, infobulle d'aide. Validation et synchro dans P.SetSyncChannel (Core.lua).
@@ -464,6 +480,7 @@ function P.BuildUI()
 	createBtn:SetScript("OnClick", SubmitTeam)
 
 	-- Clic gauche : sélectionne l'équipe ; clic droit : désélectionne (plus aucune équipe).
+	-- Glisser : sélectionne l'équipe et la sort en barre flottante (UI_TeamBar.lua).
 	CreateScrollList(teamPanel, function(data)
 		return data.name
 	end, HEADER_HEIGHT + INPUT_HEIGHT, {
@@ -478,7 +495,16 @@ function P.BuildUI()
 			return data.name == selectedTeam
 		end,
 		tooltip = function(data)
-			return { data.name, "Clic gauche : sélectionner l'équipe", "Clic droit : désélectionner" }
+			return {
+				data.name,
+				"Clic gauche : sélectionner l'équipe",
+				"Clic droit : désélectionner",
+				"Glisser : sélectionner et afficher en barre flottante",
+			}
+		end,
+		onDragStart = function(data)
+			ChooseTeam(data.name)
+			P.StartTeamBarDrag()
 		end,
 	})
 	teamPanel.emptyText:SetText("Aucune équipe")
@@ -585,6 +611,10 @@ function P.RefreshUI()
 	-- raccourcis Suivre/Assister suivent le leader, que la fenêtre soit construite ou non.
 	if P.UpdateLeaderMacros then
 		P.UpdateLeaderMacros()
+	end
+	-- Barre flottante de l'équipe sélectionnée (UI_TeamBar.lua), si elle est affichée.
+	if P.RefreshTeamBar then
+		P.RefreshTeamBar()
 	end
 	-- Fenêtre des comptes autorisés (UI_Tokens.lua), si elle est ouverte.
 	if P.RefreshTokensWindow then

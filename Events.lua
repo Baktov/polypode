@@ -49,6 +49,7 @@ frame:SetScript("OnEvent", function(self, event, ...)
 		P.SayHello()
 		P.BuildMinimapButton()
 		P.BuildOptions()
+		P.RefreshTeamBar() -- barre flottante laissée affichée à la déconnexion
 		P.JoinSyncChannelLater()
 		P.UpdateLeaderMacros()
 		P.Debug("Personnage enregistré : " .. key)

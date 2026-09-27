@@ -111,6 +111,8 @@ côte à côte :
   déconnexion, une reconnexion ou un reload, la même équipe est sélectionnée, que ce
   personnage en soit le leader ou non (une équipe reçue via « Inviter l'équipe » devient
   aussi la sélection mémorisée).
+  **Glisser** une équipe (clic gauche maintenu) hors de la fenêtre la sélectionne et la pose en
+  **barre flottante** à l'endroit où vous la lâchez (voir Barre flottante d'équipe).
 - **Personnages de l'équipe** : membres de l'équipe sélectionnée, triés par nom, même
   présentation que les personnages trouvés.
   - **Clic gauche** sur un membre : il devient **leader de l'équipe** (surbrillance dorée et
@@ -139,6 +141,24 @@ Les trois listes défilent (molette ou barre de défilement), sans limite de nom
 La fenêtre se **redimensionne** par la poignée du coin bas-droit ; les trois cadres se
 partagent la largeur à parts égales et la taille est mémorisée pour le compte (720 × 320
 par défaut). Si la fenêtre est très réduite, le contenu est simplement tronqué.
+
+---
+
+## Barre flottante d'équipe
+
+Petite barre posée sur l'écran de jeu, sortie de la fenêtre principale en **glissant** une équipe
+du cadre « Équipes ». Elle affiche le nom de **l'équipe sélectionnée** et son nombre de
+personnages, et suit la sélection (clic sur une autre équipe, synchro) ; « Aucune équipe » si
+rien n'est sélectionné.
+
+- **Clic droit** : déplie / replie la liste des personnages de l'équipe (même présentation que
+  dans la fenêtre, `[leader]` marqué). Au-delà de 8 personnages, la liste défile. Elle s'ouvre
+  sous la barre, ou au-dessus si la barre est trop près du bas de l'écran.
+- **Glisser** : déplace la barre.
+- **Croix** : masque la barre ; glisser à nouveau une équipe hors de la fenêtre pour la réafficher.
+
+Affichage, pliage et position sont mémorisés **pour chaque personnage** (chaque fenêtre de
+multibox a sa propre barre) et retrouvés à la connexion.
 
 ---
 
@@ -240,10 +260,10 @@ vous avez désactivé le skin de Polypode dans ses options).
 
 ## État du projet
 
-Version `0.29.1` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
+Version `0.30.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
 automatique aux annonces, fenêtre redimensionnable à trois listes défilantes (personnages
 trouvés / équipes avec création par saisie et sélection / personnages de l'équipe, ajout
-et retrait de membres au clic, leader par équipe, invitation de toute l'équipe, synchronisation automatique et versionnée des équipes, ajout du joueur ciblé)
+et retrait de membres au clic, leader par équipe, invitation de toute l'équipe, synchronisation automatique et versionnée des équipes, ajout du joueur ciblé, barre flottante de l'équipe sélectionnée)
 skinnée (EllesmereUI/ElvUI), bouton de minimap (masquable), panneau d'options (accessible par un bouton de la fenêtre),
 commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, inviter), suivi des dialogues de PNJ (quêtes, options, fermeture de DialogueUI), acceptation et validation automatiques des quêtes du leader, passage automatique des cinématiques, vol automatique chez le maître de vol, entrée et sortie de gouffre et entrée par portail automatiques, volume et coupure du son de l'équipe par le leader, groupage automatique de l'équipe à la connexion, canal dédié commun aux comptes, autorisation d'autres comptes Battle.net. Pistes envisagées pour la suite,
 à activer seulement si le besoin se confirme (voir la règle de simplicité dans
