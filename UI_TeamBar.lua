@@ -288,7 +288,7 @@ local function MemberState(key, unit)
 end
 
 -- Habillage d'une ligne (opts.decorate de P.CreateScrollList) : libellé d'état à droite du
--- nom, barre de vie en bas pour un membre groupé et connecté.
+-- nom, barre de vie en bas pour un membre groupé et connecté (option P.charDb.teamBar.healthBar).
 local function DecorateRow(row, data)
 	if not row.stateText then
 		row.stateText = row:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
@@ -309,7 +309,7 @@ local function DecorateRow(row, data)
 	row.stateText:SetText(label)
 	row:SetAlpha(alpha)
 
-	if unit and Known(UnitIsConnected(unit)) ~= false then
+	if P.charDb.teamBar.healthBar and unit and Known(UnitIsConnected(unit)) ~= false then
 		row.health:SetMinMaxValues(0, UnitHealthMax(unit))
 		row.health:SetValue(UnitHealth(unit))
 		row.health:Show()

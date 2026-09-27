@@ -313,6 +313,26 @@ function P.BuildOptions()
 		.. "niveau d'objet équipé. Infos envoyées par le Polypode de chaque personnage (« ? » tant "
 		.. "qu'elles ne sont pas reçues). Réglage propre à ce personnage.")
 
+	-- Barre de vie des membres dans la barre flottante d'équipe (par personnage, UI_TeamBar.lua).
+	local teamBarHealthSetting = Settings.RegisterProxySetting(
+		category,
+		"POLYPODE_TEAMBAR_HEALTH",
+		Settings.VarType.Boolean,
+		"Barre d'équipe : barre de vie des membres",
+		Settings.Default.True,
+		function()
+			return P.charDb.teamBar.healthBar
+		end,
+		function(value)
+			P.charDb.teamBar.healthBar = value
+			P.RefreshTeamBar()
+		end
+	)
+	Settings.CreateCheckbox(category, teamBarHealthSetting,
+		"Dans la liste de la barre flottante d'équipe, souligne chaque membre groupé d'une fine "
+		.. "barre de vie. Décochée : seul le libellé d'état (hors groupe, mort, loin...) reste. "
+		.. "Réglage propre à ce personnage.")
+
 	Settings.RegisterAddOnCategory(category)
 	P.optionsCategory = category
 end
