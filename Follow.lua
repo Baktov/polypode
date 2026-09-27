@@ -43,8 +43,9 @@ function P.OnFollowEvent(event, name)
 	if not IsEnabled() or not followed or not entry or not entry.name then
 		return
 	end
-	-- Nom suivi, avec ou sans royaume selon WoW : comparé sur le seul nom du personnage.
-	if strsplit("-", followed) ~= entry.name then
+	-- Nom suivi, avec ou sans royaume ni nom de famille (Forever) selon WoW : comparé sur le
+	-- seul prénom.
+	if followed:match("^[^%s%-]+") ~= entry.name then
 		return
 	end
 	-- Relancer /follow alors qu'on suit déjà (raccourci « Suivre le leader ») produit
@@ -78,6 +79,6 @@ function P.OnFollowEndMessage(key)
 		return
 	end
 	lastAlert[key] = now
-	UIErrorsFrame:AddMessage((entry.name or key) .. " ne vous suit plus.", 1, 0.5, 0)
+	UIErrorsFrame:AddMessage(P.GetDisplayName(key) .. " ne vous suit plus.", 1, 0.5, 0)
 	PlaySound(SOUNDKIT.RAID_WARNING)
 end

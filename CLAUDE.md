@@ -7,6 +7,11 @@ Addon World of Warcraft Retail (Interface 120000) et **WoW Forever** (Interface 
 dédié au **multiboxing**. Toute API liée à du contenu récent (gouffres, expéditions, spécialisations...)
 reste testée avant usage (`if C_X and C_X.Fn then`) pour se désactiver sur Forever ; ne pas se fier à
 `WOW_PROJECT_ID` (Forever est classé mainline). Pas de `ReloadUI()` depuis l'addon (bloqué sur Forever).
+Sur Forever, `UnitName(unit)` renvoie **prénom, nom de famille** (Retail : nom, royaume) : ne jamais lire
+son second résultat directement, passer par `P.UnitNameParts(unit)` (prénom, royaume, nom de famille).
+La clé de roster reste « Prénom-Royaume », le nom de famille est dans `entry.surname` (reçu en fin de
+HELLO/HI) ; tout affichage d'un personnage passe par `P.GetDisplayName(key [, withRealm])` (« Prénom Nom »
+si connu). `P.HasSurnames()` = `RegionalUniqueNamesEnabled()`.
 Objectif : gérer *simplement* plusieurs personnages joués simultanément dans plusieurs
 fenêtres/clients WoW sur la même machine (roster des personnages, équipes avec un
 leader par équipe — pas de leader global —, synchronisation d'infos de base entre clients). Même famille d'outils que
@@ -166,7 +171,8 @@ messages (renvoyés par le serveur à l'émetteur). Un message qui appelle une r
 type de réponse distinct (`HELLO` → `HI`) pour ne jamais boucler.
 `P.OnSyncMessage` lit `TYPE:token:reste` (`strsplit(":", message, 3)`) puis dispatche selon le type.
 Messages existants :
-- `HELLO` / `HI` : `TYPE:token:nom:royaume:classe:niveau` (canal groupe/raid/guilde).
+- `HELLO` / `HI` : `TYPE:token:nom:royaume:classe:niveau:nomDeFamille` (canal groupe/raid/guilde ; nom de
+  famille vide sur Retail, ajouté en dernier pour rester lisible par les versions précédentes).
 - `TEAM` : `TEAM:token:flag:version:leader:membre1,membre2,...:nomÉquipe`, envoyé par
   `P.SyncTeam(teamName, target, select)` en **WHISPER**. `flag` = `N` (premier fragment), `S`
   (premier fragment + sélection chez le destinataire), `+` (suite) ou `D` (équipe supprimée : un seul

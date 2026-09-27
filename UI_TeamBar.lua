@@ -112,7 +112,7 @@ local function FormatDetailed(data)
 	local ilvl = status and status.ilvl
 	parts[#parts + 1] = "|cff66bbff" .. ((ilvl and ilvl > 0) and ilvl or "?") .. "|r"
 
-	local name = entry.name or key
+	local name = P.GetDisplayName(key)
 	local color = entry.class and C_ClassColor and C_ClassColor.GetClassColor(entry.class)
 	parts[#parts + 1] = color and color:WrapTextInColorCode(name) or name
 	if P.GetTeamLeader(P.GetSelectedTeam()) == key then
@@ -136,12 +136,9 @@ local function FindGroupUnit(key)
 		end
 	end
 	for _, unit in ipairs(units) do
-		local name, realm = UnitName(unit)
+		local name, realm = P.UnitNameParts(unit)
 		if name and not (issecretvalue and (issecretvalue(name) or issecretvalue(realm))) then
-			if realm == nil or realm == "" then
-				realm = GetRealmName()
-			end
-			if NormalizeKey(name .. "-" .. realm) == wanted then
+			if NormalizeKey(name .. "-" .. (realm or GetRealmName())) == wanted then
 				return unit
 			end
 		end

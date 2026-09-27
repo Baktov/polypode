@@ -121,6 +121,52 @@ function P.GetCharKey(name, realm)
 	return name .. "-" .. realm
 end
 
+-- NOMS DE FAMILLE (WoW Forever) : les personnages y ont un prénom et un nom de famille, et
+-- UnitName renvoie le nom de famille en second résultat, là où Retail renvoie le royaume.
+-- La clé de roster reste « Prénom-Royaume » ; le nom de famille est gardé à part
+-- (entry.surname) pour l'affichage « Prénom Nom ». Sur Retail, rien ne change.
+
+-- Vrai si les personnages ont un nom de famille (WoW Forever).
+function P.HasSurnames()
+	return RegionalUniqueNamesEnabled ~= nil and RegionalUniqueNamesEnabled() == true
+end
+
+local function SurnameSeparator()
+	return Constants and Constants.CharacterNameSeparatorConsts
+		and Constants.CharacterNameSeparatorConsts.CHARACTERNAME_SURNAME_SEPARATOR or " "
+end
+
+-- Prénom, royaume (nil = le nôtre) et nom de famille (nil sur Retail) d'une unité.
+function P.UnitNameParts(unit)
+	local name, second = UnitName(unit)
+	second = second ~= "" and second or nil
+	if P.HasSurnames() then
+		return name, nil, second
+	end
+	return name, second, nil
+end
+
+-- « Prénom Nom » d'après UnitName, ou le prénom seul.
+function P.JoinSurname(name, surname)
+	if name and surname and surname ~= "" then
+		return name .. SurnameSeparator() .. surname
+	end
+	return name
+end
+
+-- Nom affiché d'un personnage du roster : « Prénom Nom » si son nom de famille est connu
+-- (Forever), sinon « Nom-Royaume » (withRealm) ou le nom seul.
+function P.GetDisplayName(key, withRealm)
+	local entry = P.db.roster[key]
+	if not entry or not entry.name then
+		return key
+	end
+	if entry.surname then
+		return P.JoinSurname(entry.name, entry.surname)
+	end
+	return withRealm and key or entry.name
+end
+
 -- Version d'une donnée synchronisée : heure serveur (commune à tous les clients), strictement
 -- croissante pour que deux modifications dans la même seconde restent ordonnées.
 local function NextVersion(current)
@@ -147,7 +193,8 @@ end
 -- personnage courant. Avec class/level fournis, enregistre un personnage distant
 -- (reçu via Sync.lua) ; token : compte Battle.net de ce personnage (entry.token, sert à
 -- lister les personnages d'un compte autorisé).
-function P.AddCharacter(name, realm, class, level, token)
+-- surname : nom de famille (WoW Forever), s'il est connu.
+function P.AddCharacter(name, realm, class, level, token, surname)
 	name = name or UnitName("player")
 	realm = realm or GetRealmName()
 	local key = P.GetCharKey(name, realm)
@@ -162,6 +209,8 @@ function P.AddCharacter(name, realm, class, level, token)
 		entry.class = playerClass
 		entry.level = UnitLevel("player")
 		entry.token = P.GetTeamToken() or entry.token
+		local _, _, mySurname = P.UnitNameParts("player")
+		entry.surname = mySurname
 	elseif class then
 		entry.class = class
 		entry.level = level or entry.level
@@ -176,6 +225,9 @@ function P.AddCharacter(name, realm, class, level, token)
 
 	if token then
 		entry.token = token
+	end
+	if surname and surname ~= "" then
+		entry.surname = surname
 	end
 	entry.lastSeen = time()
 	return key, entry
@@ -199,10 +251,8 @@ function P.AddTargetCharacter()
 	if not UnitExists("target") or not UnitIsPlayer("target") then
 		return false, "Ciblez d'abord un joueur."
 	end
-	local name, realm = UnitName("target")
-	if not realm or realm == "" then
-		realm = GetRealmName()
-	end
+	local name, realm, surname = P.UnitNameParts("target")
+	realm = realm or GetRealmName()
 	local key = P.GetCharKey(name, realm)
 	if P.GetCharacter(key) then
 		return false, key .. " est déjà dans la liste."
@@ -214,6 +264,7 @@ function P.AddTargetCharacter()
 	local level = UnitLevel("target")
 	entry.name = name
 	entry.realm = realm
+	entry.surname = surname or entry.surname
 	entry.class = class
 	entry.level = level and level > 0 and level or entry.level
 	entry.removed = nil

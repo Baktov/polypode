@@ -215,7 +215,7 @@ local function GroupedTeamMembers()
 		if entry and entry.name and key ~= P.GetCharKey() then
 			local name = P.GetTargetName(entry)
 			if UnitInParty(name) or UnitInRaid(name) then
-				members[key] = entry.name
+				members[key] = P.GetDisplayName(key)
 			end
 		end
 	end

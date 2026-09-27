@@ -304,7 +304,7 @@ end
 -- Lignes d'infobulle d'un personnage : nom, rappels des clics (hints), puis ses équipes
 -- (l'équipe sélectionnée en vert, « (leader) » là où il est leader).
 local function CharacterTooltip(key, hints)
-	local lines = { key }
+	local lines = { P.GetDisplayName(key, true) }
 	for _, hint in ipairs(hints) do
 		lines[#lines + 1] = hint
 	end
@@ -343,7 +343,7 @@ end
 local function FormatCharacter(data, teamName)
 	local key = data.key
 	local entry = P.db.roster[key] or {}
-	local label = key
+	local label = P.GetDisplayName(key, true)
 	local color = entry.class and C_ClassColor and C_ClassColor.GetClassColor(entry.class)
 	if color then
 		label = color:WrapTextInColorCode(label)

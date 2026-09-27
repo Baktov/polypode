@@ -15,8 +15,7 @@ local frame, listPanel
 local titleRequested = {} -- [questID] = true : chargement déjà demandé (une fois par session)
 
 local function MemberName(key)
-	local entry = P.db.roster[key]
-	return entry and entry.name or key
+	return P.GetDisplayName(key)
 end
 
 -- Titre d'une quête ; inconnu (quête d'un autre personnage), il est demandé une seule fois

@@ -96,7 +96,8 @@ local function LayoutModels()
 		model:SetCamDistanceScale(1)
 		model:Show()
 
-		local name = UnitName(unit)
+		local firstName, _, surname = P.UnitNameParts(unit)
+		local name = P.JoinSurname(firstName, surname)
 		local _, class = UnitClass(unit)
 		local color = class and C_ClassColor and C_ClassColor.GetClassColor(class)
 		local text = name or "?"

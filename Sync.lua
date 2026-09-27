@@ -184,7 +184,8 @@ end
 
 -- Annonce le personnage courant aux autres clients de l'équipe.
 -- kind : "HELLO" (annonce spontanée, appelle une réponse) ou "HI" (réponse, sans suite).
--- Format : TYPE:token:nom:royaume:classe:niveau
+-- Format : TYPE:token:nom:royaume:classe:niveau:nomDeFamille (nom de famille vide sur
+-- Retail ; champ ajouté en dernier, ignoré par les versions qui ne le lisent pas).
 function P.SayHello(kind, channel)
 	local token = P.GetTeamToken()
 	if not token then
@@ -193,8 +194,9 @@ function P.SayHello(kind, channel)
 	end
 	local _, class = UnitClass("player")
 	local level = UnitLevel("player")
-	P.Broadcast(string.format("%s:%s:%s:%s:%s:%d", kind or "HELLO", token,
-		UnitName("player"), GetRealmName(), class, level), channel)
+	local _, _, surname = P.UnitNameParts("player")
+	P.Broadcast(string.format("%s:%s:%s:%s:%s:%d:%s", kind or "HELLO", token,
+		UnitName("player"), GetRealmName(), class, level, surname or ""), channel)
 end
 
 -- ACTIONS DU LEADER (Quests.lua, Cinematics.lua) : le leader de l'équipe sélectionnée
@@ -889,7 +891,7 @@ function P.OnSyncMessage(message, channel, sender)
 	if kind ~= "HELLO" and kind ~= "HI" then
 		return
 	end
-	local name, realm, class, level = strsplit(":", rest or "")
+	local name, realm, class, level, surname = strsplit(":", rest or "")
 	if not name or not realm then
 		return
 	end
@@ -899,7 +901,7 @@ function P.OnSyncMessage(message, channel, sender)
 		return
 	end
 
-	P.AddCharacter(name, realm, class, tonumber(level), token)
+	P.AddCharacter(name, realm, class, tonumber(level), token, surname)
 	if P.RefreshUI then
 		P.RefreshUI()
 	end
