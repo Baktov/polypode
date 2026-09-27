@@ -53,7 +53,9 @@ end
 -- top : décalage depuis le haut du cadre (défaut : juste sous l'en-tête).
 -- opts (facultatif) : lignes cliquables (gauche et droit) avec opts.onClick(data, mouseButton) ;
 -- opts.isSelected(data) met la ligne en surbrillance (aussi sans clic). opts.tooltip(data) renvoie les lignes
--- de l'infobulle affichée au survol (la première sert de titre). opts.button : bouton à
+-- de l'infobulle affichée au survol (la première sert de titre) ; opts.tooltipUnit(data)
+-- renvoie une unité (ex. "party2") dont l'infobulle WoW complète remplace alors ces lignes,
+-- ou nil. opts.button : bouton à
 -- droite de chaque ligne, { text, width, onClick = fn(data), tooltip = texte d'aide }.
 -- opts.onDragStart(data) : appelé quand on commence à glisser une ligne (clic gauche maintenu).
 local function CreateScrollList(panel, formatFn, top, opts)
@@ -69,8 +71,13 @@ local function CreateScrollList(panel, formatFn, top, opts)
 
 	-- Infobulle de la ligne survolée, construite depuis la donnée courante de la ligne.
 	local function ShowRowTooltip(row)
-		local lines = opts.tooltip(row.data)
 		GameTooltip:SetOwner(row, "ANCHOR_RIGHT")
+		local unit = opts.tooltipUnit and opts.tooltipUnit(row.data)
+		if unit then
+			GameTooltip:SetUnit(unit)
+			return
+		end
+		local lines = opts.tooltip(row.data)
 		for i, line in ipairs(lines) do
 			if i == 1 then
 				GameTooltip:AddLine(line)
@@ -262,6 +269,9 @@ local function CharacterTooltip(key, hints)
 	end
 	return lines
 end
+
+-- Partagé avec la barre flottante d'équipe (UI_TeamBar.lua).
+P.CharacterTooltip = CharacterTooltip
 
 -- Raison pour laquelle le bouton « Inviter l'équipe » est inactif, ou nil s'il est actif
 -- (règle commune avec le raccourci clavier, cf. P.GetInviteBlockedReason).

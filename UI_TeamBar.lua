@@ -24,6 +24,39 @@ local function Clamp(value, low, high)
 	return math.max(low, math.min(high, value))
 end
 
+-- Clé nom-royaume comparable : les royaumes renvoyés par UnitName n'ont pas d'espace
+-- (« Chantséternels »), ceux de GetRealmName (clés du roster) en ont.
+local function NormalizeKey(key)
+	return (key:gsub("%s", ""))
+end
+
+-- Unité du groupe (player, partyN, raidN) correspondant à un personnage du roster, ou nil
+-- s'il n'est pas groupé avec nous. Un nom rendu secret par WoW (issecretvalue) est ignoré.
+local function FindGroupUnit(key)
+	local wanted = NormalizeKey(key)
+	local units = { "player" }
+	if IsInRaid() then
+		for i = 1, GetNumGroupMembers() do
+			units[#units + 1] = "raid" .. i
+		end
+	else
+		for i = 1, GetNumSubgroupMembers() do
+			units[#units + 1] = "party" .. i
+		end
+	end
+	for _, unit in ipairs(units) do
+		local name, realm = UnitName(unit)
+		if name and not (issecretvalue and (issecretvalue(name) or issecretvalue(realm))) then
+			if realm == nil or realm == "" then
+				realm = GetRealmName()
+			end
+			if NormalizeKey(name .. "-" .. realm) == wanted then
+				return unit
+			end
+		end
+	end
+end
+
 -- Mémorise la position de la barre pour ce personnage.
 local function SavePosition()
 	local point, _, relativePoint, x, y = bar:GetPoint(1)
@@ -206,6 +239,15 @@ local function Build()
 	end, LIST_PADDING, { -- marge basse identique, fixée par P.CreateScrollList
 		isSelected = function(data)
 			return P.GetTeamLeader(P.GetSelectedTeam()) == data.key
+		end,
+		-- Personnage groupé : infobulle WoW complète (comme au survol d'un cadre de groupe) ;
+		-- sinon, ses équipes comme dans la fenêtre principale.
+		tooltipUnit = function(data)
+			return FindGroupUnit(data.key)
+		end,
+		tooltip = function(data)
+			return P.CharacterTooltip(data.key,
+				{ "|cff999999Hors de votre groupe : infobulle détaillée une fois groupé|r" })
 		end,
 	})
 	listPanel:Hide()
