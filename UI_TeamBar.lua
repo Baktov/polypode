@@ -312,6 +312,7 @@ local function Build()
 	P.CreateScrollList(listPanel, function(data)
 		return P.FormatCharacter(data, P.GetSelectedTeam())
 	end, LIST_PADDING, { -- marge basse identique, fixée par P.CreateScrollList
+		inset = 4, -- quelques pixels seulement de chaque côté
 		isSelected = function(data)
 			return P.GetTeamLeader(P.GetSelectedTeam()) == data.key
 		end,

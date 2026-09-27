@@ -143,7 +143,8 @@ côte à côte :
   Les équipes, leurs membres et leur leader sont mémorisés pour le compte ; un personnage
   retiré du roster (`/poly remove`) quitte aussi ses équipes.
 
-Les trois listes défilent (molette ou barre de défilement), sans limite de nombre.
+Les trois listes défilent (molette ou barre de défilement), sans limite de nombre ; la barre
+de défilement n'apparaît que si la liste déborde du cadre.
 
 La fenêtre se **redimensionne** par la poignée du coin bas-droit ; les trois cadres se
 partagent la largeur à parts égales et la taille est mémorisée pour le compte (720 × 320
@@ -282,7 +283,7 @@ vous avez désactivé le skin de Polypode dans ses options).
 
 ## État du projet
 
-Version `0.33.1` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
+Version `0.33.2` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
 automatique aux annonces, fenêtre redimensionnable à trois listes défilantes (personnages
 disponibles / équipes avec création par saisie, sélection et suppression / personnages de l'équipe, ajout
 et retrait de membres au clic, leader par équipe, invitation de toute l'équipe, synchronisation automatique et versionnée des équipes, ajout du joueur ciblé, barre flottante de l'équipe sélectionnée)

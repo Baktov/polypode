@@ -58,12 +58,15 @@ end
 -- ou nil. opts.button : bouton à
 -- droite de chaque ligne, { text, width, onClick = fn(data), tooltip = texte d'aide }.
 -- opts.onDragStart(data) : appelé quand on commence à glisser une ligne (clic gauche maintenu).
+-- opts.inset : marge gauche et droite de la liste dans le cadre (défaut 10). La barre de
+-- défilement n'apparaît (et ne prend de place à droite) que si la liste déborde.
 local function CreateScrollList(panel, formatFn, top, opts)
 	top = top or HEADER_HEIGHT
 	opts = opts or {}
+	local inset = opts.inset or 10
 	local scrollBox = CreateFrame("Frame", nil, panel, "WowScrollBoxList")
-	scrollBox:SetPoint("TOPLEFT", 10, -top)
-	scrollBox:SetPoint("BOTTOMRIGHT", -22, 8)
+	scrollBox:SetPoint("TOPLEFT", inset, -top) -- ancres initiales, ajustées ensuite selon la barre
+	scrollBox:SetPoint("BOTTOMRIGHT", -inset, 8)
 
 	local scrollBar = CreateFrame("EventFrame", nil, panel, "MinimalScrollBar")
 	scrollBar:SetPoint("TOPLEFT", scrollBox, "TOPRIGHT", 4, 0)
@@ -178,11 +181,16 @@ local function CreateScrollList(panel, formatFn, top, opts)
 		end
 	end)
 	ScrollUtil.InitScrollBoxListWithScrollBar(scrollBox, scrollBar, view)
+	-- Place de la barre réservée à droite seulement quand elle est affichée.
+	local topLeft = CreateAnchor("TOPLEFT", panel, "TOPLEFT", inset, -top)
+	ScrollUtil.AddManagedScrollBarVisibilityBehavior(scrollBox, scrollBar,
+		{ topLeft, CreateAnchor("BOTTOMRIGHT", panel, "BOTTOMRIGHT", -22, 8) },
+		{ topLeft, CreateAnchor("BOTTOMRIGHT", panel, "BOTTOMRIGHT", -inset, 8) })
 
 	-- Texte affiché quand la liste est vide.
 	panel.emptyText = panel:CreateFontString(nil, "OVERLAY", "GameFontDisable")
-	panel.emptyText:SetPoint("TOPLEFT", 10, -top)
-	panel.emptyText:SetPoint("RIGHT", -10, 0)
+	panel.emptyText:SetPoint("TOPLEFT", inset, -top)
+	panel.emptyText:SetPoint("RIGHT", -inset, 0)
 	panel.emptyText:SetJustifyH("LEFT")
 	panel.emptyText:SetWordWrap(false)
 
