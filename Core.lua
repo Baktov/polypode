@@ -62,6 +62,7 @@ P.charDefaults = {
 		background = "",
 		showName = true,
 		showDetails = true,
+		showPets = true, -- familiers (chasseur, démoniste...) après leur maître
 	},
 	-- Barre flottante de l'équipe sélectionnée (UI_TeamBar.lua) : affichée, liste dépliée,
 	-- figée (Alt + clic) ; position (point, relativePoint, x, y), largeur (width) et hauteur

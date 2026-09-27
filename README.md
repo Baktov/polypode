@@ -273,7 +273,10 @@ la croix pour fermer) :
   fichiers du jeu, avec la zone utile de chaque image mesurée (bandes noires retirées) ;
 - **Afficher le nom des personnages** (oui par défaut), en couleur de classe ;
 - **Afficher classe, spé, niveau et niveau d'objet** (oui par défaut) sous le nom. La spé et le
-  niveau d'objet des autres membres viennent de leur Polypode (absents sinon).
+  niveau d'objet des autres membres viennent de leur Polypode (absents sinon) ;
+- **Afficher les familiers** (oui par défaut) : le familier présent de chaque membre (chasseur,
+  démoniste, chevalier de la mort, mage...) apparaît juste après lui, avec son nom et « Familier
+  de ... » ; il se zoome et se déplace comme les personnages (10 modèles au plus en tout).
 La **molette** sur un personnage le zoome ou le dézoome, et un **clic gauche maintenu** le
 déplace sur l'écran (son nom et ses détails suivent) ; il garde sa place au relâchement. Chaque
 personnage se règle séparément ; tout est remis en place à chaque ouverture. **Échap** revient au jeu ; **Impr. écran** fait une capture comme
@@ -388,7 +391,7 @@ vous avez désactivé le skin de Polypode dans ses options).
 
 ## État du projet
 
-Version `0.46.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
+Version `0.46.1` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
 automatique aux annonces, fenêtre redimensionnable à trois listes défilantes (personnages
 disponibles / équipes avec création par saisie, sélection, renommage et suppression / personnages de l'équipe, ajout
 et retrait de membres au clic, leader par équipe, invitation de toute l'équipe, synchronisation automatique et versionnée des équipes, ajout du joueur ciblé, barre flottante de l'équipe sélectionnée)

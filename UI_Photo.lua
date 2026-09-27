@@ -14,14 +14,16 @@ local P = Polypode
 --     déformation (CoverTexCoord) ;
 --   showName — nom sous chaque personnage, en couleur de classe ;
 --   showDetails — classe, spécialisation, niveau et niveau d'objet sous le nom (spé et niveau
---     d'objet des autres membres : état envoyé par leur Polypode, STATUS dans Sync.lua).
+--     d'objet des autres membres : état envoyé par leur Polypode, STATUS dans Sync.lua) ;
+--   showPets — familiers (chasseur, démoniste, chevalier de la mort...) juste après leur maître
+--     (unités pet / partypetN / raidpetN), « Familier de ... » en détails.
 -- Molette sur un modèle : zoom avant / arrière ; glisser : le déplacer. Échap revient au jeu (P.StopPhotoMode) ; les
 -- autres touches passent au jeu (Impr. écran pour la capture). Hors combat seulement : UIParent ne peut pas être masqué / réaffiché en
 -- combat, le mode photo se ferme donc à l'entrée en combat (PLAYER_REGEN_DISABLED, avant le
 -- verrouillage). Le cadre n'a pas de parent, pour rester visible quand UIParent est masqué.
 -- WoW n'affiche le modèle d'un membre que s'il est visible (à proximité).
 
-local MAX_MODELS = 10 -- au-delà (grand raid), seuls les premiers membres sont affichés
+local MAX_MODELS = 10 -- au-delà (grand raid), seuls les premiers modèles sont affichés
 local HINT_DURATION = 4 -- secondes d'affichage du rappel « Échap »
 local ZOOM_STEP = 0.1 -- variation de la distance de caméra par cran de molette
 local ZOOM_MIN, ZOOM_MAX = 0.3, 3 -- distance de caméra (1 = en pied)
@@ -90,23 +92,41 @@ local function JournalTiers()
 	return journalTiers
 end
 
--- Unités du groupe dans l'ordre du groupe, soi en premier hors raid.
+-- Unité du familier d'une unité de groupe (player → pet, partyN → partypetN, raidN → raidpetN).
+local function PetUnit(unit)
+	if unit == "player" then
+		return "pet"
+	end
+	return (unit:gsub("^(%a+)(%d+)$", "%1pet%2"))
+end
+
+-- Unités à afficher dans l'ordre du groupe, soi en premier hors raid ; avec showPets, le
+-- familier présent de chacun juste après lui. Renvoie la liste et { [familier] = maître }.
 local function GroupUnits()
-	local units = {}
+	local members = {}
 	if IsInRaid() then
 		for i = 1, GetNumGroupMembers() do
-			units[#units + 1] = "raid" .. i
+			members[#members + 1] = "raid" .. i
 		end
 	else
-		units[1] = "player"
+		members[1] = "player"
 		for i = 1, GetNumSubgroupMembers() do
-			units[#units + 1] = "party" .. i
+			members[#members + 1] = "party" .. i
+		end
+	end
+	local units, owners = {}, {}
+	for _, unit in ipairs(members) do
+		units[#units + 1] = unit
+		local pet = PetUnit(unit)
+		if P.charDb.photo.showPets and UnitExists(pet) then
+			units[#units + 1] = pet
+			owners[pet] = unit
 		end
 	end
 	while #units > MAX_MODELS do
 		table.remove(units)
 	end
-	return units
+	return units, owners
 end
 
 -- Clé de roster d'une unité (royaumes comparés sans espaces : UnitName n'en a pas), ou nil.
@@ -275,7 +295,7 @@ end
 -- selon les options.
 local function LayoutModels()
 	local settings = PhotoSettings()
-	local units = GroupUnits()
+	local units, owners = GroupUnits()
 	local width, height = frame:GetWidth(), frame:GetHeight()
 	local slot = width / #units
 	local bottom = height * ((settings.showName or settings.showDetails) and 0.14 or 0.05)
@@ -292,13 +312,20 @@ local function LayoutModels()
 		model:SetCamDistanceScale(1)
 		model:Show()
 
-		local firstName, _, surname = P.UnitNameParts(unit)
-		local name = P.JoinSurname(firstName, surname)
-		local _, class = UnitClass(unit)
-		local color = class and C_ClassColor and C_ClassColor.GetClassColor(class)
-		local text = name or "?"
-		if color and name then
-			text = color:WrapTextInColorCode(name)
+		local owner = owners[unit]
+		local text
+		if owner then
+			-- Familier : son nom en blanc.
+			text = UnitName(unit) or "?"
+		else
+			local firstName, _, surname = P.UnitNameParts(unit)
+			local name = P.JoinSurname(firstName, surname)
+			local _, class = UnitClass(unit)
+			local color = class and C_ClassColor and C_ClassColor.GetClassColor(class)
+			text = name or "?"
+			if color and name then
+				text = color:WrapTextInColorCode(name)
+			end
 		end
 		if not UnitIsVisible(unit) then
 			text = text .. " |cff999999(hors de vue)|r"
@@ -316,7 +343,12 @@ local function LayoutModels()
 			details:SetPoint("TOP", model, "BOTTOM", 0, -8)
 		end
 		details:SetWidth(slot - 10)
-		details:SetText(DetailsText(unit))
+		if owner then
+			local ownerName, _, ownerSurname = P.UnitNameParts(owner)
+			details:SetText("Familier de " .. (P.JoinSurname(ownerName, ownerSurname) or "?"))
+		else
+			details:SetText(DetailsText(unit))
+		end
 		details:SetShown(settings.showDetails)
 	end
 	for i = #units + 1, #models do
@@ -390,7 +422,7 @@ end
 
 local function BuildOptions()
 	optionsFrame = CreateFrame("Frame", "PolypodePhotoOptions", UIParent, "BackdropTemplate")
-	optionsFrame:SetSize(280, 190)
+	optionsFrame:SetSize(280, 216)
 	optionsFrame:SetFrameStrata("DIALOG")
 	optionsFrame:EnableMouse(true)
 	optionsFrame:SetBackdrop({
@@ -419,10 +451,12 @@ local function BuildOptions()
 	local nameCheck = CreateCheck(optionsFrame, "Afficher le nom des personnages", "showName", hideCheck)
 	local detailsCheck = CreateCheck(optionsFrame, "Afficher classe, spé, niveau et niveau d'objet",
 		"showDetails", nameCheck)
+	local petsCheck = CreateCheck(optionsFrame, "Afficher les familiers (chasseur, démoniste...)",
+		"showPets", detailsCheck)
 
 	-- Fond : voile sombre ou un écran de chargement (menu Blizzard, défilant).
 	local bgLabel = optionsFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-	bgLabel:SetPoint("TOPLEFT", detailsCheck, "BOTTOMLEFT", 4, -10)
+	bgLabel:SetPoint("TOPLEFT", petsCheck, "BOTTOMLEFT", 4, -10)
 	bgLabel:SetText("Fond :")
 
 	local dropdown = CreateFrame("DropdownButton", nil, optionsFrame, "WowStyle1DropdownTemplate")
