@@ -265,21 +265,51 @@ function P.SyncCharacter(key, target)
 end
 
 -- ÉTAT DES PERSONNAGES : ce que la liste d'amis montrerait (race, spécialisation, niveau,
--- niveau d'objet, guilde, zone), pour les infobulles d'un personnage non groupé (WoW ne donne
--- ces infos que sur une unité du groupe). Chaque client envoie le sien aux clients connectés
--- à chaque rencontre (HELLO/HI) et quand il change ; gardé en mémoire (session seulement).
--- Format : STATUS:token:niveau:ilvl:race:spé:guilde:nom:royaume:zone (zone en dernier).
-local characterStatus = {} -- [nom-royaume] = { level, ilvl, race, spec, guild, zone, received }
+-- niveau d'objet, guilde, zone) plus la progression du niveau (% d'XP), pour les infobulles
+-- et les détails de la barre flottante d'équipe (WoW ne donne ces infos que sur une unité
+-- du groupe). Chaque client envoie le sien aux clients connectés à chaque rencontre
+-- (HELLO/HI) et quand il change ; gardé en mémoire (session seulement).
+-- Format : STATUS:token:niveau:ilvl:race:spé:guilde:xp:nom:royaume:zone (zone en dernier ;
+-- xp = % du niveau en cours, vide au niveau maximum).
+local characterStatus = {} -- [nom-royaume] = { level, ilvl, race, spec, guild, xp, zone, received }
 local lastStatusSent
 local statusPending
 
-local function BuildStatusMessage(token)
+-- % d'XP du niveau en cours (entier), ou nil au niveau maximum (ou XP désactivée).
+local function ExperiencePercent()
+	if (IsPlayerAtEffectiveMaxLevel and IsPlayerAtEffectiveMaxLevel())
+		or (IsXPUserDisabled and IsXPUserDisabled()) then
+		return nil
+	end
+	local max = UnitXPMax("player")
+	if not max or max <= 0 then
+		return nil
+	end
+	return math.floor(UnitXP("player") / max * 100)
+end
+
+-- État courant du personnage joué (même forme que les états reçus).
+local function LocalStatus()
 	local specIndex = GetSpecialization and GetSpecialization()
-	local spec = specIndex and select(2, GetSpecializationInfo(specIndex)) or ""
+	local spec = specIndex and select(2, GetSpecializationInfo(specIndex))
 	local _, ilvl = GetAverageItemLevel()
-	return string.format("STATUS:%s:%d:%d:%s:%s:%s:%s:%s:%s", token, UnitLevel("player"),
-		math.floor(ilvl or 0), UnitRace("player") or "", spec or "", GetGuildInfo("player") or "",
-		UnitName("player"), GetRealmName(), GetRealZoneText() or "")
+	return {
+		level = UnitLevel("player"),
+		ilvl = math.floor(ilvl or 0),
+		race = UnitRace("player"),
+		spec = spec,
+		guild = GetGuildInfo("player"),
+		xp = ExperiencePercent(),
+		zone = GetRealZoneText(),
+		received = GetTime(),
+	}
+end
+
+local function BuildStatusMessage(token)
+	local s = LocalStatus()
+	return string.format("STATUS:%s:%d:%d:%s:%s:%s:%s:%s:%s:%s", token, s.level, s.ilvl,
+		s.race or "", s.spec or "", s.guild or "", s.xp or "", UnitName("player"), GetRealmName(),
+		s.zone or "")
 end
 
 -- Envoie l'état du personnage : à target (rencontre), sinon aux clients connectés s'il a
@@ -301,8 +331,9 @@ function P.SendStatus(target)
 	end
 end
 
--- Changement d'état (zone, niveau, spécialisation, équipement, guilde ; Events.lua) : envoi
--- différé de 2 s, les événements arrivant souvent en rafale (équipement).
+-- Changement d'état (zone, niveau, XP, spécialisation, équipement, guilde ; Events.lua) :
+-- envoi différé de 2 s, les événements arrivant souvent en rafale (équipement, XP), puis
+-- mise à jour de la barre flottante (état du personnage joué).
 function P.ScheduleStatus()
 	if statusPending then
 		return
@@ -311,11 +342,14 @@ function P.ScheduleStatus()
 	C_Timer.After(2, function()
 		statusPending = nil
 		P.SendStatus()
+		if P.RefreshTeamBar then
+			P.RefreshTeamBar()
+		end
 	end)
 end
 
 local function OnStatusMessage(rest)
-	local level, ilvl, race, spec, guild, name, realm, zone = strsplit(":", rest or "", 8)
+	local level, ilvl, race, spec, guild, xp, name, realm, zone = strsplit(":", rest or "", 9)
 	if not name or name == "" or not realm or realm == "" then
 		return
 	end
@@ -325,13 +359,21 @@ local function OnStatusMessage(rest)
 		race = race ~= "" and race or nil,
 		spec = spec ~= "" and spec or nil,
 		guild = guild ~= "" and guild or nil,
+		xp = tonumber(xp),
 		zone = zone ~= "" and zone or nil,
 		received = GetTime(),
 	}
+	if P.RefreshTeamBar then
+		P.RefreshTeamBar()
+	end
 end
 
--- Dernier état reçu d'un personnage pendant la session, ou nil.
+-- État d'un personnage : le personnage joué est lu en direct, les autres sont le dernier état
+-- reçu pendant la session (nil si aucun).
 function P.GetCharacterStatus(key)
+	if key == P.GetCharKey() then
+		return LocalStatus()
+	end
 	return characterStatus[key]
 end
 

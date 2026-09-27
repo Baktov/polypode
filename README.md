@@ -169,6 +169,12 @@ rien n'est sélectionné.
 - **Clic gauche** : invite l'équipe dans votre groupe, exactement comme le bouton **Inviter
   l'équipe** de la fenêtre principale (réservé au leader de l'équipe ; sinon un message rouge
   explique pourquoi, rappelé dans l'infobulle).
+- **Détails** (option « Barre d'équipe : niveau, niveau d'objet et progression », cochée par
+  défaut) : à gauche de chaque personnage, son **niveau** (doré), le **% d'avancement** dans ce
+  niveau (gris, masqué au niveau maximum) et son **niveau d'objet** équipé (bleu), puis son nom
+  court. Ces infos viennent du Polypode de chaque personnage (mises à jour en direct : XP,
+  équipement, niveau) ; « ? » tant qu'elles ne sont pas reçues. Décochée : présentation de la
+  fenêtre principale (nom-royaume, classe, niveau).
 - **Clic droit** : déplie / replie la liste des personnages de l'équipe (même présentation que
   dans la fenêtre : le leader est surligné en doré et marqué `[leader]`). Au survol d'un
   personnage **groupé avec vous**, l'infobulle complète de WoW s'affiche (la même qu'au survol
@@ -269,6 +275,7 @@ fenêtre principale) :
 | Entrer automatiquement en instance (gouffre, portail) | Oui | Quand le leader choisit le palier d'un gouffre, ce personnage choisit le même si sa fenêtre de palier est ouverte ; quand le leader vote la sortie du gouffre, il vote « Oui » aussi (jusqu'à 30 s après) ; quand le leader confirme l'entrée par un portail d'instance, il confirme aussi. Réglage **par personnage**, à cocher sur le leader et les membres |
 | Volume envoyé | 50 % | Curseur de 0 à 100 % par pas de 5 %. Sur le leader : volume principal appliqué aux autres membres par le raccourci « Envoyer le volume à l'équipe ». Réglage **par personnage** |
 | Suivre le son du leader | Oui | Applique à ce personnage le volume envoyé par le leader et la coupure / le rétablissement du son. Décoché : ce client garde son propre son. Réglage **par personnage** |
+| Barre d'équipe : niveau, niveau d'objet et progression | Oui | Dans la liste de la barre flottante d'équipe, affiche à gauche de chaque personnage son niveau, son % d'avancement dans ce niveau (sauf au niveau maximum) et son niveau d'objet équipé. Réglage **par personnage** |
 | Groupage automatique de l'équipe | Oui | Leader : invite automatiquement dans son groupe les membres de son équipe sélectionnée qui se connectent, ou déjà connectés quand il se connecte lui-même. Membre : accepte automatiquement l'invitation de groupe du leader d'une de ses équipes. Réglage **par personnage** |
 
 ---
@@ -290,7 +297,7 @@ vous avez désactivé le skin de Polypode dans ses options).
 
 ## État du projet
 
-Version `0.34.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
+Version `0.35.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
 automatique aux annonces, fenêtre redimensionnable à trois listes défilantes (personnages
 disponibles / équipes avec création par saisie, sélection et suppression / personnages de l'équipe, ajout
 et retrait de membres au clic, leader par équipe, invitation de toute l'équipe, synchronisation automatique et versionnée des équipes, ajout du joueur ciblé, barre flottante de l'équipe sélectionnée)

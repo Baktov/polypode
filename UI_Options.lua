@@ -272,6 +272,27 @@ function P.BuildOptions()
 		.. "(ou déjà connectés quand il se connecte). Membre : accepte automatiquement l'invitation "
 		.. "de groupe du leader d'une de ses équipes. Réglage propre à ce personnage.")
 
+	-- Détails des membres dans la barre flottante d'équipe (par personnage, UI_TeamBar.lua).
+	local teamBarDetailsSetting = Settings.RegisterProxySetting(
+		category,
+		"POLYPODE_TEAMBAR_DETAILS",
+		Settings.VarType.Boolean,
+		"Barre d'équipe : niveau, niveau d'objet et progression",
+		Settings.Default.True,
+		function()
+			return P.charDb.teamBar.details
+		end,
+		function(value)
+			P.charDb.teamBar.details = value
+			P.RefreshTeamBar()
+		end
+	)
+	Settings.CreateCheckbox(category, teamBarDetailsSetting,
+		"Dans la liste de la barre flottante d'équipe, affiche à gauche de chaque personnage son "
+		.. "niveau, le pourcentage d'avancement dans ce niveau (sauf au niveau maximum) et son "
+		.. "niveau d'objet équipé. Infos envoyées par le Polypode de chaque personnage (« ? » tant "
+		.. "qu'elles ne sont pas reçues). Réglage propre à ce personnage.")
+
 	Settings.RegisterAddOnCategory(category)
 	P.optionsCategory = category
 end

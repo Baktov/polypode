@@ -96,6 +96,31 @@ local function StatusLines(key)
 	return lines
 end
 
+-- Ligne d'un membre avec détails (option P.charDb.teamBar.details) : niveau (doré), % d'XP du
+-- niveau en cours (gris, absent au niveau maximum), niveau d'objet (bleu), puis le nom court
+-- en couleur de classe (le royaume et la classe sont dans l'infobulle) et [leader].
+-- Valeurs inconnues (pas encore d'état reçu du Polypode du personnage) : « ? ».
+local function FormatDetailed(data)
+	local key = data.key
+	local entry = P.db.roster[key] or {}
+	local status = P.GetCharacterStatus(key)
+
+	local parts = { "|cffffd200" .. ((status and status.level) or entry.level or "?") .. "|r" }
+	if status and status.xp then
+		parts[#parts + 1] = "|cff999999" .. status.xp .. "%|r"
+	end
+	local ilvl = status and status.ilvl
+	parts[#parts + 1] = "|cff66bbff" .. ((ilvl and ilvl > 0) and ilvl or "?") .. "|r"
+
+	local name = entry.name or key
+	local color = entry.class and C_ClassColor and C_ClassColor.GetClassColor(entry.class)
+	parts[#parts + 1] = color and color:WrapTextInColorCode(name) or name
+	if P.GetTeamLeader(P.GetSelectedTeam()) == key then
+		parts[#parts + 1] = "|cffffd200[leader]|r"
+	end
+	return table.concat(parts, " ")
+end
+
 -- Unité du groupe (player, partyN, raidN) correspondant à un personnage du roster, ou nil
 -- s'il n'est pas groupé avec nous. Un nom rendu secret par WoW (issecretvalue) est ignoré.
 local function FindGroupUnit(key)
@@ -310,6 +335,9 @@ local function Build()
 	-- et marqué [leader].
 	listPanel = P.CreatePanel(bar, "")
 	P.CreateScrollList(listPanel, function(data)
+		if P.charDb.teamBar.details then
+			return FormatDetailed(data)
+		end
 		return P.FormatCharacter(data, P.GetSelectedTeam())
 	end, LIST_PADDING, { -- marge basse identique, fixée par P.CreateScrollList
 		inset = 4, -- quelques pixels seulement de chaque côté

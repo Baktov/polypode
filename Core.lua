@@ -61,6 +61,7 @@ P.charDefaults = {
 		shown = false,
 		expanded = false,
 		locked = false,
+		details = true, -- niveau, niveau d'objet et % d'XP à gauche des personnages
 	},
 	-- selectedTeam : nom de l'équipe sélectionnée dans la fenêtre (nil par défaut),
 	-- conservé même si l'équipe manque momentanément (cf. UI_Main.lua).
