@@ -69,7 +69,7 @@ en tête de chaque fichier). Ex. `P.db` (= `PolypodeDB`), `P.charDb` (= `Polypod
     Chaque nouveau panneau, liste ou fenêtre doit pouvoir défiler, même si peu d'éléments sont
     attendus aujourd'hui. Jamais de pile de lignes à hauteur fixe qui déborde du cadre. Pour une
     liste : `P.CreateScrollList(panel, formatFn [, top, opts])` + `P.SetListData(panel, items)` (`UI_Main.lua`, partagés avec les autres fenêtres, comme `P.CreatePanel`)
-    (`opts.onClick(data, mouseButton)` rend les lignes cliquables, `opts.isSelected(data)` les surligne, `opts.tooltip(data)` renvoie les lignes de l'infobulle au survol — toute action au clic doit y être rappelée —, `opts.button` ajoute un bouton à droite de chaque ligne, `opts.onDragStart(data)` réagit au glisser d'une ligne ; les lignes
+    (`opts.onClick(data, mouseButton)` rend les lignes cliquables, `opts.isSelected(data)` les surligne (aussi sans `onClick`), `opts.tooltip(data)` renvoie les lignes de l'infobulle au survol — toute action au clic doit y être rappelée —, `opts.button` ajoute un bouton à droite de chaque ligne, `opts.onDragStart(data)` réagit au glisser d'une ligne ; les lignes
     étant recyclées, tout état visuel se recalcule dans l'initializer, jamais stocké sur la ligne)
     (ScrollBox Blizzard virtualisée + `MinimalScrollBar`, skinnée via `P.SkinScrollBar`).
 13. **Fenêtres redimensionnables** : la fenêtre principale se redimensionne (poignée bas-droite,

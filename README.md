@@ -159,7 +159,7 @@ personnages, et suit la sélection (clic sur une autre équipe, synchro) ; « Au
 rien n'est sélectionné.
 
 - **Clic droit** : déplie / replie la liste des personnages de l'équipe (même présentation que
-  dans la fenêtre, `[leader]` marqué). Au-delà de 8 personnages, la liste défile. Elle s'ouvre
+  dans la fenêtre : le leader est surligné en doré et marqué `[leader]`). Au-delà de 8 personnages, la liste défile. Elle s'ouvre
   sous la barre, ou au-dessus si la barre est trop près du bas de l'écran.
 - **Glisser** : déplace la barre.
 - **Poignée du coin** (en bas à droite de la barre, ou de la liste dépliée) : redimensionne la
@@ -272,7 +272,7 @@ vous avez désactivé le skin de Polypode dans ses options).
 
 ## État du projet
 
-Version `0.32.1` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
+Version `0.32.2` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
 automatique aux annonces, fenêtre redimensionnable à trois listes défilantes (personnages
 disponibles / équipes avec création par saisie, sélection et suppression / personnages de l'équipe, ajout
 et retrait de membres au clic, leader par équipe, invitation de toute l'équipe, synchronisation automatique et versionnée des équipes, ajout du joueur ciblé, barre flottante de l'équipe sélectionnée)

@@ -52,7 +52,7 @@ end
 -- le texte d'une ligne. Remplir avec SetListData(panel, items), items = liste de tables.
 -- top : décalage depuis le haut du cadre (défaut : juste sous l'en-tête).
 -- opts (facultatif) : lignes cliquables (gauche et droit) avec opts.onClick(data, mouseButton) ;
--- opts.isSelected(data) met la ligne en surbrillance. opts.tooltip(data) renvoie les lignes
+-- opts.isSelected(data) met la ligne en surbrillance (aussi sans clic). opts.tooltip(data) renvoie les lignes
 -- de l'infobulle affichée au survol (la première sert de titre). opts.button : bouton à
 -- droite de chaque ligne, { text, width, onClick = fn(data), tooltip = texte d'aide }.
 -- opts.onDragStart(data) : appelé quand on commence à glisser une ligne (clic gauche maintenu).
@@ -91,12 +91,16 @@ local function CreateScrollList(panel, formatFn, top, opts)
 			row.text:SetJustifyH("LEFT")
 			row.text:SetWordWrap(false)
 
-			if opts.onClick then
-				row:RegisterForClicks("LeftButtonUp", "RightButtonUp")
-				-- Fond doré de la ligne sélectionnée, voile clair au survol.
+			-- Fond doré de la ligne sélectionnée.
+			if opts.isSelected then
 				row.selected = row:CreateTexture(nil, "BACKGROUND")
 				row.selected:SetAllPoints()
 				row.selected:SetColorTexture(1, 0.82, 0, 0.25)
+			end
+
+			if opts.onClick then
+				row:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+				-- Voile clair au survol.
 				local highlight = row:CreateTexture(nil, "HIGHLIGHT")
 				highlight:SetAllPoints()
 				highlight:SetColorTexture(1, 1, 1, 0.08)
@@ -155,8 +159,11 @@ local function CreateScrollList(panel, formatFn, top, opts)
 			end)
 		end
 
+		if opts.isSelected then
+			row.selected:SetShown(opts.isSelected(data) or false)
+		end
+
 		if opts.onClick then
-			row.selected:SetShown(opts.isSelected and opts.isSelected(data) or false)
 			-- Les lignes sont recyclées : le script est rebranché sur la donnée courante.
 			row:SetScript("OnClick", function(_, mouseButton)
 				opts.onClick(data, mouseButton)

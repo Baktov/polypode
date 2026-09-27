@@ -198,11 +198,16 @@ local function Build()
 	bar.header:SetPoint("LEFT", toggleIcon, "RIGHT", 4, 0)
 	bar.header:SetPoint("RIGHT", lockIcon, "LEFT", -2, 0)
 
-	-- Membres de l'équipe, même présentation que dans la fenêtre ([leader] marqué).
+	-- Membres de l'équipe, même présentation que dans la fenêtre : leader surligné en doré
+	-- et marqué [leader].
 	listPanel = P.CreatePanel(bar, "")
 	P.CreateScrollList(listPanel, function(data)
 		return P.FormatCharacter(data, P.GetSelectedTeam())
-	end, LIST_PADDING) -- marge basse identique, fixée par P.CreateScrollList
+	end, LIST_PADDING, { -- marge basse identique, fixée par P.CreateScrollList
+		isSelected = function(data)
+			return P.GetTeamLeader(P.GetSelectedTeam()) == data.key
+		end,
+	})
 	listPanel:Hide()
 
 	-- Poignée de redimensionnement, au-dessus de la liste (placée par LayoutGrip).
