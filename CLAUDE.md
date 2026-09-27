@@ -225,9 +225,14 @@ Un message ciblant un joueur passe par `P.Broadcast(message, "WHISPER", P.GetTar
 
 ### Référencer l'API Blizzard pour une nouvelle fonctionnalité
 → Avant d'implémenter un appel à l'API WoW (frames, events, namespaces `C_*`), vérifier la
-signature exacte plutôt que de deviner. Deux sources, par ordre de préférence :
-1. **Local** : un clone de `wow-ui-source` placé à côté de `Polypode/` dans `AddOns/`, si présent.
-2. **GitHub** : https://github.com/Gethe/wow-ui-source/
+signature exacte plutôt que de deviner. Sources, par ordre de préférence :
+1. **Serveur MCP `wow`** ([hated-wow-mcp](https://github.com/RdyGaming/hated-wow-mcp)), si ses
+   outils sont disponibles dans la session : recherche d'API/events/types, source de l'UI Blizzard,
+   CVars, atlas de textures. Ses outils de lint Lua et de validation TOC/XML servent aussi à
+   vérifier une modification avant de la commiter. Il est configuré en portée *locale* (hors repo) :
+   `claude mcp add --scope local wow -- cmd /c npx -y hated-wow-mcp` (Node 20+).
+2. **Local** : un clone de `wow-ui-source` placé à côté de `Polypode/` dans `AddOns/`, si présent.
+3. **GitHub** : https://github.com/Gethe/wow-ui-source/
 
 ---
 
