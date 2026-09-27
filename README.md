@@ -148,7 +148,8 @@ côte à côte :
   vide, déjà pris ou contenant « : » est refusé.
   **Glisser** une équipe (clic gauche maintenu) hors de la fenêtre la sélectionne et la pose en
   **barre flottante** à l'endroit où vous la lâchez (voir Barre flottante d'équipe).
-- **Personnages de l'équipe** : membres de l'équipe sélectionnée, triés par nom, même
+- **Personnages de l'équipe** : membres de l'équipe sélectionnée, le **leader toujours en tête**
+  puis les autres triés par nom, même
   présentation que les personnages disponibles.
   - **Clic gauche** sur un membre : il devient **leader de l'équipe** (surbrillance dorée et
     `[leader]`). Chaque équipe a son propre leader.
@@ -204,7 +205,7 @@ rien n'est sélectionné.
   équipement, niveau) ; « ? » tant qu'elles ne sont pas reçues. Décochée : présentation de la
   fenêtre principale (nom-royaume, classe, niveau).
 - **Clic droit** : déplie / replie la liste des personnages de l'équipe (même présentation que
-  dans la fenêtre : le leader est surligné en doré et marqué `[leader]`). Au survol d'un
+  dans la fenêtre : le leader est en tête, surligné en doré et marqué `[leader]`). Au survol d'un
   personnage **groupé avec vous**, l'infobulle complète de WoW s'affiche (la même qu'au survol
   de son cadre de groupe : niveau, classe, spécialisation, guilde, royaume...). **Hors du groupe**,
   une infobulle façon liste d'amis : niveau, race, classe et spécialisation, guilde, zone, niveau
@@ -359,7 +360,7 @@ vous avez désactivé le skin de Polypode dans ses options).
 
 ## État du projet
 
-Version `0.43.1` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
+Version `0.43.2` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
 automatique aux annonces, fenêtre redimensionnable à trois listes défilantes (personnages
 disponibles / équipes avec création par saisie, sélection, renommage et suppression / personnages de l'équipe, ajout
 et retrait de membres au clic, leader par équipe, invitation de toute l'équipe, synchronisation automatique et versionnée des équipes, ajout du joueur ciblé, barre flottante de l'équipe sélectionnée)

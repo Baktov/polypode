@@ -840,7 +840,11 @@ function P.RefreshUI()
 	SetListData(ui.teamPanel, teams)
 
 	local members = P.GetTeamMembers(selectedTeam)
-	SetListData(ui.memberPanel, SortedKeyItems(members or {}))
+	-- Leader toujours en tête, puis les autres membres par ordre alphabétique.
+	local leader = P.GetTeamLeader(selectedTeam)
+	SetListData(ui.memberPanel, SortedKeyItems(members or {}, function(key)
+		return key == leader
+	end))
 	if not members then
 		ui.memberPanel.emptyText:SetText("Sélectionnez une équipe")
 	else

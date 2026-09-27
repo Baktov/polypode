@@ -536,7 +536,11 @@ function P.RefreshTeamBar()
 
 	local team = P.GetSelectedTeam()
 	local members = P.GetTeamMembers(team)
-	local items = P.SortedKeyItems(members or {})
+	-- Leader toujours en tête, puis les autres membres par ordre alphabétique.
+	local leader = P.GetTeamLeader(team)
+	local items = P.SortedKeyItems(members or {}, function(key)
+		return key == leader
+	end)
 	if team then
 		bar.header:SetText(team .. " |cff999999(" .. #items .. ")|r")
 		listPanel.emptyText:SetText("Aucun personnage dans l'équipe")
