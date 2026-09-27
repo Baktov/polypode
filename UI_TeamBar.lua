@@ -407,10 +407,36 @@ local function Build()
 	bar:SetScript("OnLeave", GameTooltip_Hide)
 	bar:Hide()
 
+	-- Icône Polypode (celle du bouton de minimap), tout à gauche : ouvre / ferme la fenêtre
+	-- principale. Glisser depuis l'icône déplace la barre comme ailleurs.
+	local iconBtn = CreateFrame("Button", nil, bar)
+	iconBtn:SetSize(18, 18)
+	iconBtn:SetPoint("LEFT", 4, 0)
+	iconBtn:SetNormalTexture(P.ICON)
+	iconBtn:GetNormalTexture():SetTexCoord(0.07, 0.93, 0.07, 0.93) -- rogne le liseré
+	iconBtn:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square", "ADD")
+	iconBtn:RegisterForDrag("LeftButton")
+	iconBtn:SetScript("OnDragStart", function()
+		bar:GetScript("OnDragStart")(bar)
+	end)
+	iconBtn:SetScript("OnDragStop", function()
+		bar:GetScript("OnDragStop")(bar)
+	end)
+	iconBtn:SetScript("OnClick", function()
+		P.ToggleUI()
+	end)
+	iconBtn:SetScript("OnEnter", function(self)
+		GameTooltip:SetOwner(self, "ANCHOR_TOP")
+		GameTooltip:AddLine("Polypode")
+		GameTooltip:AddLine("Clic : ouvrir / fermer la fenêtre Polypode", 1, 1, 1)
+		GameTooltip:Show()
+	end)
+	iconBtn:SetScript("OnLeave", GameTooltip_Hide)
+
 	-- Indicateur plié (+) / déplié (-), à gauche du nom.
 	toggleIcon = bar:CreateTexture(nil, "OVERLAY")
 	toggleIcon:SetSize(14, 14)
-	toggleIcon:SetPoint("LEFT", 6, 0)
+	toggleIcon:SetPoint("LEFT", iconBtn, "RIGHT", 4, 0)
 
 	local closeBtn = CreateFrame("Button", nil, bar, "UIPanelCloseButton")
 	closeBtn:SetSize(20, 20)
@@ -486,6 +512,7 @@ local function Build()
 	P.ui.teamBar = bar
 	P.ui.teamBarList = listPanel
 	P.ui.teamBarClose = closeBtn
+	P.ui.teamBarIcon = iconBtn
 	P.ui.teamBarGrip = grip
 	P.ui.teamBarLock = lockIcon
 

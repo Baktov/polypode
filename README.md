@@ -175,6 +175,8 @@ du cadre « Équipes ». Elle affiche le nom de **l'équipe sélectionnée** et 
 personnages, et suit la sélection (clic sur une autre équipe, synchro) ; « Aucune équipe » si
 rien n'est sélectionné.
 
+- **Icône Polypode** (tout à gauche, la même que le bouton de minimap) : un clic ouvre ou ferme
+  la fenêtre principale de Polypode.
 - **Clic gauche** : invite l'équipe dans votre groupe, exactement comme le bouton **Inviter
   l'équipe** de la fenêtre principale (réservé au leader de l'équipe ; sinon un message rouge
   explique pourquoi, rappelé dans l'infobulle).
@@ -345,7 +347,7 @@ vous avez désactivé le skin de Polypode dans ses options).
 
 ## État du projet
 
-Version `0.41.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
+Version `0.41.1` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
 automatique aux annonces, fenêtre redimensionnable à trois listes défilantes (personnages
 disponibles / équipes avec création par saisie, sélection, renommage et suppression / personnages de l'équipe, ajout
 et retrait de membres au clic, leader par équipe, invitation de toute l'équipe, synchronisation automatique et versionnée des équipes, ajout du joueur ciblé, barre flottante de l'équipe sélectionnée)

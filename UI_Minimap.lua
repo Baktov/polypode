@@ -3,6 +3,7 @@
 local P = Polypode
 
 local ICON = "Interface\\Icons\\spell_holy_layonhands" -- une main (Imposition des mains)
+P.ICON = ICON -- partagée avec la barre flottante d'équipe (UI_TeamBar.lua)
 local EDGE_OFFSET = 5 -- distance du bouton au-delà du bord de la minimap
 
 -- Place le bouton sur le pourtour de la minimap selon l'angle sauvegardé (en degrés).
