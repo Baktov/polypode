@@ -14,7 +14,7 @@ local P = Polypode
 --   showName — nom sous chaque personnage, en couleur de classe ;
 --   showDetails — classe, spécialisation, niveau et niveau d'objet sous le nom (spé et niveau
 --     d'objet des autres membres : état envoyé par leur Polypode, STATUS dans Sync.lua).
--- Molette sur un modèle : zoom avant / arrière. Échap revient au jeu (P.StopPhotoMode) ; les
+-- Molette sur un modèle : zoom avant / arrière ; glisser : le déplacer. Échap revient au jeu (P.StopPhotoMode) ; les
 -- autres touches passent au jeu (Impr. écran pour la capture). Hors combat seulement : UIParent ne peut pas être masqué / réaffiché en
 -- combat, le mode photo se ferme donc à l'entrée en combat (PLAYER_REGEN_DISABLED, avant le
 -- verrouillage). Le cadre n'a pas de parent, pour rester visible quand UIParent est masqué.
@@ -182,8 +182,8 @@ local function Build()
 
 	hint = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightLarge")
 	hint:SetPoint("TOP", 0, -30)
-	hint:SetText("Mode photo — molette sur un personnage pour zoomer, Échap pour revenir au jeu, "
-		.. "Impr. écran pour une capture")
+	hint:SetText("Mode photo — glisser un personnage pour le déplacer, molette pour zoomer, "
+		.. "Échap pour revenir au jeu, Impr. écran pour une capture")
 
 	-- Échap ferme le mode photo et n'atteint pas le jeu (pas de menu) ; les autres touches
 	-- passent au jeu.
@@ -210,6 +210,14 @@ local function GetModel(i)
 			self.zoom = math.max(ZOOM_MIN, math.min(ZOOM_MAX, (self.zoom or 1) - delta * ZOOM_STEP))
 			self:SetCamDistanceScale(self.zoom)
 		end)
+		-- Clic gauche maintenu : déplace le modèle (son nom et ses détails le suivent) ; il
+		-- garde sa place au relâchement, jusqu'à la prochaine ouverture du mode photo.
+		model:EnableMouse(true)
+		model:SetMovable(true)
+		model:SetClampedToScreen(true)
+		model:RegisterForDrag("LeftButton")
+		model:SetScript("OnDragStart", model.StartMoving)
+		model:SetScript("OnDragStop", model.StopMovingOrSizing)
 		local label = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalHuge")
 		label:SetWordWrap(false)
 		local details = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")

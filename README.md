@@ -270,8 +270,9 @@ la croix pour fermer) :
 - **Afficher le nom des personnages** (oui par défaut), en couleur de classe ;
 - **Afficher classe, spé, niveau et niveau d'objet** (oui par défaut) sous le nom. La spé et le
   niveau d'objet des autres membres viennent de leur Polypode (absents sinon).
-La **molette** sur un personnage le zoome ou le dézoome (chaque personnage séparément, remis en
-pied à chaque ouverture). **Échap** revient au jeu ; **Impr. écran** fait une capture comme
+La **molette** sur un personnage le zoome ou le dézoome, et un **clic gauche maintenu** le
+déplace sur l'écran (son nom et ses détails suivent) ; il garde sa place au relâchement. Chaque
+personnage se règle séparément ; tout est remis en place à chaque ouverture. **Échap** revient au jeu ; **Impr. écran** fait une capture comme
 d'habitude. Hors combat
 seulement : le mode photo se ferme de lui-même à l'entrée en combat. WoW n'affiche le modèle
 d'un membre que s'il est à proximité (sinon « hors de vue »).
@@ -383,7 +384,7 @@ vous avez désactivé le skin de Polypode dans ses options).
 
 ## État du projet
 
-Version `0.45.2` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
+Version `0.45.3` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
 automatique aux annonces, fenêtre redimensionnable à trois listes défilantes (personnages
 disponibles / équipes avec création par saisie, sélection, renommage et suppression / personnages de l'équipe, ajout
 et retrait de membres au clic, leader par équipe, invitation de toute l'équipe, synchronisation automatique et versionnée des équipes, ajout du joueur ciblé, barre flottante de l'équipe sélectionnée)
