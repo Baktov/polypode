@@ -479,13 +479,23 @@ function P.BuildUI()
 	teamInput:SetScript("OnEscapePressed", teamInput.ClearFocus)
 	createBtn:SetScript("OnClick", SubmitTeam)
 
-	-- Clic gauche : sélectionne l'équipe ; clic droit : désélectionne (plus aucune équipe).
+	-- Clic gauche : sélectionne l'équipe ; clic droit : désélectionne (plus aucune équipe) ;
+	-- Maj + clic gauche : supprime l'équipe (synchronisé).
 	-- Glisser : sélectionne l'équipe et la sort en barre flottante (UI_TeamBar.lua).
 	CreateScrollList(teamPanel, function(data)
 		return data.name
 	end, HEADER_HEIGHT + INPUT_HEIGHT, {
 		onClick = function(data, mouseButton)
-			if mouseButton == "RightButton" then
+			if mouseButton == "LeftButton" and IsShiftKeyDown() then
+				if P.DeleteTeam(data.name) then
+					UIErrorsFrame:AddMessage("Équipe « " .. data.name .. " » supprimée.", 1, 0.82, 0)
+					if P.charDb.selectedTeam == data.name then
+						ChooseTeam(nil)
+					else
+						P.RefreshUI()
+					end
+				end
+			elseif mouseButton == "RightButton" then
 				ChooseTeam(nil)
 			else
 				ChooseTeam(data.name)
@@ -499,6 +509,7 @@ function P.BuildUI()
 				data.name,
 				"Clic gauche : sélectionner l'équipe",
 				"Clic droit : désélectionner",
+				"Maj + clic gauche : supprimer l'équipe",
 				"Glisser : sélectionner et afficher en barre flottante",
 			}
 		end,

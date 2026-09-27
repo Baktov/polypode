@@ -226,7 +226,7 @@ function P.RemoveCharacter(key)
 	entry.removed = true
 	CharacterChanged(key)
 	-- Un personnage retiré du roster ne reste membre (ni leader) d'aucune équipe.
-	for name in pairs(P.db.teams) do
+	for name in pairs(P.GetTeams()) do
 		P.RemoveTeamMember(name, key)
 	end
 	return true
@@ -284,28 +284,64 @@ local function TeamChanged(teamName)
 	end
 end
 
--- Crée une équipe. Renvoie true, ou false et un message d'erreur à afficher.
+-- Équipe active (ni absente ni supprimée), ou nil. Une équipe supprimée reste dans
+-- P.db.teams comme pierre tombale versionnée (removed = true), pour que la suppression
+-- l'emporte sur les copies plus anciennes des autres clients : toute décision passe par ici.
+local function ActiveTeam(teamName)
+	local team = teamName and P.db.teams[teamName]
+	if team and not team.removed then
+		return team
+	end
+end
+
+-- Crée une équipe (ou recrée une équipe supprimée, avec une version plus récente que sa
+-- pierre tombale). Renvoie true, ou false et un message d'erreur à afficher.
 function P.CreateTeam(name)
 	name = strtrim(name or "")
 	if name == "" then
 		return false, "Nom d'équipe vide."
 	end
-	if P.db.teams[name] then
+	if ActiveTeam(name) then
 		return false, "L'équipe « " .. name .. " » existe déjà."
 	end
-	P.db.teams[name] = { name = name, members = {} }
+	local old = P.db.teams[name]
+	P.db.teams[name] = { name = name, members = {}, updated = old and old.updated }
 	TeamChanged(name)
 	return true
 end
 
+-- Supprime une équipe (pierre tombale synchronisée). Renvoie true si supprimée.
+function P.DeleteTeam(teamName)
+	if not ActiveTeam(teamName) then
+		return false
+	end
+	local old = P.db.teams[teamName]
+	P.db.teams[teamName] = { name = teamName, members = {}, removed = true, updated = old.updated }
+	TeamChanged(teamName)
+	return true
+end
+
+-- Vrai si l'équipe est une pierre tombale (supprimée), pour la synchro.
+function P.IsTeamRemoved(teamName)
+	local team = teamName and P.db.teams[teamName]
+	return team ~= nil and team.removed == true
+end
+
+-- Équipes actives : { [nom] = équipe }, sans les équipes supprimées.
 function P.GetTeams()
-	return P.db.teams
+	local teams = {}
+	for name, team in pairs(P.db.teams) do
+		if not team.removed then
+			teams[name] = team
+		end
+	end
+	return teams
 end
 
 -- Membres d'une équipe : ensemble { [nom-royaume] = true }, ou nil si l'équipe n'existe pas.
 -- Les équipes créées avant l'ajout des membres reçoivent un ensemble vide.
 function P.GetTeamMembers(teamName)
-	local team = teamName and P.db.teams[teamName]
+	local team = ActiveTeam(teamName)
 	if not team then
 		return nil
 	end
@@ -324,7 +360,7 @@ end
 -- Noms des équipes dont le personnage est membre, triés par ordre alphabétique.
 function P.GetCharacterTeams(key)
 	local names = {}
-	for name, team in pairs(P.db.teams) do
+	for name, team in pairs(P.GetTeams()) do
 		if team.members and team.members[key] then
 			names[#names + 1] = name
 		end
@@ -348,12 +384,12 @@ end
 
 -- Leader d'une équipe (clé nom-royaume), ou nil.
 function P.GetTeamLeader(teamName)
-	local team = teamName and P.db.teams[teamName]
+	local team = ActiveTeam(teamName)
 	return team and team.leader
 end
 
 -- Horodatage de la dernière modification d'une équipe (0 si inconnu : équipe antérieure
--- à la synchro automatique).
+-- à la synchro automatique). Aussi pour une pierre tombale.
 function P.GetTeamUpdated(teamName)
 	local team = teamName and P.db.teams[teamName]
 	return team and team.updated or 0
@@ -364,16 +400,17 @@ end
 -- plus récente que la version locale (une copie ancienne n'écrase jamais une récente) : les
 -- membres sont remplacés. reset = false : fragment suivant ; appliqué seulement si la
 -- version locale est celle du premier fragment (les membres s'ajoutent).
--- Les membres sont pris tels quels, même absents du roster local. Renvoie true si appliqué.
-function P.ApplyTeamSync(teamName, updated, reset, leader, memberKeys)
+-- Les membres sont pris tels quels, même absents du roster local. removed = true : pierre
+-- tombale (équipe supprimée), en un seul fragment. Renvoie true si appliqué.
+function P.ApplyTeamSync(teamName, updated, reset, leader, memberKeys, removed)
 	local team = P.db.teams[teamName]
 	if reset then
 		if team and P.GetTeamUpdated(teamName) >= updated then
 			return false
 		end
-		team = { name = teamName, members = {}, leader = leader, updated = updated }
+		team = { name = teamName, members = {}, leader = leader, updated = updated, removed = removed or nil }
 		P.db.teams[teamName] = team
-	elseif not team or team.updated ~= updated then
+	elseif not team or team.removed or team.updated ~= updated then
 		return false
 	end
 	for _, key in ipairs(memberKeys) do
@@ -534,7 +571,7 @@ end
 
 function P.GetSelectedTeam()
 	local name = P.charDb and P.charDb.selectedTeam
-	if name and P.db.teams[name] then
+	if ActiveTeam(name) then
 		return name
 	end
 end

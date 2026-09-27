@@ -368,12 +368,21 @@ end
 --   les invités ne se sont pas forcément annoncés).
 -- select : le destinataire sélectionne l'équipe dans sa fenêtre.
 -- Format : TEAM:token:flag:version:leader:membre1,membre2,...:nomÉquipe
---   flag "N" = premier fragment, "S" = premier fragment + sélection, "+" = suite ;
+--   flag "N" = premier fragment, "S" = premier fragment + sélection, "+" = suite,
+--   "D" = équipe supprimée (pierre tombale, un seul message sans leader ni membres) ;
 --   version = heure serveur de la dernière modification (la plus récente l'emporte) ;
 --   le nom d'équipe est en dernier pour pouvoir contenir ":".
 -- Les membres sont découpés en fragments pour respecter MAX_MESSAGE_LENGTH.
 function P.SyncTeam(teamName, target, select)
 	local token = P.GetTeamToken()
+	if token and P.IsTeamRemoved(teamName) then
+		local message = string.format("TEAM:%s:D:%d:::%s", token, P.GetTeamUpdated(teamName), teamName)
+		for to in pairs(ResolveTargets(target)) do
+			P.Broadcast(message, "WHISPER", to)
+		end
+		P.Debug("Suppression de l'équipe « " .. teamName .. " » envoyée")
+		return
+	end
 	local members = P.GetTeamMembers(teamName)
 	if not token or not members then
 		P.Debug("Synchro d'équipe impossible (BattleTag ou équipe indisponible).")
@@ -421,9 +430,10 @@ function P.SyncTeam(teamName, target, select)
 	end
 end
 
--- Envoie toutes les équipes à un destinataire (ex. client qui vient de se connecter).
+-- Envoie toutes les équipes, supprimées comprises, à un destinataire (ex. client qui vient
+-- de se connecter) : une suppression l'emporte ainsi sur sa copie plus ancienne.
 function P.SyncAllTeams(target)
-	for teamName in pairs(P.GetTeams()) do
+	for teamName in pairs(P.db.teams) do
 		P.SyncTeam(teamName, target)
 	end
 end
@@ -436,7 +446,7 @@ local function OnTeamMessage(rest, sender)
 	teamName = teamName and strtrim(teamName)
 	-- 32 caractères au plus à la saisie, soit au plus 128 octets en UTF-8.
 	if not teamName or teamName == "" or #teamName > 128 or not updated
-		or (flag ~= "N" and flag ~= "S" and flag ~= "+") then
+		or (flag ~= "N" and flag ~= "S" and flag ~= "+" and flag ~= "D") then
 		return
 	end
 
@@ -444,7 +454,8 @@ local function OnTeamMessage(rest, sender)
 	for key in (memberList or ""):gmatch("[^,]+") do
 		memberKeys[#memberKeys + 1] = key
 	end
-	local applied = P.ApplyTeamSync(teamName, updated, flag ~= "+", leader ~= "" and leader or nil, memberKeys)
+	local applied = P.ApplyTeamSync(teamName, updated, flag ~= "+", leader ~= "" and leader or nil, memberKeys,
+		flag == "D")
 	if applied then
 		P.Debug("Équipe « " .. teamName .. " » reçue de " .. tostring(sender))
 	end
