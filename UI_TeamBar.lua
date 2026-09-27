@@ -30,6 +30,71 @@ local function NormalizeKey(key)
 	return (key:gsub("%s", ""))
 end
 
+-- Durée écoulée depuis un instant GetTime(), en clair.
+local function FormatAgo(since)
+	local minutes = math.floor((GetTime() - since) / 60)
+	if minutes < 1 then
+		return "à l'instant"
+	elseif minutes < 60 then
+		return "il y a " .. minutes .. " min"
+	end
+	return "il y a " .. math.floor(minutes / 60) .. " h"
+end
+
+-- Lignes d'infobulle d'un personnage non groupé, à la manière de la liste d'amis : niveau,
+-- race, classe et spécialisation, guilde, zone, niveau d'objet, présence. Infos envoyées par
+-- son Polypode (STATUS, Sync.lua) ; à défaut, ce que le roster en sait.
+local function StatusLines(key)
+	local entry = P.db.roster[key] or {}
+	local status = P.GetCharacterStatus(key)
+	local lines = {}
+
+	local identity = {}
+	local level = status and status.level or entry.level
+	if level then
+		identity[#identity + 1] = "Niveau " .. level
+	end
+	if status and status.race then
+		identity[#identity + 1] = status.race
+	end
+	if entry.class then
+		local className = LOCALIZED_CLASS_NAMES_MALE and LOCALIZED_CLASS_NAMES_MALE[entry.class] or entry.class
+		local color = C_ClassColor and C_ClassColor.GetClassColor(entry.class)
+		identity[#identity + 1] = color and color:WrapTextInColorCode(className) or className
+	end
+	if status and status.spec then
+		identity[#identity + 1] = "(" .. status.spec .. ")"
+	end
+	if #identity > 0 then
+		lines[#lines + 1] = table.concat(identity, " ")
+	end
+
+	if status then
+		if status.guild then
+			lines[#lines + 1] = "|cff40ff40<" .. status.guild .. ">|r"
+		end
+		if status.zone then
+			lines[#lines + 1] = "Zone : " .. status.zone
+		end
+		if status.ilvl and status.ilvl > 0 then
+			lines[#lines + 1] = "Niveau d'objet : " .. status.ilvl
+		end
+		if P.IsCharacterOnline(key) then
+			lines[#lines + 1] = "|cff40ff40En ligne|r |cff999999(infos " .. FormatAgo(status.received) .. ")|r"
+		else
+			lines[#lines + 1] = "|cff999999Hors ligne (dernières infos " .. FormatAgo(status.received) .. ")|r"
+		end
+	else
+		lines[#lines + 1] = "|cff999999Pas encore d'infos de son Polypode cette session|r"
+		if entry.lastSeen then
+			lines[#lines + 1] = "|cff999999Vu le " .. date("%d/%m à %H:%M", entry.lastSeen) .. "|r"
+		end
+	end
+
+	lines[#lines + 1] = "|cff999999Infobulle complète une fois groupé|r"
+	return lines
+end
+
 -- Unité du groupe (player, partyN, raidN) correspondant à un personnage du roster, ou nil
 -- s'il n'est pas groupé avec nous. Un nom rendu secret par WoW (issecretvalue) est ignoré.
 local function FindGroupUnit(key)
@@ -241,13 +306,12 @@ local function Build()
 			return P.GetTeamLeader(P.GetSelectedTeam()) == data.key
 		end,
 		-- Personnage groupé : infobulle WoW complète (comme au survol d'un cadre de groupe) ;
-		-- sinon, ses équipes comme dans la fenêtre principale.
+		-- sinon, son état façon liste d'amis puis ses équipes comme dans la fenêtre principale.
 		tooltipUnit = function(data)
 			return FindGroupUnit(data.key)
 		end,
 		tooltip = function(data)
-			return P.CharacterTooltip(data.key,
-				{ "|cff999999Hors de votre groupe : infobulle détaillée une fois groupé|r" })
+			return P.CharacterTooltip(data.key, StatusLines(data.key))
 		end,
 	})
 	listPanel:Hide()

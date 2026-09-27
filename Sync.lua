@@ -264,6 +264,84 @@ function P.SyncCharacter(key, target)
 	end
 end
 
+-- ÉTAT DES PERSONNAGES : ce que la liste d'amis montrerait (race, spécialisation, niveau,
+-- niveau d'objet, guilde, zone), pour les infobulles d'un personnage non groupé (WoW ne donne
+-- ces infos que sur une unité du groupe). Chaque client envoie le sien aux clients connectés
+-- à chaque rencontre (HELLO/HI) et quand il change ; gardé en mémoire (session seulement).
+-- Format : STATUS:token:niveau:ilvl:race:spé:guilde:nom:royaume:zone (zone en dernier).
+local characterStatus = {} -- [nom-royaume] = { level, ilvl, race, spec, guild, zone, received }
+local lastStatusSent
+local statusPending
+
+local function BuildStatusMessage(token)
+	local specIndex = GetSpecialization and GetSpecialization()
+	local spec = specIndex and select(2, GetSpecializationInfo(specIndex)) or ""
+	local _, ilvl = GetAverageItemLevel()
+	return string.format("STATUS:%s:%d:%d:%s:%s:%s:%s:%s:%s", token, UnitLevel("player"),
+		math.floor(ilvl or 0), UnitRace("player") or "", spec or "", GetGuildInfo("player") or "",
+		UnitName("player"), GetRealmName(), GetRealZoneText() or "")
+end
+
+-- Envoie l'état du personnage : à target (rencontre), sinon aux clients connectés s'il a
+-- changé depuis le dernier envoi.
+function P.SendStatus(target)
+	local token = P.GetTeamToken()
+	if not token then
+		return
+	end
+	local message = BuildStatusMessage(token)
+	if not target then
+		if message == lastStatusSent then
+			return
+		end
+		lastStatusSent = message
+	end
+	for to in pairs(ResolveTargets(target)) do
+		P.Broadcast(message, "WHISPER", to)
+	end
+end
+
+-- Changement d'état (zone, niveau, spécialisation, équipement, guilde ; Events.lua) : envoi
+-- différé de 2 s, les événements arrivant souvent en rafale (équipement).
+function P.ScheduleStatus()
+	if statusPending then
+		return
+	end
+	statusPending = true
+	C_Timer.After(2, function()
+		statusPending = nil
+		P.SendStatus()
+	end)
+end
+
+local function OnStatusMessage(rest)
+	local level, ilvl, race, spec, guild, name, realm, zone = strsplit(":", rest or "", 8)
+	if not name or name == "" or not realm or realm == "" then
+		return
+	end
+	characterStatus[P.GetCharKey(name, realm)] = {
+		level = tonumber(level),
+		ilvl = tonumber(ilvl),
+		race = race ~= "" and race or nil,
+		spec = spec ~= "" and spec or nil,
+		guild = guild ~= "" and guild or nil,
+		zone = zone ~= "" and zone or nil,
+		received = GetTime(),
+	}
+end
+
+-- Dernier état reçu d'un personnage pendant la session, ou nil.
+function P.GetCharacterStatus(key)
+	return characterStatus[key]
+end
+
+-- Vrai si le personnage s'est annoncé pendant la session sans erreur « non connecté » depuis.
+function P.IsCharacterOnline(key)
+	local entry = P.db.roster[key]
+	return entry ~= nil and entry.name ~= nil and entry.realm ~= nil
+		and onlineChars[FullName(P.GetTargetName(entry))] == true
+end
+
 -- Messages acceptés seulement de nos propres clients (même token), pas des comptes autorisés.
 local OWN_ACCOUNT_ONLY = {
 	CHANSET = true,
@@ -533,6 +611,9 @@ function P.OnSyncMessage(message, channel, sender)
 	elseif kind == "CHAR" then
 		OnCharMessage(rest, sender)
 		return
+	elseif kind == "STATUS" then
+		OnStatusMessage(rest)
+		return
 	elseif kind == "CHANSET" then
 		OnChannelSettingMessage(rest, sender)
 		return
@@ -629,6 +710,7 @@ function P.OnSyncMessage(message, channel, sender)
 	P.SyncTrust(nil, sender)
 	P.SyncAllCharacters(sender)
 	P.SyncAllTeams(sender)
+	P.SendStatus(sender)
 
 	-- Leader : invite automatiquement ce personnage s'il est membre de l'équipe (AutoGroup.lua).
 	P.OnTeamCharacterOnline(P.GetCharKey(name, realm))

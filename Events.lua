@@ -32,6 +32,17 @@ local CINEMATIC_EVENTS = {
 for cinematicEvent in pairs(CINEMATIC_EVENTS) do
 	frame:RegisterEvent(cinematicEvent)
 end
+-- État du personnage envoyé aux autres clients (Sync.lua, P.ScheduleStatus)
+local STATUS_EVENTS = {
+	ZONE_CHANGED_NEW_AREA = true,
+	PLAYER_LEVEL_UP = true,
+	PLAYER_SPECIALIZATION_CHANGED = true,
+	PLAYER_EQUIPMENT_CHANGED = true,
+	PLAYER_GUILD_UPDATE = true,
+}
+for statusEvent in pairs(STATUS_EVENTS) do
+	frame:RegisterEvent(statusEvent)
+end
 -- Groupage automatique de l'équipe (AutoGroup.lua)
 frame:RegisterEvent("PARTY_INVITE_REQUEST")
 frame:RegisterEvent("GROUP_ROSTER_UPDATE")
@@ -62,6 +73,10 @@ frame:SetScript("OnEvent", function(self, event, ...)
 		P.ApplyPendingKeybinds()
 	elseif QUEST_EVENTS[event] then
 		P.OnQuestEvent(event, ...)
+	elseif STATUS_EVENTS[event] then
+		if event ~= "PLAYER_SPECIALIZATION_CHANGED" or ... == "player" then
+			P.ScheduleStatus()
+		end
 	elseif CINEMATIC_EVENTS[event] then
 		P.OnCinematicEvent(event)
 	elseif event == "PARTY_INVITE_REQUEST" or event == "GROUP_ROSTER_UPDATE" then
