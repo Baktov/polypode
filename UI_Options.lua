@@ -333,6 +333,49 @@ function P.BuildOptions()
 		.. "barre de vie. Décochée : seul le libellé d'état (hors groupe, mort, loin...) reste. "
 		.. "Réglage propre à ce personnage.")
 
+	-- Clignotement des membres à durabilité faible dans la barre flottante (par personnage).
+	local durabilityAlertSetting = Settings.RegisterProxySetting(
+		category,
+		"POLYPODE_TEAMBAR_DURABILITY_ALERT",
+		Settings.VarType.Boolean,
+		"Barre d'équipe : clignoter si la durabilité est faible",
+		Settings.Default.True,
+		function()
+			return P.charDb.teamBar.durabilityAlert
+		end,
+		function(value)
+			P.charDb.teamBar.durabilityAlert = value
+			P.RefreshTeamBar()
+		end
+	)
+	Settings.CreateCheckbox(category, durabilityAlertSetting,
+		"Dans la liste de la barre flottante d'équipe, fait clignoter en rouge un personnage dont "
+		.. "la pièce d'équipement la plus usée est sous le seuil de durabilité ci-dessous. Durabilité "
+		.. "envoyée par le Polypode de chaque personnage. Réglage propre à ce personnage.")
+
+	local durabilityThresholdSetting = Settings.RegisterProxySetting(
+		category,
+		"POLYPODE_TEAMBAR_DURABILITY_THRESHOLD",
+		Settings.VarType.Number,
+		"Barre d'équipe : seuil de durabilité",
+		25,
+		function()
+			return P.charDb.teamBar.durabilityThreshold
+		end,
+		function(value)
+			P.charDb.teamBar.durabilityThreshold = math.floor(value + 0.5)
+			P.RefreshTeamBar()
+		end
+	)
+	local durabilityOptions = Settings.CreateSliderOptions(5, 95, 5)
+	durabilityOptions:SetLabelFormatter(MinimalSliderWithSteppersMixin.Label.Right, function(value)
+		return string.format("%d %%", value)
+	end)
+	Settings.CreateSlider(category, durabilityThresholdSetting, durabilityOptions,
+		"Un personnage clignote dans la barre flottante d'équipe quand la durabilité de sa pièce la "
+		.. "plus usée est inférieure à ce pourcentage (de 5 à 95 %, par pas de 5). Réglage propre à "
+		.. "ce personnage.")
+
 	Settings.RegisterAddOnCategory(category)
 	P.optionsCategory = category
 end

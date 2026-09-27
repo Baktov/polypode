@@ -42,6 +42,7 @@ local STATUS_EVENTS = {
 	PLAYER_SPECIALIZATION_CHANGED = true,
 	PLAYER_EQUIPMENT_CHANGED = true,
 	PLAYER_GUILD_UPDATE = true,
+	UPDATE_INVENTORY_DURABILITY = true,
 }
 for statusEvent in pairs(STATUS_EVENTS) do
 	frame:RegisterEvent(statusEvent)

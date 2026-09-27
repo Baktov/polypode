@@ -274,9 +274,10 @@ end
 -- et les détails de la barre flottante d'équipe (WoW ne donne ces infos que sur une unité
 -- du groupe). Chaque client envoie le sien aux clients connectés à chaque rencontre
 -- (HELLO/HI) et quand il change ; gardé en mémoire (session seulement).
--- Format : STATUS:token:niveau:ilvl:race:spé:guilde:xp:nom:royaume:zone (zone en dernier ;
--- xp = % du niveau en cours, vide au niveau maximum).
-local characterStatus = {} -- [nom-royaume] = { level, ilvl, race, spec, guild, xp, zone, received }
+-- Format : STATUS:token:niveau:ilvl:race:spé:guilde:xp:durabilité:nom:royaume:zone (zone en
+-- dernier ; xp = % du niveau en cours, vide au niveau maximum ; durabilité = % de la pièce
+-- équipée la plus usée, vide sans pièce à durabilité).
+local characterStatus = {} -- [nom-royaume] = { level, ilvl, race, spec, guild, xp, durability, zone, received }
 local lastStatusSent
 local statusPending
 
@@ -293,6 +294,22 @@ local function ExperiencePercent()
 	return math.floor(UnitXP("player") / max * 100)
 end
 
+-- % de durabilité de la pièce équipée la plus usée (comme l'alerte de durabilité de WoW),
+-- ou nil si aucune pièce n'a de durabilité.
+local function DurabilityPercent()
+	local lowest
+	for slot = 1, 18 do
+		local current, maximum = GetInventoryItemDurability(slot)
+		if current and maximum and maximum > 0 then
+			local percent = current / maximum * 100
+			if not lowest or percent < lowest then
+				lowest = percent
+			end
+		end
+	end
+	return lowest and math.floor(lowest) or nil
+end
+
 -- État courant du personnage joué (même forme que les états reçus).
 local function LocalStatus()
 	local specIndex = GetSpecialization and GetSpecialization()
@@ -305,6 +322,7 @@ local function LocalStatus()
 		spec = spec,
 		guild = GetGuildInfo("player"),
 		xp = ExperiencePercent(),
+		durability = DurabilityPercent(),
 		zone = GetRealZoneText(),
 		received = GetTime(),
 	}
@@ -312,9 +330,9 @@ end
 
 local function BuildStatusMessage(token)
 	local s = LocalStatus()
-	return string.format("STATUS:%s:%d:%d:%s:%s:%s:%s:%s:%s:%s", token, s.level, s.ilvl,
-		s.race or "", s.spec or "", s.guild or "", s.xp or "", UnitName("player"), GetRealmName(),
-		s.zone or "")
+	return string.format("STATUS:%s:%d:%d:%s:%s:%s:%s:%s:%s:%s:%s", token, s.level, s.ilvl,
+		s.race or "", s.spec or "", s.guild or "", s.xp or "", s.durability or "", UnitName("player"),
+		GetRealmName(), s.zone or "")
 end
 
 -- Envoie l'état du personnage : à target (rencontre), sinon aux clients connectés s'il a
@@ -354,7 +372,7 @@ function P.ScheduleStatus()
 end
 
 local function OnStatusMessage(rest)
-	local level, ilvl, race, spec, guild, xp, name, realm, zone = strsplit(":", rest or "", 9)
+	local level, ilvl, race, spec, guild, xp, durability, name, realm, zone = strsplit(":", rest or "", 10)
 	if not name or name == "" or not realm or realm == "" then
 		return
 	end
@@ -365,6 +383,7 @@ local function OnStatusMessage(rest)
 		spec = spec ~= "" and spec or nil,
 		guild = guild ~= "" and guild or nil,
 		xp = tonumber(xp),
+		durability = tonumber(durability),
 		zone = zone ~= "" and zone or nil,
 		received = GetTime(),
 	}

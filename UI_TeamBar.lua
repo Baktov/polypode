@@ -80,6 +80,11 @@ local function StatusLines(key)
 		if status.ilvl and status.ilvl > 0 then
 			lines[#lines + 1] = "Niveau d'objet : " .. status.ilvl
 		end
+		if status.durability then
+			local low = status.durability < P.charDb.teamBar.durabilityThreshold
+			lines[#lines + 1] = "Durabilité : " .. (low and "|cffff4040" or "") .. status.durability .. " %"
+				.. (low and "|r" or "")
+		end
 		if P.IsCharacterOnline(key) then
 			lines[#lines + 1] = "|cff40ff40En ligne|r |cff999999(infos " .. FormatAgo(status.received) .. ")|r"
 		else
@@ -299,6 +304,18 @@ local function DecorateRow(row, data)
 		row.health:SetHeight(2)
 		row.health:SetStatusBarTexture("Interface\\Buttons\\WHITE8X8")
 		row.health:SetStatusBarColor(0.2, 0.9, 0.2)
+
+		-- Voile rouge clignotant (durabilité faible), sous le texte.
+		row.flash = row:CreateTexture(nil, "ARTWORK")
+		row.flash:SetAllPoints()
+		row.flash:SetColorTexture(1, 0.1, 0.1, 0.35)
+		row.flash:Hide()
+		row.flashAnim = row.flash:CreateAnimationGroup()
+		row.flashAnim:SetLooping("BOUNCE")
+		local fade = row.flashAnim:CreateAnimation("Alpha")
+		fade:SetFromAlpha(1)
+		fade:SetToAlpha(0.1)
+		fade:SetDuration(0.6)
 	end
 
 	local unit = FindGroupUnit(data.key)
@@ -312,6 +329,21 @@ local function DecorateRow(row, data)
 		row.health:Show()
 	else
 		row.health:Hide()
+	end
+
+	-- Durabilité sous le seuil (option) : la ligne clignote. Durabilité envoyée par le Polypode
+	-- du personnage (STATUS), lue en direct pour le personnage joué.
+	local settings = P.charDb.teamBar
+	local status = P.GetCharacterStatus(data.key)
+	if settings.durabilityAlert and status and status.durability
+		and status.durability < settings.durabilityThreshold then
+		row.flash:Show()
+		if not row.flashAnim:IsPlaying() then
+			row.flashAnim:Play()
+		end
+	else
+		row.flashAnim:Stop()
+		row.flash:Hide()
 	end
 end
 

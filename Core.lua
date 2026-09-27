@@ -64,6 +64,8 @@ P.charDefaults = {
 		locked = false,
 		details = true, -- niveau, niveau d'objet et % d'XP à gauche des personnages
 		healthBar = true, -- barre de vie sous les membres groupés
+		durabilityAlert = true, -- ligne clignotante si la durabilité est sous le seuil
+		durabilityThreshold = 25, -- seuil de durabilité (%), par pas de 5
 	},
 	-- selectedTeam : nom de l'équipe sélectionnée dans la fenêtre (nil par défaut),
 	-- conservé même si l'équipe manque momentanément (cf. UI_Main.lua).

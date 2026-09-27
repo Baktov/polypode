@@ -198,6 +198,12 @@ rien n'est sélectionné.
   **barre de vie** verte souligne chaque membre groupé (masquable par l'option « Barre d'équipe :
   barre de vie des membres »). La ligne d'un personnage hors ligne ou
   déconnecté est estompée. Mis à jour en continu tant que la liste est dépliée.
+- **Durabilité faible** (option « Barre d'équipe : clignoter si la durabilité est faible »,
+  cochée par défaut) : la ligne d'un personnage clignote en rouge quand la pièce d'équipement la
+  plus usée passe sous le **seuil** choisi par le curseur « Barre d'équipe : seuil de
+  durabilité » (25 % par défaut, de 5 à 95 % par pas de 5). La durabilité est envoyée par le
+  Polypode de chaque personnage à chaque changement ; l'infobulle d'un membre non groupé
+  l'affiche aussi.
 - **Détails** (option « Barre d'équipe : niveau, niveau d'objet et progression », cochée par
   défaut) : à gauche de chaque personnage, son **niveau** (doré), le **% d'avancement** dans ce
   niveau (gris, masqué au niveau maximum) et son **niveau d'objet** équipé (bleu), puis son nom
@@ -339,6 +345,8 @@ fenêtre principale) :
 | Alerte quand un membre ne suit plus | Oui | Membre : signale au leader la fin de son suivi automatique. Leader : affiche « X ne vous suit plus. » à l'écran avec un son d'alerte (au plus une fois toutes les 3 s par membre). Réglage **par personnage**, à cocher sur le leader et les membres |
 | Barre d'équipe : niveau, niveau d'objet et progression | Oui | Dans la liste de la barre flottante d'équipe, affiche à gauche de chaque personnage son niveau, son % d'avancement dans ce niveau (sauf au niveau maximum) et son niveau d'objet équipé. Réglage **par personnage** |
 | Barre d'équipe : barre de vie des membres | Oui | Souligne chaque membre groupé de la liste de la barre flottante d'une fine barre de vie ; décochée, seul le libellé d'état reste. Réglage **par personnage** |
+| Barre d'équipe : clignoter si la durabilité est faible | Oui | Fait clignoter en rouge, dans la liste de la barre flottante, un personnage dont la pièce la plus usée est sous le seuil ci-dessous. Réglage **par personnage** |
+| Barre d'équipe : seuil de durabilité | 25 % | Curseur de 5 à 95 % par pas de 5 : seuil de durabilité sous lequel un personnage clignote. Réglage **par personnage** |
 | Groupage automatique de l'équipe | Oui | Leader : invite automatiquement dans son groupe les membres de son équipe sélectionnée qui se connectent, ou déjà connectés quand il se connecte lui-même. Membre : accepte automatiquement l'invitation de groupe du leader d'une de ses équipes. Réglage **par personnage** |
 
 ---
@@ -360,7 +368,7 @@ vous avez désactivé le skin de Polypode dans ses options).
 
 ## État du projet
 
-Version `0.43.2` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
+Version `0.44.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
 automatique aux annonces, fenêtre redimensionnable à trois listes défilantes (personnages
 disponibles / équipes avec création par saisie, sélection, renommage et suppression / personnages de l'équipe, ajout
 et retrait de membres au clic, leader par équipe, invitation de toute l'équipe, synchronisation automatique et versionnée des équipes, ajout du joueur ciblé, barre flottante de l'équipe sélectionnée)
