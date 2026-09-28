@@ -694,7 +694,20 @@ function P.BuildUI()
 				return
 			end
 			if not selectedTeam then
-				UIErrorsFrame:AddMessage("Sélectionnez d'abord une équipe.", 1, 0.1, 0.1)
+				if mouseButton == "RightButton" then
+					-- Sans équipe sélectionnée : nouvelle équipe à son nom, avec lui pour leader.
+					local teamName, err = P.CreateTeamWithLeader(data.key)
+					if teamName then
+						UIErrorsFrame:AddMessage("Équipe « " .. teamName .. " » créée, leader : "
+							.. P.GetDisplayName(data.key) .. ".", 1, 0.82, 0)
+						ChooseTeam(teamName)
+					else
+						UIErrorsFrame:AddMessage(err, 1, 0.1, 0.1)
+					end
+				else
+					UIErrorsFrame:AddMessage("Sélectionnez d'abord une équipe (ou clic droit pour en "
+						.. "créer une avec ce personnage pour leader).", 1, 0.1, 0.1)
+				end
 				return
 			end
 			if mouseButton == "RightButton" then
@@ -721,7 +734,8 @@ function P.BuildUI()
 			local hint = "Alt + clic : ranger dans un compte WoW"
 			if not selectedTeam then
 				return CharacterTooltip(data.key, { presence, account,
-					"Sélectionnez d'abord une équipe pour y ajouter ce personnage.", hint })
+					"Sélectionnez d'abord une équipe pour y ajouter ce personnage.",
+					"Clic droit : créer une équipe à son nom, avec lui pour leader", hint })
 			end
 			return CharacterTooltip(data.key, {
 				presence,

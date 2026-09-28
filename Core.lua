@@ -534,6 +534,25 @@ function P.ApplyTeamSync(teamName, updated, reset, leader, memberKeys, removed)
 	return true
 end
 
+-- Crée une équipe pour un personnage, qui en devient membre et leader. Nom : celui du
+-- personnage (P.GetDisplayName), ou suivi de « _1 », « _2 »... s'il est déjà pris par une
+-- équipe active. Renvoie le nom de l'équipe, ou nil et un message d'erreur.
+function P.CreateTeamWithLeader(key)
+	local base = P.GetDisplayName(key)
+	local name, index = base, 0
+	while P.GetTeams()[name] do
+		index = index + 1
+		name = base .. "_" .. index
+	end
+	local ok, err = P.CreateTeam(name)
+	if not ok then
+		return nil, err
+	end
+	P.AddTeamMember(name, key)
+	P.SetTeamLeader(name, key)
+	return name
+end
+
 -- Désigne le leader d'une équipe ; il doit en être membre.
 function P.SetTeamLeader(teamName, key)
 	local members = P.GetTeamMembers(teamName)
