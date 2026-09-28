@@ -55,15 +55,6 @@ P.charDefaults = {
 	followLeaderSound = true, -- membre : appliquer le volume / la coupure du son du leader
 	autoGroup = true, -- inviter (leader) / accepter (membre) l'équipe à la connexion (AutoGroup.lua)
 	followAlert = true, -- alerte du leader quand un membre ne le suit plus (Follow.lua)
-	-- Mode photo (UI_Photo.lua, clic droit sur le bouton « Photo ») : interface masquée, fond
-	-- ("" = voile sombre, sinon fichier d'écran de chargement), nom et détails sous les modèles.
-	photo = {
-		hideUI = true,
-		background = "",
-		showName = true,
-		showDetails = true,
-		showPets = true, -- familiers (chasseur, démoniste...) après leur maître
-	},
 	-- Barre flottante de l'équipe sélectionnée (UI_TeamBar.lua) : affichée, liste dépliée,
 	-- figée (Alt + clic) ; position (point, relativePoint, x, y), largeur (width) et hauteur
 	-- de la liste (listHeight, sinon automatique) ajoutées au premier placement / redimensionnement.

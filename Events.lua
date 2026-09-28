@@ -8,7 +8,6 @@ frame:RegisterEvent("ADDON_LOADED")
 frame:RegisterEvent("PLAYER_LOGIN")
 frame:RegisterEvent("UPDATE_BINDINGS") -- touches modifiées dans le panneau Raccourcis
 frame:RegisterEvent("PLAYER_REGEN_ENABLED") -- sortie de combat : mises à jour différées
-frame:RegisterEvent("PLAYER_REGEN_DISABLED") -- entrée en combat : fin du mode photo
 -- Acceptation, validation et sélection (dialogues de PNJ) automatiques des quêtes (Quests.lua)
 local QUEST_EVENTS = {
 	GOSSIP_SHOW = true,
@@ -76,9 +75,6 @@ frame:SetScript("OnEvent", function(self, event, ...)
 		if P.db then
 			P.UpdateLeaderMacros()
 		end
-	elseif event == "PLAYER_REGEN_DISABLED" then
-		-- Avant le verrouillage de combat : l'interface peut encore être réaffichée.
-		P.StopPhotoMode()
 	elseif event == "PLAYER_REGEN_ENABLED" then
 		P.ApplyPendingKeybinds()
 	elseif QUEST_EVENTS[event] then

@@ -252,37 +252,12 @@ ne sont pas listés. Échap ferme la fenêtre.
 
 ---
 
-## Mode photo
+## Mode photo (addon séparé)
 
-Le bouton **Photo** (barre de titre de la fenêtre principale, à gauche de la croix) ou
-`/poly photo` affiche **en pied, côte à côte**, chaque membre du groupe (vous compris, 10 au
-plus).
-
-Un **clic droit** sur le bouton ouvre ses options (mémorisées pour chaque personnage ; Échap ou
-la croix pour fermer) :
-
-- **Masquer l'interface** (oui par défaut) ;
-- **Fond** : voile sombre en dégradé (par défaut), l'un des **168 écrans de chargement** de WoW
-  (zones, donjons, raids, champs de bataille, arènes, domaines de classe...), rangés par
-  extension de Midnight aux continents, plus un groupe **WoW Forever** (en tête sur ce client),
-  ou l'**illustration d'un donjon ou d'un raid** du guide de l'aventurier, rangés par extension
-  puis « Donjons » / « Raids » (liste lue dans le guide, donc toujours à jour ; les gouffres n'y
-  figurent pas). Toute image remplit l'écran sans être déformée (les bords en trop sont coupés
-  au centre) ; les illustrations du guide, petites à l'origine, apparaissent un peu floues. Aucune
-  API ne liste les écrans de chargement : leur liste vient de l'inventaire communautaire des
-  fichiers du jeu, avec la zone utile de chaque image mesurée (bandes noires retirées) ;
-- **Afficher le nom des personnages** (oui par défaut), en couleur de classe ;
-- **Afficher classe, spé, niveau et niveau d'objet** (oui par défaut) sous le nom. La spé et le
-  niveau d'objet des autres membres viennent de leur Polypode (absents sinon) ;
-- **Afficher les familiers** (oui par défaut) : le familier présent de chaque membre (chasseur,
-  démoniste, chevalier de la mort, mage...) apparaît juste après lui, avec son nom et « Familier
-  de ... » ; il se zoome et se déplace comme les personnages (10 modèles au plus en tout).
-La **molette** sur un personnage le zoome ou le dézoome, et un **clic gauche maintenu** le
-déplace sur l'écran (son nom et ses détails suivent) ; il garde sa place au relâchement. Chaque
-personnage se règle séparément ; tout est remis en place à chaque ouverture. **Échap** revient au jeu ; **Impr. écran** fait une capture comme
-d'habitude. Hors combat
-seulement : le mode photo se ferme de lui-même à l'entrée en combat. WoW n'affiche le modèle
-d'un membre que s'il est à proximité (sinon « hors de vue »).
+Le mode photo (membres du groupe en pied, côte à côte, sur un fond au choix) est un addon
+compagnon séparé, **Polypode Photo** : https://github.com/Baktov/Polypode-Photo. Installé et
+activé, il ajoute le bouton **Photo** à la barre de titre (à gauche de « Quêtes ») et la commande
+`/poly photo` ; sans lui, Polypode fonctionne normalement.
 
 ---
 
@@ -297,7 +272,7 @@ d'un membre que s'il est à proximité (sinon « hors de vue »).
 | `/poly minimap` | Afficher/masquer l'icône de minimap |
 | `/poly options` | Ouvrir le panneau d'options (Options → AddOns → Polypode) |
 | `/poly quetes` | Ouvrir/fermer la fenêtre des quêtes du leader manquantes chez les membres |
-| `/poly photo` | Mode photo : interface masquée, membres du groupe en pied (Échap pour revenir) |
+| `/poly photo` | Mode photo (addon **Polypode Photo**, s'il est installé et activé) |
 | `/poly comptes` | Lister les autres comptes Battle.net autorisés (numérotés) |
 | `/poly retirer-compte <n°>` | Retirer l'autorisation d'un compte (numéro donné par `/poly comptes`) |
 | `/poly debug` | Activer/désactiver les messages de debug (mémorisé pour ce personnage, comme la case du panneau d'options) |
@@ -391,12 +366,12 @@ vous avez désactivé le skin de Polypode dans ses options).
 
 ## État du projet
 
-Version `0.46.1` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
+Version `0.47.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
 automatique aux annonces, fenêtre redimensionnable à trois listes défilantes (personnages
 disponibles / équipes avec création par saisie, sélection, renommage et suppression / personnages de l'équipe, ajout
 et retrait de membres au clic, leader par équipe, invitation de toute l'équipe, synchronisation automatique et versionnée des équipes, ajout du joueur ciblé, barre flottante de l'équipe sélectionnée)
 skinnée (EllesmereUI/ElvUI), bouton de minimap (masquable), panneau d'options (accessible par un bouton de la fenêtre),
-commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, inviter), suivi des dialogues de PNJ (quêtes, options, fermeture de DialogueUI), acceptation, partage et validation automatiques des quêtes du leader, passage automatique des cinématiques, vol automatique chez le maître de vol, entrée et sortie de gouffre et entrée par portail automatiques, volume et coupure du son de l'équipe par le leader, groupage automatique de l'équipe à la connexion, alerte « ne suit plus », mode photo, quêtes du leader manquantes chez les membres, canal dédié commun aux comptes, autorisation d'autres comptes Battle.net. Pistes envisagées pour la suite,
+commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, inviter), suivi des dialogues de PNJ (quêtes, options, fermeture de DialogueUI), acceptation, partage et validation automatiques des quêtes du leader, passage automatique des cinématiques, vol automatique chez le maître de vol, entrée et sortie de gouffre et entrée par portail automatiques, volume et coupure du son de l'équipe par le leader, groupage automatique de l'équipe à la connexion, alerte « ne suit plus », mode photo (addon séparé Polypode Photo), quêtes du leader manquantes chez les membres, canal dédié commun aux comptes, autorisation d'autres comptes Battle.net. Pistes envisagées pour la suite,
 à activer seulement si le besoin se confirme (voir la règle de simplicité dans
 `CLAUDE.md`) :
 

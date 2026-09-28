@@ -2,6 +2,16 @@
 
 local P = Polypode
 
+-- Sous-commandes ajoutées par des addons compagnons (ex. Polypode Photo) :
+-- [nom] = { handler = fn(args), help = texte }.
+local extraCommands = {}
+
+-- Ajoute une sous-commande /poly <nom> ; handler reçoit les mots qui suivent. Point
+-- d'extension pour les addons qui dépendent de Polypode.
+function P.RegisterSlashCommand(name, handler, help)
+	extraCommands[name:lower()] = { handler = handler, help = help }
+end
+
 local function PrintHelp()
 	print("|cff33ff99Polypode|r — commandes :")
 	print("  /poly list         — lister les personnages connus")
@@ -10,11 +20,13 @@ local function PrintHelp()
 	print("  /poly ui           — ouvrir/fermer la fenêtre")
 	print("  /poly minimap      — afficher/masquer l'icône de minimap")
 	print("  /poly options      — ouvrir le panneau d'options")
-	print("  /poly photo        — mode photo (membres du groupe en pied, Échap pour revenir)")
 	print("  /poly quetes       — quêtes du leader manquantes chez les membres de l'équipe")
 	print("  /poly comptes      — lister les autres comptes Battle.net autorisés")
 	print("  /poly retirer-compte <n°> — retirer l'autorisation d'un compte")
 	print("  /poly debug        — activer/désactiver le mode debug")
+	for name, command in pairs(extraCommands) do
+		print(string.format("  /poly %-12s — %s", name, command.help or ""))
+	end
 end
 
 local function SlashHandler(msg)
@@ -58,8 +70,6 @@ local function SlashHandler(msg)
 		print("Polypode: icône de minimap " .. (show and "affichée" or "masquée"))
 	elseif sub == "options" then
 		P.OpenOptions()
-	elseif sub == "photo" then
-		P.StartPhotoMode()
 	elseif sub == "quetes" or sub == "quêtes" then
 		P.ToggleTeamQuests()
 	elseif sub == "comptes" then
@@ -82,6 +92,8 @@ local function SlashHandler(msg)
 	elseif sub == "debug" then
 		P.SetDebug(not P.debugEnabled)
 		print("Polypode: debug " .. (P.debugEnabled and "activé" or "désactivé"))
+	elseif extraCommands[sub] then
+		extraCommands[sub].handler({ select(2, unpack(args)) })
 	else
 		PrintHelp()
 	end

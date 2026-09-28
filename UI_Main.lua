@@ -485,35 +485,11 @@ function P.BuildUI()
 	end)
 	optionsBtn:SetScript("OnLeave", GameTooltip_Hide)
 
-	-- Bouton Photo (barre de titre, à gauche de la croix) : mode photo (UI_Photo.lua).
-	local photoBtn = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
-	photoBtn:SetSize(60, 20)
-	photoBtn:SetPoint("RIGHT", closeBtn, "LEFT", -4, 0)
-	photoBtn:SetText("Photo")
-	photoBtn:RegisterForClicks("LeftButtonUp", "RightButtonUp")
-	photoBtn:SetScript("OnClick", function(self, mouseButton)
-		if mouseButton == "RightButton" then
-			P.TogglePhotoOptions(self)
-		else
-			P.StartPhotoMode()
-		end
-	end)
-	photoBtn:SetScript("OnEnter", function(self)
-		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-		GameTooltip:AddLine("Photo")
-		GameTooltip:AddLine("Clic gauche : affiche en pied, côte à côte, chaque membre du groupe "
-			.. "(interface masquée selon les options). Échap pour revenir au jeu. Hors combat "
-			.. "seulement.", 1, 1, 1, true)
-		GameTooltip:AddLine("Clic droit : options (interface, fond, nom, détails)", 1, 1, 1, true)
-		GameTooltip:Show()
-	end)
-	photoBtn:SetScript("OnLeave", GameTooltip_Hide)
-
-	-- Bouton Quêtes (barre de titre, à gauche de Photo) : quêtes du leader manquantes chez les
-	-- membres (UI_TeamQuests.lua).
+	-- Bouton Quêtes (barre de titre, à gauche de la croix) : quêtes du leader manquantes chez les
+	-- membres (UI_TeamQuests.lua). L'addon Polypode Photo ajoute son bouton à sa gauche.
 	local questsBtn = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
 	questsBtn:SetSize(60, 20)
-	questsBtn:SetPoint("RIGHT", photoBtn, "LEFT", -4, 0)
+	questsBtn:SetPoint("RIGHT", closeBtn, "LEFT", -4, 0)
 	questsBtn:SetText("Quêtes")
 	questsBtn:SetScript("OnClick", function()
 		P.ToggleTeamQuests()
@@ -773,7 +749,6 @@ function P.BuildUI()
 	ui.title = title
 	ui.closeButton = closeBtn
 	ui.optionsButton = optionsBtn
-	ui.photoButton = photoBtn
 	ui.questsButton = questsBtn
 	ui.channelLabel = channelLabel
 	ui.channelInput = channelInput
@@ -796,7 +771,6 @@ function P.BuildUI()
 		P.SkinButton(inviteBtn)
 		P.SkinButton(addTargetBtn)
 		P.SkinButton(optionsBtn)
-		P.SkinButton(photoBtn)
 		P.SkinButton(questsBtn)
 		P.SkinEditBox(channelInput)
 	end
