@@ -25,6 +25,47 @@ function P.ChannelSettingMixin:Init()
 	self.EditBox:SetText(P.GetSyncChannelName())
 end
 
+-- Élément « Compte WoW de ce personnage » (modèle PolypodeAccountSettingTemplate) : range le
+-- personnage connecté dans un compte WoW nommé (P.SetCharacterAccount, partagé et synchronisé,
+-- comme Alt + clic dans la fenêtre). Par personnage : WoW ne donne pas le compte WoW aux addons,
+-- et le fichier de compte est commun à tous les comptes (jonctions). Vide = automatique.
+P.AccountSettingMixin = {}
+
+function P.AccountSettingMixin:OnLoad()
+	local editBox = self.EditBox
+	editBox:SetAutoFocus(false)
+	editBox:SetMaxLetters(32)
+	editBox:SetScript("OnEnterPressed", function(box)
+		local label = strtrim(box:GetText() or "")
+		P.SetCharacterAccount(P.GetCharKey(), label)
+		UIErrorsFrame:AddMessage(label == "" and "Compte WoW : automatique (compte Battle.net)."
+			or "Compte WoW de ce personnage : " .. label .. ".", 1, 0.82, 0)
+		box:ClearFocus()
+		P.RefreshUI()
+	end)
+	editBox:SetScript("OnEscapePressed", function(box)
+		box:SetText(P.GetCharacterAccount(P.GetCharKey()) or "")
+		box:ClearFocus()
+	end)
+	editBox:SetScript("OnEnter", function(box)
+		GameTooltip:SetOwner(box, "ANCHOR_BOTTOM")
+		GameTooltip:AddLine("Compte WoW de ce personnage")
+		GameTooltip:AddLine("Nom du compte WoW sur lequel vous jouez ce personnage (ex. WoW1). WoW ne "
+			.. "le donne pas aux addons : à saisir une fois par personnage. Sert au regroupement par "
+			.. "compte des personnages disponibles ; partagé avec vos autres Polypode. Entrée pour "
+			.. "valider, vide pour revenir au regroupement automatique (compte Battle.net). Même "
+			.. "réglage que Alt + clic sur un personnage dans la fenêtre Polypode.", 1, 1, 1, true)
+		GameTooltip:Show()
+	end)
+	editBox:SetScript("OnLeave", GameTooltip_Hide)
+end
+
+function P.AccountSettingMixin:Init()
+	if not self.EditBox:HasFocus() then
+		self.EditBox:SetText(P.GetCharacterAccount(P.GetCharKey()) or "")
+	end
+end
+
 -- Enregistre la catégorie "Polypode" dans Options > AddOns. Appelé à PLAYER_LOGIN,
 -- une fois P.db disponible.
 function P.BuildOptions()
@@ -273,6 +314,8 @@ function P.BuildOptions()
 		.. "repliable d'un clic. WoW ne donne pas le nom du compte WoW aux addons : les personnages "
 		.. "sont regroupés par compte Battle.net, sauf ceux rangés à la main dans un compte nommé "
 		.. "(Alt + clic sur un personnage). Réglage propre à ce personnage.")
+	-- Compte WoW du personnage connecté : champ de texte (élément personnalisé).
+	layout:AddInitializer(Settings.CreateElementInitializer("PolypodeAccountSettingTemplate", {}))
 
 	-- Groupage automatique de l'équipe à la connexion (par personnage, cf. AutoGroup.lua).
 	local autoGroupSetting = Settings.RegisterProxySetting(

@@ -37,4 +37,33 @@
 			</OnLoad>
 		</Scripts>
 	</Frame>
+
+	<!-- Compte WoW du personnage connecté (même rangement que Alt + clic dans la fenêtre).
+	     Méthodes dans Polypode.AccountSettingMixin (UI_Options.lua). -->
+	<Frame name="PolypodeAccountSettingTemplate" virtual="true">
+		<Size y="30"/>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString parentKey="Text" inherits="GameFontNormal" justifyH="LEFT" text="Compte WoW de ce personnage">
+					<Anchors>
+						<Anchor point="LEFT" x="37" y="0"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<EditBox parentKey="EditBox" inherits="InputBoxTemplate">
+				<Size x="180" y="20"/>
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="CENTER" x="-80" y="0"/>
+				</Anchors>
+			</EditBox>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				Mixin(self, Polypode.AccountSettingMixin)
+				self:OnLoad()
+			</OnLoad>
+		</Scripts>
+	</Frame>
 </Ui>
