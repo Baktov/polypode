@@ -518,6 +518,53 @@ function P.SetupChannelInput(editBox)
 	editBox:SetScript("OnLeave", GameTooltip_Hide)
 end
 
+-- BOUTONS DE LA BARRE DE TITRE DES ADDONS COMPAGNONS (Polypode Photo, Polypode Quêtes) :
+-- empilés de droite à gauche depuis la croix, dans l'ordre de leurs demandes. Créés dès que la
+-- fenêtre existe (P.BuildUI la construit à la première ouverture).
+local titleButtonSpecs, titleButtons = {}, {}
+
+local function CreateTitleButton(spec)
+	local button = CreateFrame("Button", nil, ui.frame, "UIPanelButtonTemplate")
+	button:SetSize(spec.width or 60, 20)
+	button:SetPoint("RIGHT", titleButtons[#titleButtons] or ui.closeButton, "LEFT", -4, 0)
+	button:SetText(spec.text)
+	if spec.rightClick then
+		button:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+	end
+	button:SetScript("OnClick", spec.onClick)
+	if spec.tooltip then
+		button:SetScript("OnEnter", function(self)
+			GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+			for i, line in ipairs(spec.tooltip) do
+				if i == 1 then
+					GameTooltip:AddLine(line)
+				else
+					GameTooltip:AddLine(line, 1, 1, 1, true)
+				end
+			end
+			GameTooltip:Show()
+		end)
+		button:SetScript("OnLeave", GameTooltip_Hide)
+	end
+	if P.SkinButton then
+		P.SkinButton(button)
+	end
+	titleButtons[#titleButtons + 1] = button
+	if spec.onCreate then
+		spec.onCreate(button)
+	end
+end
+
+-- Ajoute un bouton à la barre de titre de la fenêtre principale (point d'extension des addons
+-- compagnons). spec = { text, width, onClick = fn(bouton, mouseButton), rightClick = clic droit
+-- aussi, tooltip = { titre, lignes... }, onCreate = fn(bouton) }.
+function P.AddTitleButton(spec)
+	titleButtonSpecs[#titleButtonSpecs + 1] = spec
+	if ui.frame then
+		CreateTitleButton(spec)
+	end
+end
+
 function P.BuildUI()
 	if ui.frame then
 		return
@@ -566,24 +613,6 @@ function P.BuildUI()
 		GameTooltip:Show()
 	end)
 	optionsBtn:SetScript("OnLeave", GameTooltip_Hide)
-
-	-- Bouton Quêtes (barre de titre, à gauche de la croix) : quêtes du leader manquantes chez les
-	-- membres (UI_TeamQuests.lua). L'addon Polypode Photo ajoute son bouton à sa gauche.
-	local questsBtn = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
-	questsBtn:SetSize(60, 20)
-	questsBtn:SetPoint("RIGHT", closeBtn, "LEFT", -4, 0)
-	questsBtn:SetText("Quêtes")
-	questsBtn:SetScript("OnClick", function()
-		P.ToggleTeamQuests()
-	end)
-	questsBtn:SetScript("OnEnter", function(self)
-		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-		GameTooltip:AddLine("Quêtes de l'équipe")
-		GameTooltip:AddLine("Liste les quêtes du leader de l'équipe sélectionnée et, pour chacune, "
-			.. "les membres qui ne l'ont pas.", 1, 1, 1, true)
-		GameTooltip:Show()
-	end)
-	questsBtn:SetScript("OnLeave", GameTooltip_Hide)
 
 	-- Canal dédié (barre de titre, à droite de Options) : validé par Entrée, Échap annule.
 	local channelLabel = f:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
@@ -859,7 +888,6 @@ function P.BuildUI()
 	ui.title = title
 	ui.closeButton = closeBtn
 	ui.optionsButton = optionsBtn
-	ui.questsButton = questsBtn
 	ui.channelLabel = channelLabel
 	ui.channelInput = channelInput
 	ui.resizeGrip = grip
@@ -881,8 +909,12 @@ function P.BuildUI()
 		P.SkinButton(inviteBtn)
 		P.SkinButton(addTargetBtn)
 		P.SkinButton(optionsBtn)
-		P.SkinButton(questsBtn)
 		P.SkinEditBox(channelInput)
+	end
+
+	-- Boutons des addons compagnons demandés avant la construction de la fenêtre.
+	for _, spec in ipairs(titleButtonSpecs) do
+		CreateTitleButton(spec)
 	end
 end
 
@@ -896,7 +928,7 @@ function P.RefreshUI()
 	if P.RefreshTeamBar then
 		P.RefreshTeamBar()
 	end
-	-- Fenêtre des quêtes de l'équipe (UI_TeamQuests.lua), si elle est ouverte.
+	-- Fenêtre des quêtes de l'équipe (addon compagnon Polypode Quêtes), si elle est ouverte.
 	if P.RefreshTeamQuests then
 		P.RefreshTeamQuests()
 	end

@@ -6,8 +6,8 @@ local P = Polypode
 -- [nom] = { handler = fn(args), help = texte }.
 local extraCommands = {}
 
--- Ajoute une sous-commande /poly <nom> ; handler reçoit les mots qui suivent. Point
--- d'extension pour les addons qui dépendent de Polypode.
+-- Ajoute une sous-commande /poly <nom> ; handler reçoit les mots qui suivent ; help nil =
+-- alias absent de l'aide. Point d'extension pour les addons qui dépendent de Polypode.
 function P.RegisterSlashCommand(name, handler, help)
 	extraCommands[name:lower()] = { handler = handler, help = help }
 end
@@ -20,12 +20,13 @@ local function PrintHelp()
 	print("  /poly ui           — ouvrir/fermer la fenêtre")
 	print("  /poly minimap      — afficher/masquer l'icône de minimap")
 	print("  /poly options      — ouvrir le panneau d'options")
-	print("  /poly quetes       — quêtes du leader manquantes chez les membres de l'équipe")
 	print("  /poly comptes      — lister les autres comptes Battle.net autorisés")
 	print("  /poly retirer-compte <n°> — retirer l'autorisation d'un compte")
 	print("  /poly debug        — activer/désactiver le mode debug")
 	for name, command in pairs(extraCommands) do
-		print(string.format("  /poly %-12s — %s", name, command.help or ""))
+		if command.help then -- sans aide : alias (ex. « quêtes » pour « quetes »)
+			print(string.format("  /poly %-12s — %s", name, command.help))
+		end
 	end
 end
 
@@ -70,8 +71,6 @@ local function SlashHandler(msg)
 		print("Polypode: icône de minimap " .. (show and "affichée" or "masquée"))
 	elseif sub == "options" then
 		P.OpenOptions()
-	elseif sub == "quetes" or sub == "quêtes" then
-		P.ToggleTeamQuests()
 	elseif sub == "comptes" then
 		local list = P.GetTrustedTokens()
 		if #list == 0 then

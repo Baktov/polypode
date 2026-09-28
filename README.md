@@ -246,26 +246,19 @@ multibox a sa propre barre) et retrouvés à la connexion.
 
 ---
 
-## Quêtes de l'équipe
+## Addons compagnons (séparés)
 
-Le bouton **Quêtes** (barre de titre de la fenêtre principale) ou `/poly quetes` ouvre une
-fenêtre qui liste les quêtes du **leader de l'équipe sélectionnée** (les vôtres si l'équipe
-n'a pas de leader) et, pour chacune, les membres de l'équipe qui **ne l'ont pas** (en rouge),
-ou « toute l'équipe ». Les quêtes qui manquent au plus de membres viennent en premier ; au
-survol, l'infobulle détaille qui l'a et qui ne l'a pas. Chaque Polypode envoie son journal de
-quêtes à la connexion et à chaque quête acceptée, rendue ou abandonnée : la fenêtre se met à
-jour d'elle-même. Un membre dont le journal n'a pas été reçu (pas de Polypode, pas encore vu
-cette session) apparaît comme « inconnu ». Les expéditions, objectifs bonus et quêtes cachées
-ne sont pas listés. Échap ferme la fenêtre.
+Deux fonctions sont des addons séparés, qui dépendent de Polypode et se chargent ou non depuis
+la liste des AddOns ; sans eux, Polypode fonctionne normalement. Chacun ajoute son bouton à la
+barre de titre de la fenêtre principale (à gauche de la croix) et sa commande `/poly` :
 
----
-
-## Mode photo (addon séparé)
-
-Le mode photo (membres du groupe en pied, côte à côte, sur un fond au choix) est un addon
-compagnon séparé, **Polypode Photo** : https://github.com/Baktov/Polypode-Photo. Installé et
-activé, il ajoute le bouton **Photo** à la barre de titre (à gauche de « Quêtes ») et la commande
-`/poly photo` ; sans lui, Polypode fonctionne normalement.
+- **Polypode Quêtes** (https://github.com/Baktov/Polypode-quetes) : bouton **Quêtes** et
+  `/poly quetes`, fenêtre des quêtes du leader de l'équipe sélectionnée avec, pour chacune, les
+  membres qui ne l'ont pas. Polypode continue d'échanger les journaux de quêtes entre vos
+  clients (à la connexion et à chaque quête acceptée, rendue ou abandonnée), que la fenêtre
+  utilise ; l'acceptation, la validation et le partage automatiques restent dans Polypode.
+- **Polypode Photo** (https://github.com/Baktov/Polypode-Photo) : bouton **Photo** et
+  `/poly photo`, membres du groupe en pied, côte à côte, sur un fond au choix.
 
 ---
 
@@ -279,7 +272,7 @@ activé, il ajoute le bouton **Photo** à la barre de titre (à gauche de « Qu�
 | `/poly ui` | Ouvrir/fermer la fenêtre principale |
 | `/poly minimap` | Afficher/masquer l'icône de minimap |
 | `/poly options` | Ouvrir le panneau d'options (Options → AddOns → Polypode) |
-| `/poly quetes` | Ouvrir/fermer la fenêtre des quêtes du leader manquantes chez les membres |
+| `/poly quetes` | Fenêtre des quêtes du leader manquantes chez les membres (addon **Polypode Quêtes**, s'il est installé et activé) |
 | `/poly photo` | Mode photo (addon **Polypode Photo**, s'il est installé et activé) |
 | `/poly comptes` | Lister les autres comptes Battle.net autorisés (numérotés) |
 | `/poly retirer-compte <n°>` | Retirer l'autorisation d'un compte (numéro donné par `/poly comptes`) |
@@ -376,12 +369,12 @@ vous avez désactivé le skin de Polypode dans ses options).
 
 ## État du projet
 
-Version `0.48.3` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
+Version `0.49.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
 automatique aux annonces, fenêtre redimensionnable à trois listes défilantes (personnages
 disponibles / équipes avec création par saisie, sélection, renommage et suppression / personnages de l'équipe, ajout
 et retrait de membres au clic, leader par équipe, invitation de toute l'équipe, synchronisation automatique et versionnée des équipes, ajout du joueur ciblé, barre flottante de l'équipe sélectionnée)
 skinnée (EllesmereUI/ElvUI), bouton de minimap (masquable), panneau d'options (accessible par un bouton de la fenêtre),
-commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, inviter), suivi des dialogues de PNJ (quêtes, options, fermeture de DialogueUI), acceptation, partage et validation automatiques des quêtes du leader, passage automatique des cinématiques, vol automatique chez le maître de vol, entrée et sortie de gouffre et entrée par portail automatiques, volume et coupure du son de l'équipe par le leader, groupage automatique de l'équipe à la connexion, alerte « ne suit plus », mode photo (addon séparé Polypode Photo), quêtes du leader manquantes chez les membres, canal dédié commun aux comptes, autorisation d'autres comptes Battle.net. Pistes envisagées pour la suite,
+commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, inviter), suivi des dialogues de PNJ (quêtes, options, fermeture de DialogueUI), acceptation, partage et validation automatiques des quêtes du leader, passage automatique des cinématiques, vol automatique chez le maître de vol, entrée et sortie de gouffre et entrée par portail automatiques, volume et coupure du son de l'équipe par le leader, groupage automatique de l'équipe à la connexion, alerte « ne suit plus », mode photo et quêtes du leader manquantes chez les membres (addons séparés Polypode Photo et Polypode Quêtes), canal dédié commun aux comptes, autorisation d'autres comptes Battle.net. Pistes envisagées pour la suite,
 à activer seulement si le besoin se confirme (voir la règle de simplicité dans
 `CLAUDE.md`) :
 
