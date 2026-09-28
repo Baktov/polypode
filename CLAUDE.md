@@ -26,7 +26,9 @@ n'ajoute une fonctionnalité que si elle sert directement cet objectif.
   (`../Polypode_Quetes`, https://github.com/Baktov/Polypode-quetes : fenêtre « Quêtes de l'équipe » —
   l'échange `QLOG`, `P.GetCharacterQuests` et Quests.lua restent dans Polypode, qui appelle
   `P.RefreshTeamQuests` s'il est défini) et **Polypode Suivi** (`../Polypode_Suivi`,
-  https://github.com/Baktov/polypode-suivi : suivi de l'équipe, message `SUIVI` à lui). Polypode n'en sait
+  https://github.com/Baktov/polypode-suivi : suivi de l'équipe, message `SUIVI` à lui) et **Polypode Data**
+  (`../Polypode_Data`, https://github.com/Baktov/polypode-data : données durables des personnages façon
+  DataStore, messages `DATA` / `DATAV` / `DATAREQ` à lui). Polypode n'en sait
   rien : chacun ajoute son bouton de barre de titre par `P.AddTitleButton` (UI_Main.lua, empilés de droite à
   gauche depuis la croix) et sa commande par `P.RegisterSlashCommand` ; un compagnon échange ses propres
   messages par `P.RegisterMessageHandler(type, fn(reste, expéditeur))` (appelé par `P.OnSyncMessage` après

@@ -252,7 +252,7 @@ multibox a sa propre barre) et retrouvés à la connexion.
 
 ## Addons compagnons (séparés)
 
-Trois fonctions sont des addons séparés, qui dépendent de Polypode et se chargent ou non depuis
+Quatre fonctions sont des addons séparés, qui dépendent de Polypode et se chargent ou non depuis
 la liste des AddOns ; sans eux, Polypode fonctionne normalement. Chacun ajoute son bouton à la
 barre de titre de la fenêtre principale (à gauche de la croix) et sa commande `/poly` :
 
@@ -267,6 +267,9 @@ barre de titre de la fenêtre principale (à gauche de la croix) et sa commande 
   `/poly suivi`, pour chaque membre de l'équipe sélectionnée : grande chambre forte, écus,
   ressources, renommées et runes de pouvoir (informations échangées par Polypode, à installer
   sur chaque personnage suivi).
+- **Polypode Data** (https://github.com/Baktov/polypode-data) : bouton **Data** et `/poly data`,
+  données durables de tous vos personnages (niveau, or, métiers, équipement, sacs et banques), avec
+  recherche d'objet, dans l'esprit de DataStore / WoWthing (à installer sur chaque personnage).
 
 ---
 
@@ -282,6 +285,7 @@ barre de titre de la fenêtre principale (à gauche de la croix) et sa commande 
 | `/poly options` | Ouvrir le panneau d'options (Options → AddOns → Polypode) |
 | `/poly quetes` | Fenêtre des quêtes du leader manquantes chez les membres (addon **Polypode Quêtes**, s'il est installé et activé) |
 | `/poly suivi` | Suivi de l'équipe : coffre, écus, ressources, renommées, runes (addon **Polypode Suivi**, s'il est installé et activé) |
+| `/poly data` | Données des personnages : niveau, or, métiers, équipement, sacs, banques, recherche d'objet (addon **Polypode Data**, s'il est installé et activé) |
 | `/poly photo` | Mode photo (addon **Polypode Photo**, s'il est installé et activé) |
 | `/poly comptes` | Lister les autres comptes Battle.net autorisés (numérotés) |
 | `/poly retirer-compte <n°>` | Retirer l'autorisation d'un compte (numéro donné par `/poly comptes`) |
