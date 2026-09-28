@@ -383,7 +383,7 @@ function P.CreateTeam(name)
 		return false, err
 	end
 	local old = P.db.teams[name]
-	P.db.teams[name] = { name = name, members = {}, updated = old and old.updated }
+	P.db.teams[name] = { name = name, members = {}, updated = old and old.updated, created = GetServerTime() }
 	TeamChanged(name)
 	return true
 end
@@ -422,7 +422,7 @@ function P.RenameTeam(oldName, newName)
 		members[key] = true
 	end
 	P.db.teams[newName] = { name = newName, members = members, leader = team.leader,
-		updated = previous and previous.updated }
+		updated = previous and previous.updated, created = team.created }
 	TeamChanged(newName)
 	P.db.teams[oldName] = { name = oldName, members = {}, removed = true, renamedTo = newName,
 		updated = team.updated }
@@ -518,7 +518,9 @@ function P.ApplyTeamSync(teamName, updated, reset, leader, memberKeys, removed)
 		if team and P.GetTeamUpdated(teamName) >= updated then
 			return false
 		end
-		team = { name = teamName, members = {}, updated = updated }
+		-- La date de création (TEAMINFO, P.ApplyTeamCreated) survit aux nouvelles versions.
+		team = { name = teamName, members = {}, updated = updated,
+			created = not removed and team and team.created or nil }
 		if removed then
 			team.removed, team.renamedTo = true, leader
 		else
@@ -551,6 +553,24 @@ function P.CreateTeamWithLeader(key)
 	P.AddTeamMember(name, key)
 	P.SetTeamLeader(name, key)
 	return name
+end
+
+-- Date de création d'une équipe active (heure serveur), ou nil (équipe créée avant que
+-- Polypode ne l'enregistre).
+function P.GetTeamCreated(teamName)
+	local team = ActiveTeam(teamName)
+	return team and team.created
+end
+
+-- Applique une date de création reçue d'un autre client (TEAMINFO) : la plus ancienne connue
+-- l'emporte (elle ne change jamais). Renvoie true si appliquée.
+function P.ApplyTeamCreated(teamName, created)
+	local team = ActiveTeam(teamName)
+	if not team or (team.created and team.created <= created) then
+		return false
+	end
+	team.created = created
+	return true
 end
 
 -- Désigne le leader d'une équipe ; il doit en être membre.

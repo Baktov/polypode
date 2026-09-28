@@ -815,8 +815,11 @@ function P.BuildUI()
 			return data.name == selectedTeam
 		end,
 		tooltip = function(data)
+			local created = P.GetTeamCreated(data.name)
 			return {
 				data.name,
+				created and ("|cff999999Créée le " .. date("%d/%m/%Y à %H:%M", created) .. "|r")
+					or "|cff999999Date de création inconnue (équipe plus ancienne)|r",
 				"Clic gauche : sélectionner l'équipe",
 				"Clic droit : désélectionner",
 				"Ctrl + clic gauche : renommer l'équipe",

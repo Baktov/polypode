@@ -740,6 +740,13 @@ function P.SyncTeam(teamName, target, select)
 			leader, table.concat(chunk, ","), teamName)
 	end
 
+	-- Date de création, dans un message à part (TEAMINFO:token:date:nomÉquipe) : un champ de plus
+	-- dans TEAM serait mal lu par les versions précédentes. Envoyé après les fragments (file).
+	local created = P.GetTeamCreated(teamName)
+	if created then
+		messages[#messages + 1] = string.format("TEAMINFO:%s:%d:%s", token, created, teamName)
+	end
+
 	for to in pairs(ResolveTargets(target, select and keys or nil)) do
 		for _, message in ipairs(messages) do
 			P.Broadcast(message, "WHISPER", to)
@@ -863,6 +870,14 @@ function P.OnSyncMessage(message, channel, sender)
 		local _, _, key = strsplit(":", rest or "", 4)
 		if key and IsSender(sender, key) then
 			OnQuestLogMessage(rest)
+		end
+		return
+	elseif kind == "TEAMINFO" then
+		-- TEAMINFO:token:date:nomÉquipe — date de création d'une équipe (nom en dernier).
+		local created, teamName = strsplit(":", rest or "", 2)
+		created = tonumber(created)
+		if created and teamName and P.ApplyTeamCreated(teamName, created) and P.RefreshUI then
+			P.RefreshUI()
 		end
 		return
 	elseif kind == "ACCT" then
