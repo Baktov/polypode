@@ -24,7 +24,7 @@ n'ajoute une fonctionnalité que si elle sert directement cet objectif.
 - **Addon compagnon** : **Polypode Photo** (mode photo, dossier voisin `../Polypode_Photo`, dépôt séparé
   https://github.com/Baktov/Polypode-Photo, `## Dependencies: Polypode`). Polypode n'en sait rien : le
   compagnon ajoute son bouton après `P.BuildUI` (à gauche de `P.ui.questsButton`) et sa commande par
-  `P.RegisterSlashCommand`. Il utilise l'API publique `P.BuildUI`, `P.ui.frame`, `P.ui.questsButton`,
+  `P.RegisterSlashCommand`. Il utilise l'API publique `P.BuildUI`, `P.optionsCategory` (sa sous-catégorie « Photo »), `P.ui.frame`, `P.ui.questsButton`,
   `P.ui.closeButton`, `P.RegisterSlashCommand`, `P.SkinFrame`, `P.SkinButton`, `P.UnitNameParts`,
   `P.JoinSurname`, `P.GetCharacterStatus`, `P.db.roster` : ne pas les renommer ni changer leur
   comportement sans adapter Polypode Photo.
