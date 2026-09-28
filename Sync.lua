@@ -553,7 +553,7 @@ end
 -- COMPTES WOW NOMMÉS (Core.lua) : rangement d'un personnage dans un compte WoW nommé à la
 -- main, versionné. Envoyé en WHISPER aux clients connectés à chaque changement et à chaque
 -- HELLO/HI reçu. Format : ACCT:token:version:nom-royaume:nomDuCompte (nom en dernier, vide =
--- regroupement automatique).
+-- aucun compte).
 function P.SyncAccountLabel(key, target)
 	local token = P.GetTeamToken()
 	local entry = P.db.accountLabels[key]

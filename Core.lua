@@ -39,7 +39,7 @@ P.defaults = {
 	-- Versionné et synchronisé entre les clients de ce compte (pierre tombale au retrait).
 	trustedTokens = {},
 	-- Comptes WoW nommés à la main (WoW ne donne pas le nom du compte WoW aux addons) :
-	-- [nom-royaume] = { label = nom du compte | nil (automatique), updated = version }.
+	-- [nom-royaume] = { label = nom du compte | nil (aucun), updated = version }.
 	-- Versionné et synchronisé (message ACCT) ; label nil = pierre tombale du rangement.
 	accountLabels = {},
 }
@@ -618,8 +618,7 @@ end
 
 -- COMPTES WOW NOMMÉS -------------------------------------------------------------------
 
--- Compte WoW nommé à la main d'un personnage, ou nil (regroupement automatique par compte
--- Battle.net, cf. UI_Main.lua).
+-- Compte WoW nommé à la main d'un personnage, ou nil (« Compte non renseigné », cf. UI_Main.lua).
 function P.GetCharacterAccount(key)
 	local entry = key and P.db.accountLabels[key]
 	return entry and entry.label
@@ -638,8 +637,8 @@ function P.GetAccountLabels()
 	return labels
 end
 
--- Range un personnage dans un compte WoW nommé (label), ou le rend au regroupement
--- automatique (label nil ou vide) ; nouvelle version puis envoi aux autres clients.
+-- Range un personnage dans un compte WoW nommé (label), ou le retire de tout compte (label nil
+-- ou vide) ; nouvelle version puis envoi aux autres clients.
 function P.SetCharacterAccount(key, label)
 	label = label and strtrim(label) or ""
 	label = label ~= "" and label or nil

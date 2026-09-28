@@ -103,7 +103,7 @@ StaticPopupDialogs[NEW_ACCOUNT_POPUP] = {
 }
 
 -- Menu Alt + clic d'un personnage : le ranger dans un compte WoW nommé, en créer un, ou le
--- rendre au regroupement automatique (compte Battle.net). Partagé avec les autres Polypode.
+-- retirer de tout compte. Partagé avec les autres Polypode.
 local function ShowAccountMenu(owner, key)
 	local function IsCurrent(label)
 		return (P.GetCharacterAccount(key) or "") == label
@@ -114,7 +114,7 @@ local function ShowAccountMenu(owner, key)
 	end
 	MenuUtil.CreateContextMenu(owner, function(_, root)
 		root:CreateTitle("Compte WoW de " .. P.GetDisplayName(key))
-		root:CreateRadio("Automatique (compte Battle.net)", IsCurrent, Assign, "")
+		root:CreateRadio("Aucun compte", IsCurrent, Assign, "")
 		for _, label in ipairs(P.GetAccountLabels()) do
 			root:CreateRadio(label, IsCurrent, Assign, label)
 		end
@@ -370,38 +370,23 @@ local function SortedKeyItems(set, isFirst)
 	return items
 end
 
--- REGROUPEMENT PAR COMPTE (option P.charDb.groupByAccount) : WoW ne donne pas le nom du
--- compte WoW aux addons. Un personnage rangé à la main dans un compte nommé (Alt + clic,
--- P.SetCharacterAccount) y figure ; sinon il est regroupé par compte Battle.net (entry.token :
--- le nôtre, un compte autorisé, ou « Autres personnages » sans token). Groupe = { key, label }.
+-- REGROUPEMENT PAR COMPTE WOW (option P.charDb.groupByAccount) : WoW ne donne pas le nom du
+-- compte WoW aux addons ; chaque personnage est rangé à la main (champ des options ou Alt + clic,
+-- P.SetCharacterAccount). Les personnages sans compte vont dans « Compte non renseigné ».
+-- Renvoie la clé de groupe et son libellé.
+local NO_ACCOUNT_GROUP = "~none"
+
 local function AccountGroup(key)
 	local label = P.GetCharacterAccount(key)
 	if label then
 		return "m:" .. label, label
 	end
-	local entry = P.db.roster[key]
-	local token = entry and entry.token
-	if not token then
-		return "~other", "Autres personnages"
-	end
-	if token == P.GetTeamToken() then
-		return "b:" .. token, "Mon compte Battle.net"
-	end
-	local trusted = P.db.trustedTokens[token]
-	return "b:" .. token, "Battle.net de " .. (trusted and trusted.label or "?")
+	return NO_ACCOUNT_GROUP, "Compte non renseigné"
 end
 
--- Ordre des groupes : comptes nommés (alphabétique), mon Battle.net, autres Battle.net,
--- « Autres personnages ».
+-- Ordre des groupes : comptes nommés (alphabétique), puis « Compte non renseigné ».
 local function GroupRank(groupKey)
-	if groupKey:sub(1, 2) == "m:" then
-		return 1
-	elseif groupKey == "b:" .. (P.GetTeamToken() or "") then
-		return 2
-	elseif groupKey == "~other" then
-		return 4
-	end
-	return 3
+	return groupKey == NO_ACCOUNT_GROUP and 2 or 1
 end
 
 -- Vrai si le personnage est connecté : soi-même, un Polypode annoncé pendant la session
@@ -703,7 +688,7 @@ function P.BuildUI()
 					"Clic : " .. (data.collapsed and "déplier" or "replier") }
 			end
 			local presence = data.first and "|cff40ff40Connecté|r" or "|cff999999Déconnecté (ou pas vu cette session)|r"
-			local account = "Compte : " .. (P.GetCharacterAccount(data.key) or "automatique (compte Battle.net)")
+			local account = "Compte WoW : " .. (P.GetCharacterAccount(data.key) or "non renseigné")
 			local hint = "Alt + clic : ranger dans un compte WoW"
 			if not selectedTeam then
 				return CharacterTooltip(data.key, { presence, account,

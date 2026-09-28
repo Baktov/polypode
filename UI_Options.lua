@@ -28,7 +28,7 @@ end
 -- Élément « Compte WoW de ce personnage » (modèle PolypodeAccountSettingTemplate) : range le
 -- personnage connecté dans un compte WoW nommé (P.SetCharacterAccount, partagé et synchronisé,
 -- comme Alt + clic dans la fenêtre). Par personnage : WoW ne donne pas le compte WoW aux addons,
--- et le fichier de compte est commun à tous les comptes (jonctions). Vide = automatique.
+-- et le fichier de compte est commun à tous les comptes (jonctions). Vide = aucun compte.
 P.AccountSettingMixin = {}
 
 -- Enregistre la saisie si elle a changé (Entrée, ou perte du focus : clic ailleurs, fermeture
@@ -39,7 +39,7 @@ local function CommitAccountName(box)
 		return
 	end
 	P.SetCharacterAccount(P.GetCharKey(), label)
-	local message = label == "" and "Compte WoW : automatique (compte Battle.net)."
+	local message = label == "" and "Compte WoW : non renseigné."
 		or "Compte WoW de ce personnage : " .. label .. "."
 	if not P.charDb.groupByAccount then
 		message = message .. " Cochez « Personnages disponibles : regrouper par compte » pour voir les comptes."
@@ -68,8 +68,8 @@ function P.AccountSettingMixin:OnLoad()
 		GameTooltip:AddLine("Nom du compte WoW sur lequel vous jouez ce personnage (ex. WoW1). WoW ne "
 			.. "le donne pas aux addons : à saisir une fois par personnage. Sert au regroupement par "
 			.. "compte des personnages disponibles ; partagé avec vos autres Polypode. Enregistré à "
-			.. "Entrée ou en quittant le champ ; Échap annule ; vide pour revenir au regroupement automatique (compte Battle.net). Même "
-			.. "réglage que Alt + clic sur un personnage dans la fenêtre Polypode.", 1, 1, 1, true)
+			.. "Entrée ou en quittant le champ ; Échap annule ; vide = aucun compte. Même réglage que "
+			.. "Alt + clic sur un personnage dans la fenêtre Polypode.", 1, 1, 1, true)
 		GameTooltip:Show()
 	end)
 	editBox:SetScript("OnLeave", GameTooltip_Hide)
@@ -325,10 +325,10 @@ function P.BuildOptions()
 		end
 	)
 	Settings.CreateCheckbox(category, groupByAccountSetting,
-		"Dans la fenêtre Polypode, range les personnages disponibles sous un en-tête par compte, "
-		.. "repliable d'un clic. WoW ne donne pas le nom du compte WoW aux addons : les personnages "
-		.. "sont regroupés par compte Battle.net, sauf ceux rangés à la main dans un compte nommé "
-		.. "(Alt + clic sur un personnage). Réglage propre à ce personnage.")
+		"Dans la fenêtre Polypode, range les personnages disponibles sous un en-tête par compte WoW, "
+		.. "repliable d'un clic. WoW ne donne pas le nom du compte WoW aux addons : renseignez-le sur "
+		.. "chaque personnage (champ ci-dessous, ou Alt + clic sur un personnage dans la fenêtre) ; "
+		.. "les autres vont dans « Compte non renseigné ». Réglage propre à ce personnage.")
 	-- Compte WoW du personnage connecté : champ de texte (élément personnalisé).
 	layout:AddInitializer(Settings.CreateElementInitializer("PolypodeAccountSettingTemplate", {}))
 
