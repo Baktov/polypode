@@ -194,6 +194,10 @@ local function CreateScrollList(panel, formatFn, top, opts)
 			return
 		end
 		local lines = opts.tooltip(row.data)
+		if not lines or #lines == 0 then -- pas d'infobulle pour cette ligne
+			GameTooltip:Hide()
+			return
+		end
 		for i, line in ipairs(lines) do
 			if i == 1 then
 				GameTooltip:AddLine(line)
