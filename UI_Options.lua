@@ -31,19 +31,34 @@ end
 -- et le fichier de compte est commun à tous les comptes (jonctions). Vide = automatique.
 P.AccountSettingMixin = {}
 
+-- Enregistre la saisie si elle a changé (Entrée, ou perte du focus : clic ailleurs, fermeture
+-- des options — sans quoi une saisie non validée par Entrée serait perdue).
+local function CommitAccountName(box)
+	local label = strtrim(box:GetText() or "")
+	if label == (P.GetCharacterAccount(P.GetCharKey()) or "") then
+		return
+	end
+	P.SetCharacterAccount(P.GetCharKey(), label)
+	local message = label == "" and "Compte WoW : automatique (compte Battle.net)."
+		or "Compte WoW de ce personnage : " .. label .. "."
+	if not P.charDb.groupByAccount then
+		message = message .. " Cochez « Personnages disponibles : regrouper par compte » pour voir les comptes."
+	end
+	UIErrorsFrame:AddMessage(message, 1, 0.82, 0)
+	P.RefreshUI()
+end
+
 function P.AccountSettingMixin:OnLoad()
 	local editBox = self.EditBox
 	editBox:SetAutoFocus(false)
 	editBox:SetMaxLetters(32)
 	editBox:SetScript("OnEnterPressed", function(box)
-		local label = strtrim(box:GetText() or "")
-		P.SetCharacterAccount(P.GetCharKey(), label)
-		UIErrorsFrame:AddMessage(label == "" and "Compte WoW : automatique (compte Battle.net)."
-			or "Compte WoW de ce personnage : " .. label .. ".", 1, 0.82, 0)
+		CommitAccountName(box)
 		box:ClearFocus()
-		P.RefreshUI()
 	end)
+	editBox:SetScript("OnEditFocusLost", CommitAccountName)
 	editBox:SetScript("OnEscapePressed", function(box)
+		-- Annule : la valeur enregistrée est remise avant la perte du focus (rien à enregistrer).
 		box:SetText(P.GetCharacterAccount(P.GetCharKey()) or "")
 		box:ClearFocus()
 	end)
@@ -52,8 +67,8 @@ function P.AccountSettingMixin:OnLoad()
 		GameTooltip:AddLine("Compte WoW de ce personnage")
 		GameTooltip:AddLine("Nom du compte WoW sur lequel vous jouez ce personnage (ex. WoW1). WoW ne "
 			.. "le donne pas aux addons : à saisir une fois par personnage. Sert au regroupement par "
-			.. "compte des personnages disponibles ; partagé avec vos autres Polypode. Entrée pour "
-			.. "valider, vide pour revenir au regroupement automatique (compte Battle.net). Même "
+			.. "compte des personnages disponibles ; partagé avec vos autres Polypode. Enregistré à "
+			.. "Entrée ou en quittant le champ ; Échap annule ; vide pour revenir au regroupement automatique (compte Battle.net). Même "
 			.. "réglage que Alt + clic sur un personnage dans la fenêtre Polypode.", 1, 1, 1, true)
 		GameTooltip:Show()
 	end)
