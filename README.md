@@ -153,7 +153,7 @@ côte à côte :
   **Maj + clic gauche** sur une équipe la **supprime** (sans confirmation), aussi sur vos autres
   Polypode connectés ; une suppression l'emporte sur les copies plus anciennes (clients démarrés
   plus tard, fichier de sauvegarde partagé). Une équipe du même nom peut ensuite être recréée.
-  **Ctrl + clic gauche** sur une équipe ouvre une fenêtre pour la **renommer** (Entrée ou
+  Un **double-clic** sur une équipe ouvre une fenêtre pour la **renommer** (Entrée ou
   « Renommer » pour valider, Échap pour annuler) : membres et leader sont conservés, le
   changement est partagé avec vos autres Polypode, et les personnages qui avaient sélectionné
   l'équipe la retrouvent sous son nouveau nom (même ceux qui se connectent plus tard). Un nom
@@ -373,7 +373,7 @@ vous avez désactivé le skin de Polypode dans ses options).
 
 ## État du projet
 
-Version `0.50.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
+Version `0.50.1` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
 automatique aux annonces, fenêtre redimensionnable à trois listes défilantes (personnages
 disponibles / équipes avec création par saisie, sélection, renommage et suppression / personnages de l'équipe, ajout
 et retrait de membres au clic, leader par équipe, invitation de toute l'équipe, synchronisation automatique et versionnée des équipes, ajout du joueur ciblé, barre flottante de l'équipe sélectionnée)

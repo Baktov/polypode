@@ -15,7 +15,7 @@ local function ChooseTeam(teamName)
 	P.RefreshUI()
 end
 
--- Fenêtre de saisie du nouveau nom d'une équipe (Ctrl + clic gauche dans « Équipes »).
+-- Fenêtre de saisie du nouveau nom d'une équipe (double-clic dans « Équipes »).
 -- data = ancien nom. Une erreur (nom vide, déjà pris...) garde la fenêtre ouverte.
 local RENAME_POPUP = "POLYPODE_RENAME_TEAM"
 
@@ -167,6 +167,8 @@ end
 -- ou nil. opts.button : bouton à
 -- droite de chaque ligne, { text, width, onClick = fn(data), tooltip = texte d'aide }.
 -- opts.onDragStart(data) : appelé quand on commence à glisser une ligne (clic gauche maintenu).
+-- opts.onDoubleClick(data, mouseButton) : double-clic sur une ligne cliquable (WoW le déclenche à
+-- la place du second clic : le premier clic passe par opts.onClick).
 -- opts.decorate(row, data) : habillage supplémentaire d'une ligne, appelé à chaque affichage
 -- (lignes recyclées : tout se recalcule ici).
 -- opts.inset : marge gauche et droite de la liste dans le cadre (défaut 10). La barre de
@@ -292,6 +294,11 @@ local function CreateScrollList(panel, formatFn, top, opts)
 			row:SetScript("OnClick", function(_, mouseButton)
 				opts.onClick(data, mouseButton)
 			end)
+			if opts.onDoubleClick then
+				row:SetScript("OnDoubleClick", function(_, mouseButton)
+					opts.onDoubleClick(data, mouseButton)
+				end)
+			end
 		end
 	end)
 	ScrollUtil.InitScrollBoxListWithScrollBar(scrollBox, scrollBar, view)
@@ -788,15 +795,13 @@ function P.BuildUI()
 	createBtn:SetScript("OnClick", SubmitTeam)
 
 	-- Clic gauche : sélectionne l'équipe ; clic droit : désélectionne (plus aucune équipe) ;
-	-- Maj + clic gauche : supprime l'équipe (synchronisé) ; Ctrl + clic gauche : la renomme.
+	-- Maj + clic gauche : supprime l'équipe (synchronisé) ; double-clic gauche : la renomme.
 	-- Glisser : sélectionne l'équipe et la sort en barre flottante (UI_TeamBar.lua).
 	CreateScrollList(teamPanel, function(data)
 		return data.name
 	end, HEADER_HEIGHT + INPUT_HEIGHT, {
 		onClick = function(data, mouseButton)
-			if mouseButton == "LeftButton" and IsControlKeyDown() then
-				StaticPopup_Show(RENAME_POPUP, data.name, nil, data.name)
-			elseif mouseButton == "LeftButton" and IsShiftKeyDown() then
+			if mouseButton == "LeftButton" and IsShiftKeyDown() then
 				if P.DeleteTeam(data.name) then
 					UIErrorsFrame:AddMessage("Équipe « " .. data.name .. " » supprimée.", 1, 0.82, 0)
 					if P.charDb.selectedTeam == data.name then
@@ -822,10 +827,19 @@ function P.BuildUI()
 					or "|cff999999Date de création inconnue (équipe plus ancienne)|r",
 				"Clic gauche : sélectionner l'équipe",
 				"Clic droit : désélectionner",
-				"Ctrl + clic gauche : renommer l'équipe",
+				"Double-clic : renommer l'équipe",
 				"Maj + clic gauche : supprimer l'équipe",
 				"Glisser : sélectionner et afficher en barre flottante",
 			}
+		end,
+		-- Double-clic gauche : renommer (le premier clic a sélectionné l'équipe). Double-clic
+		-- droit : second clic droit ordinaire (désélection).
+		onDoubleClick = function(data, mouseButton)
+			if mouseButton == "LeftButton" then
+				StaticPopup_Show(RENAME_POPUP, data.name, nil, data.name)
+			else
+				ChooseTeam(nil)
+			end
 		end,
 		onDragStart = function(data)
 			ChooseTeam(data.name)
