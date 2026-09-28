@@ -25,13 +25,19 @@ n'ajoute une fonctionnalité que si elle sert directement cet objectif.
   (`../Polypode_Photo`, https://github.com/Baktov/Polypode-Photo : mode photo) et **Polypode Quêtes**
   (`../Polypode_Quetes`, https://github.com/Baktov/Polypode-quetes : fenêtre « Quêtes de l'équipe » —
   l'échange `QLOG`, `P.GetCharacterQuests` et Quests.lua restent dans Polypode, qui appelle
-  `P.RefreshTeamQuests` s'il est défini). Polypode n'en sait rien : chacun ajoute son bouton de barre de
-  titre par `P.AddTitleButton` (UI_Main.lua, empilés de droite à gauche depuis la croix) et sa commande par
-  `P.RegisterSlashCommand`. API publique qu'ils utilisent (voir leur CLAUDE.md) : `P.AddTitleButton`,
+  `P.RefreshTeamQuests` s'il est défini) et **Polypode Suivi** (`../Polypode_Suivi`,
+  https://github.com/Baktov/polypode-suivi : suivi de l'équipe, message `SUIVI` à lui). Polypode n'en sait
+  rien : chacun ajoute son bouton de barre de titre par `P.AddTitleButton` (UI_Main.lua, empilés de droite à
+  gauche depuis la croix) et sa commande par `P.RegisterSlashCommand` ; un compagnon échange ses propres
+  messages par `P.RegisterMessageHandler(type, fn(reste, expéditeur))` (appelé par `P.OnSyncMessage` après
+  la vérification du token), `P.RegisterPeerCallback(fn(expéditeur))` (appelé à chaque HELLO/HI reçu) et
+  `P.WhisperOnline(message, cible)` (à cible, sinon aux clients connectés), avec `P.IsSender` et
+  `P.MAX_MESSAGE_LENGTH` (Sync.lua). API publique qu'ils utilisent (voir leur CLAUDE.md) : `P.AddTitleButton`,
   `P.RegisterSlashCommand`, `P.optionsCategory`, `P.CreatePanel`, `P.CreateScrollList`, `P.SetListData`,
   `P.SkinFrame`, `P.SkinPanel`, `P.SkinButton`, `P.UnitNameParts`, `P.JoinSurname`, `P.GetCharacterStatus`,
   `P.GetCharacterQuests`, `P.GetSelectedTeam`, `P.GetTeamLeader`, `P.GetTeamMembers`, `P.GetCharKey`,
-  `P.GetDisplayName`, `P.db.roster` : ne pas les renommer ni changer leur comportement sans adapter les
+  `P.GetDisplayName`, `P.db.roster`, `P.SortedKeyItems`, `P.GetTeamToken`, `P.RefreshUI`, et les points
+  d'extension de synchro ci-dessus : ne pas les renommer ni changer leur comportement sans adapter les
   compagnons.
 
 ---

@@ -250,6 +250,31 @@ local function ResolveTargets(target, extraKeys)
 	return targets
 end
 
+-- POINTS D'EXTENSION DES ADDONS COMPAGNONS (ex. Polypode Suivi) : échanger leurs propres
+-- messages sans que Polypode les connaisse. Le préfixe, le token et le filtrage des comptes
+-- restent ceux de Polypode (P.OnSyncMessage).
+P.MAX_MESSAGE_LENGTH = MAX_MESSAGE_LENGTH
+local messageHandlers = {} -- [type] = handler(reste, expéditeur)
+local peerCallbacks = {} -- fonctions(expéditeur) appelées à chaque HELLO/HI reçu
+
+-- Reçoit les messages « type:token:reste » d'un type propre au compagnon (token déjà vérifié).
+function P.RegisterMessageHandler(kind, handler)
+	messageHandlers[kind] = handler
+end
+
+-- Appelle callback(expéditeur) à chaque client qui s'annonce (HELLO/HI), pour lui envoyer ses
+-- données comme Polypode le fait (équipes, état, journal de quêtes).
+function P.RegisterPeerCallback(callback)
+	peerCallbacks[#peerCallbacks + 1] = callback
+end
+
+-- Envoie un message en chuchotement à target, sinon aux clients connectés vus pendant la session.
+function P.WhisperOnline(message, target)
+	for to in pairs(ResolveTargets(target)) do
+		P.Broadcast(message, "WHISPER", to)
+	end
+end
+
 -- Envoie une entrée de roster ajoutée ou retirée à la main (cible, /poly remove) : les
 -- personnages sans Polypode ne s'annoncent jamais, les autres clients doivent la recevoir.
 -- target : un destinataire précis, sinon les clients connectés.
@@ -818,6 +843,7 @@ local function IsSender(sender, key)
 	local name, realm = strsplit("-", key, 2)
 	return FullName(sender) == FullName(P.GetTargetName({ name = name, realm = realm or "" }))
 end
+P.IsSender = IsSender -- pour les addons compagnons (expéditeur d'un message = personnage annoncé)
 
 function P.OnSyncMessage(message, channel, sender)
 	local kind, token, rest = strsplit(":", message, 3)
@@ -850,6 +876,12 @@ function P.OnSyncMessage(message, channel, sender)
 			P.Debug(kind .. " ignoré : " .. tostring(sender) .. " n'est pas le leader de l'équipe sélectionnée")
 			return
 		end
+	end
+
+	-- Type propre à un addon compagnon (P.RegisterMessageHandler).
+	if messageHandlers[kind] then
+		messageHandlers[kind](rest, sender)
+		return
 	end
 
 	if kind == "TEAM" then
@@ -996,6 +1028,9 @@ function P.OnSyncMessage(message, channel, sender)
 	P.SyncAllAccountLabels(sender)
 	P.SendStatus(sender)
 	P.SendQuestLog(sender)
+	for _, callback in ipairs(peerCallbacks) do
+		callback(sender)
+	end
 
 	-- Leader : invite automatiquement ce personnage s'il est membre de l'équipe (AutoGroup.lua).
 	P.OnTeamCharacterOnline(P.GetCharKey(name, realm))

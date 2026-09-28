@@ -252,7 +252,7 @@ multibox a sa propre barre) et retrouvés à la connexion.
 
 ## Addons compagnons (séparés)
 
-Deux fonctions sont des addons séparés, qui dépendent de Polypode et se chargent ou non depuis
+Trois fonctions sont des addons séparés, qui dépendent de Polypode et se chargent ou non depuis
 la liste des AddOns ; sans eux, Polypode fonctionne normalement. Chacun ajoute son bouton à la
 barre de titre de la fenêtre principale (à gauche de la croix) et sa commande `/poly` :
 
@@ -263,6 +263,10 @@ barre de titre de la fenêtre principale (à gauche de la croix) et sa commande 
   utilise ; l'acceptation, la validation et le partage automatiques restent dans Polypode.
 - **Polypode Photo** (https://github.com/Baktov/Polypode-Photo) : bouton **Photo** et
   `/poly photo`, membres du groupe en pied, côte à côte, sur un fond au choix.
+- **Polypode Suivi** (https://github.com/Baktov/polypode-suivi) : bouton **Suivi** et
+  `/poly suivi`, pour chaque membre de l'équipe sélectionnée : grande chambre forte, écus,
+  ressources, renommées et runes de pouvoir (informations échangées par Polypode, à installer
+  sur chaque personnage suivi).
 
 ---
 
@@ -277,6 +281,7 @@ barre de titre de la fenêtre principale (à gauche de la croix) et sa commande 
 | `/poly minimap` | Afficher/masquer l'icône de minimap |
 | `/poly options` | Ouvrir le panneau d'options (Options → AddOns → Polypode) |
 | `/poly quetes` | Fenêtre des quêtes du leader manquantes chez les membres (addon **Polypode Quêtes**, s'il est installé et activé) |
+| `/poly suivi` | Suivi de l'équipe : coffre, écus, ressources, renommées, runes (addon **Polypode Suivi**, s'il est installé et activé) |
 | `/poly photo` | Mode photo (addon **Polypode Photo**, s'il est installé et activé) |
 | `/poly comptes` | Lister les autres comptes Battle.net autorisés (numérotés) |
 | `/poly retirer-compte <n°>` | Retirer l'autorisation d'un compte (numéro donné par `/poly comptes`) |
@@ -373,12 +378,12 @@ vous avez désactivé le skin de Polypode dans ses options).
 
 ## État du projet
 
-Version `0.50.1` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
+Version `0.51.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
 automatique aux annonces, fenêtre redimensionnable à trois listes défilantes (personnages
 disponibles / équipes avec création par saisie, sélection, renommage et suppression / personnages de l'équipe, ajout
 et retrait de membres au clic, leader par équipe, invitation de toute l'équipe, synchronisation automatique et versionnée des équipes, ajout du joueur ciblé, barre flottante de l'équipe sélectionnée)
 skinnée (EllesmereUI/ElvUI), bouton de minimap (masquable), panneau d'options (accessible par un bouton de la fenêtre),
-commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, inviter), suivi des dialogues de PNJ (quêtes, options, fermeture de DialogueUI), acceptation, partage et validation automatiques des quêtes du leader, passage automatique des cinématiques, vol automatique chez le maître de vol, entrée et sortie de gouffre et entrée par portail automatiques, volume et coupure du son de l'équipe par le leader, groupage automatique de l'équipe à la connexion, alerte « ne suit plus », mode photo et quêtes du leader manquantes chez les membres (addons séparés Polypode Photo et Polypode Quêtes), canal dédié commun aux comptes, autorisation d'autres comptes Battle.net. Pistes envisagées pour la suite,
+commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, inviter), suivi des dialogues de PNJ (quêtes, options, fermeture de DialogueUI), acceptation, partage et validation automatiques des quêtes du leader, passage automatique des cinématiques, vol automatique chez le maître de vol, entrée et sortie de gouffre et entrée par portail automatiques, volume et coupure du son de l'équipe par le leader, groupage automatique de l'équipe à la connexion, alerte « ne suit plus », mode photo, quêtes du leader manquantes chez les membres et suivi de l'équipe (addons séparés Polypode Photo, Polypode Quêtes et Polypode Suivi), canal dédié commun aux comptes, autorisation d'autres comptes Battle.net. Pistes envisagées pour la suite,
 à activer seulement si le besoin se confirme (voir la règle de simplicité dans
 `CLAUDE.md`) :
 
