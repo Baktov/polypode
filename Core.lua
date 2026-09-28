@@ -38,6 +38,10 @@ P.defaults = {
 	-- [token] = { label = personnage vu à l'autorisation, updated = version, removed = true|nil }.
 	-- Versionné et synchronisé entre les clients de ce compte (pierre tombale au retrait).
 	trustedTokens = {},
+	-- Comptes WoW nommés à la main (WoW ne donne pas le nom du compte WoW aux addons) :
+	-- [nom-royaume] = { label = nom du compte | nil (automatique), updated = version }.
+	-- Versionné et synchronisé (message ACCT) ; label nil = pierre tombale du rangement.
+	accountLabels = {},
 }
 
 -- Par personnage : réglages propres à une fenêtre de multibox (et à l'abri du fichier de
@@ -55,6 +59,8 @@ P.charDefaults = {
 	followLeaderSound = true, -- membre : appliquer le volume / la coupure du son du leader
 	autoGroup = true, -- inviter (leader) / accepter (membre) l'équipe à la connexion (AutoGroup.lua)
 	followAlert = true, -- alerte du leader quand un membre ne le suit plus (Follow.lua)
+	groupByAccount = false, -- « Personnages disponibles » regroupés par compte (UI_Main.lua)
+	collapsedAccounts = {}, -- [clé de groupe] = true : groupe de compte replié
 	-- Barre flottante de l'équipe sélectionnée (UI_TeamBar.lua) : affichée, liste dépliée,
 	-- figée (Alt + clic) ; position (point, relativePoint, x, y), largeur (width) et hauteur
 	-- de la liste (listHeight, sinon automatique) ajoutées au premier placement / redimensionnement.
@@ -607,6 +613,55 @@ function P.ApplyTrustSync(token, updated, removed, label)
 	entry.label = label
 	entry.removed = removed or nil
 	entry.updated = updated
+	return true
+end
+
+-- COMPTES WOW NOMMÉS -------------------------------------------------------------------
+
+-- Compte WoW nommé à la main d'un personnage, ou nil (regroupement automatique par compte
+-- Battle.net, cf. UI_Main.lua).
+function P.GetCharacterAccount(key)
+	local entry = key and P.db.accountLabels[key]
+	return entry and entry.label
+end
+
+-- Noms des comptes WoW utilisés, triés.
+function P.GetAccountLabels()
+	local seen, labels = {}, {}
+	for _, entry in pairs(P.db.accountLabels) do
+		if entry.label and not seen[entry.label] then
+			seen[entry.label] = true
+			labels[#labels + 1] = entry.label
+		end
+	end
+	table.sort(labels)
+	return labels
+end
+
+-- Range un personnage dans un compte WoW nommé (label), ou le rend au regroupement
+-- automatique (label nil ou vide) ; nouvelle version puis envoi aux autres clients.
+function P.SetCharacterAccount(key, label)
+	label = label and strtrim(label) or ""
+	label = label ~= "" and label or nil
+	local entry = P.db.accountLabels[key] or {}
+	P.db.accountLabels[key] = entry
+	if entry.label == label and entry.updated then
+		return
+	end
+	entry.label = label
+	entry.updated = NextVersion(entry.updated)
+	if P.SyncAccountLabel then
+		P.SyncAccountLabel(key)
+	end
+end
+
+-- Applique un rangement reçu d'un autre client, s'il est plus récent. Renvoie true si appliqué.
+function P.ApplyAccountLabelSync(key, updated, label)
+	local entry = P.db.accountLabels[key]
+	if entry and (entry.updated or 0) >= updated then
+		return false
+	end
+	P.db.accountLabels[key] = { label = label ~= "" and label or nil, updated = updated }
 	return true
 end
 

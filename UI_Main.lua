@@ -61,6 +61,69 @@ StaticPopupDialogs[RENAME_POPUP] = {
 	preferredIndex = 3,
 }
 
+-- Fenêtre de saisie d'un nouveau compte WoW nommé (menu Alt + clic d'un personnage).
+-- data = clé du personnage à y ranger.
+local NEW_ACCOUNT_POPUP = "POLYPODE_NEW_ACCOUNT"
+
+local function SubmitNewAccount(popup, key)
+	local label = strtrim(PopupEditBox(popup):GetText() or "")
+	if label == "" then
+		UIErrorsFrame:AddMessage("Nom de compte vide.", 1, 0.1, 0.1)
+		return true -- reste ouverte
+	end
+	P.SetCharacterAccount(key, label)
+	P.RefreshUI()
+end
+
+StaticPopupDialogs[NEW_ACCOUNT_POPUP] = {
+	text = "Nom du compte WoW de %s :",
+	button1 = "Créer",
+	button2 = "Annuler",
+	hasEditBox = true,
+	maxLetters = 32,
+	OnShow = function(self)
+		local editBox = PopupEditBox(self)
+		editBox:SetText("")
+		editBox:SetFocus()
+	end,
+	OnAccept = SubmitNewAccount,
+	EditBoxOnEnterPressed = function(editBox, key)
+		local popup = editBox:GetParent()
+		if not SubmitNewAccount(popup, key) then
+			popup:Hide()
+		end
+	end,
+	EditBoxOnEscapePressed = function(editBox)
+		editBox:GetParent():Hide()
+	end,
+	timeout = 0,
+	whileDead = true,
+	hideOnEscape = true,
+	preferredIndex = 3,
+}
+
+-- Menu Alt + clic d'un personnage : le ranger dans un compte WoW nommé, en créer un, ou le
+-- rendre au regroupement automatique (compte Battle.net). Partagé avec les autres Polypode.
+local function ShowAccountMenu(owner, key)
+	local function IsCurrent(label)
+		return (P.GetCharacterAccount(key) or "") == label
+	end
+	local function Assign(label)
+		P.SetCharacterAccount(key, label)
+		P.RefreshUI()
+	end
+	MenuUtil.CreateContextMenu(owner, function(_, root)
+		root:CreateTitle("Compte WoW de " .. P.GetDisplayName(key))
+		root:CreateRadio("Automatique (compte Battle.net)", IsCurrent, Assign, "")
+		for _, label in ipairs(P.GetAccountLabels()) do
+			root:CreateRadio(label, IsCurrent, Assign, label)
+		end
+		root:CreateButton("Nouveau compte...", function()
+			StaticPopup_Show(NEW_ACCOUNT_POPUP, P.GetDisplayName(key), nil, key)
+		end)
+	end)
+end
+
 -- Taille minimale volontairement petite : en dessous du confortable, le contenu est
 -- simplement tronqué (textes coupés sur une ligne, listes réduites), pas réorganisé.
 local MIN_WIDTH, MIN_HEIGHT = 200, 100
@@ -305,6 +368,40 @@ local function SortedKeyItems(set, isFirst)
 		items[i] = { key = key, first = first[key] }
 	end
 	return items
+end
+
+-- REGROUPEMENT PAR COMPTE (option P.charDb.groupByAccount) : WoW ne donne pas le nom du
+-- compte WoW aux addons. Un personnage rangé à la main dans un compte nommé (Alt + clic,
+-- P.SetCharacterAccount) y figure ; sinon il est regroupé par compte Battle.net (entry.token :
+-- le nôtre, un compte autorisé, ou « Autres personnages » sans token). Groupe = { key, label }.
+local function AccountGroup(key)
+	local label = P.GetCharacterAccount(key)
+	if label then
+		return "m:" .. label, label
+	end
+	local entry = P.db.roster[key]
+	local token = entry and entry.token
+	if not token then
+		return "~other", "Autres personnages"
+	end
+	if token == P.GetTeamToken() then
+		return "b:" .. token, "Mon compte Battle.net"
+	end
+	local trusted = P.db.trustedTokens[token]
+	return "b:" .. token, "Battle.net de " .. (trusted and trusted.label or "?")
+end
+
+-- Ordre des groupes : comptes nommés (alphabétique), mon Battle.net, autres Battle.net,
+-- « Autres personnages ».
+local function GroupRank(groupKey)
+	if groupKey:sub(1, 2) == "m:" then
+		return 1
+	elseif groupKey == "b:" .. (P.GetTeamToken() or "") then
+		return 2
+	elseif groupKey == "~other" then
+		return 4
+	end
+	return 3
 end
 
 -- Vrai si le personnage est connecté : soi-même, un Polypode annoncé pendant la session
@@ -564,8 +661,24 @@ function P.BuildUI()
 
 	-- Clic gauche : ajoute à l'équipe sélectionnée ; clic droit : l'en retire.
 	-- Les membres de l'équipe sélectionnée sont surlignés.
-	CreateScrollList(charPanel, FormatCharacter, HEADER_HEIGHT + INPUT_HEIGHT, {
+	CreateScrollList(charPanel, function(data)
+		if data.header then
+			-- En-tête de compte (option « regrouper par compte ») : pliage, nom, connectés / total.
+			return string.format("|cffffd200%s %s|r |cff999999(%d/%d)|r", data.collapsed and "+" or "-",
+				data.label, data.online, #data.items)
+		end
+		return FormatCharacter(data)
+	end, HEADER_HEIGHT + INPUT_HEIGHT, {
 		onClick = function(data, mouseButton)
+			if data.header then
+				P.charDb.collapsedAccounts[data.groupKey] = not data.collapsed or nil
+				P.RefreshUI()
+				return
+			end
+			if IsAltKeyDown() then
+				ShowAccountMenu(charPanel, data.key)
+				return
+			end
 			if not selectedTeam then
 				UIErrorsFrame:AddMessage("Sélectionnez d'abord une équipe.", 1, 0.1, 0.1)
 				return
@@ -578,18 +691,30 @@ function P.BuildUI()
 			P.RefreshUI()
 		end,
 		isSelected = function(data)
+			if data.header then
+				return false
+			end
 			local members = P.GetTeamMembers(selectedTeam)
 			return members and members[data.key] or false
 		end,
 		tooltip = function(data)
+			if data.header then
+				return { data.label, data.online .. " connecté(s) sur " .. #data.items,
+					"Clic : " .. (data.collapsed and "déplier" or "replier") }
+			end
 			local presence = data.first and "|cff40ff40Connecté|r" or "|cff999999Déconnecté (ou pas vu cette session)|r"
+			local account = "Compte : " .. (P.GetCharacterAccount(data.key) or "automatique (compte Battle.net)")
+			local hint = "Alt + clic : ranger dans un compte WoW"
 			if not selectedTeam then
-				return CharacterTooltip(data.key, { presence, "Sélectionnez d'abord une équipe pour y ajouter ce personnage." })
+				return CharacterTooltip(data.key, { presence, account,
+					"Sélectionnez d'abord une équipe pour y ajouter ce personnage.", hint })
 			end
 			return CharacterTooltip(data.key, {
 				presence,
+				account,
 				"Clic gauche : ajouter à l'équipe « " .. selectedTeam .. " »",
 				"Clic droit : retirer de l'équipe « " .. selectedTeam .. " »",
+				hint,
 			})
 		end,
 		-- Personnages déconnectés légèrement grisés (connectés en tête, cf. RefreshUI).
@@ -808,8 +933,41 @@ function P.RefreshUI()
 		ui.channelInput:SetText(P.GetSyncChannelName())
 	end
 
-	-- Connectés en tête, puis déconnectés ; ordre alphabétique dans chaque groupe.
-	SetListData(ui.charPanel, SortedKeyItems(P.GetRoster(), IsConnected))
+	-- Connectés en tête, puis déconnectés ; ordre alphabétique dans chaque groupe. Avec
+	-- l'option, un en-tête repliable par compte précède ses personnages.
+	local characters = SortedKeyItems(P.GetRoster(), IsConnected)
+	if P.charDb.groupByAccount then
+		local groups, order = {}, {}
+		for _, item in ipairs(characters) do
+			local groupKey, label = AccountGroup(item.key)
+			if not groups[groupKey] then
+				groups[groupKey] = { header = true, groupKey = groupKey, label = label, items = {}, online = 0 }
+				order[#order + 1] = groups[groupKey]
+			end
+			local group = groups[groupKey]
+			group.items[#group.items + 1] = item
+			group.online = group.online + (item.first and 1 or 0)
+		end
+		table.sort(order, function(a, b)
+			local rankA, rankB = GroupRank(a.groupKey), GroupRank(b.groupKey)
+			if rankA ~= rankB then
+				return rankA < rankB
+			end
+			return a.label < b.label
+		end)
+		characters = {}
+		for _, group in ipairs(order) do
+			group.collapsed = P.charDb.collapsedAccounts[group.groupKey] or false
+			group.first = true -- en-tête jamais estompé
+			characters[#characters + 1] = group
+			if not group.collapsed then
+				for _, item in ipairs(group.items) do
+					characters[#characters + 1] = item
+				end
+			end
+		end
+	end
+	SetListData(ui.charPanel, characters)
 
 	local teams = {}
 	for name in pairs(P.GetTeams()) do

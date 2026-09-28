@@ -550,6 +550,36 @@ local function OnTeamBarLayoutMessage(rest)
 	})
 end
 
+-- COMPTES WOW NOMMÉS (Core.lua) : rangement d'un personnage dans un compte WoW nommé à la
+-- main, versionné. Envoyé en WHISPER aux clients connectés à chaque changement et à chaque
+-- HELLO/HI reçu. Format : ACCT:token:version:nom-royaume:nomDuCompte (nom en dernier, vide =
+-- regroupement automatique).
+function P.SyncAccountLabel(key, target)
+	local token = P.GetTeamToken()
+	local entry = P.db.accountLabels[key]
+	if not token or not entry or not entry.updated then
+		return
+	end
+	local message = string.format("ACCT:%s:%d:%s:%s", token, entry.updated, key, entry.label or "")
+	for to in pairs(ResolveTargets(target)) do
+		P.Broadcast(message, "WHISPER", to)
+	end
+end
+
+function P.SyncAllAccountLabels(target)
+	for key in pairs(P.db.accountLabels) do
+		P.SyncAccountLabel(key, target)
+	end
+end
+
+local function OnAccountLabelMessage(rest)
+	local version, key, label = strsplit(":", rest or "", 3)
+	local updated = tonumber(version)
+	if updated and key and key ~= "" and P.ApplyAccountLabelSync(key, updated, label or "") and P.RefreshUI then
+		P.RefreshUI()
+	end
+end
+
 -- Messages acceptés seulement de nos propres clients (même token), pas des comptes autorisés.
 local OWN_ACCOUNT_ONLY = {
 	CHANSET = true,
@@ -835,6 +865,10 @@ function P.OnSyncMessage(message, channel, sender)
 			OnQuestLogMessage(rest)
 		end
 		return
+	elseif kind == "ACCT" then
+		-- ACCT:token:version:nom-royaume:nomDuCompte — compte WoW nommé d'un personnage.
+		OnAccountLabelMessage(rest)
+		return
 	elseif kind == "FOLLOWEND" then
 		-- FOLLOWEND:token:nom-royaume — un membre ne suit plus le leader (Follow.lua) ; le
 		-- personnage annoncé doit être l'expéditeur.
@@ -944,6 +978,7 @@ function P.OnSyncMessage(message, channel, sender)
 	P.SyncTrust(nil, sender)
 	P.SyncAllCharacters(sender)
 	P.SyncAllTeams(sender)
+	P.SyncAllAccountLabels(sender)
 	P.SendStatus(sender)
 	P.SendQuestLog(sender)
 

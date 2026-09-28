@@ -123,7 +123,15 @@ côte à côte :
   (groupe, raid, guilde). Les personnages **connectés** viennent en tête, puis les déconnectés,
   **légèrement grisés** ; ordre alphabétique dans chaque groupe (sans tenir compte des accents ni
   des majuscules). Connecté = vous, un personnage dont le Polypode s'est annoncé pendant la
-  session, ou un membre connecté de votre groupe (même sans Polypode) ; l'infobulle l'indique. Nom en couleur de classe, puis classe et niveau ;
+  session, ou un membre connecté de votre groupe (même sans Polypode) ; l'infobulle l'indique.
+  **Regrouper par compte** (option « Personnages disponibles : regrouper par compte ») : un
+  en-tête par compte (« - Nom du compte (connectés/total) »), repliable ou dépliable d'un clic.
+  WoW ne donne pas le nom du compte WoW aux addons : par défaut, les personnages sont regroupés
+  par **compte Battle.net** (« Mon compte Battle.net », « Battle.net de ... » pour un compte
+  autorisé, « Autres personnages » pour ceux ajoutés à la main). **Alt + clic** sur un personnage
+  ouvre un menu pour le **ranger dans un compte WoW nommé** (ex. « WoW1 », « ALTHEANA »), en créer
+  un (« Nouveau compte... ») ou le rendre au regroupement automatique ; ce rangement est partagé
+  avec vos autres Polypode (le plus récent l'emporte) et fonctionne aussi option décochée. Nom en couleur de classe, puis classe et niveau ;
   `(vous)` marque le personnage courant.
   Bouton **Ajouter la cible** (en haut du cadre) : ajoute le joueur ciblé à la liste, même
   s'il n'a pas Polypode (ex. un ami) ; il peut alors rejoindre une équipe et être invité
@@ -345,6 +353,7 @@ fenêtre principale) :
 | Barre d'équipe : barre de vie des membres | Oui | Souligne chaque membre groupé de la liste de la barre flottante d'une fine barre de vie ; décochée, seul le libellé d'état reste. Réglage **par personnage** |
 | Barre d'équipe : clignoter si la durabilité est faible | Oui | Fait clignoter en rouge, dans la liste de la barre flottante, un personnage dont la pièce la plus usée est sous le seuil ci-dessous. Réglage **par personnage** |
 | Barre d'équipe : seuil de durabilité | 25 % | Curseur de 5 à 95 % par pas de 5 : seuil de durabilité sous lequel un personnage clignote. Réglage **par personnage** |
+| Personnages disponibles : regrouper par compte | Non | Range les personnages disponibles sous un en-tête repliable par compte : compte WoW nommé à la main (Alt + clic sur un personnage), sinon compte Battle.net. Réglage **par personnage** |
 | Groupage automatique de l'équipe | Oui | Leader : invite automatiquement dans son groupe les membres de son équipe sélectionnée qui se connectent, ou déjà connectés quand il se connecte lui-même. Membre : accepte automatiquement l'invitation de groupe du leader d'une de ses équipes. Réglage **par personnage** |
 
 ---
@@ -366,7 +375,7 @@ vous avez désactivé le skin de Polypode dans ses options).
 
 ## État du projet
 
-Version `0.47.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
+Version `0.48.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
 automatique aux annonces, fenêtre redimensionnable à trois listes défilantes (personnages
 disponibles / équipes avec création par saisie, sélection, renommage et suppression / personnages de l'équipe, ajout
 et retrait de membres au clic, leader par équipe, invitation de toute l'équipe, synchronisation automatique et versionnée des équipes, ajout du joueur ciblé, barre flottante de l'équipe sélectionnée)

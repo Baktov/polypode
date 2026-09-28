@@ -253,6 +253,27 @@ function P.BuildOptions()
 		.. "rétablissement du son (raccourcis du leader). Décoché : ce client garde son propre son. "
 		.. "Réglage propre à ce personnage.")
 
+	-- « Personnages disponibles » regroupés par compte (par personnage, cf. UI_Main.lua).
+	local groupByAccountSetting = Settings.RegisterProxySetting(
+		category,
+		"POLYPODE_GROUP_BY_ACCOUNT",
+		Settings.VarType.Boolean,
+		"Personnages disponibles : regrouper par compte",
+		Settings.Default.False,
+		function()
+			return P.charDb.groupByAccount
+		end,
+		function(value)
+			P.charDb.groupByAccount = value
+			P.RefreshUI()
+		end
+	)
+	Settings.CreateCheckbox(category, groupByAccountSetting,
+		"Dans la fenêtre Polypode, range les personnages disponibles sous un en-tête par compte, "
+		.. "repliable d'un clic. WoW ne donne pas le nom du compte WoW aux addons : les personnages "
+		.. "sont regroupés par compte Battle.net, sauf ceux rangés à la main dans un compte nommé "
+		.. "(Alt + clic sur un personnage). Réglage propre à ce personnage.")
+
 	-- Groupage automatique de l'équipe à la connexion (par personnage, cf. AutoGroup.lua).
 	local autoGroupSetting = Settings.RegisterProxySetting(
 		category,
