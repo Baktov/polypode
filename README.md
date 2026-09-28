@@ -136,8 +136,8 @@ côte à côte :
   Bouton **Ajouter la cible** (en haut du cadre) : ajoute le joueur ciblé à la liste, même
   s'il n'a pas Polypode (ex. un ami) ; il peut alors rejoindre une équipe et être invité
   avec elle. L'ajout est partagé avec vos autres Polypode connectés.
-  Quand une équipe est sélectionnée : **clic gauche** sur un personnage l'ajoute à l'équipe,
-  **clic droit** l'en retire ; les membres de l'équipe sont surlignés en doré. Une infobulle au survol donne le nom du personnage, rappelle ces actions, puis liste les équipes dont il fait déjà partie (l'équipe sélectionnée en vert).
+  Quand une équipe est sélectionnée : **clic droit** sur un personnage l'ajoute à l'équipe,
+  **clic gauche** l'en retire ; les membres de l'équipe sont surlignés en doré. Une infobulle au survol donne le nom du personnage, rappelle ces actions, puis liste les équipes dont il fait déjà partie (l'équipe sélectionnée en vert).
   **Sans équipe sélectionnée**, un **clic droit** sur un personnage crée une équipe à son nom
   (« Arthas », ou « Arthas_1 », « Arthas_2 »... si ce nom est déjà pris), avec lui pour membre et
   **leader**, et la sélectionne.
@@ -372,7 +372,7 @@ vous avez désactivé le skin de Polypode dans ses options).
 
 ## État du projet
 
-Version `0.49.1` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
+Version `0.49.2` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
 automatique aux annonces, fenêtre redimensionnable à trois listes défilantes (personnages
 disponibles / équipes avec création par saisie, sélection, renommage et suppression / personnages de l'équipe, ajout
 et retrait de membres au clic, leader par équipe, invitation de toute l'équipe, synchronisation automatique et versionnée des équipes, ajout du joueur ciblé, barre flottante de l'équipe sélectionnée)

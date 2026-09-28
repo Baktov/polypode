@@ -666,7 +666,7 @@ function P.BuildUI()
 		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
 		GameTooltip:AddLine("Ajouter la cible")
 		GameTooltip:AddLine("Ajoute le joueur ciblé à la liste des personnages disponibles : il peut "
-			.. "ensuite rejoindre une équipe (clic gauche avec l'équipe sélectionnée) et être "
+			.. "ensuite rejoindre une équipe (clic droit avec l'équipe sélectionnée) et être "
 			.. "invité avec elle.", 1, 1, 1, true)
 		GameTooltip:AddLine("Partagé avec vos autres Polypode connectés.", 1, 1, 1, true)
 		GameTooltip:Show()
@@ -710,10 +710,11 @@ function P.BuildUI()
 				end
 				return
 			end
+			-- Clic droit = ajouter (comme la création d'équipe au clic droit), clic gauche = retirer.
 			if mouseButton == "RightButton" then
-				P.RemoveTeamMember(selectedTeam, data.key)
-			else
 				P.AddTeamMember(selectedTeam, data.key)
+			else
+				P.RemoveTeamMember(selectedTeam, data.key)
 			end
 			P.RefreshUI()
 		end,
@@ -740,8 +741,8 @@ function P.BuildUI()
 			return CharacterTooltip(data.key, {
 				presence,
 				account,
-				"Clic gauche : ajouter à l'équipe « " .. selectedTeam .. " »",
-				"Clic droit : retirer de l'équipe « " .. selectedTeam .. " »",
+				"Clic droit : ajouter à l'équipe « " .. selectedTeam .. " »",
+				"Clic gauche : retirer de l'équipe « " .. selectedTeam .. " »",
 				hint,
 			})
 		end,
@@ -1018,7 +1019,7 @@ function P.RefreshUI()
 	if not members then
 		ui.memberPanel.emptyText:SetText("Sélectionnez une équipe")
 	else
-		ui.memberPanel.emptyText:SetText("Clic gauche sur un personnage disponible pour l'ajouter")
+		ui.memberPanel.emptyText:SetText("Clic droit sur un personnage disponible pour l'ajouter")
 	end
 
 	-- L'état du groupe, qui change sans rafraîchir la fenêtre, est vérifié au clic par P.InviteTeam.
