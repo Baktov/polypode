@@ -40,7 +40,8 @@ n'ajoute une fonctionnalité que si elle sert directement cet objectif.
   `P.RegisterSlashCommand`, `P.optionsCategory`, `P.CreatePanel`, `P.CreateScrollList`, `P.SetListData`,
   `P.SkinFrame`, `P.SkinPanel`, `P.SkinButton`, `P.UnitNameParts`, `P.JoinSurname`, `P.GetCharacterStatus`,
   `P.GetCharacterQuests`, `P.GetSelectedTeam`, `P.GetTeamLeader`, `P.GetTeamMembers`, `P.GetCharKey`,
-  `P.GetDisplayName`, `P.db.roster`, `P.SortedKeyItems`, `P.GetTeamToken`, `P.RefreshUI`, et les points
+  `P.GetDisplayName`, `P.db.roster`, `P.SortedKeyItems`, `P.FormatCharacter`, `P.CharacterTooltip`,
+  `P.IsCharacterConnected` (règle « connecté » de « Personnages disponibles », 0.51.2), `P.GetTeamToken`, `P.RefreshUI`, et les points
   d'extension de synchro ci-dessus : ne pas les renommer ni changer leur comportement sans adapter les
   compagnons.
 

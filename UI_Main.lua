@@ -488,6 +488,8 @@ end
 -- Partagés avec la barre flottante d'équipe (UI_TeamBar.lua).
 P.SortedKeyItems = SortedKeyItems
 P.FormatCharacter = FormatCharacter
+-- Même règle « connecté » que « Personnages disponibles », pour les addons compagnons (Polypode Profil).
+P.IsCharacterConnected = IsConnected
 
 -- Champ de saisie du canal dédié (fenêtre principale et panneau d'options) : Entrée valide,
 -- Échap annule, infobulle d'aide. Validation et synchro dans P.SetSyncChannel (Core.lua).
