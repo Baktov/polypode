@@ -290,11 +290,22 @@ Un message ciblant un joueur passe par `P.Broadcast(message, "WHISPER", P.GetTar
 ### Référencer l'API Blizzard pour une nouvelle fonctionnalité
 → Avant d'implémenter un appel à l'API WoW (frames, events, namespaces `C_*`), vérifier la
 signature exacte plutôt que de deviner. Sources, par ordre de préférence :
-1. **Serveur MCP `wow`** ([hated-wow-mcp](https://github.com/RdyGaming/hated-wow-mcp)), si ses
-   outils sont disponibles dans la session : recherche d'API/events/types, source de l'UI Blizzard,
-   CVars, atlas de textures. Ses outils de lint Lua et de validation TOC/XML servent aussi à
-   vérifier une modification avant de la commiter. Il est configuré en portée *locale* (hors repo) :
-   `claude mcp add --scope local wow -- cmd /c npx -y hated-wow-mcp` (Node 20+).
+1. **Serveurs MCP**, si leurs outils sont disponibles dans la session. Configurés en portée *user*
+   (hors repo, actifs dans tous les projets d'addon ; Node 20+) :
+   - `wow` ([hated-wow-mcp](https://github.com/RdyGaming/hated-wow-mcp)) — Retail et Forever
+     (`flavor: "forever"`) : recherche d'API/events/types, source de l'UI Blizzard, CVars, atlas de
+     textures. Ses outils de lint Lua et de validation TOC/XML servent aussi à vérifier une
+     modification avant de la commiter.
+     `claude mcp add --scope user wow -- cmd /c npx -y hated-wow-mcp`
+   - `wow-addon-api` ([wow-addon-api-mcp](https://github.com/Koodattu/wow-addon-api-mcp)) — canaux
+     `retail` et `forever` : historique et comparaison de l'API entre versions (`compare_api`,
+     `diff_versions`, `get_api_history`), restrictions (`search_restrictions`). Sert à savoir si une
+     API existe sur Forever, donc si elle doit être testée avant usage.
+     `claude mcp add --scope user wow-addon-api -- cmd /c npx -y wow-addon-api-mcp@latest`
+   - `wow-api` ([wow-api-mcp](https://github.com/spartanui-wow/wow-api-mcp)) — annotations de
+     l'extension VS Code `ketho.wow-api` (requise) : fonctions dépréciées et leurs remplaçants
+     (`list_deprecated`), méthodes de widgets, enums, charges utiles des events.
+     `claude mcp add --scope user wow-api -- cmd /c npx -y wow-api-mcp`
 2. **Local** : un clone de `wow-ui-source` placé à côté de `Polypode/` dans `AddOns/`, si présent.
 3. **GitHub** : https://github.com/Gethe/wow-ui-source/
 
