@@ -270,6 +270,10 @@ barre de titre de la fenêtre principale (à gauche de la croix) et sa commande 
 - **Polypode Data** (https://github.com/Baktov/polypode-data) : bouton **Data** et `/poly data`,
   données durables de tous vos personnages (niveau, or, métiers, équipement, sacs et banques), avec
   recherche d'objet, dans l'esprit de DataStore / WoWthing (à installer sur chaque personnage).
+- **Polypode Profil** (https://github.com/Baktov/polypode-profil) : bouton **Profils** et
+  `/poly profil`, bibliothèque des chaînes d'export du mode Édition, des talents et des addons
+  (EllesmereUI, ElvUI, Baganator, MySlots...), communes à tous vos personnages et échangées entre
+  vos clients connectés.
 
 ---
 
@@ -286,6 +290,7 @@ barre de titre de la fenêtre principale (à gauche de la croix) et sa commande 
 | `/poly quetes` | Fenêtre des quêtes du leader manquantes chez les membres (addon **Polypode Quêtes**, s'il est installé et activé) |
 | `/poly suivi` | Suivi de l'équipe : coffre, écus, ressources, renommées, runes (addon **Polypode Suivi**, s'il est installé et activé) |
 | `/poly data` | Données des personnages : niveau, or, métiers, équipement, sacs, banques, recherche d'objet (addon **Polypode Data**, s'il est installé et activé) |
+| `/poly profil` | Profils : chaînes d'export du mode Édition, des talents et des addons (addon **Polypode Profil**, s'il est installé et activé) |
 | `/poly photo` | Mode photo (addon **Polypode Photo**, s'il est installé et activé) |
 | `/poly comptes` | Lister les autres comptes Battle.net autorisés (numérotés) |
 | `/poly retirer-compte <n°>` | Retirer l'autorisation d'un compte (numéro donné par `/poly comptes`) |
