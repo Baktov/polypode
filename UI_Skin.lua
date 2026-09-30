@@ -119,6 +119,21 @@ function P.SkinEditBox(editBox)
 	end
 end
 
+-- Skinne une liste déroulante Blizzard (WowStyle1DropdownTemplate) : cadre plat et flèche du
+-- skin. width : largeur imposée par ElvUI (défaut : largeur actuelle).
+function P.SkinDropdown(dropdown, width)
+	local eui = GetEUISkin()
+	if eui then
+		eui.Dropdown(dropdown)
+		return
+	end
+
+	local S = GetElvSkins()
+	if S and S.HandleDropDownBox then
+		S:HandleDropDownBox(dropdown, width or dropdown:GetWidth())
+	end
+end
+
 -- Skinne un bouton texte (ex. UIPanelButtonTemplate). Libellé blanc, gris si désactivé.
 function P.SkinButton(button)
 	local eui = GetEUISkin()
