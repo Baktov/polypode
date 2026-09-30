@@ -210,6 +210,12 @@ rien n'est sélectionné.
   **barre de vie** verte souligne chaque membre groupé (masquable par l'option « Barre d'équipe :
   barre de vie des membres »). La ligne d'un personnage hors ligne ou
   déconnecté est estompée. Mis à jour en continu tant que la liste est dépliée.
+- **Boutons des modules** (option « Barre d'équipe : boutons des modules », cochée par
+  défaut) : contre la barre, une colonne verticale de petits boutons reprend ceux des addons
+  compagnons installés (Data, Photo, Profils, Quêtes, Suivi...). Pour rester discrets, seules les
+  **trois premières lettres** du nom s'affichent, en petite police ; le clic et l'infobulle sont
+  les mêmes que dans la fenêtre Polypode (Photo : clic droit = options). Colonne **à gauche**
+  par défaut, **à droite** au choix (option « Barre d'équipe : côté des boutons des modules »).
 - **Durabilité faible** (option « Barre d'équipe : clignoter si la durabilité est faible »,
   cochée par défaut) : la ligne d'un personnage clignote en rouge quand la pièce d'équipement la
   plus usée passe sous le **seuil** choisi par le curseur « Barre d'équipe : seuil de
@@ -364,6 +370,8 @@ fenêtre principale) :
 | Barre d'équipe : barre de vie des membres | Oui | Souligne chaque membre groupé de la liste de la barre flottante d'une fine barre de vie ; décochée, seul le libellé d'état reste. Réglage **par personnage** |
 | Barre d'équipe : clignoter si la durabilité est faible | Oui | Fait clignoter en rouge, dans la liste de la barre flottante, un personnage dont la pièce la plus usée est sous le seuil ci-dessous. Réglage **par personnage** |
 | Barre d'équipe : seuil de durabilité | 25 % | Curseur de 5 à 95 % par pas de 5 : seuil de durabilité sous lequel un personnage clignote. Réglage **par personnage** |
+| Barre d'équipe : boutons des modules | Oui | Colonne de petits boutons (trois premières lettres) reprenant ceux des addons compagnons contre la barre flottante : même clic, même infobulle que dans la fenêtre. Réglage **par personnage** |
+| Barre d'équipe : côté des boutons des modules | À gauche | Liste : à gauche ou à droite de la barre flottante. Réglage **par personnage** |
 | Personnages disponibles : regrouper par compte | Non | Range les personnages disponibles sous un en-tête repliable par compte WoW (renseigné par le champ ci-dessous ou Alt + clic sur un personnage), puis « Compte non renseigné ». Réglage **par personnage** |
 | Compte WoW de ce personnage | vide | Champ de texte : nom du compte WoW sur lequel vous jouez ce personnage (enregistré à Entrée ou en quittant le champ, Échap annule ; vide = aucun compte). Visible dans la liste avec l'option « regrouper par compte ». Même réglage que Alt + clic dans la fenêtre ; partagé avec vos autres Polypode |
 | Groupage automatique de l'équipe | Oui | Leader : invite automatiquement dans son groupe les membres de son équipe sélectionnée qui se connectent, ou déjà connectés quand il se connecte lui-même. Membre : accepte automatiquement l'invitation de groupe du leader d'une de ses équipes. Réglage **par personnage** |
@@ -387,7 +395,7 @@ vous avez désactivé le skin de Polypode dans ses options).
 
 ## État du projet
 
-Version `0.51.4` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
+Version `0.52.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
 automatique aux annonces, fenêtre redimensionnable à trois listes défilantes (personnages
 disponibles / équipes avec création par saisie, sélection, renommage et suppression / personnages de l'équipe, ajout
 et retrait de membres au clic, leader par équipe, invitation de toute l'équipe, synchronisation automatique et versionnée des équipes, ajout du joueur ciblé, barre flottante de l'équipe sélectionnée)

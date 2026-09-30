@@ -396,6 +396,90 @@ local function ShowBarTooltip(self)
 	GameTooltip:Show()
 end
 
+-- BOUTONS DES MODULES : les boutons des addons compagnons (P.AddTitleButton, UI_Main.lua) repris en
+-- colonne contre la barre, à gauche (défaut) ou à droite (P.charDb.teamBar.moduleButtons /
+-- moduleSide, panneau d'options). Discrets : trois premières lettres du libellé, petite police ;
+-- même clic (le bouton de la colonne est passé à spec.onClick) et même infobulle que dans la
+-- fenêtre. spec.onCreate n'est pas rappelé (il référence le bouton de la fenêtre).
+local MODULE_WIDTH, MODULE_HEIGHT, MODULE_GAP = 34, 16, 2
+local moduleColumn
+local moduleButtons = {}
+
+-- Trois premiers caractères (UTF-8 entiers : « Quê » pour « Quêtes »).
+local function ShortLabel(text)
+	local chars = {}
+	for char in tostring(text or ""):gmatch("[%z\1-\127\194-\244][\128-\191]*") do
+		chars[#chars + 1] = char
+		if #chars == 3 then
+			break
+		end
+	end
+	return table.concat(chars)
+end
+
+local function CreateModuleButton(spec)
+	local button = CreateFrame("Button", nil, moduleColumn, "UIPanelButtonTemplate")
+	button:SetSize(MODULE_WIDTH, MODULE_HEIGHT)
+	button:SetNormalFontObject("GameFontNormalSmall")
+	button:SetHighlightFontObject("GameFontHighlightSmall")
+	button:SetDisabledFontObject("GameFontDisableSmall")
+	button:SetText(ShortLabel(spec.text))
+	if spec.rightClick then
+		button:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+	end
+	button:SetScript("OnClick", spec.onClick)
+	if spec.tooltip then
+		button:SetScript("OnEnter", function(self)
+			-- Infobulle du côté opposé à la barre.
+			GameTooltip:SetOwner(self, P.charDb.teamBar.moduleSide == "right" and "ANCHOR_RIGHT" or "ANCHOR_LEFT")
+			for i, line in ipairs(spec.tooltip) do
+				if i == 1 then
+					GameTooltip:AddLine(line)
+				else
+					GameTooltip:AddLine(line, 1, 1, 1, true)
+				end
+			end
+			GameTooltip:Show()
+		end)
+		button:SetScript("OnLeave", GameTooltip_Hide)
+	end
+	if P.SkinButton then
+		P.SkinButton(button)
+	end
+	return button
+end
+
+-- Place (et crée au besoin) la colonne selon les options ; la zone gardée à l'écran par
+-- SetClampedToScreen inclut la colonne.
+local function LayoutModuleButtons()
+	local state = P.charDb.teamBar
+	local specs = P.GetTitleButtonSpecs and P.GetTitleButtonSpecs() or {}
+	if not state.moduleButtons or #specs == 0 then
+		moduleColumn:Hide()
+		bar:SetClampRectInsets(0, 0, 0, 0)
+		return
+	end
+	for index = #moduleButtons + 1, #specs do
+		moduleButtons[index] = CreateModuleButton(specs[index])
+	end
+	local right = state.moduleSide == "right"
+	local width = MODULE_WIDTH + 2
+	moduleColumn:ClearAllPoints()
+	if right then
+		moduleColumn:SetPoint("TOPLEFT", bar, "TOPRIGHT", 2, 0)
+		bar:SetClampRectInsets(0, width, 0, 0)
+	else
+		moduleColumn:SetPoint("TOPRIGHT", bar, "TOPLEFT", -2, 0)
+		bar:SetClampRectInsets(-width, 0, 0, 0)
+	end
+	moduleColumn:SetSize(MODULE_WIDTH, #specs * (MODULE_HEIGHT + MODULE_GAP) - MODULE_GAP)
+	for index, button in ipairs(moduleButtons) do
+		button:ClearAllPoints()
+		button:SetPoint("TOP", moduleColumn, "TOP", 0, -(index - 1) * (MODULE_HEIGHT + MODULE_GAP))
+	end
+	moduleColumn:Show()
+end
+
 local function Build()
 	bar = P.CreatePanel(UIParent, "")
 	bar:SetSize(BAR_WIDTH, BAR_HEIGHT)
@@ -538,7 +622,12 @@ local function Build()
 	grip:SetScript("OnMouseUp", StopResize)
 	grip:SetScript("OnHide", StopResize)
 
+	-- Colonne des boutons des modules (placée par LayoutModuleButtons).
+	moduleColumn = CreateFrame("Frame", nil, bar)
+	moduleColumn:Hide()
+
 	P.ui.teamBar = bar
+	P.ui.teamBarModules = moduleColumn
 	P.ui.teamBarList = listPanel
 	P.ui.teamBarClose = closeBtn
 	P.ui.teamBarIcon = iconBtn
@@ -589,6 +678,7 @@ function P.RefreshTeamBar()
 	LayoutList(#items)
 	listPanel:SetShown(state.expanded)
 	LayoutGrip()
+	LayoutModuleButtons()
 	bar:Show()
 end
 

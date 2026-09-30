@@ -579,6 +579,15 @@ function P.AddTitleButton(spec)
 	if ui.frame then
 		CreateTitleButton(spec)
 	end
+	if ui.teamBar and P.RefreshTeamBar then
+		P.RefreshTeamBar() -- barre déjà construite : sa colonne des modules suit (UI_TeamBar.lua)
+	end
+end
+
+-- Boutons des addons compagnons, dans l'ordre de leurs demandes (lecture seule) : repris par la
+-- colonne des modules de la barre flottante d'équipe (UI_TeamBar.lua).
+function P.GetTitleButtonSpecs()
+	return titleButtonSpecs
 end
 
 function P.BuildUI()

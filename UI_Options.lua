@@ -455,6 +455,49 @@ function P.BuildOptions()
 		.. "plus usée est inférieure à ce pourcentage (de 5 à 95 %, par pas de 5). Réglage propre à "
 		.. "ce personnage.")
 
+	-- Boutons des addons compagnons en colonne contre la barre flottante (par personnage).
+	local moduleButtonsSetting = Settings.RegisterProxySetting(
+		category,
+		"POLYPODE_TEAMBAR_MODULE_BUTTONS",
+		Settings.VarType.Boolean,
+		"Barre d'équipe : boutons des modules",
+		Settings.Default.True,
+		function()
+			return P.charDb.teamBar.moduleButtons
+		end,
+		function(value)
+			P.charDb.teamBar.moduleButtons = value
+			P.RefreshTeamBar()
+		end
+	)
+	Settings.CreateCheckbox(category, moduleButtonsSetting,
+		"Affiche contre la barre flottante d'équipe une colonne de petits boutons reprenant ceux des "
+		.. "modules (Data, Photo, Profils, Quêtes, Suivi... selon les addons installés) : trois premières "
+		.. "lettres, même clic et même infobulle que dans la fenêtre Polypode. Réglage propre à ce "
+		.. "personnage.")
+
+	local moduleSideSetting = Settings.RegisterProxySetting(
+		category,
+		"POLYPODE_TEAMBAR_MODULE_SIDE",
+		Settings.VarType.String,
+		"Barre d'équipe : côté des boutons des modules",
+		"left",
+		function()
+			return P.charDb.teamBar.moduleSide
+		end,
+		function(value)
+			P.charDb.teamBar.moduleSide = value
+			P.RefreshTeamBar()
+		end
+	)
+	Settings.CreateDropdown(category, moduleSideSetting, function()
+		local container = Settings.CreateControlTextContainer()
+		container:Add("left", "À gauche")
+		container:Add("right", "À droite")
+		return container:GetData()
+	end, "Côté de la barre flottante d'équipe où se place la colonne des boutons des modules. "
+		.. "Réglage propre à ce personnage.")
+
 	Settings.RegisterAddOnCategory(category)
 	P.optionsCategory = category
 end
