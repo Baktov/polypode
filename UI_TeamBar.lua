@@ -373,6 +373,9 @@ local function ShareLayout()
 end
 
 local function ShowBarTooltip(self)
+	if bar and bar.dragging then
+		return -- pas d'infobulle pendant le déplacement de la barre
+	end
 	GameTooltip:SetOwner(self, "ANCHOR_TOP")
 	GameTooltip:AddLine(P.GetSelectedTeam() or "Aucune équipe sélectionnée")
 	GameTooltip:AddLine("Clic gauche : inviter l'équipe (comme le bouton « Inviter l'équipe »)", 1, 1, 1)
@@ -490,6 +493,7 @@ local function Build()
 	bar:SetScript("OnDragStart", function(self)
 		if not P.charDb.teamBar.locked then
 			self.dragging = true
+			GameTooltip:Hide() -- l'infobulle suivrait la barre et masquerait l'endroit visé
 			self:StartMoving()
 		end
 	end)
@@ -539,6 +543,9 @@ local function Build()
 		P.ToggleUI()
 	end)
 	iconBtn:SetScript("OnEnter", function(self)
+		if bar.dragging then
+			return -- pas d'infobulle pendant le déplacement de la barre
+		end
 		GameTooltip:SetOwner(self, "ANCHOR_TOP")
 		GameTooltip:AddLine("Polypode")
 		GameTooltip:AddLine("Clic : ouvrir / fermer la fenêtre Polypode", 1, 1, 1)
