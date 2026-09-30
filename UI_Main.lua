@@ -639,6 +639,10 @@ function P.BuildUI()
 	local f = CreateFrame("Frame", "PolypodeMainFrame", UIParent, "BackdropTemplate")
 	f:SetSize(P.db.mainFrame.width, P.db.mainFrame.height)
 	f:SetPoint("CENTER")
+	-- Devant les barres d'action et la plupart des informations (strate MEDIUM par défaut),
+	-- derrière les fenêtres des addons compagnons (DIALOG), ouvertes depuis celle-ci.
+	f:SetFrameStrata("HIGH")
+	f:SetToplevel(true)
 	f:SetMovable(true)
 	f:SetResizable(true)
 	f:SetResizeBounds(MIN_WIDTH, MIN_HEIGHT)
