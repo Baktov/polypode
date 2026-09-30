@@ -272,7 +272,7 @@ barre de titre de la fenêtre principale (à gauche de la croix) et sa commande 
   recherche d'objet, dans l'esprit de DataStore / WoWthing (à installer sur chaque personnage).
 - **Polypode Profil** (https://github.com/Baktov/polypode-profil) : bouton **Profils** et
   `/poly profil`, bibliothèque des chaînes d'export du mode Édition, des talents, de la transmogrification, des titres, des ensembles d'équipement et des addons
-  (EllesmereUI, ElvUI, Baganator, MySlots...), communes à tous vos personnages et échangées entre
+  (EllesmereUI, ElvUI, Baganator, MySlots, Simple Addon Manager...), communes à tous vos personnages et échangées entre
   vos clients connectés.
 
 ---
