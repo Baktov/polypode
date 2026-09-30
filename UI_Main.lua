@@ -199,7 +199,9 @@ local function CreateScrollList(panel, formatFn, top, opts)
 			return
 		end
 		for i, line in ipairs(lines) do
-			if i == 1 then
+			if type(line) == "table" then -- { gauche, droite } : deux colonnes (P.LIST_TOOLTIP_COLUMNS)
+				GameTooltip:AddDoubleLine(line[1] or "", line[2] or "", 1, 1, 1, 1, 1, 1)
+			elseif i == 1 then
 				GameTooltip:AddLine(line)
 			else
 				GameTooltip:AddLine(line, 1, 1, 1)
@@ -334,6 +336,7 @@ end
 -- Partagés avec les autres fenêtres (UI_*.lua) : cadre à en-tête et liste défilante.
 P.CreatePanel = CreatePanel
 P.CreateScrollList = CreateScrollList
+P.LIST_TOOLTIP_COLUMNS = true -- opts.tooltip peut renvoyer des lignes { gauche, droite } (0.51.4)
 P.SetListData = SetListData
 
 -- Lettres accentuées (UTF-8) ramenées à leur lettre de base minuscule pour le tri alphabétique.
