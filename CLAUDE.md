@@ -35,7 +35,7 @@ n'ajoute une fonctionnalité que si elle sert directement cet objectif.
   gauche depuis la croix) et sa commande par `P.RegisterSlashCommand` ; un compagnon échange ses propres
   messages par `P.RegisterMessageHandler(type, fn(reste, expéditeur))` (appelé par `P.OnSyncMessage` après
   la vérification du token), `P.RegisterPeerCallback(fn(expéditeur))` (appelé à chaque HELLO/HI reçu) et
-  `P.WhisperOnline(message, cible)` (à cible, sinon aux clients connectés), avec `P.IsSender` et
+  `P.WhisperOnline(message, cible)` (à cible, sinon aux clients connectés), et déclare les données qu'il garde d'un personnage par `P.RegisterCharacterData({ name, describe(clé) → texte|nil, remove(clé, fromSync) })` (Core.lua, 0.53.0 : appelé par `P.RemoveCharacter` — Maj + clic dans « Personnages disponibles », confirmation `POLYPODE_REMOVE_CHARACTER` listant `P.DescribeCharacterData(clé)` — et par `P.ApplyCharacterSync` à la réception d'une suppression, `fromSync` vrai), avec `P.IsSender` et
   `P.MAX_MESSAGE_LENGTH` (Sync.lua). API publique qu'ils utilisent (voir leur CLAUDE.md) : `P.AddTitleButton`,
   `P.RegisterSlashCommand`, `P.optionsCategory`, `P.CreatePanel`, `P.CreateScrollList`, `P.SetListData`,
   `P.SkinFrame`, `P.SkinPanel`, `P.SkinButton`, `P.SkinDropdown`, `P.UnitNameParts`, `P.JoinSurname`, `P.GetCharacterStatus`,

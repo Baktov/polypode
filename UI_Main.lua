@@ -104,6 +104,34 @@ StaticPopupDialogs[NEW_ACCOUNT_POPUP] = {
 
 -- Menu Alt + clic d'un personnage : le ranger dans un compte WoW nommé, en créer un, ou le
 -- retirer de tout compte. Partagé avec les autres Polypode.
+-- SUPPRESSION D'UN PERSONNAGE (Maj + clic dans « Personnages disponibles ») : confirmation
+-- qui liste ce qui part avec lui (équipes, compte WoW nommé, données des addons compagnons,
+-- P.DescribeCharacterData), puis P.RemoveCharacter (synchronisé avec les autres clients).
+local REMOVE_CHARACTER_POPUP = "POLYPODE_REMOVE_CHARACTER"
+
+StaticPopupDialogs[REMOVE_CHARACTER_POPUP] = {
+	text = "Supprimer %s de Polypode ?%s\n\n(sur tous vos clients connectés ; il reviendra s'il se reconnecte avec Polypode)",
+	button1 = DELETE or "Supprimer",
+	button2 = CANCEL,
+	OnAccept = function(_, key)
+		P.RemoveCharacter(key)
+		P.RefreshUI()
+	end,
+	timeout = 0,
+	whileDead = true,
+	hideOnEscape = true,
+}
+
+local function ConfirmRemoveCharacter(key)
+	if key == P.GetCharKey() then
+		UIErrorsFrame:AddMessage("Le personnage joué ne peut pas être supprimé.", 1, 0.1, 0.1)
+		return
+	end
+	local lines = P.DescribeCharacterData(key)
+	local details = #lines > 0 and ("\n\nSeront aussi supprimés :\n" .. table.concat(lines, "\n")) or ""
+	StaticPopup_Show(REMOVE_CHARACTER_POPUP, P.GetDisplayName(key, true), details, key)
+end
+
 local function ShowAccountMenu(owner, key)
 	local function IsCurrent(label)
 		return (P.GetCharacterAccount(key) or "") == label
@@ -714,6 +742,10 @@ function P.BuildUI()
 				P.RefreshUI()
 				return
 			end
+			if IsShiftKeyDown() then
+				ConfirmRemoveCharacter(data.key)
+				return
+			end
 			if IsAltKeyDown() then
 				ShowAccountMenu(charPanel, data.key)
 				return
@@ -757,7 +789,7 @@ function P.BuildUI()
 			end
 			local presence = data.first and "|cff40ff40Connecté|r" or "|cff999999Déconnecté (ou pas vu cette session)|r"
 			local account = "Compte WoW : " .. (P.GetCharacterAccount(data.key) or "non renseigné")
-			local hint = "Alt + clic : ranger dans un compte WoW"
+			local hint = "Alt + clic : ranger dans un compte WoW|nMaj + clic : supprimer ce personnage et ses données"
 			if not selectedTeam then
 				return CharacterTooltip(data.key, { presence, account,
 					"Sélectionnez d'abord une équipe pour y ajouter ce personnage.",

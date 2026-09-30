@@ -284,6 +284,46 @@ function P.AddTargetCharacter()
 end
 
 -- Retire un personnage du roster (pierre tombale synchronisée). Renvoie true si retiré.
+-- DONNÉES LIÉES À UN PERSONNAGE (point d'extension des addons compagnons) : chacun déclare ce
+-- qu'il garde d'un personnage, pour que sa suppression (Maj + clic dans « Personnages
+-- disponibles ») l'efface aussi. handler = { name, describe = fn(clé) → texte ou nil (rien de
+-- gardé), remove = fn(clé, fromSync) } ; fromSync vrai quand la suppression vient d'un autre
+-- client (ne pas renvoyer ce que ce client propage déjà lui-même).
+local characterDataHandlers = {}
+
+function P.RegisterCharacterData(handler)
+	characterDataHandlers[#characterDataHandlers + 1] = handler
+end
+
+-- Ce qui sera supprimé avec le personnage : lignes « module : description ».
+function P.DescribeCharacterData(key)
+	local lines = {}
+	local teams = P.GetCharacterTeams(key)
+	if #teams > 0 then
+		lines[#lines + 1] = "Polypode : membre de " .. table.concat(teams, ", ")
+	end
+	if P.GetCharacterAccount(key) then
+		lines[#lines + 1] = "Polypode : compte WoW « " .. P.GetCharacterAccount(key) .. " »"
+	end
+	for _, handler in ipairs(characterDataHandlers) do
+		local ok, text = pcall(handler.describe, key)
+		if ok and text then
+			lines[#lines + 1] = handler.name .. " : " .. text
+		end
+	end
+	return lines
+end
+
+-- Efface les données des addons compagnons (une erreur de l'un n'arrête pas les autres).
+local function RemoveCharacterData(key, fromSync)
+	for _, handler in ipairs(characterDataHandlers) do
+		local ok, err = pcall(handler.remove, key, fromSync)
+		if not ok then
+			P.Debug("Suppression des données de " .. key .. " (" .. tostring(handler.name) .. ") : " .. tostring(err))
+		end
+	end
+end
+
 function P.RemoveCharacter(key)
 	local entry = P.GetCharacter(key)
 	if not entry then
@@ -295,6 +335,11 @@ function P.RemoveCharacter(key)
 	for name in pairs(P.GetTeams()) do
 		P.RemoveTeamMember(name, key)
 	end
+	-- Ni rangé dans un compte WoW nommé (versionné, synchronisé), ni gardé par les compagnons.
+	if P.GetCharacterAccount(key) then
+		P.SetCharacterAccount(key, nil)
+	end
+	RemoveCharacterData(key, false)
 	return true
 end
 
@@ -328,6 +373,7 @@ function P.ApplyCharacterSync(key, updated, removed, name, realm, class, level)
 	end
 	entry = entry or {}
 	P.db.roster[key] = entry
+	local wasActive = not entry.removed and entry.name ~= nil
 	entry.name = name
 	entry.realm = realm
 	entry.class = class or entry.class
@@ -335,6 +381,10 @@ function P.ApplyCharacterSync(key, updated, removed, name, realm, class, level)
 	entry.removed = removed or nil
 	entry.updated = updated
 	entry.lastSeen = entry.lastSeen or time()
+	-- Supprimé sur un autre client : les données des compagnons gardées ici partent aussi.
+	if removed and wasActive then
+		RemoveCharacterData(key, true)
+	end
 	return true
 end
 

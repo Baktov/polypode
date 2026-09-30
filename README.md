@@ -138,6 +138,11 @@ côte à côte :
   avec elle. L'ajout est partagé avec vos autres Polypode connectés.
   Quand une équipe est sélectionnée : **clic droit** sur un personnage l'ajoute à l'équipe,
   **clic gauche** l'en retire ; les membres de l'équipe sont surlignés en doré. Une infobulle au survol donne le nom du personnage, rappelle ces actions, puis liste les équipes dont il fait déjà partie (l'équipe sélectionnée en vert).
+  **Maj + clic** sur un personnage le **supprime** de Polypode, après une confirmation qui liste
+  ce qui part avec lui : ses équipes, son compte WoW nommé et les données des addons compagnons
+  (relevés de Polypode Data et Polypode Suivi, profils de Polypode Profil rangés sous lui). La
+  suppression est partagée avec vos autres Polypode connectés. Le personnage joué ne peut pas être
+  supprimé ; un personnage supprimé revient s'il se reconnecte avec Polypode.
   **Sans équipe sélectionnée**, un **clic droit** sur un personnage crée une équipe à son nom
   (« Arthas », ou « Arthas_1 », « Arthas_2 »... si ce nom est déjà pris), avec lui pour membre et
   **leader**, et la sélectionne.
@@ -395,7 +400,7 @@ vous avez désactivé le skin de Polypode dans ses options).
 
 ## État du projet
 
-Version `0.52.1` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
+Version `0.53.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
 automatique aux annonces, fenêtre redimensionnable à trois listes défilantes (personnages
 disponibles / équipes avec création par saisie, sélection, renommage et suppression / personnages de l'équipe, ajout
 et retrait de membres au clic, leader par équipe, invitation de toute l'équipe, synchronisation automatique et versionnée des équipes, ajout du joueur ciblé, barre flottante de l'équipe sélectionnée)
