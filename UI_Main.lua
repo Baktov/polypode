@@ -426,6 +426,19 @@ local function AccountGroup(key)
 	return NO_ACCOUNT_GROUP, "Compte non renseigné"
 end
 
+-- Clés des comptes affichés au dernier RefreshUI (bouton « Tout replier / déplier »).
+local accountGroupKeys = {}
+
+-- Vrai si tous les comptes affichés sont repliés.
+local function AllAccountsCollapsed()
+	for _, groupKey in ipairs(accountGroupKeys) do
+		if not P.charDb.collapsedAccounts[groupKey] then
+			return false
+		end
+	end
+	return true
+end
+
 -- Ordre des groupes : comptes nommés (alphabétique), puis « Compte non renseigné ».
 local function GroupRank(groupKey)
 	return groupKey == NO_ACCOUNT_GROUP and 2 or 1
@@ -699,6 +712,33 @@ function P.BuildUI()
 	local charPanel = CreatePanel(f, "Personnages disponibles")
 	charPanel:SetPoint("TOPLEFT", PANEL_MARGIN, PANEL_TOP)
 	charPanel:SetPoint("BOTTOMLEFT", PANEL_MARGIN, PANEL_MARGIN)
+
+	-- « Tout replier » / « Tout déplier » les comptes, à droite du titre (affiché seulement avec
+	-- l'option « regrouper par compte », cf. RefreshUI).
+	local collapseAllBtn = CreateFrame("Button", nil, charPanel, "UIPanelButtonTemplate")
+	collapseAllBtn:SetSize(90, 18)
+	collapseAllBtn:SetPoint("TOPRIGHT", -6, -4)
+	collapseAllBtn:SetText("Tout replier")
+	collapseAllBtn:SetScript("OnClick", function()
+		local collapsed = P.charDb.collapsedAccounts
+		if AllAccountsCollapsed() then
+			wipe(collapsed)
+		else
+			for _, groupKey in ipairs(accountGroupKeys) do
+				collapsed[groupKey] = true
+			end
+		end
+		P.RefreshUI()
+	end)
+	collapseAllBtn:SetScript("OnEnter", function(self)
+		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+		GameTooltip:AddLine("Tout replier / déplier")
+		GameTooltip:AddLine("Replie tous les comptes pour ne voir que leurs en-têtes, ou les déplie tous.",
+			1, 1, 1, true)
+		GameTooltip:Show()
+	end)
+	collapseAllBtn:SetScript("OnLeave", GameTooltip_Hide)
+	collapseAllBtn:Hide()
 
 	-- Bouton d'ajout du joueur ciblé (personnage sans Polypode, ex. un ami) au roster.
 	local addTargetBtn = CreateFrame("Button", nil, charPanel, "UIPanelButtonTemplate")
@@ -974,6 +1014,7 @@ function P.BuildUI()
 	ui.channelInput = channelInput
 	ui.resizeGrip = grip
 	ui.charPanel = charPanel
+	ui.collapseAccountsButton = collapseAllBtn
 	ui.teamPanel = teamPanel
 	ui.teamInput = teamInput
 	ui.teamCreateButton = createBtn
@@ -990,6 +1031,7 @@ function P.BuildUI()
 		P.SkinButton(createBtn)
 		P.SkinButton(inviteBtn)
 		P.SkinButton(addTargetBtn)
+		P.SkinButton(collapseAllBtn)
 		P.SkinButton(optionsBtn)
 		P.SkinEditBox(channelInput)
 	end
@@ -1055,7 +1097,9 @@ function P.RefreshUI()
 			return a.label < b.label
 		end)
 		characters = {}
+		wipe(accountGroupKeys)
 		for _, group in ipairs(order) do
+			accountGroupKeys[#accountGroupKeys + 1] = group.groupKey
 			group.collapsed = P.charDb.collapsedAccounts[group.groupKey] or false
 			group.first = true -- en-tête jamais estompé
 			characters[#characters + 1] = group
@@ -1067,6 +1111,12 @@ function P.RefreshUI()
 		end
 	end
 	SetListData(ui.charPanel, characters)
+	-- Bouton « Tout replier » : seulement regroupé par compte ; le titre lui laisse la place.
+	local grouped = P.charDb.groupByAccount and #accountGroupKeys > 0
+	ui.collapseAccountsButton:SetShown(grouped)
+	ui.collapseAccountsButton:SetText(AllAccountsCollapsed() and "Tout déplier" or "Tout replier")
+	ui.charPanel.header:SetPoint("RIGHT", grouped and ui.collapseAccountsButton or ui.charPanel,
+		grouped and "LEFT" or "RIGHT", grouped and -6 or -10, 0)
 
 	local teams = {}
 	for name in pairs(P.GetTeams()) do

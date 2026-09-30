@@ -126,7 +126,9 @@ côte à côte :
   session, ou un membre connecté de votre groupe (même sans Polypode) ; l'infobulle l'indique.
   **Regrouper par compte WoW** (option « Personnages disponibles : regrouper par compte ») : un
   en-tête par compte WoW (« - Nom du compte (connectés/total) »), repliable ou dépliable d'un clic,
-  puis « Compte non renseigné » pour les personnages sans compte. WoW ne donne pas le nom du
+  puis « Compte non renseigné » pour les personnages sans compte. Un bouton **Tout replier** à droite du titre
+  « Personnages disponibles » replie tous les comptes (il devient **Tout déplier** quand tout est
+  replié) ; il n'apparaît qu'avec cette option. WoW ne donne pas le nom du
   compte WoW aux addons : il se renseigne sur chaque personnage, dans les options (champ **Compte
   WoW de ce personnage**, une fois par personnage) ou par **Alt + clic** sur un personnage dans la
   fenêtre (menu : comptes existants, « Nouveau compte... », « Aucun compte »). Ce rangement est
@@ -400,7 +402,7 @@ vous avez désactivé le skin de Polypode dans ses options).
 
 ## État du projet
 
-Version `0.53.0` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
+Version `0.53.1` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
 automatique aux annonces, fenêtre redimensionnable à trois listes défilantes (personnages
 disponibles / équipes avec création par saisie, sélection, renommage et suppression / personnages de l'équipe, ajout
 et retrait de membres au clic, leader par équipe, invitation de toute l'équipe, synchronisation automatique et versionnée des équipes, ajout du joueur ciblé, barre flottante de l'équipe sélectionnée)
