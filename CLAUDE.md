@@ -29,7 +29,7 @@ n'ajoute une fonctionnalité que si elle sert directement cet objectif.
   https://github.com/Baktov/polypode-suivi : suivi de l'équipe, message `SUIVI` à lui) et **Polypode Data**
   (`../Polypode_Data`, https://github.com/Baktov/polypode-data : données durables des personnages façon
   DataStore, messages `DATA` / `DATAV` / `DATAREQ` à lui) et **Polypode Profil** (`../Polypode_Profil`,
-  https://github.com/Baktov/polypode-profil : chaînes d'export du mode Édition, des talents, de la transmogrification, des titres, des ensembles d'équipement et des addons,
+  https://github.com/Baktov/polypode-profil : chaînes d'export du mode Édition, des talents, de la transmogrification, des titres, des ensembles d'équipement, des options de WoW, des raccourcis, des fenêtres de discussion et des addons,
   messages `PROF` / `PROFV` / `PROFREQ` à lui). Polypode n'en sait
   rien : chacun ajoute son bouton de barre de titre par `P.AddTitleButton` (UI_Main.lua, empilés de droite à
   gauche depuis la croix) et sa commande par `P.RegisterSlashCommand` ; un compagnon échange ses propres
