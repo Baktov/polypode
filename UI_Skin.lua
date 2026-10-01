@@ -134,6 +134,20 @@ function P.SkinDropdown(dropdown, width)
 	end
 end
 
+-- Skinne une case à cocher (ex. UICheckButtonTemplate) : case sombre et coche du skin.
+function P.SkinCheckBox(check)
+	local eui = GetEUISkin()
+	if eui then
+		eui.Checkbox(check)
+		return
+	end
+
+	local S = GetElvSkins()
+	if S and S.HandleCheckBox then
+		S:HandleCheckBox(check)
+	end
+end
+
 -- Skinne un bouton texte (ex. UIPanelButtonTemplate). Libellé blanc, gris si désactivé.
 function P.SkinButton(button)
 	local eui = GetEUISkin()
