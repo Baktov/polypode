@@ -24,7 +24,8 @@ P.defaults = {
 	mainFrame = {
 		width = 720, -- taille de la fenêtre principale, mémorisée au redimensionnement
 		height = 320,
-		soloWidth = 620, -- largeur en mode solo (un seul cadre, cf. UI_Main.lua), mémorisée à part
+		soloWidth = 700, -- largeur en mode solo (un seul cadre, cf. UI_Main.lua), mémorisée à part ;
+		-- en dessous, la case « Solo » chevauche le titre centré « Polypode »
 	},
 	-- [nom] = { name, members = { [nom-royaume] = true }, leader = nom-royaume|nil,
 	--          updated = heure serveur de la dernière modification (synchro) }
@@ -123,6 +124,10 @@ function P.InitDB()
 	-- par personnage associé ne sont plus utilisés.
 	P.db.leader = nil
 	P.charDb.role = nil
+	-- Largeur solo par défaut de 0.54.0 (620) : trop étroite, la case « Solo » touchait le titre.
+	if P.db.mainFrame.soloWidth == 620 then
+		P.db.mainFrame.soloWidth = 700
+	end
 
 	-- Migration : l'option « quêtes dans les dialogues » (v0.21) couvre désormais tous les
 	-- dialogues de PNJ sous un nouveau nom ; le choix déjà fait est conservé.
