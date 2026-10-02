@@ -286,7 +286,7 @@ multibox a sa propre barre) et retrouvés à la connexion.
 
 ## Addons compagnons (séparés)
 
-Quatre fonctions sont des addons séparés, qui dépendent de Polypode et se chargent ou non depuis
+Cinq fonctions sont des addons séparés, qui dépendent de Polypode et se chargent ou non depuis
 la liste des AddOns ; sans eux, Polypode fonctionne normalement. Chacun ajoute son bouton à la
 barre de titre de la fenêtre principale (à gauche de la croix) et sa commande `/poly` :
 
@@ -298,12 +298,16 @@ barre de titre de la fenêtre principale (à gauche de la croix) et sa commande 
 - **Polypode Photo** (https://github.com/Baktov/Polypode-Photo) : bouton **Photo** et
   `/poly photo`, membres du groupe en pied, côte à côte, sur un fond au choix.
 - **Polypode Suivi** (https://github.com/Baktov/polypode-suivi) : bouton **Suivi** et
-  `/poly suivi`, pour chaque membre de l'équipe sélectionnée : grande chambre forte, écus,
-  ressources, renommées et runes de pouvoir (informations échangées par Polypode, à installer
-  sur chaque personnage suivi).
+  `/poly suivi`, tableau triable de l'équipe sélectionnée : grande chambre forte, écus, catalyseur,
+  ressources, renommées, runes de pouvoir, activités de la semaine, courrier, et avancement des
+  **campagnes** (chapitres, par extension, de Mists of Pandaria à Midnight) ; panneau des
+  activités de l'extension (informations échangées par Polypode, à installer sur chaque personnage
+  suivi).
 - **Polypode Data** (https://github.com/Baktov/polypode-data) : bouton **Data** et `/poly data`,
-  données durables de tous vos personnages (niveau, or, métiers, équipement, sacs et banques), avec
-  recherche d'objet, dans l'esprit de DataStore / WoWthing (à installer sur chaque personnage).
+  tableau triable des données durables de tous vos personnages (niveau, niveau d'objet, or, métiers
+  et recettes, hauts faits, temps de jeu, équipement, sacs et banques), avec recherche d'objet et
+  de recette et rangement automatique en banque, dans l'esprit de DataStore / WoWthing (à installer
+  sur chaque personnage).
 - **Polypode Profil** (https://github.com/Baktov/polypode-profil) : bouton **Profils** et
   `/poly profil`, bibliothèque des chaînes d'export du mode Édition, des talents, de la transmogrification, des titres, des ensembles d'équipement, des options de WoW, des raccourcis, des fenêtres de discussion, de la liste des addons et des addons
   (EllesmereUI, ElvUI, Baganator, MySlots, Simple Addon Manager...), communes à tous vos personnages et échangées entre
@@ -442,6 +446,111 @@ commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, in
   `AcceptRoleCheck`) dont le fonctionnement n'a pas été constaté en jeu.
 - Invitation automatique du groupe depuis le roster.
 - Skin des textes de la fenêtre (police EllesmereUI via `S.Font`).
+
+---
+
+## Version
+
+Du plus récent au plus ancien (d'après l'historique des commits).
+
+`0.54.2` : mode solo : fenêtre de 700 px par défaut, la case Solo ne touche plus le titre (annulée le jour même : retour à 620 px, version de nouveau 0.54.1).
+`0.54.1` : case Solo : libellé écarté de 5 px de la case (skin EllesmereUI).
+`0.54.0` : mode solo : fenêtre réduite aux personnages disponibles, barre flottante du personnage joué.
+`0.53.3` : P.SkinCheckBox : cases à cocher skinnées EllesmereUI / ElvUI.
+`0.53.2` : fenêtre principale en strate HIGH, devant les barres d'action.
+`0.53.1` : personnages disponibles : bouton « Tout replier » des comptes.
+`0.53.0` : Maj + clic : supprimer un personnage et ses données.
+`0.52.1` : barre flottante : pas d'infobulle pendant son déplacement.
+`0.52.0` : barre flottante : colonne des boutons des modules.
+`0.51.4` : listes : lignes d'infobulle sur deux colonnes.
+`0.51.3` : P.SkinDropdown : listes déroulantes habillées par EllesmereUI / ElvUI.
+`0.51.2` : P.IsCharacterConnected exposé aux addons compagnons.
+`0.51.1` : liste défilante : pas d'infobulle si opts.tooltip ne renvoie rien.
+`0.51.0` : points d'extension de synchro pour les addons compagnons.
+`0.50.1` : renommer une équipe par double-clic au lieu de Ctrl + clic.
+`0.50.0` : date de création des équipes dans leur infobulle.
+`0.49.2` : personnages disponibles : clic droit ajoute, clic gauche retire.
+`0.49.1` : clic droit sans équipe sélectionnée : équipe créée avec ce personnage pour leader.
+`0.49.0` : fenêtre « Quêtes de l'équipe » sortie dans l'addon Polypode Quêtes.
+`0.48.3` : regroupement par compte WoW seulement, plus par compte Battle.net.
+`0.48.2` : compte WoW : saisie enregistrée aussi en quittant le champ.
+`0.48.1` : champ « Compte WoW de ce personnage » dans les options.
+`0.48.0` : personnages disponibles regroupés par compte, en option.
+`0.47.0` : mode photo sorti dans l'addon séparé Polypode Photo.
+`0.46.1` : mode photo : option pour afficher les familiers.
+`0.46.0` : mode photo : 168 écrans de chargement en fond, sans déformation.
+`0.45.4` : mode photo : illustrations du guide étendues à tout l'écran.
+`0.45.3` : mode photo : déplacer chaque personnage par glisser.
+`0.45.2` : mode photo : zoom à la molette sur chaque personnage.
+`0.45.1` : mode photo : fonds tirés du guide de l'aventurier.
+`0.45.0` : mode photo : options par clic droit sur le bouton « Photo ».
+`0.44.0` : barre d'équipe : clignotement si la durabilité est sous un seuil.
+`0.43.2` : leader toujours en tête des personnages de l'équipe.
+`0.43.1` : personnages disponibles : connectés en tête, déconnectés grisés.
+`0.43.0` : WoW Forever : affichage « Prénom Nom » des personnages.
+`0.42.1` : pas de fausse alerte « ne suit plus » en relançant le suivi.
+`0.42.0` : prise en charge de WoW Forever (Interface 16001).
+`0.41.1` : icône Polypode à gauche de la barre flottante d'équipe.
+`0.41.0` : fenêtre « Quêtes de l'équipe » : quêtes du leader manquantes chez les membres.
+`0.40.0` : mode photo : membres du groupe en pied, interface masquée.
+`0.39.1` : option pour masquer la barre de vie de la barre flottante d'équipe.
+`0.39.0` : état des membres dans la barre flottante d'équipe.
+`0.38.0` : alerte « ne suit plus » en option.
+`0.37.0` : renommer une équipe par Ctrl + clic gauche.
+`0.36.0` : Maj + clic sur la barre flottante : partager sa disposition à l'équipe.
+`0.35.0` : barre d'équipe : niveau, % d'XP et niveau d'objet des membres.
+`0.34.0` : partage automatique des quêtes du leader aux membres qui ne l'ont pas.
+`0.33.2` : marge droite réduite dans la barre flottante d'équipe.
+`0.33.1` : clic gauche sur la barre flottante d'équipe : inviter l'équipe.
+`0.33.0` : infobulle façon liste d'amis pour les membres non groupés.
+`0.32.3` : infobulle WoW complète des personnages groupés dans la barre flottante.
+`0.32.2` : leader surligné en doré dans la barre flottante d'équipe.
+`0.32.1` : infobulle du canal dédié : canal optionnel, grouper reste le plus simple.
+`0.32.0` : barre flottante d'équipe redimensionnable et verrouillable.
+`0.31.1` : « Personnages trouvés » devient « Personnages disponibles », tri alphabétique.
+`0.31.0` : suppression d'équipe par Maj + clic gauche.
+`0.30.1` : croix de la barre flottante d'équipe skinnée EllesmereUI/ElvUI.
+`0.30.0` : barre flottante de l'équipe sélectionnée.
+`0.29.1` : fenêtre de gestion des comptes autorisés.
+`0.29.0` : autorisation d'autres comptes Battle.net vus sur le canal dédié.
+`0.28.0` : canal dédié commun aux comptes pour les annonces de connexion.
+`0.27.1` : clic droit sur une équipe pour la désélectionner.
+`0.27.0` : groupage automatique de l'équipe à la connexion.
+`0.26.0` : son de l'équipe piloté par le leader : volume et coupure.
+`0.25.0` : gouffres (entrée, sortie) et portails d'instance suivis du leader.
+`0.24.0` : vol automatique chez le maître de vol.
+`0.23.0` : passage automatique des cinématiques.
+`0.22.0` : dialogues de PNJ : options de dialogue et fermeture de DialogueUI.
+`0.21.0` : sélection automatique des quêtes dans les dialogues de PNJ.
+`0.20.0` : validation automatique des quêtes du leader.
+`0.19.0` : acceptation automatique des quêtes du leader.
+`0.18.2` : libellés des raccourcis sans le préfixe « Polypode: ».
+`0.18.1` : option « Attaquer après l'assistance » (/startattack).
+`0.18.0` : raccourcis clavier : se nommer leader, suivre, assister, inviter.
+`0.17.2` : sélection d'équipe mémorisée par personnage.
+`0.17.1` : option « Mode debug » dans le panneau d'options.
+`0.17.0` : bouton « Options » dans la fenêtre principale.
+`0.16.1` : retrait du bouton « Actualiser ».
+`0.16.0` : bouton « Actualiser » : liste des personnages connectés.
+`0.15.0` : bouton « Ajouter la cible » et roster synchronisé.
+`0.14.1` : « Inviter l'équipe » réservé au leader de l'équipe.
+`0.14.0` : synchro automatique et versionnée des équipes (corrige leur perte).
+`0.13.0` : synchronisation de l'équipe vers les Polypode des membres.
+`0.12.0` : bouton « Inviter l'équipe » dans le cadre des personnages.
+`0.11.1` : suppression du leader global au profit du leader par équipe.
+`0.11.0` : leader par équipe au clic gauche.
+`0.10.3` : infobulle personnage : nom, rappels de clic, puis équipes.
+`0.10.2` : infobulles d'aide au survol des personnages.
+`0.10.1` : clic droit sur un membre de l'équipe pour le retirer.
+`0.10.0` : membres d'équipe : ajout/retrait au clic sur les personnages trouvés.
+`0.9.0` : sélection d'une équipe au clic, cadre « Personnages de l'équipe ».
+`0.8.0` : équipes : création par saisie, fenêtre à trois cadres.
+`0.7.0` : fenêtre principale redimensionnable.
+`0.6.0` : listes défilantes sans limite dans la fenêtre principale.
+`0.5.0` : fenêtre à deux cadres : personnages trouvés / équipes gérées.
+`0.4.0` : panneau d'options et /poly minimap.
+`0.3.0` : bouton de minimap (icône main) ouvrant la fenêtre.
+`0.2.0` : sync : token d'équipe BattleTag et réponse aux annonces.
 
 ---
 

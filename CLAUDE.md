@@ -26,7 +26,7 @@ n'ajoute une fonctionnalité que si elle sert directement cet objectif.
   (`../Polypode_Quetes`, https://github.com/Baktov/Polypode-quetes : fenêtre « Quêtes de l'équipe » —
   l'échange `QLOG`, `P.GetCharacterQuests` et Quests.lua restent dans Polypode, qui appelle
   `P.RefreshTeamQuests` s'il est défini) et **Polypode Suivi** (`../Polypode_Suivi`,
-  https://github.com/Baktov/polypode-suivi : suivi de l'équipe, message `SUIVI` à lui) et **Polypode Data**
+  https://github.com/Baktov/polypode-suivi : suivi de l'équipe et avancement des campagnes, message `SUIVI` à lui) et **Polypode Data**
   (`../Polypode_Data`, https://github.com/Baktov/polypode-data : données durables des personnages façon
   DataStore, messages `DATA` / `DATAV` / `DATAREQ` à lui) et **Polypode Profil** (`../Polypode_Profil`,
   https://github.com/Baktov/polypode-profil : chaînes d'export du mode Édition, des talents, de la transmogrification, des titres, des ensembles d'équipement, des options de WoW, des raccourcis, des fenêtres de discussion, de la liste des addons et des addons,
@@ -143,6 +143,51 @@ Avant d'ajouter une fonctionnalité :
   1. mettre à jour la section correspondante du `README.md` (commandes, raccourcis, fonctionnalités, apparence) ;
   2. mettre à jour ce `CLAUDE.md` si l'architecture, les conventions ou les dépendances changent ;
   3. commiter puis pousser (`git push`) sur `origin`.
+  (Procédure détaillée, commune à tous les modules : section suivante.)
+
+---
+
+## Modules Polypode et documentation (valable pour chaque dépôt)
+
+Chaque module est un **dépôt git séparé** (dossier voisin dans `Interface/AddOns`) avec **son
+propre `CLAUDE.md` et son `README.md`** :
+
+| Dossier | Dépôt | Rôle |
+|---|---|---|
+| `Polypode` | https://github.com/Baktov/polypode | cœur : roster, équipes, synchro, fenêtre, API des compagnons |
+| `Polypode_Data` | https://github.com/Baktov/polypode-data | données durables des personnages (bouton Data) |
+| `Polypode_Photo` | https://github.com/Baktov/Polypode-Photo | mode photo (bouton Photo) |
+| `Polypode_Profil` | https://github.com/Baktov/polypode-profil | bibliothèque de chaînes d'export (bouton Profils) |
+| `Polypode_Quetes` | https://github.com/Baktov/Polypode-quetes | quêtes de l'équipe (bouton Quêtes) |
+| `Polypode_Suivi` | https://github.com/Baktov/polypode-suivi | suivi de l'équipe et des campagnes (bouton Suivi) |
+
+**Avant** de toucher un module : lire **son** `CLAUDE.md` (architecture, dépendances, procédures
+propres) **et** ce fichier (conventions communes : pas de `print()` mais `P.Debug` ou
+`UIErrorsFrame`, commentaires en français, code en anglais, tests d'existence des API...).
+
+**Après chaque modification d'un module**, dans **son** dépôt, sans attendre qu'on le demande :
+
+1. **Version** : incrémenter `## Version` du `.toc` (correctif : 3e chiffre ; fonctionnalité :
+   2e chiffre) et l'indiquer entre parenthèses à la fin du message de commit, « Description (1.2.3) ».
+2. **README.md** : ajouter en tête de la section « Version » la ligne `` `x.y.z` : description. ``
+   (du plus récent au plus ancien), et mettre à jour les sections d'utilisation concernées
+   (colonnes, boutons, infobulles, options, commandes, fonctionnement).
+3. **CLAUDE.md** du module : mettre à jour l'architecture (fichiers, fonctions, sections de données,
+   SavedVariables, messages) et la liste « Dépendances vers Polypode » si une nouvelle fonction
+   `P.*` est utilisée.
+4. Si le **périmètre** d'un compagnon change (nouvelle fonction visible, nouveau message de synchro,
+   nouvelle API de Polypode utilisée) : mettre aussi à jour, dans `Polypode`, la section « Addons
+   compagnons » du `README.md` et la liste des compagnons / API publique de ce `CLAUDE.md`, et
+   commiter ce dépôt-là aussi.
+5. Commiter puis pousser (`git push`) chaque dépôt modifié sur `origin`.
+
+Vérification rapide qu'une doc n'a pas décroché : chaque version des messages de commit
+(`git log --format=%s`) doit avoir sa ligne dans la section « Version » du README, et chaque `P.X`
+utilisé par un compagnon (hors fonctions qu'il définit) doit figurer dans ses dépendances.
+
+Outillage (Windows) : écrire les messages de commit et les scripts contenant des accents ou des
+échappements Lua (`\195`, `\\`) dans un fichier (`git commit -F fichier`), jamais par un heredoc
+bash passé à Python, qui les déforme.
 
 ---
 
