@@ -24,6 +24,7 @@ P.defaults = {
 	mainFrame = {
 		width = 720, -- taille de la fenêtre principale, mémorisée au redimensionnement
 		height = 320,
+		soloWidth = 620, -- largeur en mode solo (un seul cadre, cf. UI_Main.lua), mémorisée à part
 	},
 	-- [nom] = { name, members = { [nom-royaume] = true }, leader = nom-royaume|nil,
 	--          updated = heure serveur de la dernière modification (synchro) }
@@ -47,6 +48,7 @@ P.defaults = {
 -- Par personnage : réglages propres à une fenêtre de multibox (et à l'abri du fichier de
 -- compte partagé entre clients, cf. CLAUDE.md).
 P.charDefaults = {
+	soloMode = false, -- mode solo : sans cadres d'équipe, barre flottante du personnage joué (UI_Main.lua)
 	debug = false, -- mode debug (/poly debug ou panneau d'options)
 	assistStartAttack = true, -- raccourci « Assister le leader » : /startattack après /assist
 	autoAcceptQuest = true, -- accepter les quêtes acceptées par le leader (Quests.lua)
@@ -66,6 +68,7 @@ P.charDefaults = {
 	-- de la liste (listHeight, sinon automatique) ajoutées au premier placement / redimensionnement.
 	teamBar = {
 		shown = false,
+		soloShown = false, -- barre du personnage joué en mode solo (affichage mémorisé à part)
 		expanded = false,
 		locked = false,
 		details = true, -- niveau, niveau d'objet et % d'XP à gauche des personnages
@@ -78,6 +81,12 @@ P.charDefaults = {
 	-- selectedTeam : nom de l'équipe sélectionnée dans la fenêtre (nil par défaut),
 	-- conservé même si l'équipe manque momentanément (cf. UI_Main.lua).
 }
+
+-- Mode solo (réglage de ce personnage) : lu par la fenêtre, la barre flottante et les addons
+-- compagnons (Polypode Suivi, Polypode Quêtes). Changé par P.SetSoloMode (UI_Main.lua).
+function P.IsSoloMode()
+	return P.charDb ~= nil and P.charDb.soloMode == true
+end
 
 function P.Debug(msg)
 	if P.debugEnabled then

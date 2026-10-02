@@ -90,6 +90,28 @@ function P.BuildOptions()
 
 	local category, layout = Settings.RegisterVerticalLayoutCategory("Polypode")
 
+	-- Mode solo, en tête et en rouge (par personnage) : même réglage que la case « Solo » de la
+	-- fenêtre (P.SetSoloMode, UI_Main.lua).
+	local soloSetting = Settings.RegisterProxySetting(
+		category,
+		"POLYPODE_SOLO_MODE",
+		Settings.VarType.Boolean,
+		"|cffff4040Mode solo|r",
+		Settings.Default.False,
+		function()
+			return P.IsSoloMode()
+		end,
+		function(value)
+			P.SetSoloMode(value)
+		end
+	)
+	Settings.CreateCheckbox(category, soloSetting,
+		"Pour jouer un seul personnage : la fenêtre Polypode ne garde que « Personnages disponibles » "
+		.. "(agrandi, fenêtre un peu plus étroite), sans les cadres d'équipe. Glissez votre personnage "
+		.. "hors de la liste pour en faire une barre flottante, avec les boutons des modules (Quêtes "
+		.. "masqué ; Suivi sur tous les personnages). Même case que « Solo » dans la fenêtre. Réglage "
+		.. "propre à ce personnage.")
+
 	-- Canal dédié : champ de texte (élément personnalisé, pas de contrôle Settings standard).
 	layout:AddInitializer(Settings.CreateElementInitializer("PolypodeChannelSettingTemplate", {}))
 

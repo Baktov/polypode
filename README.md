@@ -116,7 +116,8 @@ annoncé.
 ## Fenêtre principale
 
 Ouverte par `/poly ui`, le raccourci clavier ou le bouton de minimap. Le bouton **Options** (en haut
-à gauche de la barre de titre) ouvre directement le panneau d'options de Polypode. Trois cadres
+à gauche de la barre de titre) ouvre directement le panneau d'options de Polypode. À sa droite, le
+champ **Canal** puis la case **Solo** (en rouge, voir « Mode solo » ci-dessous). Trois cadres
 côte à côte :
 
 - **Personnages disponibles** : tous les personnages de votre équipe détectés via les canaux
@@ -199,6 +200,26 @@ partagent la largeur à parts égales et la taille est mémorisée pour le compt
 par défaut). Si la fenêtre est très réduite, le contenu est simplement tronqué.
 
 ---
+
+## Mode solo
+
+Pour jouer **un seul personnage** : case **Solo** (en rouge, à droite du champ Canal de la fenêtre
+principale) ou première option du panneau, **Mode solo** (en rouge). Réglage propre à chaque
+personnage.
+
+- La fenêtre ne garde que **Personnages disponibles**, sur toute sa largeur ; les cadres
+  « Équipes » et « Personnages de l'équipe » sont masqués, et la fenêtre est un peu plus étroite
+  (620 pixels par défaut ; sa largeur en mode solo est gardée à part de la largeur normale).
+- Les clics d'équipe sur les personnages sont sans effet ; Alt + clic (compte WoW) et Maj + clic
+  (suppression) restent.
+- **Glisser votre personnage** (la ligne « (vous) ») hors de la liste en fait une **barre
+  flottante**, comme une équipe : votre nom en couleur de classe, clic droit pour déplier sa ligne
+  (niveau, niveau d'objet, vie, durabilité), même poignée, cadenas, croix et **colonne des boutons
+  des modules**. Pas d'invitation ni de partage de position. Son affichage est mémorisé à part :
+  la barre d'équipe revient en quittant le mode solo.
+- Modules : **Quêtes** est masqué (bouton et colonne de la barre) ; **Suivi** liste toujours tous
+  les personnages (case « Tous les personnages » cochée et grisée) ; **Profils**, **Photo** et
+  **Data** restent disponibles.
 
 ## Barre flottante d'équipe
 
@@ -360,6 +381,7 @@ fenêtre principale) :
 
 | Option | Défaut | Effet |
 |---|---|---|
+| **Mode solo** (en rouge, en tête) | Non | Un seul personnage : fenêtre réduite à « Personnages disponibles », barre flottante du personnage joué, Quêtes masqué, Suivi sur tous les personnages (voir « Mode solo »). Même case que **Solo** dans la fenêtre. Réglage **par personnage** |
 | Canal dédié | vide | Optionnel : nom du canal de discussion commun à vos comptes, utile sans groupe ni guilde commune (voir Fonctionnement ; l'infobulle du champ le rappelle). Aussi modifiable dans la fenêtre principale. À droite, bouton « Gestion liste token » : liste et révocation des comptes autorisés. Pour tout le compte, synchronisé entre vos clients |
 | Afficher l'icône de minimap | Oui | Affiche le bouton Polypode autour de la minimap |
 | Mode debug | Non | Affiche dans le chat les messages de diagnostic (synchro, invitations...). Réglage **par personnage** : on peut l'activer sur une seule fenêtre |
@@ -402,7 +424,7 @@ vous avez désactivé le skin de Polypode dans ses options).
 
 ## État du projet
 
-Version `0.53.3` : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
+Version `0.54.0` (mode solo) : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
 automatique aux annonces, fenêtre redimensionnable à trois listes défilantes (personnages
 disponibles / équipes avec création par saisie, sélection, renommage et suppression / personnages de l'équipe, ajout
 et retrait de membres au clic, leader par équipe, invitation de toute l'équipe, synchronisation automatique et versionnée des équipes, ajout du joueur ciblé, barre flottante de l'équipe sélectionnée)

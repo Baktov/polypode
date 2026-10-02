@@ -580,10 +580,29 @@ end
 -- fenêtre existe (P.BuildUI la construit à la première ouverture).
 local titleButtonSpecs, titleButtons = {}, {}
 
+-- Vrai si le bouton d'un compagnon est affiché : spec.hideInSolo le masque en mode solo
+-- (Polypode Quêtes, sans objet sans équipe).
+function P.IsTitleButtonShown(spec)
+	return not (spec.hideInSolo and P.IsSoloMode())
+end
+
+-- Place les boutons affichés de droite à gauche depuis la croix, sans trou pour les masqués.
+local function LayoutTitleButtons()
+	local previous = ui.closeButton
+	for index, button in ipairs(titleButtons) do
+		local shown = P.IsTitleButtonShown(titleButtonSpecs[index])
+		button:SetShown(shown)
+		if shown then
+			button:ClearAllPoints()
+			button:SetPoint("RIGHT", previous, "LEFT", -4, 0)
+			previous = button
+		end
+	end
+end
+
 local function CreateTitleButton(spec)
 	local button = CreateFrame("Button", nil, ui.frame, "UIPanelButtonTemplate")
 	button:SetSize(spec.width or 60, 20)
-	button:SetPoint("RIGHT", titleButtons[#titleButtons] or ui.closeButton, "LEFT", -4, 0)
 	button:SetText(spec.text)
 	if spec.rightClick then
 		button:RegisterForClicks("LeftButtonUp", "RightButtonUp")
@@ -607,6 +626,7 @@ local function CreateTitleButton(spec)
 		P.SkinButton(button)
 	end
 	titleButtons[#titleButtons + 1] = button
+	LayoutTitleButtons()
 	if spec.onCreate then
 		spec.onCreate(button)
 	end
@@ -614,7 +634,7 @@ end
 
 -- Ajoute un bouton à la barre de titre de la fenêtre principale (point d'extension des addons
 -- compagnons). spec = { text, width, onClick = fn(bouton, mouseButton), rightClick = clic droit
--- aussi, tooltip = { titre, lignes... }, onCreate = fn(bouton) }.
+-- aussi, tooltip = { titre, lignes... }, onCreate = fn(bouton), hideInSolo = masqué en mode solo }.
 function P.AddTitleButton(spec)
 	titleButtonSpecs[#titleButtonSpecs + 1] = spec
 	if ui.frame then
@@ -629,6 +649,49 @@ end
 -- colonne des modules de la barre flottante d'équipe (UI_TeamBar.lua).
 function P.GetTitleButtonSpecs()
 	return titleButtonSpecs
+end
+
+-- MODE SOLO (P.charDb.soloMode, case « Solo » de la barre de titre et panneau d'options) : un
+-- seul personnage joué. Les cadres « Équipes » et « Personnages de l'équipe » sont masqués,
+-- « Personnages disponibles » prend toute la largeur de la fenêtre, un peu plus étroite (largeur
+-- gardée à part, P.db.mainFrame.soloWidth). Le personnage joué se glisse hors de la liste pour
+-- devenir la barre flottante (UI_TeamBar.lua), avec la colonne des modules.
+
+-- Clé de P.db.mainFrame où se garde la largeur de la fenêtre dans le mode courant.
+local function WidthKey()
+	return P.IsSoloMode() and "soloWidth" or "width"
+end
+
+-- Largeur des cadres : un tiers chacun, ou toute la largeur pour le seul cadre du mode solo.
+local function LayoutPanels()
+	local f = ui.frame
+	if P.IsSoloMode() then
+		ui.charPanel:SetWidth(math.max(f:GetWidth() - 2 * PANEL_MARGIN, 1))
+		return
+	end
+	local width = (f:GetWidth() - 2 * PANEL_MARGIN - 2 * PANEL_GAP) / 3
+	width = math.max(width, 1)
+	ui.charPanel:SetWidth(width)
+	ui.teamPanel:SetWidth(width)
+end
+
+-- Applique le mode courant à la fenêtre : cadres d'équipe, largeur, boutons des compagnons.
+local function ApplySoloLayout()
+	local solo = P.IsSoloMode()
+	ui.teamPanel:SetShown(not solo)
+	ui.memberPanel:SetShown(not solo)
+	ui.frame:SetWidth(math.max(P.db.mainFrame[WidthKey()] or P.db.mainFrame.width, MIN_WIDTH))
+	LayoutPanels()
+	LayoutTitleButtons()
+end
+
+-- Active / désactive le mode solo pour ce personnage (case de la fenêtre et panneau d'options).
+function P.SetSoloMode(enabled)
+	P.charDb.soloMode = enabled and true or false
+	if ui.frame then
+		ApplySoloLayout()
+	end
+	P.RefreshUI() -- barre flottante, compagnons (Suivi, Quêtes) et case « Solo »
 end
 
 function P.BuildUI()
@@ -694,6 +757,29 @@ function P.BuildUI()
 	channelInput:SetPoint("LEFT", channelLabel, "RIGHT", 8, 0) -- 8 : l'art du template déborde à gauche
 	P.SetupChannelInput(channelInput)
 
+	-- Mode solo (à droite du canal), même réglage que la première case du panneau d'options.
+	local soloCheck = CreateFrame("CheckButton", nil, f, "UICheckButtonTemplate")
+	soloCheck:SetSize(22, 22)
+	soloCheck:SetPoint("LEFT", channelInput, "RIGHT", 6, 0)
+	local soloText = soloCheck.Text or soloCheck.text
+	if soloText then
+		soloText:SetFontObject("GameFontNormalSmall")
+		soloText:SetText("|cffff4040Solo|r")
+	end
+	soloCheck:SetScript("OnClick", function(self)
+		P.SetSoloMode(self:GetChecked())
+	end)
+	soloCheck:SetScript("OnEnter", function(self)
+		GameTooltip:SetOwner(self, "ANCHOR_BOTTOM")
+		GameTooltip:AddLine("Mode solo")
+		GameTooltip:AddLine("Pour jouer un seul personnage : la fenêtre ne garde que « Personnages "
+			.. "disponibles », sans les équipes. Glissez votre personnage hors de la liste pour en "
+			.. "faire une barre flottante, avec les boutons des modules.", 1, 1, 1, true)
+		GameTooltip:AddLine("Réglage propre à ce personnage (aussi dans les options).", 0.8, 0.8, 0.8, true)
+		GameTooltip:Show()
+	end)
+	soloCheck:SetScript("OnLeave", GameTooltip_Hide)
+
 	-- Poignée de redimensionnement (coin bas-droit), au-dessus des cadres intérieurs.
 	local grip = CreateFrame("Button", nil, f)
 	grip:SetSize(16, 16)
@@ -707,7 +793,7 @@ function P.BuildUI()
 	end)
 	grip:SetScript("OnMouseUp", function()
 		f:StopMovingOrSizing()
-		P.db.mainFrame.width, P.db.mainFrame.height = f:GetSize()
+		P.db.mainFrame[WidthKey()], P.db.mainFrame.height = f:GetSize()
 	end)
 
 	-- Trois cadres côte à côte, chacun sur un tiers de la largeur : les deux premiers
@@ -794,6 +880,9 @@ function P.BuildUI()
 				ShowAccountMenu(charPanel, data.key)
 				return
 			end
+			if P.IsSoloMode() then
+				return -- pas d'équipe en mode solo
+			end
 			if not selectedTeam then
 				if mouseButton == "RightButton" then
 					-- Sans équipe sélectionnée : nouvelle équipe à son nom, avec lui pour leader.
@@ -820,7 +909,7 @@ function P.BuildUI()
 			P.RefreshUI()
 		end,
 		isSelected = function(data)
-			if data.header then
+			if data.header or P.IsSoloMode() then
 				return false
 			end
 			local members = P.GetTeamMembers(selectedTeam)
@@ -834,6 +923,14 @@ function P.BuildUI()
 			local presence = data.first and "|cff40ff40Connecté|r" or "|cff999999Déconnecté (ou pas vu cette session)|r"
 			local account = "Compte WoW : " .. (P.GetCharacterAccount(data.key) or "non renseigné")
 			local hint = "Alt + clic : ranger dans un compte WoW|nMaj + clic : supprimer ce personnage et ses données"
+			if P.IsSoloMode() then
+				local lines = { P.GetDisplayName(data.key, true), presence, account }
+				if data.key == P.GetCharKey() then
+					lines[#lines + 1] = "Glisser : afficher en barre flottante"
+				end
+				lines[#lines + 1] = hint
+				return lines
+			end
 			if not selectedTeam then
 				return CharacterTooltip(data.key, { presence, account,
 					"Sélectionnez d'abord une équipe pour y ajouter ce personnage.",
@@ -850,6 +947,12 @@ function P.BuildUI()
 		-- Personnages déconnectés légèrement grisés (connectés en tête, cf. RefreshUI).
 		decorate = function(row, data)
 			row:SetAlpha(data.first and 1 or 0.55)
+		end,
+		-- Mode solo : le personnage joué, glissé hors de la liste, devient la barre flottante.
+		onDragStart = function(data)
+			if P.IsSoloMode() and data.key == P.GetCharKey() then
+				P.StartTeamBarDrag()
+			end
 		end,
 	})
 	charPanel.emptyText:SetText("Aucun personnage disponible")
@@ -1001,21 +1104,13 @@ function P.BuildUI()
 		end,
 	})
 
-	local function LayoutPanels()
-		local width = (f:GetWidth() - 2 * PANEL_MARGIN - 2 * PANEL_GAP) / 3
-		width = math.max(width, 1)
-		charPanel:SetWidth(width)
-		teamPanel:SetWidth(width)
-	end
-	f:SetScript("OnSizeChanged", LayoutPanels)
-	LayoutPanels()
-
 	ui.frame = f
 	ui.title = title
 	ui.closeButton = closeBtn
 	ui.optionsButton = optionsBtn
 	ui.channelLabel = channelLabel
 	ui.channelInput = channelInput
+	ui.soloCheck = soloCheck
 	ui.resizeGrip = grip
 	ui.charPanel = charPanel
 	ui.collapseAccountsButton = collapseAllBtn
@@ -1038,12 +1133,16 @@ function P.BuildUI()
 		P.SkinButton(collapseAllBtn)
 		P.SkinButton(optionsBtn)
 		P.SkinEditBox(channelInput)
+		P.SkinCheckBox(soloCheck)
 	end
 
 	-- Boutons des addons compagnons demandés avant la construction de la fenêtre.
 	for _, spec in ipairs(titleButtonSpecs) do
 		CreateTitleButton(spec)
 	end
+
+	f:SetScript("OnSizeChanged", LayoutPanels)
+	ApplySoloLayout()
 end
 
 function P.RefreshUI()
@@ -1077,6 +1176,7 @@ function P.RefreshUI()
 	if not ui.channelInput:HasFocus() then
 		ui.channelInput:SetText(P.GetSyncChannelName())
 	end
+	ui.soloCheck:SetChecked(P.IsSoloMode()) -- peut avoir changé dans les options
 
 	-- Connectés en tête, puis déconnectés ; ordre alphabétique dans chaque groupe. Avec
 	-- l'option, un en-tête repliable par compte précède ses personnages.

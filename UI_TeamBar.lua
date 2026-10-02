@@ -10,6 +10,10 @@ local P = Polypode
 -- et hauteur de la liste dépliée), Alt + clic = figer / libérer (position et taille),
 -- croix = masquer. État par personnage (chaque fenêtre de multibox a son écran) dans
 -- P.charDb.teamBar : shown, expanded, locked, position, width, listHeight.
+--
+-- MODE SOLO (P.IsSoloMode, UI_Main.lua) : la même barre montre le personnage joué, sorti en
+-- glissant sa ligne de « Personnages disponibles » ; affichage mémorisé à part (soloShown),
+-- position, taille et options communes. Pas d'invitation ni de partage de disposition.
 
 local BAR_WIDTH, BAR_HEIGHT = 180, 24
 local MIN_WIDTH, MAX_WIDTH = 100, 600
@@ -23,6 +27,11 @@ local listAbove -- liste dépliée au-dessus de la barre (trop près du bas de l
 
 local function Clamp(value, low, high)
 	return math.max(low, math.min(high, value))
+end
+
+-- Clé de P.charDb.teamBar qui mémorise l'affichage de la barre dans le mode courant.
+local function ShownKey()
+	return P.IsSoloMode() and "soloShown" or "shown"
 end
 
 -- Clé nom-royaume comparable : les royaumes renvoyés par UnitName n'ont pas d'espace
@@ -120,7 +129,7 @@ local function FormatDetailed(data)
 	local name = P.GetDisplayName(key)
 	local color = entry.class and C_ClassColor and C_ClassColor.GetClassColor(entry.class)
 	parts[#parts + 1] = color and color:WrapTextInColorCode(name) or name
-	if P.GetTeamLeader(P.GetSelectedTeam()) == key then
+	if not P.IsSoloMode() and P.GetTeamLeader(P.GetSelectedTeam()) == key then
 		parts[#parts + 1] = "|cffffd200[leader]|r"
 	end
 	return table.concat(parts, " ")
@@ -377,13 +386,19 @@ local function ShowBarTooltip(self)
 		return -- pas d'infobulle pendant le déplacement de la barre
 	end
 	GameTooltip:SetOwner(self, "ANCHOR_TOP")
-	GameTooltip:AddLine(P.GetSelectedTeam() or "Aucune équipe sélectionnée")
-	GameTooltip:AddLine("Clic gauche : inviter l'équipe (comme le bouton « Inviter l'équipe »)", 1, 1, 1)
-	local reason = P.GetInviteBlockedReason(P.GetSelectedTeam())
-	if reason then
-		GameTooltip:AddLine(reason, 1, 0.1, 0.1, true)
+	local solo = P.IsSoloMode()
+	if solo then
+		GameTooltip:AddLine(P.GetDisplayName(P.GetCharKey()) .. " |cffff4040(mode solo)|r")
+		GameTooltip:AddLine("Clic droit : déplier / replier la ligne du personnage", 1, 1, 1)
+	else
+		GameTooltip:AddLine(P.GetSelectedTeam() or "Aucune équipe sélectionnée")
+		GameTooltip:AddLine("Clic gauche : inviter l'équipe (comme le bouton « Inviter l'équipe »)", 1, 1, 1)
+		local reason = P.GetInviteBlockedReason(P.GetSelectedTeam())
+		if reason then
+			GameTooltip:AddLine(reason, 1, 0.1, 0.1, true)
+		end
+		GameTooltip:AddLine("Clic droit : déplier / replier la liste des personnages", 1, 1, 1)
 	end
-	GameTooltip:AddLine("Clic droit : déplier / replier la liste des personnages", 1, 1, 1)
 	if P.charDb.teamBar.locked then
 		GameTooltip:AddLine("Barre figée (position et taille)", 1, 0.82, 0)
 		GameTooltip:AddLine("Alt + clic : libérer", 1, 1, 1)
@@ -392,10 +407,15 @@ local function ShowBarTooltip(self)
 		GameTooltip:AddLine("Poignée du coin : redimensionner", 1, 1, 1)
 		GameTooltip:AddLine("Alt + clic : figer la position et la taille", 1, 1, 1)
 	end
-	GameTooltip:AddLine("Maj + clic : envoyer cette position et cette taille aux personnages de "
-		.. "l'équipe dont la barre est masquée", 1, 1, 1, true)
-	GameTooltip:AddLine("Croix : masquer (glisser une équipe hors de la fenêtre Polypode pour "
-		.. "la réafficher)", 1, 1, 1, true)
+	if solo then
+		GameTooltip:AddLine("Croix : masquer (glisser votre personnage hors de la fenêtre Polypode "
+			.. "pour la réafficher)", 1, 1, 1, true)
+	else
+		GameTooltip:AddLine("Maj + clic : envoyer cette position et cette taille aux personnages de "
+			.. "l'équipe dont la barre est masquée", 1, 1, 1, true)
+		GameTooltip:AddLine("Croix : masquer (glisser une équipe hors de la fenêtre Polypode pour "
+			.. "la réafficher)", 1, 1, 1, true)
+	end
 	GameTooltip:Show()
 end
 
@@ -457,13 +477,22 @@ end
 local function LayoutModuleButtons()
 	local state = P.charDb.teamBar
 	local specs = P.GetTitleButtonSpecs and P.GetTitleButtonSpecs() or {}
-	if not state.moduleButtons or #specs == 0 then
+	for index = #moduleButtons + 1, #specs do
+		moduleButtons[index] = CreateModuleButton(specs[index])
+	end
+	-- Boutons masqués dans le mode courant (spec.hideInSolo, P.IsTitleButtonShown) : retirés.
+	local shown = {}
+	for index, button in ipairs(moduleButtons) do
+		local visible = P.IsTitleButtonShown(specs[index])
+		button:SetShown(visible)
+		if visible then
+			shown[#shown + 1] = button
+		end
+	end
+	if not state.moduleButtons or #shown == 0 then
 		moduleColumn:Hide()
 		bar:SetClampRectInsets(0, 0, 0, 0)
 		return
-	end
-	for index = #moduleButtons + 1, #specs do
-		moduleButtons[index] = CreateModuleButton(specs[index])
 	end
 	local right = state.moduleSide == "right"
 	local width = MODULE_WIDTH + 2
@@ -475,8 +504,8 @@ local function LayoutModuleButtons()
 		moduleColumn:SetPoint("TOPRIGHT", bar, "TOPLEFT", -2, 0)
 		bar:SetClampRectInsets(-width, 0, 0, 0)
 	end
-	moduleColumn:SetSize(MODULE_WIDTH, #specs * (MODULE_HEIGHT + MODULE_GAP) - MODULE_GAP)
-	for index, button in ipairs(moduleButtons) do
+	moduleColumn:SetSize(MODULE_WIDTH, #shown * (MODULE_HEIGHT + MODULE_GAP) - MODULE_GAP)
+	for index, button in ipairs(shown) do
 		button:ClearAllPoints()
 		button:SetPoint("TOP", moduleColumn, "TOP", 0, -(index - 1) * (MODULE_HEIGHT + MODULE_GAP))
 	end
@@ -509,6 +538,8 @@ local function Build()
 		if mouseButton == "LeftButton" and not dragged then
 			if IsAltKeyDown() then
 				ToggleLocked()
+			elseif P.IsSoloMode() then
+				return -- pas d'équipe à inviter ni de disposition à partager
 			elseif IsShiftKeyDown() then
 				ShareLayout()
 			else
@@ -562,7 +593,7 @@ local function Build()
 	closeBtn:SetSize(20, 20)
 	closeBtn:SetPoint("RIGHT", -14, 0) -- laisse le coin bas-droit à la poignée (barre pliée)
 	closeBtn:SetScript("OnClick", function()
-		P.charDb.teamBar.shown = false
+		P.charDb.teamBar[ShownKey()] = false
 		P.RefreshTeamBar()
 	end)
 
@@ -584,11 +615,11 @@ local function Build()
 		if P.charDb.teamBar.details then
 			return FormatDetailed(data)
 		end
-		return P.FormatCharacter(data, P.GetSelectedTeam())
+		return P.FormatCharacter(data, not P.IsSoloMode() and P.GetSelectedTeam() or nil)
 	end, LIST_PADDING, { -- marge basse identique, fixée par P.CreateScrollList
 		inset = 4, -- quelques pixels seulement de chaque côté
 		isSelected = function(data)
-			return P.GetTeamLeader(P.GetSelectedTeam()) == data.key
+			return not P.IsSoloMode() and P.GetTeamLeader(P.GetSelectedTeam()) == data.key
 		end,
 		-- Personnage groupé : infobulle WoW complète (comme au survol d'un cadre de groupe) ;
 		-- sinon, son état façon liste d'amis puis ses équipes comme dans la fenêtre principale.
@@ -652,7 +683,7 @@ end
 -- Appelé par P.RefreshUI et au login (barre laissée affichée à la déconnexion).
 function P.RefreshTeamBar()
 	local state = P.charDb and P.charDb.teamBar
-	if not state or not state.shown then
+	if not state or not state[ShownKey()] then
 		if bar then
 			bar:Hide()
 		end
@@ -669,7 +700,15 @@ function P.RefreshTeamBar()
 	local items = P.SortedKeyItems(members or {}, function(key)
 		return key == leader
 	end)
-	if team then
+	if P.IsSoloMode() then
+		-- Mode solo : le personnage joué seul, nom en couleur de classe.
+		local key = P.GetCharKey()
+		local entry = P.db.roster[key] or {}
+		local color = entry.class and C_ClassColor and C_ClassColor.GetClassColor(entry.class)
+		local name = P.GetDisplayName(key)
+		items = { { key = key, first = true } }
+		bar.header:SetText(color and color:WrapTextInColorCode(name) or name)
+	elseif team then
 		bar.header:SetText(team .. " |cff999999(" .. #items .. ")|r")
 		listPanel.emptyText:SetText("Aucun personnage dans l'équipe")
 	else
@@ -724,7 +763,7 @@ end
 -- recyclée par le rafraîchissement de la liste pendant le glisser. Barre figée : elle est
 -- seulement (ré)affichée à sa place.
 function P.StartTeamBarDrag()
-	P.charDb.teamBar.shown = true
+	P.charDb.teamBar[ShownKey()] = true
 	P.RefreshTeamBar()
 	if P.charDb.teamBar.locked then
 		return
