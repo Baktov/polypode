@@ -1135,6 +1135,12 @@ function P.BuildUI()
 		P.SkinEditBox(channelInput)
 		P.SkinCheckBox(soloCheck)
 	end
+	-- Libellé « Solo » écarté de la case (après le skin : EllesmereUI le collait à son cadre).
+	local soloLabel = soloCheck.Text or soloCheck.text
+	if soloLabel then
+		soloLabel:ClearAllPoints()
+		soloLabel:SetPoint("LEFT", soloCheck, "RIGHT", 5, 0)
+	end
 
 	-- Boutons des addons compagnons demandés avant la construction de la fenêtre.
 	for _, spec in ipairs(titleButtonSpecs) do
