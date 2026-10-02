@@ -1,0 +1,29 @@
+SQUELETTE D'ADDON COMPAGNON DE POLYPODE
+=======================================
+
+Ce dossier n'est PAS un addon chargé par WoW (WoW ne lit pas les dossiers imbriqués dans un
+addon) : c'est un modèle à copier pour démarrer un nouveau module « Polypode X ». La démarche
+complète est dans ../MODULES.md, section « Créer un nouveau module ».
+
+Exemple fourni, fonctionnel : la fenêtre liste les personnages du roster avec leur zone actuelle,
+échangée entre clients. Il montre chaque branchement sur Polypode (bouton, commande /poly, option,
+liste défilante, skin, synchro, sauvegarde, oubli d'un personnage supprimé) : garder les
+branchements utiles, remplacer l'exemple par la vraie fonction.
+
+Pour créer « Polypode X » (dossier Polypode_X) :
+
+1. Copier ce dossier vers Interface/AddOns/Polypode_X.
+2. Renommer les fichiers :
+     Polypode_Modele.toc  ->  Polypode_X.toc
+     Modele.lua           ->  X.lua            (et la ligne correspondante du .toc)
+     CLAUDE.modele.md     ->  CLAUDE.md
+     README.modele.md     ->  README.md
+   puis supprimer ce LISEZMOI.txt.
+3. Remplacer partout, en respectant la casse :
+     Modele / modele / MODELE  ->  X / x / X (type de message de synchro propre au module)
+   ce qui renomme aussi les SavedVariables (PolypodeXData, PolypodeXDB), la fenêtre
+   (PolypodeXFrame), les fonctions (P.ToggleX, P.RefreshX), la commande (/poly x), le réglage
+   (POLYPODE_X_SHOW_REALM) et l'adresse du dépôt dans CLAUDE.md.
+4. git init, git remote add origin https://github.com/Baktov/polypode-x.git
+5. Suivre les étapes 4 à 7 de « Créer un nouveau module » (../MODULES.md) : branchement,
+   documentation, déclaration dans Polypode, vérification et publication.

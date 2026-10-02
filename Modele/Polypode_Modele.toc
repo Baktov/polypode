@@ -1,0 +1,11 @@
+## Interface: 120000, 16001
+## Title: Polypode Modele
+## Notes: Modèle d'addon compagnon de Polypode : zone actuelle de chaque personnage (exemple à remplacer).
+## Author: Baktov
+## Version: 1.0.0
+## Dependencies: Polypode
+## SavedVariables: PolypodeModeleData
+## SavedVariablesPerCharacter: PolypodeModeleDB
+## Category: Polypode
+
+Modele.lua

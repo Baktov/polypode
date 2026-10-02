@@ -73,6 +73,8 @@ n'ajoute une fonctionnalité que si elle sert directement cet objectif.
 | `Events.lua` | Handlers `ADDON_LOADED`, `PLAYER_LOGIN`, `CHAT_MSG_ADDON`, `UPDATE_BINDINGS`, `PLAYER_REGEN_ENABLED`, événements de quête, de cinématique, de suivi (`AUTOFOLLOW_BEGIN`/`END`), d'état du personnage (`STATUS_EVENTS` → `P.ScheduleStatus`) et de groupe (`PARTY_INVITE_REQUEST`, `GROUP_ROSTER_UPDATE`) |
 | `Bindings.xml` | Déclaration XML des raccourcis clavier WoW |
 | `Polypode.toc` | Manifeste — définit l'ordre de chargement des fichiers |
+| `MODULES.md` | Conventions communes à tous les modules, liste des dépôts, procédure de documentation et création d'un module ; importé (`@`) par ce fichier, par le `CLAUDE.md` de chaque compagnon et par `Interface/AddOns/CLAUDE.md` |
+| `Modele/` | Squelette d'addon compagnon à copier (non chargé par WoW : dossier imbriqué) : `Polypode_Modele.toc`, `Modele.lua` (exemple fonctionnel : zone de chaque personnage, avec chaque branchement sur l'API publique), `CLAUDE.modele.md`, `README.modele.md`, `LISEZMOI.txt` (renommage) |
 
 **État partagé** : tout passe par la table globale `Polypode` (raccourci local `local P = Polypode`
 en tête de chaque fichier). Ex. `P.db` (= `PolypodeDB`), `P.charDb` (= `PolypodeCharDB`), `P.ui`.

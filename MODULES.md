@@ -64,6 +64,37 @@ Dans **son** dépôt, sans attendre qu'on le demande :
 (`git log --format=%s`) a sa ligne dans la section « Version » du README, et chaque `P.X` utilisé
 par un compagnon (hors fonctions qu'il définit) figure dans ses dépendances.
 
+## Créer un nouveau module
+
+Squelette prêt à copier : `Polypode/Modele/` (voir son `LISEZMOI.txt`). Démarche, pour un module
+« Polypode X » :
+
+1. **Cadrage** : le besoin passe la règle de simplicité (sert directement la gestion des
+   personnages) ; noms : dossier `Polypode_X`, titre « Polypode X », dépôt `Baktov/polypode-x`,
+   commande `/poly x`, type de message de synchro propre s'il en faut un (comme `SUIVI`, `DATA`).
+2. **Dépôt** : créer le dépôt GitHub ; dans `AddOns/Polypode_X` : `git init`, `git remote add origin`.
+3. **Fichiers** : copier `Polypode/Modele/` vers `AddOns/Polypode_X`, renommer (`Polypode_Modele.toc`
+   → `Polypode_X.toc`, `Modele.lua` → `X.lua`, `CLAUDE.modele.md` → `CLAUDE.md`,
+   `README.modele.md` → `README.md`, supprimer `LISEZMOI.txt`) et remplacer partout `Modele` /
+   `modele` par le nom (SavedVariables `PolypodeXDB`, fenêtre `PolypodeXFrame`, `P.ToggleX`...).
+4. **Branchement** : uniquement par l'API publique de Polypode, chaque fonction testée avant usage
+   (`P.AddTitleButton`, `P.RegisterSlashCommand`, sous-catégorie de `P.optionsCategory`,
+   `P.CreatePanel` / `P.CreateScrollList` / `P.SetListData`, `P.Skin*`, synchro
+   `P.RegisterMessageHandler` / `P.RegisterPeerCallback` / `P.WhisperOnline` / `P.IsSender` /
+   `P.MAX_MESSAGE_LENGTH`, `P.RegisterCharacterData` pour des données par personnage). Une fonction
+   qui manque s'ajoute **d'abord dans Polypode** (nouvelle version), et le README du module indique
+   « Nécessite Polypode x.y ».
+5. **Documentation dès la 1.0.0** : `CLAUDE.md` (import `@../Polypode/MODULES.md`, architecture,
+   « Dépendances vers Polypode », pistes) et `README.md` (installation, utilisation, options,
+   section « Version » avec `` `1.0.0` : première version… ``).
+6. **Déclarer le module dans Polypode** (commit dans ce dépôt) : ligne du tableau « Les modules »
+   ci-dessus, section « Addons compagnons » du `README.md` de Polypode (et son nombre), liste des
+   compagnons / API publique de son `CLAUDE.md` ; ajouter aussi le dossier dans
+   `Interface/AddOns/CLAUDE.md` (local).
+7. **Vérifier et publier** : `luac -p`, linter WoW (`wow_lua_lint`), test en jeu (`/reload`, et
+   WoW Forever si pertinent) ; commit « Polypode X 1.0.0 : … » puis push ; installer le module sur
+   chaque installation (`git clone`) et l'activer sur les personnages concernés.
+
 ## Outillage (Windows)
 
 Écrire les messages de commit et les scripts contenant des accents ou des échappements Lua
