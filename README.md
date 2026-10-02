@@ -209,7 +209,7 @@ personnage.
 
 - La fenêtre ne garde que **Personnages disponibles**, sur toute sa largeur ; les cadres
   « Équipes » et « Personnages de l'équipe » sont masqués, et la fenêtre est un peu plus étroite
-  (700 pixels par défaut ; sa largeur en mode solo est gardée à part de la largeur normale).
+  (620 pixels par défaut ; sa largeur en mode solo est gardée à part de la largeur normale).
 - Les clics d'équipe sur les personnages sont sans effet ; Alt + clic (compte WoW) et Maj + clic
   (suppression) restent.
 - **Glisser votre personnage** (la ligne « (vous) ») hors de la liste en fait une **barre
@@ -424,7 +424,7 @@ vous avez désactivé le skin de Polypode dans ses options).
 
 ## État du projet
 
-Version `0.54.2` (mode solo) : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
+Version `0.54.1` (mode solo) : roster, sync filtrée par token d'équipe (BattleTag) avec réponse
 automatique aux annonces, fenêtre redimensionnable à trois listes défilantes (personnages
 disponibles / équipes avec création par saisie, sélection, renommage et suppression / personnages de l'équipe, ajout
 et retrait de membres au clic, leader par équipe, invitation de toute l'équipe, synchronisation automatique et versionnée des équipes, ajout du joueur ciblé, barre flottante de l'équipe sélectionnée)
