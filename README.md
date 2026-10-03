@@ -229,7 +229,8 @@ personnages, et suit la sélection (clic sur une autre équipe, synchro) ; « Au
 rien n'est sélectionné.
 
 - **Icône Polypode** (tout à gauche, la même que le bouton de minimap) : un clic ouvre ou ferme
-  la fenêtre principale de Polypode.
+  la fenêtre principale de Polypode ; un **clic droit** ouvre les options de Polypode. De même, un
+  clic droit sur le bouton d'un module ouvre ses options, s'il en a (Data, Photo, Suivi).
 - **Clic gauche** : invite l'équipe dans votre groupe, exactement comme le bouton **Inviter
   l'équipe** de la fenêtre principale (réservé au leader de l'équipe ; sinon un message rouge
   explique pourquoi, rappelé dans l'infobulle).
@@ -462,6 +463,7 @@ commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, ba
 
 Du plus récent au plus ancien (d'après l'historique des commits).
 
+`0.56.1` : barre flottante : clic droit sur l'icône Polypode = options de Polypode.
 `0.56.0` : listes défilantes : hauteur de ligne réglable (`opts.rowHeight` de `P.CreateScrollList`), pour l'affichage en icônes de Polypode Data.
 `0.55.1` : fenêtres de Polypode et des modules toujours au premier plan avec tout leur contenu (plus de textes mélangés entre fenêtres superposées).
 `0.55.0` : raccourcis « Barbare » (suivre un joueur du groupe au hasard) et « Train » (suivre un joueur du groupe que personne ne suit), message `FOLLOWING`.

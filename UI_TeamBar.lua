@@ -570,8 +570,14 @@ local function Build()
 	iconBtn:SetScript("OnDragStop", function()
 		bar:GetScript("OnDragStop")(bar)
 	end)
-	iconBtn:SetScript("OnClick", function()
-		P.ToggleUI()
+	-- Clic gauche : fenêtre Polypode ; clic droit : options (comme les boutons des modules).
+	iconBtn:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+	iconBtn:SetScript("OnClick", function(_, mouseButton)
+		if mouseButton == "RightButton" then
+			P.OpenOptions()
+		else
+			P.ToggleUI()
+		end
 	end)
 	iconBtn:SetScript("OnEnter", function(self)
 		if bar.dragging then
@@ -580,6 +586,7 @@ local function Build()
 		GameTooltip:SetOwner(self, "ANCHOR_TOP")
 		GameTooltip:AddLine("Polypode")
 		GameTooltip:AddLine("Clic : ouvrir / fermer la fenêtre Polypode", 1, 1, 1)
+		GameTooltip:AddLine("Clic droit : options de Polypode", 1, 1, 1)
 		GameTooltip:Show()
 	end)
 	iconBtn:SetScript("OnLeave", GameTooltip_Hide)
