@@ -11,6 +11,12 @@
   <Binding name="POLYPODE_ASSIST" category="Polypode">
     POLYPODE_ASSIST()
   </Binding>
+  <Binding name="POLYPODE_BARBARE" category="Polypode">
+    POLYPODE_BARBARE()
+  </Binding>
+  <Binding name="POLYPODE_TRAIN" category="Polypode">
+    POLYPODE_TRAIN()
+  </Binding>
   <Binding name="POLYPODE_INVITE" category="Polypode">
     POLYPODE_INVITE()
   </Binding>

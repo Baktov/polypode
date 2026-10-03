@@ -1,4 +1,5 @@
--- Polypode: Follow — alerte du leader quand un membre ne le suit plus
+-- Polypode: Follow — alerte du leader quand un membre ne le suit plus, qui suit qui dans le groupe
+-- (raccourcis « Barbare » et « Train »)
 
 local P = Polypode
 
@@ -29,14 +30,178 @@ local function LeaderEntry()
 	end
 end
 
+-- QUI SUIT QUI (raccourcis « Barbare » et « Train », UI_Keybinds.lua) ---------------------
+-- Chaque client annonce au groupe/raid le joueur qu'il suit, et l'arrêt de son suivi :
+--   FOLLOWING:token:nom-royaume:nom-royaumeSuivi — suivi vide = ne suit plus personne.
+-- Gardé en mémoire (session) ; un client qui rejoint le groupe ne connaît que les suivis
+-- annoncés depuis (chacun réannonce le sien quand le groupe s'agrandit).
+
+local MAX_CHAIN = 40 -- longueur maximale d'une file de suivi parcourue (taille d'un raid)
+
+local followState = {} -- [clé normalisée du suiveur] = clé normalisée du joueur suivi
+local lastGroupSize = 0
+
+-- Clé « Nom-Royaume » sans espaces ni tirets dans le royaume (le royaume de UnitName n'en a pas).
+local function NormalizeKey(key)
+	local name, realm = strsplit("-", key, 2)
+	return name .. "-" .. ((realm or GetRealmName()):gsub("[%s%-]", ""))
+end
+
+local function OwnKey()
+	return NormalizeKey(P.GetCharKey())
+end
+
+-- Autres joueurs connectés du groupe : liste de { unit, key, name }. Un nom rendu secret par
+-- WoW (issecretvalue) est ignoré.
+local function GroupMembers()
+	local members = {}
+	local prefix, count = "party", GetNumSubgroupMembers()
+	if IsInRaid() then
+		prefix, count = "raid", GetNumGroupMembers()
+	end
+	for i = 1, count do
+		local unit = prefix .. i
+		if not UnitIsUnit(unit, "player") and UnitIsConnected(unit) then
+			local name, realm = P.UnitNameParts(unit)
+			if name and not (issecretvalue and (issecretvalue(name) or issecretvalue(realm))) then
+				members[#members + 1] = { unit = unit, name = name, key = NormalizeKey(realm and name .. "-" .. realm or name) }
+			end
+		end
+	end
+	return members
+end
+
+-- Clés des joueurs atteints en remontant la file de suivi depuis key (key compris).
+local function Chain(key)
+	local reached = {}
+	for _ = 1, MAX_CHAIN do
+		if not key or reached[key] then
+			break
+		end
+		reached[key] = true
+		key = followState[key]
+	end
+	return reached
+end
+
+-- Annonce au groupe le joueur suivi par ce personnage (nil = plus aucun).
+local function SetOwnFollow(key)
+	local own = OwnKey()
+	if followState[own] == key then
+		return
+	end
+	followState[own] = key
+	local token = P.GetTeamToken()
+	if token and IsInGroup() then
+		P.Broadcast("FOLLOWING:" .. token .. ":" .. P.GetCharKey() .. ":" .. (key or ""), IsInRaid() and "RAID" or "PARTY")
+	end
+	P.UpdateLeaderMacros()
+end
+
+-- Réception de FOLLOWING (Sync.lua, expéditeur vérifié).
+function P.OnFollowingMessage(followerKey, followedKey)
+	followState[NormalizeKey(followerKey)] = followedKey and followedKey ~= "" and NormalizeKey(followedKey) or nil
+	P.UpdateLeaderMacros()
+end
+
+-- Changement du groupe (Events.lua) : macros des raccourcis à recalculer ; si le groupe
+-- s'agrandit, réannonce son propre suivi aux nouveaux venus.
+function P.OnFollowRosterUpdate()
+	local size = GetNumGroupMembers()
+	local own = followState[OwnKey()]
+	if size > lastGroupSize and own then
+		local token = P.GetTeamToken()
+		if token then
+			P.Broadcast("FOLLOWING:" .. token .. ":" .. P.GetCharKey() .. ":" .. own, IsInRaid() and "RAID" or "PARTY")
+		end
+	end
+	lastGroupSize = size
+	P.UpdateLeaderMacros()
+end
+
+-- Barbare : unité d'un autre joueur du groupe tiré au hasard (autre que celui déjà suivi s'il y
+-- a le choix). Renvoie unité, ou nil et le message d'erreur.
+function P.GetBarbareFollowUnit()
+	local members = GroupMembers()
+	if #members == 0 then
+		return nil, "Polypode : aucun autre joueur connecté dans le groupe."
+	end
+	local current = followState[OwnKey()]
+	local choices = {}
+	for _, member in ipairs(members) do
+		if member.key ~= current then
+			choices[#choices + 1] = member
+		end
+	end
+	if #choices == 0 then
+		choices = members
+	end
+	return choices[math.random(#choices)].unit
+end
+
+-- Train : unité d'un joueur du groupe que personne d'autre ne suit, et qui ne nous suit pas
+-- (même indirectement : pas de boucle). De préférence la queue de la file du leader de
+-- l'équipe sélectionnée, sinon au hasard. Renvoie unité, ou nil et le message d'erreur.
+function P.GetTrainFollowUnit()
+	local members = GroupMembers()
+	if #members == 0 then
+		return nil, "Polypode : aucun autre joueur connecté dans le groupe."
+	end
+	local own = OwnKey()
+	local inGroup = { [own] = true }
+	for _, member in ipairs(members) do
+		inGroup[member.key] = true
+	end
+	local followed = {}
+	for follower, target in pairs(followState) do
+		if follower ~= own and inGroup[follower] then
+			followed[target] = true
+		end
+	end
+	local leader = P.GetTeamLeader(P.GetSelectedTeam())
+	leader = leader and NormalizeKey(leader)
+	local choices, preferred = {}, {}
+	for _, member in ipairs(members) do
+		local chain = Chain(member.key)
+		if not followed[member.key] and not chain[own] then
+			choices[#choices + 1] = member
+			if leader and chain[leader] then
+				preferred[#preferred + 1] = member
+			end
+		end
+	end
+	if #choices == 0 then
+		return nil, "Polypode : tous les joueurs du groupe sont déjà suivis."
+	end
+	local pool = #preferred > 0 and preferred or choices
+	return pool[math.random(#pool)].unit
+end
+
+-- Clé normalisée du joueur du groupe dont le nom (AUTOFOLLOW_BEGIN, avec ou sans royaume ni
+-- nom de famille) a ce prénom.
+local function GroupKeyByName(name)
+	local first = name and name:match("^[^%s%-]+")
+	for _, member in ipairs(GroupMembers()) do
+		if member.name == first then
+			return member.key
+		end
+	end
+end
+
 -- MEMBRE (Events.lua) -------------------------------------------------------------------
 
 function P.OnFollowEvent(event, name)
 	if event == "AUTOFOLLOW_BEGIN" then
 		followedName = name
+		SetOwnFollow(GroupKeyByName(name))
 		return
 	end
-	-- AUTOFOLLOW_END
+	-- AUTOFOLLOW_END : annoncé seulement si le suivi n'a pas repris (cf. plus bas).
+	C_Timer.After(END_CONFIRM_DELAY, function()
+		if not followedName then
+			SetOwnFollow(nil)
+		end
+	end)
 	local followed = followedName
 	followedName = nil
 	local entry = LeaderEntry()

@@ -93,6 +93,9 @@ frame:SetScript("OnEvent", function(self, event, ...)
 			P.RefreshUI()
 		end
 		P.OnGroupEvent(event, ...)
+		if event == "GROUP_ROSTER_UPDATE" then
+			P.OnFollowRosterUpdate() -- raccourcis Barbare / Train
+		end
 	elseif event == "CHAT_MSG_ADDON" then
 		local prefix, message, channel, sender = ...
 		if prefix == P.SYNC_PREFIX then

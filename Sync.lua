@@ -923,6 +923,14 @@ function P.OnSyncMessage(message, channel, sender)
 			P.OnFollowEndMessage(rest)
 		end
 		return
+	elseif kind == "FOLLOWING" then
+		-- FOLLOWING:token:nom-royaume:nom-royaumeSuivi — joueur suivi par un client du groupe
+		-- (vide = plus aucun, Follow.lua) ; le suiveur annoncé doit être l'expéditeur.
+		local follower, followed = strsplit(":", rest or "", 2)
+		if follower and IsSender(sender, follower) then
+			P.OnFollowingMessage(follower, followed)
+		end
+		return
 	elseif kind == "CHANSET" then
 		OnChannelSettingMessage(rest, sender)
 		return

@@ -349,6 +349,8 @@ Configurable dans le menu des raccourcis WoW, catégorie **Polypode** :
 | Se nommer leader de l'équipe | Le personnage courant devient leader de l'équipe sélectionnée (il y entre s'il n'en est pas membre) ; synchronisé avec vos autres Polypode |
 | Suivre le leader | Suit (`/follow`) le leader de l'équipe sélectionnée |
 | Assister le leader | Assiste (`/assist`) le leader de l'équipe sélectionnée : prend sa cible, puis attaque (`/startattack`) si l'option « Attaquer après l'assistance » est cochée |
+| Barbare : suivre un joueur du groupe au hasard | Suit (`/follow`) un autre joueur connecté du groupe tiré au hasard (autre que celui déjà suivi s'il y a le choix) ; un nouveau joueur est tiré après chaque appui |
+| Train : suivre un joueur du groupe que personne ne suit | Suit un joueur du groupe qu'aucun autre personnage ne suit encore et qui ne vous suit pas (pas de boucle) : de préférence la queue de la file qui mène au leader de l'équipe sélectionnée, sinon au hasard. Appuyé sur chaque personnage l'un après l'autre, il forme une file derrière le leader |
 | Inviter l'équipe | Même action que le bouton « Inviter l'équipe » (réservée au leader) |
 | Envoyer le volume à l'équipe | Leader : règle le volume principal des autres membres sur l'option « Volume envoyé » |
 | Couper/rétablir le son de l'équipe | Leader : coupe tout le son des autres membres, puis le rétablit à l'appui suivant |
@@ -359,6 +361,13 @@ est confiée à un bouton sécurisé Blizzard qui exécute la macro, elles fonct
 en combat. Seul le changement de leader, d'équipe ou de touche pendant un combat n'est pris
 en compte qu'à la sortie du combat. Sans leader utilisable (pas d'équipe, pas de leader, ou
 vous êtes le leader), la touche affiche un message à l'écran.
+
+« Barbare » et « Train » portent sur **le groupe** (pas l'équipe) et sont aussi des boutons
+sécurisés : le joueur à suivre est choisi à l'avance, hors combat (en combat, la touche suit le
+dernier choisi). Pour « Train », chaque client Polypode annonce au groupe qui il suit (et quand
+il arrête) : seuls les suivis des personnages équipés de Polypode sont connus, et un personnage
+qui rejoint le groupe apprend les suivis en cours quand les autres le voient arriver. Sans joueur
+possible (seul dans le groupe, ou tous déjà suivis), la touche affiche un message à l'écran.
 
 ---
 
@@ -433,7 +442,7 @@ automatique aux annonces, fenêtre redimensionnable à trois listes défilantes 
 disponibles / équipes avec création par saisie, sélection, renommage et suppression / personnages de l'équipe, ajout
 et retrait de membres au clic, leader par équipe, invitation de toute l'équipe, synchronisation automatique et versionnée des équipes, ajout du joueur ciblé, barre flottante de l'équipe sélectionnée)
 skinnée (EllesmereUI/ElvUI), bouton de minimap (masquable), panneau d'options (accessible par un bouton de la fenêtre),
-commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, inviter), suivi des dialogues de PNJ (quêtes, options, fermeture de DialogueUI), acceptation, partage et validation automatiques des quêtes du leader, passage automatique des cinématiques, vol automatique chez le maître de vol, entrée et sortie de gouffre et entrée par portail automatiques, volume et coupure du son de l'équipe par le leader, groupage automatique de l'équipe à la connexion, alerte « ne suit plus », mode photo, quêtes du leader manquantes chez les membres et suivi de l'équipe (addons séparés Polypode Photo, Polypode Quêtes et Polypode Suivi), canal dédié commun aux comptes, autorisation d'autres comptes Battle.net. Pistes envisagées pour la suite,
+commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, barbare, train, inviter), suivi des dialogues de PNJ (quêtes, options, fermeture de DialogueUI), acceptation, partage et validation automatiques des quêtes du leader, passage automatique des cinématiques, vol automatique chez le maître de vol, entrée et sortie de gouffre et entrée par portail automatiques, volume et coupure du son de l'équipe par le leader, groupage automatique de l'équipe à la connexion, alerte « ne suit plus », mode photo, quêtes du leader manquantes chez les membres et suivi de l'équipe (addons séparés Polypode Photo, Polypode Quêtes et Polypode Suivi), canal dédié commun aux comptes, autorisation d'autres comptes Battle.net. Pistes envisagées pour la suite,
 à activer seulement si le besoin se confirme (voir la règle de simplicité dans
 `CLAUDE.md`) :
 
@@ -453,6 +462,7 @@ commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, in
 
 Du plus récent au plus ancien (d'après l'historique des commits).
 
+`0.55.0` : raccourcis « Barbare » (suivre un joueur du groupe au hasard) et « Train » (suivre un joueur du groupe que personne ne suit), message `FOLLOWING`.
 `0.54.2` : mode solo : fenêtre de 700 px par défaut, la case Solo ne touche plus le titre (annulée le jour même : retour à 620 px, version de nouveau 0.54.1).
 `0.54.1` : case Solo : libellé écarté de 5 px de la case (skin EllesmereUI).
 `0.54.0` : mode solo : fenêtre réduite aux personnages disponibles, barre flottante du personnage joué.

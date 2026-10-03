@@ -1,4 +1,5 @@
--- Polypode: UI_Keybinds — boutons sécurisés des raccourcis « Suivre / Assister le leader »
+-- Polypode: UI_Keybinds — boutons sécurisés des raccourcis « Suivre / Assister le leader »,
+-- « Barbare » et « Train »
 
 local P = Polypode
 
@@ -16,16 +17,21 @@ local function CreateSecureMacroButton(name)
 	button:SetAttribute("type", "macro")
 	button:SetAttribute("macrotext", "")
 	button:RegisterForClicks("AnyUp", "AnyDown")
-	-- Après la macro (hors contexte sécurisé) : message si le raccourci est sans effet.
+	-- Après la macro (hors contexte sécurisé) : message si le raccourci est sans effet ; au
+	-- relâchement, nouveau tirage du joueur à suivre (Barbare, Train ; hors combat).
 	button:SetScript("PostClick", function(self, _, down)
 		if down and self.problem then
 			UIErrorsFrame:AddMessage(self.problem, 1, 0.1, 0.1)
+		elseif not down and self.reroll then
+			P.UpdateLeaderMacros()
 		end
 	end)
 	return button
 end
 
--- Raccourci (nom du binding) -> bouton sécurisé et macro à partir du nom du leader.
+-- Raccourci (nom du binding) -> bouton sécurisé et macro : à partir du nom du leader (macro),
+-- ou de l'unité du groupe à suivre choisie par pick() (Follow.lua), qui renvoie unité, ou nil
+-- et le message d'erreur. Ces derniers sont retirés après chaque appui (reroll).
 local secureBindings = {
 	POLYPODE_FOLLOW = {
 		button = CreateSecureMacroButton("PolypodeFollowButton"),
@@ -43,9 +49,28 @@ local secureBindings = {
 			return "/assist " .. leaderName
 		end,
 	},
+	-- Barbare : suivre un autre joueur du groupe au hasard.
+	POLYPODE_BARBARE = {
+		button = CreateSecureMacroButton("PolypodeBarbareButton"),
+		pick = function()
+			return P.GetBarbareFollowUnit()
+		end,
+	},
+	-- Train : suivre un joueur du groupe que personne ne suit encore.
+	POLYPODE_TRAIN = {
+		button = CreateSecureMacroButton("PolypodeTrainButton"),
+		pick = function()
+			return P.GetTrainFollowUnit()
+		end,
+	},
 }
+for _, binding in pairs(secureBindings) do
+	binding.button.reroll = binding.pick ~= nil
+end
 P.ui.followButton = secureBindings.POLYPODE_FOLLOW.button
 P.ui.assistButton = secureBindings.POLYPODE_ASSIST.button
+P.ui.barbareButton = secureBindings.POLYPODE_BARBARE.button
+P.ui.trainButton = secureBindings.POLYPODE_TRAIN.button
 
 local pendingUpdate = false -- mise à jour demandée pendant un combat
 
@@ -66,7 +91,8 @@ local function RefreshOverrideBindings()
 	end
 end
 
--- Met à jour les macros selon le leader de l'équipe sélectionnée pour ce personnage.
+-- Met à jour les macros selon le leader de l'équipe sélectionnée pour ce personnage, et
+-- celles de Barbare / Train selon le groupe.
 local function RefreshMacros()
 	local team = P.GetSelectedTeam()
 	local leader = team and P.GetTeamLeader(team)
@@ -88,12 +114,19 @@ local function RefreshMacros()
 	end
 
 	for _, binding in pairs(secureBindings) do
-		binding.button:SetAttribute("macrotext", leaderName and binding.macro(leaderName) or "")
-		binding.button.problem = problem
+		if binding.pick then
+			local unit, pickProblem = binding.pick()
+			binding.button:SetAttribute("macrotext", unit and "/follow " .. unit or "")
+			binding.button.problem = pickProblem
+		else
+			binding.button:SetAttribute("macrotext", leaderName and binding.macro(leaderName) or "")
+			binding.button.problem = problem
+		end
 	end
 end
 
--- Met à jour macros et touches des raccourcis Suivre/Assister (hors combat, sinon différé).
+-- Met à jour macros et touches des raccourcis Suivre/Assister/Barbare/Train (hors combat,
+-- sinon différé).
 function P.UpdateLeaderMacros()
 	if InCombatLockdown() then
 		pendingUpdate = true

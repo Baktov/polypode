@@ -151,7 +151,7 @@ function POLYPODE_SETLEADER()
 	ShowInfo("Vous êtes le leader de l'équipe « " .. team .. " ».")
 end
 
--- Suivre / Assister : la touche est normalement redirigée vers un bouton sécurisé
+-- Suivre / Assister / Barbare / Train : la touche est normalement redirigée vers un bouton sécurisé
 -- (UI_Keybinds.lua) et ces fonctions ne sont pas appelées. Elles ne servent que si la
 -- redirection n'est pas encore en place (ex. touche choisie pendant un combat).
 function POLYPODE_FOLLOW()
@@ -160,6 +160,14 @@ function POLYPODE_FOLLOW()
 end
 
 function POLYPODE_ASSIST()
+	POLYPODE_FOLLOW()
+end
+
+function POLYPODE_BARBARE()
+	POLYPODE_FOLLOW()
+end
+
+function POLYPODE_TRAIN()
 	POLYPODE_FOLLOW()
 end
 
