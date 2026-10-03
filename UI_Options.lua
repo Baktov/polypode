@@ -16,7 +16,7 @@ function P.ChannelSettingMixin:OnLoad()
 		GameTooltip:AddLine("Gestion liste token")
 		GameTooltip:AddLine("Ouvre la liste des autres comptes Battle.net autorisés sur le canal "
 			.. "dédié, pour voir leurs personnages et révoquer une autorisation.", 1, 1, 1, true)
-		GameTooltip:Show()
+		P.ShowTooltip()
 	end)
 	self.ManageButton:SetScript("OnLeave", GameTooltip_Hide)
 end
@@ -70,7 +70,7 @@ function P.AccountSettingMixin:OnLoad()
 			.. "compte des personnages disponibles ; partagé avec vos autres Polypode. Enregistré à "
 			.. "Entrée ou en quittant le champ ; Échap annule ; vide = aucun compte. Même réglage que "
 			.. "Alt + clic sur un personnage dans la fenêtre Polypode.", 1, 1, 1, true)
-		GameTooltip:Show()
+		P.ShowTooltip()
 	end)
 	editBox:SetScript("OnLeave", GameTooltip_Hide)
 end
@@ -94,6 +94,7 @@ function P.BuildOptions()
 	-- de la barre flottante (P.optionsPopup, UI_OptionsPopup.lua), avec le même réglage.
 	local popupItems = {}
 	local function AddCheck(setting, tooltip)
+		tooltip = P.ColorClicks(tooltip) -- clics en bleu, dans le panneau comme dans la petite fenêtre
 		Settings.CreateCheckbox(category, setting, tooltip)
 		popupItems[#popupItems + 1] = { kind = "check", setting = setting, tooltip = tooltip }
 	end
@@ -102,6 +103,7 @@ function P.BuildOptions()
 		return string.format("%d %%", value)
 	end
 	local function AddSlider(setting, min, max, step, tooltip)
+		tooltip = P.ColorClicks(tooltip)
 		local options = Settings.CreateSliderOptions(min, max, step)
 		options:SetLabelFormatter(MinimalSliderWithSteppersMixin.Label.Right, PercentText)
 		Settings.CreateSlider(category, setting, options, tooltip)
@@ -110,6 +112,7 @@ function P.BuildOptions()
 	end
 	-- values = { { valeur, libellé }, ... }
 	local function AddDropdown(setting, values, tooltip)
+		tooltip = P.ColorClicks(tooltip)
 		Settings.CreateDropdown(category, setting, function()
 			local container = Settings.CreateControlTextContainer()
 			for _, value in ipairs(values) do

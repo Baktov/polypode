@@ -422,7 +422,7 @@ local function ShowBarTooltip(self)
 		GameTooltip:AddLine("Croix : masquer (glisser une équipe hors de la fenêtre Polypode pour "
 			.. "la réafficher)", 1, 1, 1, true)
 	end
-	GameTooltip:Show()
+	P.ShowTooltip()
 end
 
 -- BOUTONS DES MODULES : les boutons des addons compagnons (P.AddTitleButton, UI_Main.lua) repris en
@@ -469,7 +469,7 @@ local function CreateModuleButton(spec)
 					GameTooltip:AddLine(line, 1, 1, 1, true)
 				end
 			end
-			GameTooltip:Show()
+			P.ShowTooltip()
 		end)
 		button:SetScript("OnLeave", GameTooltip_Hide)
 	end
@@ -559,6 +559,12 @@ local function Build()
 	end)
 	bar:SetScript("OnDragStop", function(self)
 		self:StopMovingOrSizing()
+		-- Fin du glisser : l'indicateur est effacé à l'image suivante (OnMouseUp de la barre, qui
+		-- le lit, passe avant ; un glisser depuis l'icône ne déclenche pas cet OnMouseUp, et
+		-- l'indicateur resté levé masquait ensuite les infobulles de la barre et de l'icône).
+		C_Timer.After(0, function()
+			self.dragging = nil
+		end)
 		SavePosition()
 		P.RefreshTeamBar() -- sens de dépliement selon la nouvelle position
 	end)
@@ -632,7 +638,7 @@ local function Build()
 			GameTooltip:AddLine(P.charDb.teamBar.locked and "Barre figée — Alt + clic : libérer"
 				or "Glisser : déplacer la barre — Alt + clic : figer", 1, 1, 1)
 		end
-		GameTooltip:Show()
+		P.ShowTooltip()
 	end)
 	iconBtn:SetScript("OnLeave", GameTooltip_Hide)
 

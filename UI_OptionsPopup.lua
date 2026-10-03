@@ -26,7 +26,7 @@ local function ShowItemTooltip(owner, item)
 	GameTooltip:SetOwner(owner, "ANCHOR_RIGHT")
 	GameTooltip:AddLine(item.setting:GetName())
 	GameTooltip:AddLine(item.tooltip, 1, 1, 1, true)
-	GameTooltip:Show()
+	P.ShowTooltip()
 end
 
 local function EnsureCheck(row)

@@ -236,7 +236,7 @@ local function CreateScrollList(panel, formatFn, top, opts)
 				GameTooltip:AddLine(line, 1, 1, 1)
 			end
 		end
-		GameTooltip:Show()
+		P.ShowTooltip()
 	end
 
 	local view = CreateScrollBoxListLinearView()
@@ -286,7 +286,7 @@ local function CreateScrollList(panel, formatFn, top, opts)
 						GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
 						GameTooltip:AddLine(opts.button.text)
 						GameTooltip:AddLine(opts.button.tooltip, 1, 1, 1, true)
-						GameTooltip:Show()
+						P.ShowTooltip()
 					end)
 					row.button:SetScript("OnLeave", GameTooltip_Hide)
 				end
@@ -580,7 +580,7 @@ function P.SetupChannelInput(editBox)
 		GameTooltip:AddLine(" ")
 		GameTooltip:AddLine("Entrée pour valider, vide pour désactiver. Partagé avec vos autres "
 			.. "Polypode connectés.", 0.8, 0.8, 0.8, true)
-		GameTooltip:Show()
+		P.ShowTooltip()
 	end)
 	editBox:SetScript("OnLeave", GameTooltip_Hide)
 end
@@ -628,7 +628,7 @@ local function CreateTitleButton(spec)
 					GameTooltip:AddLine(line, 1, 1, 1, true)
 				end
 			end
-			GameTooltip:Show()
+			P.ShowTooltip()
 		end)
 		button:SetScript("OnLeave", GameTooltip_Hide)
 	end
@@ -756,7 +756,7 @@ function P.BuildUI()
 		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
 		GameTooltip:AddLine("Options")
 		GameTooltip:AddLine("Ouvre les options de Polypode (Options > AddOns > Polypode).", 1, 1, 1, true)
-		GameTooltip:Show()
+		P.ShowTooltip()
 	end)
 	optionsBtn:SetScript("OnLeave", GameTooltip_Hide)
 
@@ -789,7 +789,7 @@ function P.BuildUI()
 			.. "disponibles », sans les équipes. Glissez votre personnage hors de la liste pour en "
 			.. "faire une barre flottante, avec les boutons des modules.", 1, 1, 1, true)
 		GameTooltip:AddLine("Réglage propre à ce personnage (aussi dans les options).", 0.8, 0.8, 0.8, true)
-		GameTooltip:Show()
+		P.ShowTooltip()
 	end)
 	soloCheck:SetScript("OnLeave", GameTooltip_Hide)
 
@@ -838,7 +838,7 @@ function P.BuildUI()
 		GameTooltip:AddLine("Tout replier / déplier")
 		GameTooltip:AddLine("Replie tous les comptes pour ne voir que leurs en-têtes, ou les déplie tous.",
 			1, 1, 1, true)
-		GameTooltip:Show()
+		P.ShowTooltip()
 	end)
 	collapseAllBtn:SetScript("OnLeave", GameTooltip_Hide)
 	collapseAllBtn:Hide()
@@ -865,7 +865,7 @@ function P.BuildUI()
 			.. "ensuite rejoindre une équipe (clic droit avec l'équipe sélectionnée) et être "
 			.. "invité avec elle.", 1, 1, 1, true)
 		GameTooltip:AddLine("Partagé avec vos autres Polypode connectés.", 1, 1, 1, true)
-		GameTooltip:Show()
+		P.ShowTooltip()
 	end)
 	addTargetBtn:SetScript("OnLeave", GameTooltip_Hide)
 
@@ -1086,7 +1086,7 @@ function P.BuildUI()
 		if reason then
 			GameTooltip:AddLine(reason, 1, 0.1, 0.1, true)
 		end
-		GameTooltip:Show()
+		P.ShowTooltip()
 	end)
 	inviteBtn:SetScript("OnLeave", GameTooltip_Hide)
 

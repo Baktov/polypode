@@ -168,6 +168,96 @@ function P.UnitNameParts(unit)
 	return name, second, nil
 end
 
+-- INFOBULLES : règle commune à Polypode et à ses modules, toute notion de clic (« Clic », « clic
+-- gauche », « Clic droit », « Maj + clic », « Alt + clic droit », « double-clic »...) est en bleu
+-- (P.CLICK_COLOR). P.ColorClicks(texte) colore un texte ; P.ShowTooltip([infobulle]) colore toutes
+-- les lignes de l'infobulle (GameTooltip par défaut) puis l'affiche, à appeler à la place de
+-- GameTooltip:Show(). Descriptions du panneau d'options : passées par P.ColorClicks.
+P.CLICK_COLOR = "|cff4da6ff"
+
+local CLICK_MODIFIERS = { Maj = true, Alt = true, Ctrl = true, Shift = true }
+
+-- Couleur active (|cffxxxxxx) à la position pos de text, ou nil (couleur de la ligne).
+local function ActiveColor(text, pos)
+	local color
+	for code, at in text:sub(1, pos - 1):gmatch("()|([cr])") do
+		if at == "c" then
+			color = text:sub(code, code + 9)
+		else
+			color = nil
+		end
+	end
+	return color
+end
+
+function P.ColorClicks(text)
+	if type(text) ~= "string" or (issecretvalue and issecretvalue(text)) or not text:find("[Cc]lic") then
+		return text
+	end
+	local out, pos = {}, 1
+	while true do
+		local first, last = text:find("[Cc]lic", pos)
+		if not first then
+			break
+		end
+		local before, after = text:sub(first - 1, first - 1), text:sub(last + 1, last + 1)
+		if after == "s" then -- « clics »
+			last = last + 1
+			after = text:sub(last + 1, last + 1)
+		end
+		-- Mot entier seulement (pas « cliquable », « clique »), « double-clic » compris.
+		if before:find("%a") or after:find("[%a\128-\255]") then
+			out[#out + 1] = text:sub(pos, last)
+			pos = last + 1
+		else
+			local start = first
+			local side = text:match("^ gauche", last + 1) or text:match("^ droit", last + 1)
+			if side then
+				last = last + #side
+			end
+			if text:sub(start - 7, start - 1):lower() == "double-" then
+				start = start - 7
+			end
+			-- Touches de modification devant : « Maj + », « Alt + Maj + »...
+			while true do
+				local word = text:sub(1, start - 1):match("(%a+) %+ $")
+				if not (word and CLICK_MODIFIERS[word]) then
+					break
+				end
+				start = start - #word - 3
+			end
+			if text:sub(start - #P.CLICK_COLOR, start - 1) == P.CLICK_COLOR then
+				out[#out + 1] = text:sub(pos, last) -- déjà en bleu
+			else
+				local color = ActiveColor(text, start)
+				out[#out + 1] = text:sub(pos, start - 1) .. P.CLICK_COLOR .. text:sub(start, last) .. "|r"
+					.. (color or "")
+			end
+			pos = last + 1
+		end
+	end
+	out[#out + 1] = text:sub(pos)
+	return table.concat(out)
+end
+
+function P.ShowTooltip(tooltip)
+	tooltip = tooltip or GameTooltip
+	local name = tooltip:GetName()
+	for line = 1, name and tooltip:NumLines() or 0 do
+		for _, side in ipairs({ "Left", "Right" }) do
+			local fontString = _G[name .. "Text" .. side .. line]
+			local text = fontString and fontString:GetText()
+			if text and not (issecretvalue and issecretvalue(text)) then
+				local ok, colored = pcall(P.ColorClicks, text)
+				if ok and colored ~= text then
+					fontString:SetText(colored)
+				end
+			end
+		end
+	end
+	tooltip:Show()
+end
+
 -- « Prénom Nom » d'après UnitName, ou le prénom seul.
 function P.JoinSurname(name, surname)
 	if name and surname and surname ~= "" then
