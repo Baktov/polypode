@@ -256,7 +256,7 @@ rien n'est sélectionné.
   poignée masqués). Les boutons des modules sont alors **dessous en colonne** (à gauche, à
   droite), ou **à droite de l'icône en rangée** (horizontal). L'icône garde ses actions : clic =
   fenêtre Polypode, clic droit = options, glisser = déplacer la barre, **Alt + clic** = figer ou
-  libérer (aussi en barre normale).
+  libérer (aussi en barre normale), **Maj + clic droit** = masquer la barre (la croix n'y est pas).
 - **Durabilité faible** (option « Barre d'équipe : clignoter si la durabilité est faible »,
   cochée par défaut) : la ligne d'un personnage clignote en rouge quand la pièce d'équipement la
   plus usée passe sous le **seuil** choisi par le curseur « Barre d'équipe : seuil de
@@ -476,6 +476,7 @@ commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, ba
 
 Du plus récent au plus ancien (d'après l'historique des commits).
 
+`0.60.2` : barre réduite : Maj + clic droit sur l'icône masque la barre flottante (pas de croix dans ce mode).
 `0.60.1` : infobulles : « cliquable », « glisser » (et « glissez »...) et « glisser/déposer » aussi en bleu, comme les clics.
 `0.60.0` : notions de clic en bleu dans toutes les infobulles (`P.ShowTooltip`, `P.ColorClicks`, aussi pour les modules) ; correctif : infobulles de la barre flottante et de son icône perdues après un déplacement par l'icône (barre réduite).
 `0.59.0` : barre flottante réduite à l'icône (option), boutons des modules en rangée horizontale (au-dessus de la barre, ou à droite de l'icône en barre réduite) ; Alt + clic sur l'icône pour figer.

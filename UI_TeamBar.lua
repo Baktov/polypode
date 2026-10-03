@@ -15,7 +15,7 @@ local P = Polypode
 -- la taille d'un bouton de module ; nom, pliage, croix, cadenas, poignée et liste masqués. Les
 -- boutons des modules sont alors dessous en colonne, ou à droite en rangée (moduleSide
 -- "horizontal" ; barre normale : rangée au-dessus). Icône : clic = fenêtre, clic droit = options,
--- Alt + clic = figer / libérer, glisser = déplacer.
+-- Alt + clic = figer / libérer, Maj + clic droit = masquer la barre (pas de croix), glisser = déplacer.
 --
 -- MODE SOLO (P.IsSoloMode, UI_Main.lua) : la même barre montre le personnage joué, sorti en
 -- glissant sa ligne de « Personnages disponibles » ; affichage mémorisé à part (soloShown),
@@ -616,6 +616,11 @@ local function Build()
 	iconBtn:SetScript("OnClick", function(self, mouseButton)
 		if mouseButton == "LeftButton" and IsAltKeyDown() then
 			ToggleLocked() -- comme sur la barre (seule l'icône reste en barre réduite)
+		elseif mouseButton == "RightButton" and IsShiftKeyDown() and P.charDb.teamBar.compact then
+			-- Barre réduite (croix masquée) : Maj + clic droit la masque, comme la croix.
+			P.charDb.teamBar[ShownKey()] = false
+			GameTooltip:Hide()
+			P.RefreshTeamBar()
 		elseif mouseButton == "RightButton" then
 			if P.optionsPopup then
 				P.ToggleOptionsPopup(self, P.optionsPopup)
@@ -637,6 +642,7 @@ local function Build()
 		if P.charDb.teamBar.compact then
 			GameTooltip:AddLine(P.charDb.teamBar.locked and "Barre figée — Alt + clic : libérer"
 				or "Glisser : déplacer la barre — Alt + clic : figer", 1, 1, 1)
+			GameTooltip:AddLine("Maj + clic droit : masquer la barre", 1, 1, 1)
 		end
 		P.ShowTooltip()
 	end)
