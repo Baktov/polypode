@@ -688,6 +688,7 @@ end
 -- Applique le mode courant à la fenêtre : cadres d'équipe, largeur, boutons des compagnons.
 local function ApplySoloLayout()
 	local solo = P.IsSoloMode()
+	ui.frame.TitleText:SetText(solo and "Monopode" or "Polypode") -- un seul personnage : « Monopode »
 	ui.teamPanel:SetShown(not solo)
 	ui.memberPanel:SetShown(not solo)
 	-- « Ajouter la cible » sert à composer des équipes : masqué en mode solo, la liste remonte.

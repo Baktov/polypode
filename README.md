@@ -210,6 +210,7 @@ personnage.
 - La fenêtre ne garde que **Personnages disponibles**, sur toute sa largeur ; les cadres
   « Équipes » et « Personnages de l'équipe » sont masqués, et la fenêtre est un peu plus étroite
   (620 pixels par défaut ; sa largeur en mode solo est gardée à part de la largeur normale).
+  Le titre de la fenêtre devient **Monopode**.
   Le bouton **Ajouter la cible** est masqué (il sert à composer des équipes) et la liste remonte
   à sa place.
 - Les clics d'équipe sur les personnages sont sans effet ; Alt + clic (compte WoW) et Maj + clic
@@ -476,6 +477,7 @@ commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, ba
 
 Du plus récent au plus ancien (d'après l'historique des commits).
 
+`2.1.0` : mode solo : le titre de la fenêtre devient « Monopode ».
 `2.0.0` : première version publique (release GitHub v2.0.0), avec Polypode Data, Polypode Profil et Polypode Suivi 2.0.0.
 `0.60.2` : barre réduite : Maj + clic droit sur l'icône masque la barre flottante (pas de croix dans ce mode).
 `0.60.1` : infobulles : « cliquable », « glisser » (et « glissez »...) et « glisser/déposer » aussi en bleu, comme les clics.
