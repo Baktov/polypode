@@ -168,8 +168,9 @@ function P.UnitNameParts(unit)
 	return name, second, nil
 end
 
--- INFOBULLES : règle commune à Polypode et à ses modules, toute notion de clic (« Clic », « clic
--- gauche », « Clic droit », « Maj + clic », « Alt + clic droit », « double-clic »...) est en bleu
+-- INFOBULLES : règle commune à Polypode et à ses modules, toute notion de souris (« Clic », « clic
+-- gauche », « Clic droit », « Maj + clic », « Alt + clic droit », « double-clic », « cliquable »,
+-- « Glisser », « glisser/déposer », « glissez »...) est en bleu
 -- (P.CLICK_COLOR). P.ColorClicks(texte) colore un texte ; P.ShowTooltip([infobulle]) colore toutes
 -- les lignes de l'infobulle (GameTooltip par défaut) puis l'affiche, à appeler à la place de
 -- GameTooltip:Show(). Descriptions du panneau d'options : passées par P.ColorClicks.
@@ -190,51 +191,81 @@ local function ActiveColor(text, pos)
 	return color
 end
 
+-- Fin de l'expression de souris commençant à first (mot reconnu jusqu'à last) : côté (« gauche »,
+-- « droit ») d'un clic, « /déposer » ou « -déposer » d'un glisser.
+local function ExtendRight(text, last, isDrag)
+	local tail
+	if isDrag then
+		tail = text:match("^/[Dd]époser", last + 1) or text:match("^%-[Dd]époser", last + 1)
+	else
+		tail = text:match("^ gauche", last + 1) or text:match("^ droit", last + 1)
+	end
+	return tail and last + #tail or last
+end
+
+-- Début de l'expression : « double- » et touches de modification (« Maj + », « Alt + Maj + »...).
+local function ExtendLeft(text, start)
+	if text:sub(start - 7, start - 1):lower() == "double-" then
+		start = start - 7
+	end
+	while true do
+		local word = text:sub(1, start - 1):match("(%a+) %+ $")
+		if not (word and CLICK_MODIFIERS[word]) then
+			return start
+		end
+		start = start - #word - 3
+	end
+end
+
+-- Prochain mot de souris à partir de pos : début, fin, vrai si c'est un glisser ; nil s'il n'y en
+-- a plus. Mots entiers : « clic », « clics », « cliquable(s) », « glisser » et ses formes
+-- (« glissez », « glissé »...) ; pas « clique », « cliquer ».
+local function NextMouseWord(text, pos)
+	while true do
+		local clickFirst = text:find("[Cc]li[cq]", pos) -- « clic », « cliquable »
+		local dragFirst = text:find("[Gg]liss", pos)
+		local first = clickFirst and (not dragFirst or clickFirst < dragFirst) and clickFirst or dragFirst
+		if not first then
+			return nil
+		end
+		local isDrag = first == dragFirst
+		local before = text:sub(first - 1, first - 1)
+		local word = text:match("^[%a\128-\255]+", first) -- mot entier (lettres accentuées comprises)
+		local valid = not before:find("[%a\128-\255]")
+		if isDrag then
+			valid = valid and word:lower():find("^gliss") ~= nil
+		else
+			local lower = word:lower()
+			valid = valid and (lower == "clic" or lower == "clics" or lower == "cliquable" or lower == "cliquables")
+		end
+		if valid then
+			return first, first + #word - 1, isDrag
+		end
+		pos = first + #word
+	end
+end
+
 function P.ColorClicks(text)
-	if type(text) ~= "string" or (issecretvalue and issecretvalue(text)) or not text:find("[Cc]lic") then
+	if type(text) ~= "string" or (issecretvalue and issecretvalue(text))
+		or not (text:find("[Cc]li[cq]") or text:find("[Gg]liss")) then
 		return text
 	end
 	local out, pos = {}, 1
 	while true do
-		local first, last = text:find("[Cc]lic", pos)
+		local first, last, isDrag = NextMouseWord(text, pos)
 		if not first then
 			break
 		end
-		local before, after = text:sub(first - 1, first - 1), text:sub(last + 1, last + 1)
-		if after == "s" then -- « clics »
-			last = last + 1
-			after = text:sub(last + 1, last + 1)
-		end
-		-- Mot entier seulement (pas « cliquable », « clique »), « double-clic » compris.
-		if before:find("%a") or after:find("[%a\128-\255]") then
-			out[#out + 1] = text:sub(pos, last)
-			pos = last + 1
+		last = ExtendRight(text, last, isDrag)
+		local start = math.max(ExtendLeft(text, first), pos)
+		if text:sub(start - #P.CLICK_COLOR, start - 1) == P.CLICK_COLOR then
+			out[#out + 1] = text:sub(pos, last) -- déjà en bleu
 		else
-			local start = first
-			local side = text:match("^ gauche", last + 1) or text:match("^ droit", last + 1)
-			if side then
-				last = last + #side
-			end
-			if text:sub(start - 7, start - 1):lower() == "double-" then
-				start = start - 7
-			end
-			-- Touches de modification devant : « Maj + », « Alt + Maj + »...
-			while true do
-				local word = text:sub(1, start - 1):match("(%a+) %+ $")
-				if not (word and CLICK_MODIFIERS[word]) then
-					break
-				end
-				start = start - #word - 3
-			end
-			if text:sub(start - #P.CLICK_COLOR, start - 1) == P.CLICK_COLOR then
-				out[#out + 1] = text:sub(pos, last) -- déjà en bleu
-			else
-				local color = ActiveColor(text, start)
-				out[#out + 1] = text:sub(pos, start - 1) .. P.CLICK_COLOR .. text:sub(start, last) .. "|r"
-					.. (color or "")
-			end
-			pos = last + 1
+			local color = ActiveColor(text, start)
+			out[#out + 1] = text:sub(pos, start - 1) .. P.CLICK_COLOR .. text:sub(start, last) .. "|r"
+				.. (color or "")
 		end
+		pos = last + 1
 	end
 	out[#out + 1] = text:sub(pos)
 	return table.concat(out)

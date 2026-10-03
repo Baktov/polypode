@@ -476,6 +476,7 @@ commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, ba
 
 Du plus récent au plus ancien (d'après l'historique des commits).
 
+`0.60.1` : infobulles : « cliquable », « glisser » (et « glissez »...) et « glisser/déposer » aussi en bleu, comme les clics.
 `0.60.0` : notions de clic en bleu dans toutes les infobulles (`P.ShowTooltip`, `P.ColorClicks`, aussi pour les modules) ; correctif : infobulles de la barre flottante et de son icône perdues après un déplacement par l'icône (barre réduite).
 `0.59.0` : barre flottante réduite à l'icône (option), boutons des modules en rangée horizontale (au-dessus de la barre, ou à droite de l'icône en barre réduite) ; Alt + clic sur l'icône pour figer.
 `0.58.1` : mode solo : bouton « Ajouter la cible » masqué, la liste des personnages remonte à sa place.

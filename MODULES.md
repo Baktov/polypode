@@ -25,7 +25,8 @@ publique `P.*`, listée dans la section « Dépendances vers Polypode » de leur
 
 - Commentaires en **français**, code (variables, fonctions) en **anglais**.
 - Pas de librairie externe (ElvUI / EllesmereUI : optionnels, toujours testés avant usage).
-- **Infobulles** : toute notion de clic (« Clic », « Clic droit », « Maj + clic »...) est en **bleu**
+- **Infobulles** : toute notion de souris (« Clic », « Clic droit », « Maj + clic », « cliquable »,
+  « Glisser », « glisser/déposer »...) est en **bleu**
   (`P.CLICK_COLOR`) : afficher une infobulle par `P.ShowTooltip()`, jamais `GameTooltip:Show()`
   (repli local si la fonction manque) ; descriptions d'options passées par `P.ColorClicks(texte)`.
 - **Pas de `print()`** : `P.Debug(msg)` (mode debug), ou `UIErrorsFrame:AddMessage` pour un message
