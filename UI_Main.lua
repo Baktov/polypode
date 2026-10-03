@@ -199,6 +199,7 @@ end
 -- la place du second clic : le premier clic passe par opts.onClick).
 -- opts.decorate(row, data) : habillage supplémentaire d'une ligne, appelé à chaque affichage
 -- (lignes recyclées : tout se recalcule ici).
+-- opts.rowHeight : hauteur des lignes (défaut 20), ex. une rangée d'icônes posées par decorate.
 -- opts.inset : marge gauche et droite de la liste dans le cadre (défaut 10). La barre de
 -- défilement n'apparaît (et ne prend de place à droite) que si la liste déborde.
 local function CreateScrollList(panel, formatFn, top, opts)
@@ -239,7 +240,7 @@ local function CreateScrollList(panel, formatFn, top, opts)
 	end
 
 	local view = CreateScrollBoxListLinearView()
-	view:SetElementExtent(ROW_HEIGHT)
+	view:SetElementExtent(opts.rowHeight or ROW_HEIGHT)
 	view:SetElementInitializer(opts.onClick and "Button" or "Frame", function(row, data)
 		if not row.text then
 			row.text = row:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
@@ -365,6 +366,7 @@ end
 P.CreatePanel = CreatePanel
 P.CreateScrollList = CreateScrollList
 P.LIST_TOOLTIP_COLUMNS = true -- opts.tooltip peut renvoyer des lignes { gauche, droite } (0.51.4)
+P.LIST_ROW_HEIGHT = true -- opts.rowHeight : hauteur des lignes réglable (0.56.0)
 P.SetListData = SetListData
 
 -- Lettres accentuées (UTF-8) ramenées à leur lettre de base minuscule pour le tri alphabétique.
