@@ -78,7 +78,8 @@ Squelette prêt à copier : `Polypode/Modele/` (voir son `LISEZMOI.txt`). Démar
    `README.modele.md` → `README.md`, supprimer `LISEZMOI.txt`) et remplacer partout `Modele` /
    `modele` par le nom (SavedVariables `PolypodeXDB`, fenêtre `PolypodeXFrame`, `P.ToggleX`...).
 4. **Branchement** : uniquement par l'API publique de Polypode, chaque fonction testée avant usage
-   (`P.AddTitleButton`, `P.RegisterSlashCommand`, sous-catégorie de `P.optionsCategory`,
+   (`P.AddTitleButton`, `P.RegisterSlashCommand`, sous-catégorie de `P.optionsCategory` — et ses
+   réglages rappelés par `P.ToggleOptionsPopup` au clic droit sur le bouton du module —,
    `P.CreatePanel` / `P.CreateScrollList` / `P.SetListData`, `P.Skin*`, synchro
    `P.RegisterMessageHandler` / `P.RegisterPeerCallback` / `P.WhisperOnline` / `P.IsSender` /
    `P.MAX_MESSAGE_LENGTH`, `P.RegisterCharacterData` pour des données par personnage). Une fonction

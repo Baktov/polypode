@@ -570,11 +570,16 @@ local function Build()
 	iconBtn:SetScript("OnDragStop", function()
 		bar:GetScript("OnDragStop")(bar)
 	end)
-	-- Clic gauche : fenêtre Polypode ; clic droit : options (comme les boutons des modules).
+	-- Clic gauche : fenêtre Polypode ; clic droit : petite fenêtre d'options (UI_OptionsPopup.lua),
+	-- comme les boutons des modules.
 	iconBtn:RegisterForClicks("LeftButtonUp", "RightButtonUp")
-	iconBtn:SetScript("OnClick", function(_, mouseButton)
+	iconBtn:SetScript("OnClick", function(self, mouseButton)
 		if mouseButton == "RightButton" then
-			P.OpenOptions()
+			if P.optionsPopup then
+				P.ToggleOptionsPopup(self, P.optionsPopup)
+			else
+				P.OpenOptions()
+			end
 		else
 			P.ToggleUI()
 		end

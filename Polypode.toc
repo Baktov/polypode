@@ -2,7 +2,7 @@
 ## Title: Polypode
 ## Notes: Gestion simple de plusieurs personnages multiboxés (roster, équipes et leader, sync entre clients). Commandes slash: /poly
 ## Author: Generated
-## Version: 0.56.1
+## Version: 0.57.0
 ## SavedVariables: PolypodeDB
 ## SavedVariablesPerCharacter: PolypodeCharDB
 ## OptionalDeps: EllesmereUI, ElvUI
@@ -22,6 +22,7 @@ UI_TeamBar.lua
 UI_Minimap.lua
 UI_Options.lua
 UI_Options.xml
+UI_OptionsPopup.lua
 UI_Trust.lua
 UI_Tokens.lua
 UI_Keybinds.lua

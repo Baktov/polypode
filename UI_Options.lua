@@ -90,6 +90,36 @@ function P.BuildOptions()
 
 	local category, layout = Settings.RegisterVerticalLayoutCategory("Polypode")
 
+	-- Chaque contrôle du panneau est aussi rappelé dans la petite fenêtre du clic droit sur l'icône
+	-- de la barre flottante (P.optionsPopup, UI_OptionsPopup.lua), avec le même réglage.
+	local popupItems = {}
+	local function AddCheck(setting, tooltip)
+		Settings.CreateCheckbox(category, setting, tooltip)
+		popupItems[#popupItems + 1] = { kind = "check", setting = setting, tooltip = tooltip }
+	end
+	-- Curseur en pourcentage, de min à max par step.
+	local function PercentText(value)
+		return string.format("%d %%", value)
+	end
+	local function AddSlider(setting, min, max, step, tooltip)
+		local options = Settings.CreateSliderOptions(min, max, step)
+		options:SetLabelFormatter(MinimalSliderWithSteppersMixin.Label.Right, PercentText)
+		Settings.CreateSlider(category, setting, options, tooltip)
+		popupItems[#popupItems + 1] = { kind = "slider", setting = setting, min = min, max = max, step = step,
+			format = PercentText, tooltip = tooltip }
+	end
+	-- values = { { valeur, libellé }, ... }
+	local function AddDropdown(setting, values, tooltip)
+		Settings.CreateDropdown(category, setting, function()
+			local container = Settings.CreateControlTextContainer()
+			for _, value in ipairs(values) do
+				container:Add(value[1], value[2])
+			end
+			return container:GetData()
+		end, tooltip)
+		popupItems[#popupItems + 1] = { kind = "dropdown", setting = setting, values = values, tooltip = tooltip }
+	end
+
 	-- Mode solo, en tête et en rouge (par personnage) : même réglage que la case « Solo » de la
 	-- fenêtre (P.SetSoloMode, UI_Main.lua).
 	local soloSetting = Settings.RegisterProxySetting(
@@ -105,7 +135,7 @@ function P.BuildOptions()
 			P.SetSoloMode(value)
 		end
 	)
-	Settings.CreateCheckbox(category, soloSetting,
+	AddCheck(soloSetting,
 		"Pour jouer un seul personnage : la fenêtre Polypode ne garde que « Personnages disponibles » "
 		.. "(agrandi, fenêtre un peu plus étroite), sans les cadres d'équipe. Glissez votre personnage "
 		.. "hors de la liste pour en faire une barre flottante, avec les boutons des modules (Quêtes "
@@ -130,7 +160,7 @@ function P.BuildOptions()
 			P.SetMinimapButtonShown(value)
 		end
 	)
-	Settings.CreateCheckbox(category, minimapSetting,
+	AddCheck(minimapSetting,
 		"Affiche le bouton Polypode autour de la minimap (équivalent de /poly minimap).")
 
 	-- Mode debug, par personnage (P.charDb.debug) ; même valeur que /poly debug.
@@ -147,7 +177,7 @@ function P.BuildOptions()
 			P.SetDebug(value)
 		end
 	)
-	Settings.CreateCheckbox(category, debugSetting,
+	AddCheck(debugSetting,
 		"Affiche dans le chat les messages de diagnostic de Polypode (synchro, invitations...). "
 		.. "Réglage propre à ce personnage (équivalent de /poly debug).")
 
@@ -166,7 +196,7 @@ function P.BuildOptions()
 			P.UpdateLeaderMacros() -- différé à la sortie du combat si besoin
 		end
 	)
-	Settings.CreateCheckbox(category, startAttackSetting,
+	AddCheck(startAttackSetting,
 		"Le raccourci « Assister le leader » lance aussi l'attaque automatique (/startattack) sur "
 		.. "la cible prise, si elle est hostile. Décoché : prend seulement la cible du leader. "
 		.. "Réglage propre à ce personnage.")
@@ -185,7 +215,7 @@ function P.BuildOptions()
 			P.charDb.autoAcceptQuest = value
 		end
 	)
-	Settings.CreateCheckbox(category, questSetting,
+	AddCheck(questSetting,
 		"Quand le leader de l'équipe accepte une quête, ce personnage l'accepte aussi dès qu'elle "
 		.. "lui est proposée (PNJ ouvert, jusqu'à 30 secondes après). Sur le leader, annonce ses "
 		.. "quêtes acceptées au groupe. Réglage propre à ce personnage.")
@@ -204,7 +234,7 @@ function P.BuildOptions()
 			P.charDb.autoValidateQuest = value
 		end
 	)
-	Settings.CreateCheckbox(category, validateSetting,
+	AddCheck(validateSetting,
 		"Quand le leader de l'équipe rend une quête (« Continuer » puis « Terminer la quête »), "
 		.. "ce personnage la rend aussi, avec le même choix de récompense, dès que le PNJ est ouvert "
 		.. "(jusqu'à 60 secondes après). Sur le leader, annonce ses validations au groupe. "
@@ -224,7 +254,7 @@ function P.BuildOptions()
 			P.charDb.autoSelectGossip = value
 		end
 	)
-	Settings.CreateCheckbox(category, gossipSetting,
+	AddCheck(gossipSetting,
 		"Quand le leader de l'équipe choisit une quête (disponible ou à rendre) ou une option dans "
 		.. "le dialogue d'un PNJ, ce personnage fait le même choix si son dialogue avec le PNJ est "
 		.. "ouvert ; quand le leader ferme DialogueUI, il le ferme aussi. L'acceptation ou la "
@@ -245,7 +275,7 @@ function P.BuildOptions()
 			P.charDb.autoSkipCinematic = value
 		end
 	)
-	Settings.CreateCheckbox(category, cinematicSetting,
+	AddCheck(cinematicSetting,
 		"Quand le leader de l'équipe passe une cinématique ou une vidéo, ce personnage la passe "
 		.. "aussi (dès qu'elle s'affiche, jusqu'à 15 secondes après). Sur le leader, annonce ses "
 		.. "cinématiques passées au groupe. Réglage propre à ce personnage.")
@@ -264,7 +294,7 @@ function P.BuildOptions()
 			P.charDb.autoTaxi = value
 		end
 	)
-	Settings.CreateCheckbox(category, taxiSetting,
+	AddCheck(taxiSetting,
 		"Quand le leader de l'équipe prend un vol chez un maître de vol, ce personnage prend le "
 		.. "même vol si sa carte de vol est ouverte et qu'il connaît la destination. Sur le leader, "
 		.. "annonce ses vols au groupe. Réglage propre à ce personnage.")
@@ -283,7 +313,7 @@ function P.BuildOptions()
 			P.charDb.autoEnterInstance = value
 		end
 	)
-	Settings.CreateCheckbox(category, instanceSetting,
+	AddCheck(instanceSetting,
 		"Quand le leader de l'équipe choisit le palier d'un gouffre, ce personnage choisit le même "
 		.. "si sa fenêtre de palier est ouverte ; quand le leader vote la sortie du gouffre, il vote "
 		.. "« Oui » aussi (jusqu'à 30 secondes après) ; quand le leader confirme l'entrée par un "
@@ -304,11 +334,7 @@ function P.BuildOptions()
 			P.charDb.sentVolume = math.floor(value + 0.5) -- entier, pour le message envoyé
 		end
 	)
-	local volumeOptions = Settings.CreateSliderOptions(0, 100, 5)
-	volumeOptions:SetLabelFormatter(MinimalSliderWithSteppersMixin.Label.Right, function(value)
-		return string.format("%d %%", value)
-	end)
-	Settings.CreateSlider(category, volumeSetting, volumeOptions,
+	AddSlider(volumeSetting, 0, 100, 5,
 		"Volume principal (en %) que le raccourci « Envoyer le volume à l'équipe » applique aux "
 		.. "autres membres quand ce personnage est le leader. Réglage propre à ce personnage.")
 
@@ -326,7 +352,7 @@ function P.BuildOptions()
 			P.charDb.followLeaderSound = value
 		end
 	)
-	Settings.CreateCheckbox(category, followSoundSetting,
+	AddCheck(followSoundSetting,
 		"Applique à ce personnage le volume envoyé par le leader de l'équipe et la coupure ou le "
 		.. "rétablissement du son (raccourcis du leader). Décoché : ce client garde son propre son. "
 		.. "Réglage propre à ce personnage.")
@@ -346,7 +372,7 @@ function P.BuildOptions()
 			P.RefreshUI()
 		end
 	)
-	Settings.CreateCheckbox(category, groupByAccountSetting,
+	AddCheck(groupByAccountSetting,
 		"Dans la fenêtre Polypode, range les personnages disponibles sous un en-tête par compte WoW, "
 		.. "repliable d'un clic. WoW ne donne pas le nom du compte WoW aux addons : renseignez-le sur "
 		.. "chaque personnage (champ ci-dessous, ou Alt + clic sur un personnage dans la fenêtre) ; "
@@ -368,7 +394,7 @@ function P.BuildOptions()
 			P.charDb.autoGroup = value
 		end
 	)
-	Settings.CreateCheckbox(category, autoGroupSetting,
+	AddCheck(autoGroupSetting,
 		"Leader : invite automatiquement dans son groupe les membres de l'équipe qui se connectent "
 		.. "(ou déjà connectés quand il se connecte). Membre : accepte automatiquement l'invitation "
 		.. "de groupe du leader d'une de ses équipes. Réglage propre à ce personnage.")
@@ -387,7 +413,7 @@ function P.BuildOptions()
 			P.charDb.followAlert = value
 		end
 	)
-	Settings.CreateCheckbox(category, followAlertSetting,
+	AddCheck(followAlertSetting,
 		"Membre : quand il arrête de suivre le leader de l'équipe (obstacle, saut, distance, "
 		.. "mouvement manuel...), il le signale au leader. Leader : affiche « X ne vous suit plus. » "
 		.. "à l'écran avec un son d'alerte. Réglage propre à ce personnage, à cocher sur le leader "
@@ -408,7 +434,7 @@ function P.BuildOptions()
 			P.RefreshTeamBar()
 		end
 	)
-	Settings.CreateCheckbox(category, teamBarDetailsSetting,
+	AddCheck(teamBarDetailsSetting,
 		"Dans la liste de la barre flottante d'équipe, affiche à gauche de chaque personnage son "
 		.. "niveau, le pourcentage d'avancement dans ce niveau (sauf au niveau maximum) et son "
 		.. "niveau d'objet équipé. Infos envoyées par le Polypode de chaque personnage (« ? » tant "
@@ -429,7 +455,7 @@ function P.BuildOptions()
 			P.RefreshTeamBar()
 		end
 	)
-	Settings.CreateCheckbox(category, teamBarHealthSetting,
+	AddCheck(teamBarHealthSetting,
 		"Dans la liste de la barre flottante d'équipe, souligne chaque membre groupé d'une fine "
 		.. "barre de vie. Décochée : seul le libellé d'état (hors groupe, mort, loin...) reste. "
 		.. "Réglage propre à ce personnage.")
@@ -449,7 +475,7 @@ function P.BuildOptions()
 			P.RefreshTeamBar()
 		end
 	)
-	Settings.CreateCheckbox(category, durabilityAlertSetting,
+	AddCheck(durabilityAlertSetting,
 		"Dans la liste de la barre flottante d'équipe, fait clignoter en rouge un personnage dont "
 		.. "la pièce d'équipement la plus usée est sous le seuil de durabilité ci-dessous. Durabilité "
 		.. "envoyée par le Polypode de chaque personnage. Réglage propre à ce personnage.")
@@ -468,11 +494,7 @@ function P.BuildOptions()
 			P.RefreshTeamBar()
 		end
 	)
-	local durabilityOptions = Settings.CreateSliderOptions(5, 95, 5)
-	durabilityOptions:SetLabelFormatter(MinimalSliderWithSteppersMixin.Label.Right, function(value)
-		return string.format("%d %%", value)
-	end)
-	Settings.CreateSlider(category, durabilityThresholdSetting, durabilityOptions,
+	AddSlider(durabilityThresholdSetting, 5, 95, 5,
 		"Un personnage clignote dans la barre flottante d'équipe quand la durabilité de sa pièce la "
 		.. "plus usée est inférieure à ce pourcentage (de 5 à 95 %, par pas de 5). Réglage propre à "
 		.. "ce personnage.")
@@ -492,7 +514,7 @@ function P.BuildOptions()
 			P.RefreshTeamBar()
 		end
 	)
-	Settings.CreateCheckbox(category, moduleButtonsSetting,
+	AddCheck(moduleButtonsSetting,
 		"Affiche contre la barre flottante d'équipe une colonne de petits boutons reprenant ceux des "
 		.. "modules (Data, Photo, Profils, Quêtes, Suivi... selon les addons installés) : trois premières "
 		.. "lettres, même clic et même infobulle que dans la fenêtre Polypode. Réglage propre à ce "
@@ -512,16 +534,13 @@ function P.BuildOptions()
 			P.RefreshTeamBar()
 		end
 	)
-	Settings.CreateDropdown(category, moduleSideSetting, function()
-		local container = Settings.CreateControlTextContainer()
-		container:Add("left", "À gauche")
-		container:Add("right", "À droite")
-		return container:GetData()
-	end, "Côté de la barre flottante d'équipe où se place la colonne des boutons des modules. "
+	AddDropdown(moduleSideSetting, { { "left", "À gauche" }, { "right", "À droite" } },
+		"Côté de la barre flottante d'équipe où se place la colonne des boutons des modules. "
 		.. "Réglage propre à ce personnage.")
 
 	Settings.RegisterAddOnCategory(category)
 	P.optionsCategory = category
+	P.optionsPopup = { key = "Polypode", title = "Options de Polypode", items = popupItems, category = category }
 end
 
 function P.OpenOptions()
