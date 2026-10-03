@@ -476,6 +476,7 @@ commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, ba
 
 Du plus récent au plus ancien (d'après l'historique des commits).
 
+`2.0.0` : première version publique (release GitHub v2.0.0), avec Polypode Data, Polypode Profil et Polypode Suivi 2.0.0.
 `0.60.2` : barre réduite : Maj + clic droit sur l'icône masque la barre flottante (pas de croix dans ce mode).
 `0.60.1` : infobulles : « cliquable », « glisser » (et « glissez »...) et « glisser/déposer » aussi en bleu, comme les clics.
 `0.60.0` : notions de clic en bleu dans toutes les infobulles (`P.ShowTooltip`, `P.ColorClicks`, aussi pour les modules) ; correctif : infobulles de la barre flottante et de son icône perdues après un déplacement par l'icône (barre réduite).
