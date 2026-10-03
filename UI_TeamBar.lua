@@ -11,6 +11,12 @@ local P = Polypode
 -- croix = masquer. État par personnage (chaque fenêtre de multibox a son écran) dans
 -- P.charDb.teamBar : shown, expanded, locked, position, width, listHeight.
 --
+-- BARRE RÉDUITE (option P.charDb.teamBar.compact) : seule reste l'icône Polypode, dans un cadre de
+-- la taille d'un bouton de module ; nom, pliage, croix, cadenas, poignée et liste masqués. Les
+-- boutons des modules sont alors dessous en colonne, ou à droite en rangée (moduleSide
+-- "horizontal" ; barre normale : rangée au-dessus). Icône : clic = fenêtre, clic droit = options,
+-- Alt + clic = figer / libérer, glisser = déplacer.
+--
 -- MODE SOLO (P.IsSoloMode, UI_Main.lua) : la même barre montre le personnage joué, sorti en
 -- glissant sa ligne de « Personnages disponibles » ; affichage mémorisé à part (soloShown),
 -- position, taille et options communes. Pas d'invitation ni de partage de disposition.
@@ -22,7 +28,7 @@ local LIST_PADDING = 8 -- marge haute et basse de la liste dans son cadre
 local MAX_VISIBLE_ROWS = 8 -- hauteur automatique : au-delà, la liste défile
 local MIN_LIST_HEIGHT, MAX_LIST_HEIGHT = ROW_HEIGHT + 2 * LIST_PADDING, 600
 
-local bar, listPanel, toggleIcon, lockIcon, grip
+local bar, listPanel, toggleIcon, lockIcon, grip, closeButton, iconButton
 local listAbove -- liste dépliée au-dessus de la barre (trop près du bas de l'écran)
 
 local function Clamp(value, low, high)
@@ -427,6 +433,7 @@ end
 local MODULE_WIDTH, MODULE_HEIGHT, MODULE_GAP = 34, 16, 2
 local moduleColumn
 local moduleButtons = {}
+local moduleTooltipAnchor = "ANCHOR_LEFT" -- côté des infobulles, opposé à la barre (LayoutModuleButtons)
 
 -- Trois premiers caractères (UTF-8 entiers : « Quê » pour « Quêtes »).
 local function ShortLabel(text)
@@ -454,7 +461,7 @@ local function CreateModuleButton(spec)
 	if spec.tooltip then
 		button:SetScript("OnEnter", function(self)
 			-- Infobulle du côté opposé à la barre.
-			GameTooltip:SetOwner(self, P.charDb.teamBar.moduleSide == "right" and "ANCHOR_RIGHT" or "ANCHOR_LEFT")
+			GameTooltip:SetOwner(self, moduleTooltipAnchor)
 			for i, line in ipairs(spec.tooltip) do
 				if i == 1 then
 					GameTooltip:AddLine(line)
@@ -472,8 +479,9 @@ local function CreateModuleButton(spec)
 	return button
 end
 
--- Place (et crée au besoin) la colonne selon les options ; la zone gardée à l'écran par
--- SetClampedToScreen inclut la colonne.
+-- Place (et crée au besoin) les boutons selon les options : colonne à gauche ou à droite de la
+-- barre, rangée au-dessus (horizontal) ; barre réduite : colonne dessous, ou rangée à droite
+-- (horizontal). La zone gardée à l'écran par SetClampedToScreen les inclut.
 local function LayoutModuleButtons()
 	local state = P.charDb.teamBar
 	local specs = P.GetTitleButtonSpecs and P.GetTitleButtonSpecs() or {}
@@ -494,20 +502,43 @@ local function LayoutModuleButtons()
 		bar:SetClampRectInsets(0, 0, 0, 0)
 		return
 	end
-	local right = state.moduleSide == "right"
-	local width = MODULE_WIDTH + 2
+	local horizontal = state.moduleSide == "horizontal"
+	local length = #shown * ((horizontal and MODULE_WIDTH or MODULE_HEIGHT) + MODULE_GAP) - MODULE_GAP
 	moduleColumn:ClearAllPoints()
-	if right then
+	if horizontal then
+		moduleColumn:SetSize(length, MODULE_HEIGHT)
+	else
+		moduleColumn:SetSize(MODULE_WIDTH, length)
+	end
+	if state.compact and horizontal then
+		moduleColumn:SetPoint("LEFT", bar, "RIGHT", 2, 0)
+		bar:SetClampRectInsets(0, length + 2, 0, 0)
+		moduleTooltipAnchor = "ANCHOR_BOTTOM"
+	elseif state.compact then
+		moduleColumn:SetPoint("TOP", bar, "BOTTOM", 0, -2)
+		bar:SetClampRectInsets(0, 0, 0, -(length + 2))
+		moduleTooltipAnchor = "ANCHOR_RIGHT"
+	elseif horizontal then
+		moduleColumn:SetPoint("BOTTOMLEFT", bar, "TOPLEFT", 0, 2)
+		bar:SetClampRectInsets(0, 0, MODULE_HEIGHT + 2, 0)
+		moduleTooltipAnchor = "ANCHOR_TOP"
+	elseif state.moduleSide == "right" then
 		moduleColumn:SetPoint("TOPLEFT", bar, "TOPRIGHT", 2, 0)
-		bar:SetClampRectInsets(0, width, 0, 0)
+		bar:SetClampRectInsets(0, MODULE_WIDTH + 2, 0, 0)
+		moduleTooltipAnchor = "ANCHOR_RIGHT"
 	else
 		moduleColumn:SetPoint("TOPRIGHT", bar, "TOPLEFT", -2, 0)
-		bar:SetClampRectInsets(-width, 0, 0, 0)
+		bar:SetClampRectInsets(-(MODULE_WIDTH + 2), 0, 0, 0)
+		moduleTooltipAnchor = "ANCHOR_LEFT"
 	end
-	moduleColumn:SetSize(MODULE_WIDTH, #shown * (MODULE_HEIGHT + MODULE_GAP) - MODULE_GAP)
 	for index, button in ipairs(shown) do
 		button:ClearAllPoints()
-		button:SetPoint("TOP", moduleColumn, "TOP", 0, -(index - 1) * (MODULE_HEIGHT + MODULE_GAP))
+		local offset = (index - 1) * ((horizontal and MODULE_WIDTH or MODULE_HEIGHT) + MODULE_GAP)
+		if horizontal then
+			button:SetPoint("LEFT", moduleColumn, "LEFT", offset, 0)
+		else
+			button:SetPoint("TOP", moduleColumn, "TOP", 0, -offset)
+		end
 	end
 	moduleColumn:Show()
 end
@@ -535,6 +566,9 @@ local function Build()
 		-- Le relâchement qui termine un déplacement n'est pas un clic.
 		local dragged = self.dragging
 		self.dragging = nil
+		if P.charDb.teamBar.compact and not IsAltKeyDown() then
+			return -- barre réduite : l'icône porte les actions (pas d'invitation ni de liste)
+		end
 		if mouseButton == "LeftButton" and not dragged then
 			if IsAltKeyDown() then
 				ToggleLocked()
@@ -574,7 +608,9 @@ local function Build()
 	-- comme les boutons des modules.
 	iconBtn:RegisterForClicks("LeftButtonUp", "RightButtonUp")
 	iconBtn:SetScript("OnClick", function(self, mouseButton)
-		if mouseButton == "RightButton" then
+		if mouseButton == "LeftButton" and IsAltKeyDown() then
+			ToggleLocked() -- comme sur la barre (seule l'icône reste en barre réduite)
+		elseif mouseButton == "RightButton" then
 			if P.optionsPopup then
 				P.ToggleOptionsPopup(self, P.optionsPopup)
 			else
@@ -592,6 +628,10 @@ local function Build()
 		GameTooltip:AddLine("Polypode")
 		GameTooltip:AddLine("Clic : ouvrir / fermer la fenêtre Polypode", 1, 1, 1)
 		GameTooltip:AddLine("Clic droit : options de Polypode", 1, 1, 1)
+		if P.charDb.teamBar.compact then
+			GameTooltip:AddLine(P.charDb.teamBar.locked and "Barre figée — Alt + clic : libérer"
+				or "Glisser : déplacer la barre — Alt + clic : figer", 1, 1, 1)
+		end
 		GameTooltip:Show()
 	end)
 	iconBtn:SetScript("OnLeave", GameTooltip_Hide)
@@ -601,6 +641,7 @@ local function Build()
 	toggleIcon:SetSize(14, 14)
 	toggleIcon:SetPoint("LEFT", iconBtn, "RIGHT", 4, 0)
 
+	iconButton = iconBtn
 	local closeBtn = CreateFrame("Button", nil, bar, "UIPanelCloseButton")
 	closeBtn:SetSize(20, 20)
 	closeBtn:SetPoint("RIGHT", -14, 0) -- laisse le coin bas-droit à la poignée (barre pliée)
@@ -614,6 +655,7 @@ local function Build()
 	lockIcon:SetSize(14, 14)
 	lockIcon:SetPoint("RIGHT", closeBtn, "LEFT", -2, 0)
 	lockIcon:SetTexture("Interface\\PetBattles\\PetBattle-LockIcon")
+	closeButton = closeBtn
 
 	-- Nom de l'équipe : l'en-tête du cadre, recentré sur la barre.
 	bar.header:ClearAllPoints()
@@ -730,12 +772,32 @@ function P.RefreshTeamBar()
 
 	toggleIcon:SetTexture(state.expanded and "Interface\\Buttons\\UI-MinusButton-Up"
 		or "Interface\\Buttons\\UI-PlusButton-Up")
-	bar:SetWidth(state.width or BAR_WIDTH)
-	lockIcon:SetShown(state.locked or false)
+	-- Barre réduite : un cadre de la taille d'un bouton de module, l'icône seule au centre.
+	local compact = state.compact and true or false
+	if compact then
+		bar:SetSize(MODULE_WIDTH, MODULE_HEIGHT)
+	else
+		bar:SetSize(state.width or BAR_WIDTH, BAR_HEIGHT)
+	end
+	iconButton:ClearAllPoints()
+	if compact then
+		iconButton:SetSize(MODULE_HEIGHT - 2, MODULE_HEIGHT - 2)
+		iconButton:SetPoint("CENTER")
+	else
+		iconButton:SetSize(18, 18)
+		iconButton:SetPoint("LEFT", 4, 0)
+	end
+	bar.header:SetShown(not compact)
+	toggleIcon:SetShown(not compact)
+	closeButton:SetShown(not compact)
+	lockIcon:SetShown(not compact and state.locked or false)
 	P.SetListData(listPanel, items)
 	LayoutList(#items)
-	listPanel:SetShown(state.expanded)
+	listPanel:SetShown(state.expanded and not compact)
 	LayoutGrip()
+	if compact then
+		grip:Hide()
+	end
 	LayoutModuleButtons()
 	bar:Show()
 end

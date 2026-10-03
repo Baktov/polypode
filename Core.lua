@@ -78,7 +78,8 @@ P.charDefaults = {
 		durabilityAlert = true, -- ligne clignotante si la durabilité est sous le seuil
 		durabilityThreshold = 25, -- seuil de durabilité (%), par pas de 5
 		moduleButtons = true, -- colonne des boutons des addons compagnons contre la barre
-		moduleSide = "left", -- côté de cette colonne : "left" ou "right"
+		moduleSide = "left", -- côté : "left" ou "right" (colonne), "horizontal" (rangée)
+		compact = false, -- barre réduite à l'icône Polypode
 	},
 	-- selectedTeam : nom de l'équipe sélectionnée dans la fenêtre (nil par défaut),
 	-- conservé même si l'équipe manque momentanément (cf. UI_Main.lua).

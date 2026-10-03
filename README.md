@@ -249,7 +249,14 @@ rien n'est sélectionné.
   compagnons installés (Data, Photo, Profils, Suivi...). Pour rester discrets, seules les
   **trois premières lettres** du nom s'affichent, en petite police ; le clic et l'infobulle sont
   les mêmes que dans la fenêtre Polypode (Photo : clic droit = options). Colonne **à gauche**
-  par défaut, **à droite** au choix (option « Barre d'équipe : côté des boutons des modules »).
+  par défaut, **à droite**, ou rangée **horizontale** au-dessus de la barre (option « Barre
+  d'équipe : côté des boutons »).
+- **Barre réduite** (option « Barre d'équipe : réduite à l'icône ») : seule l'**icône Polypode**
+  reste, dans un cadre de la taille d'un bouton de module (nom, liste des personnages, croix et
+  poignée masqués). Les boutons des modules sont alors **dessous en colonne** (à gauche, à
+  droite), ou **à droite de l'icône en rangée** (horizontal). L'icône garde ses actions : clic =
+  fenêtre Polypode, clic droit = options, glisser = déplacer la barre, **Alt + clic** = figer ou
+  libérer (aussi en barre normale).
 - **Durabilité faible** (option « Barre d'équipe : clignoter si la durabilité est faible »,
   cochée par défaut) : la ligne d'un personnage clignote en rouge quand la pièce d'équipement la
   plus usée passe sous le **seuil** choisi par le curseur « Barre d'équipe : seuil de
@@ -419,7 +426,8 @@ fenêtre principale) :
 | Barre d'équipe : clignoter si la durabilité est faible | Oui | Fait clignoter en rouge, dans la liste de la barre flottante, un personnage dont la pièce la plus usée est sous le seuil ci-dessous. Réglage **par personnage** |
 | Barre d'équipe : seuil de durabilité | 25 % | Curseur de 5 à 95 % par pas de 5 : seuil de durabilité sous lequel un personnage clignote. Réglage **par personnage** |
 | Barre d'équipe : boutons des modules | Oui | Colonne de petits boutons (trois premières lettres) reprenant ceux des addons compagnons contre la barre flottante : même clic, même infobulle que dans la fenêtre. Réglage **par personnage** |
-| Barre d'équipe : côté des boutons des modules | À gauche | Liste : à gauche ou à droite de la barre flottante. Réglage **par personnage** |
+| Barre d'équipe : côté des boutons | À gauche | Liste : colonne à gauche ou à droite de la barre flottante, ou rangée horizontale au-dessus. Barre réduite : colonne sous l'icône (à gauche, à droite) ou rangée à sa droite (horizontal). Réglage **par personnage** |
+| Barre d'équipe : réduite à l'icône | Non | La barre flottante ne garde que l'icône Polypode, dans un cadre de la taille d'un bouton de module ; boutons des modules dessous (ou à droite en horizontal). Réglage **par personnage** |
 | Personnages disponibles : regrouper par compte | Non | Range les personnages disponibles sous un en-tête repliable par compte WoW (renseigné par le champ ci-dessous ou Alt + clic sur un personnage), puis « Compte non renseigné ». Réglage **par personnage** |
 | Compte WoW de ce personnage | vide | Champ de texte : nom du compte WoW sur lequel vous jouez ce personnage (enregistré à Entrée ou en quittant le champ, Échap annule ; vide = aucun compte). Visible dans la liste avec l'option « regrouper par compte ». Même réglage que Alt + clic dans la fenêtre ; partagé avec vos autres Polypode |
 | Groupage automatique de l'équipe | Oui | Leader : invite automatiquement dans son groupe les membres de son équipe sélectionnée qui se connectent, ou déjà connectés quand il se connecte lui-même. Membre : accepte automatiquement l'invitation de groupe du leader d'une de ses équipes. Réglage **par personnage** |
@@ -468,6 +476,7 @@ commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, ba
 
 Du plus récent au plus ancien (d'après l'historique des commits).
 
+`0.59.0` : barre flottante réduite à l'icône (option), boutons des modules en rangée horizontale (au-dessus de la barre, ou à droite de l'icône en barre réduite) ; Alt + clic sur l'icône pour figer.
 `0.58.1` : mode solo : bouton « Ajouter la cible » masqué, la liste des personnages remonte à sa place.
 `0.58.0` : `P.RegisterQuestLogCallback` (journal de quêtes reçu ou modifié) pour le panneau « Quêtes » de Polypode Suivi ; Polypode Quêtes obsolète.
 `0.57.0` : petite fenêtre d'options au clic droit sur l'icône de la barre flottante (au lieu du panneau de WoW) ; `P.ToggleOptionsPopup` pour les modules.

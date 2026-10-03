@@ -524,7 +524,7 @@ function P.BuildOptions()
 		category,
 		"POLYPODE_TEAMBAR_MODULE_SIDE",
 		Settings.VarType.String,
-		"Barre d'équipe : côté des boutons des modules",
+		"Barre d'équipe : côté des boutons",
 		"left",
 		function()
 			return P.charDb.teamBar.moduleSide
@@ -534,9 +534,32 @@ function P.BuildOptions()
 			P.RefreshTeamBar()
 		end
 	)
-	AddDropdown(moduleSideSetting, { { "left", "À gauche" }, { "right", "À droite" } },
-		"Côté de la barre flottante d'équipe où se place la colonne des boutons des modules. "
-		.. "Réglage propre à ce personnage.")
+	AddDropdown(moduleSideSetting, { { "left", "À gauche" }, { "right", "À droite" }, { "horizontal", "Horizontal" } },
+		"Place des boutons des modules : colonne à gauche ou à droite de la barre flottante d'équipe, "
+		.. "ou rangée horizontale au-dessus. Barre réduite : colonne sous l'icône (à gauche, à droite), "
+		.. "ou rangée à sa droite (horizontal). Réglage propre à ce personnage.")
+
+	-- Barre réduite à l'icône Polypode (par personnage, UI_TeamBar.lua).
+	local compactSetting = Settings.RegisterProxySetting(
+		category,
+		"POLYPODE_TEAMBAR_COMPACT",
+		Settings.VarType.Boolean,
+		"Barre d'équipe : réduite à l'icône",
+		Settings.Default.False,
+		function()
+			return P.charDb.teamBar.compact
+		end,
+		function(value)
+			P.charDb.teamBar.compact = value
+			P.RefreshTeamBar()
+		end
+	)
+	AddCheck(compactSetting,
+		"La barre flottante d'équipe ne garde que l'icône Polypode, dans un cadre de la taille d'un "
+		.. "bouton de module (nom, liste des personnages et croix masqués) ; les boutons des modules "
+		.. "sont dessous en colonne, ou à droite en rangée avec « Horizontal ». Icône : clic = fenêtre "
+		.. "Polypode, clic droit = options, glisser = déplacer, Alt + clic = figer. Réglage propre à ce "
+		.. "personnage.")
 
 	Settings.RegisterAddOnCategory(category)
 	P.optionsCategory = category
