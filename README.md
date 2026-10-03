@@ -300,9 +300,9 @@ barre de titre de la fenêtre principale (à gauche de la croix) et sa commande 
 - **Polypode Suivi** (https://github.com/Baktov/polypode-suivi) : bouton **Suivi** et
   `/poly suivi`, tableau triable de l'équipe sélectionnée : grande chambre forte, écus, catalyseur,
   ressources, renommées, runes de pouvoir, activités de la semaine, courrier, et avancement des
-  **campagnes** (chapitres, par extension, de Mists of Pandaria à Midnight) ; panneau des
-  activités de l'extension (informations échangées par Polypode, à installer sur chaque personnage
-  suivi).
+  **campagnes** (chapitres, par extension, de Mists of Pandaria à Midnight) ; panneaux des
+  activités de l'extension et de toutes les campagnes (qui les a finies, commencées ou pas faites)
+  (informations échangées par Polypode, à installer sur chaque personnage suivi).
 - **Polypode Data** (https://github.com/Baktov/polypode-data) : bouton **Data** et `/poly data`,
   tableau triable des données durables de tous vos personnages (niveau, niveau d'objet, or, métiers
   et recettes, hauts faits, temps de jeu, équipement, sacs et banques), avec recherche d'objet et
