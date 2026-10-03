@@ -3,10 +3,13 @@
 Addon World of Warcraft pour **gérer simplement plusieurs personnages joués dans
 plusieurs fenêtres WoW sur le même PC** (multiboxing).
 
-Polypode s'inspire de TeamManager, MAMA, EMA et DynamicBoxer, mais vise volontairement
-la simplicité : un roster de vos personnages, des équipes avec leur leader, et une synchronisation
+Polypode s'inspire de TeamManager, MAMA, EMA et DynamicBoxer (merci à Moorea, EbonyFaye, la communauté MultiBox ), mais vise initialement la simplicité : un roster de vos personnages, des équipes avec leur leader, et une synchronisation
 automatique de base entre vos clients — sans configuration complexe.
 
+Des addons ont étendus les fonctionnalités en s'inspirant également d'addons connus mais adapté au contexte multibox initialement ( muslot, myAlts, SavedInstance, AlterEgo, Altoholi, CharacterInfo, Narcissus etc ... ).
+
+Avec la prise en compte de cs addons est venu l'envie de faire un mode Solo (Monopode :D ) qui revient à avoir un équivalent des addons précités (tout en gardant la philosophie de Polypode) : la boucle est bouclée. 
+ 
 ---
 
 ## Installation
@@ -477,6 +480,7 @@ commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, ba
 
 Du plus récent au plus ancien (d'après l'historique des commits).
 
+`2.1.1` : présentation : remerciements, addons compagnons et mode solo (Monopode).
 `2.1.0` : mode solo : le titre de la fenêtre devient « Monopode ».
 `2.0.0` : première version publique (release GitHub v2.0.0), avec Polypode Data, Polypode Profil et Polypode Suivi 2.0.0.
 `0.60.2` : barre réduite : Maj + clic droit sur l'icône masque la barre flottante (pas de croix dans ce mode).
