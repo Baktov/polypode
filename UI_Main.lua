@@ -339,7 +339,7 @@ local function CreateScrollList(panel, formatFn, top, opts)
 	ScrollUtil.InitScrollBoxListWithScrollBar(scrollBox, scrollBar, view)
 	-- Place de la barre réservée à droite seulement quand elle est affichée.
 	local topLeft = CreateAnchor("TOPLEFT", panel, "TOPLEFT", inset, -top)
-	ScrollUtil.AddManagedScrollBarVisibilityBehavior(scrollBox, scrollBar,
+	local behavior = ScrollUtil.AddManagedScrollBarVisibilityBehavior(scrollBox, scrollBar,
 		{ topLeft, CreateAnchor("BOTTOMRIGHT", panel, "BOTTOMRIGHT", -22, 8) },
 		{ topLeft, CreateAnchor("BOTTOMRIGHT", panel, "BOTTOMRIGHT", -inset, 8) })
 
@@ -352,6 +352,14 @@ local function CreateScrollList(panel, formatFn, top, opts)
 
 	panel.scrollBox = scrollBox
 	panel.scrollBar = scrollBar
+	-- Décalage du haut de la liste changé après coup (ex. bouton masqué au-dessus en mode solo) :
+	-- l'ancre commune aux deux dispositions (avec / sans barre) est déplacée puis réappliquée.
+	function panel.SetListTop(newTop)
+		topLeft:SetOffsets(inset, -newTop)
+		panel.emptyText:SetPoint("TOPLEFT", inset, -newTop)
+		behavior.appliedAnchors = nil
+		behavior:EvaluateVisibility(true)
+	end
 	if P.SkinScrollBar then
 		P.SkinScrollBar(scrollBar)
 	end
@@ -682,6 +690,9 @@ local function ApplySoloLayout()
 	local solo = P.IsSoloMode()
 	ui.teamPanel:SetShown(not solo)
 	ui.memberPanel:SetShown(not solo)
+	-- « Ajouter la cible » sert à composer des équipes : masqué en mode solo, la liste remonte.
+	ui.addTargetButton:SetShown(not solo)
+	ui.charPanel.SetListTop(solo and HEADER_HEIGHT or HEADER_HEIGHT + INPUT_HEIGHT)
 	ui.frame:SetWidth(math.max(P.db.mainFrame[WidthKey()] or P.db.mainFrame.width, MIN_WIDTH))
 	LayoutPanels()
 	LayoutTitleButtons()

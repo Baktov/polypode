@@ -210,6 +210,8 @@ personnage.
 - La fenêtre ne garde que **Personnages disponibles**, sur toute sa largeur ; les cadres
   « Équipes » et « Personnages de l'équipe » sont masqués, et la fenêtre est un peu plus étroite
   (620 pixels par défaut ; sa largeur en mode solo est gardée à part de la largeur normale).
+  Le bouton **Ajouter la cible** est masqué (il sert à composer des équipes) et la liste remonte
+  à sa place.
 - Les clics d'équipe sur les personnages sont sans effet ; Alt + clic (compte WoW) et Maj + clic
   (suppression) restent.
 - **Glisser votre personnage** (la ligne « (vous) ») hors de la liste en fait une **barre
@@ -466,6 +468,7 @@ commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, ba
 
 Du plus récent au plus ancien (d'après l'historique des commits).
 
+`0.58.1` : mode solo : bouton « Ajouter la cible » masqué, la liste des personnages remonte à sa place.
 `0.58.0` : `P.RegisterQuestLogCallback` (journal de quêtes reçu ou modifié) pour le panneau « Quêtes » de Polypode Suivi ; Polypode Quêtes obsolète.
 `0.57.0` : petite fenêtre d'options au clic droit sur l'icône de la barre flottante (au lieu du panneau de WoW) ; `P.ToggleOptionsPopup` pour les modules.
 `0.56.1` : barre flottante : clic droit sur l'icône Polypode = options de Polypode.
