@@ -303,7 +303,7 @@ Polypode Suivi ; il peut être désactivé (il ne fait plus que le rappeler).
   ressources, renommées, runes de pouvoir, activités de la semaine, courrier, et avancement des
   **campagnes** (chapitres, par extension, de Mists of Pandaria à Midnight) ; panneaux des
   activités de l'extension, de toutes les campagnes (qui les a finies, commencées ou pas faites) et
-  des **quêtes** du leader (qui ne les a pas, `/poly quetes`) (informations échangées par Polypode,
+  des **quêtes** en cours de l'équipe (qui les a terminées, en cours ou à prendre, `/poly quetes`) (informations échangées par Polypode,
   à installer sur chaque personnage suivi). Polypode échange les journaux de quêtes entre vos
   clients (à la connexion et à chaque quête acceptée, rendue ou abandonnée) ; l'acceptation, la
   validation et le partage automatiques restent dans Polypode.
