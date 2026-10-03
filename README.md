@@ -462,6 +462,7 @@ commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, ba
 
 Du plus récent au plus ancien (d'après l'historique des commits).
 
+`0.55.1` : fenêtres de Polypode et des modules toujours au premier plan avec tout leur contenu (plus de textes mélangés entre fenêtres superposées).
 `0.55.0` : raccourcis « Barbare » (suivre un joueur du groupe au hasard) et « Train » (suivre un joueur du groupe que personne ne suit), message `FOLLOWING`.
 `0.54.2` : mode solo : fenêtre de 700 px par défaut, la case Solo ne touche plus le titre (annulée le jour même : retour à 620 px, version de nouveau 0.54.1).
 `0.54.1` : case Solo : libellé écarté de 5 px de la case (skin EllesmereUI).

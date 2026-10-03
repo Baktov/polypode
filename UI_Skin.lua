@@ -39,9 +39,24 @@ end
 -- Toutes les fonctions suivantes : priorité à EllesmereUI (l'utilisateur a laissé le skin
 -- activé), sinon ElvUI, sinon on garde l'apparence générique de UI_Main.lua.
 
--- Skinne un frame top-level. Le bouton de fermeture est attendu dans frame.CloseButton
--- (convention ElvUI/Blizzard), le titre dans frame.TitleText.
+-- Fenêtre au premier plan de sa strate, avec tout son contenu : sans cela, deux fenêtres de la
+-- même strate (DIALOG pour les compagnons) gardent des niveaux voisins et les lignes, boutons et
+-- textes de celle du dessous se dessinent par-dessus le fond de celle du dessus. SetToplevel la
+-- remonte au clic, Raise à chaque affichage.
+local function KeepOnTop(frame)
+	frame:SetToplevel(true)
+	frame:HookScript("OnShow", function(self)
+		self:Raise()
+	end)
+	if frame:IsShown() then
+		frame:Raise()
+	end
+end
+
+-- Skinne un frame top-level (et le garde au premier plan, skin ou non). Le bouton de fermeture
+-- est attendu dans frame.CloseButton (convention ElvUI/Blizzard), le titre dans frame.TitleText.
 function P.SkinFrame(frame)
+	KeepOnTop(frame)
 	local eui = GetEUISkin()
 	if eui then
 		eui.Shell(frame)
