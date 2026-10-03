@@ -22,11 +22,10 @@ n'ajoute une fonctionnalité que si elle sert directement cet objectif.
 - **Style** : minimaliste, lisible, pas de dépendance externe obligatoire.
 - **Dépendances optionnelles** : EllesmereUI et ElvUI (skinning via `UI_Skin.lua`), jamais requises pour charger.
 - **Addons compagnons** (dossiers voisins, dépôts séparés, `## Dependencies: Polypode`) : **Polypode Photo**
-  (`../Polypode_Photo`, https://github.com/Baktov/Polypode-Photo : mode photo) et **Polypode Quêtes**
-  (`../Polypode_Quetes`, https://github.com/Baktov/Polypode-quetes : fenêtre « Quêtes de l'équipe » —
-  l'échange `QLOG`, `P.GetCharacterQuests` et Quests.lua restent dans Polypode, qui appelle
-  `P.RefreshTeamQuests` s'il est défini) et **Polypode Suivi** (`../Polypode_Suivi`,
-  https://github.com/Baktov/polypode-suivi : suivi de l'équipe et avancement des campagnes, message `SUIVI` à lui) et **Polypode Data**
+  (`../Polypode_Photo`, https://github.com/Baktov/Polypode-Photo : mode photo) et **Polypode Suivi** (`../Polypode_Suivi`,
+  https://github.com/Baktov/polypode-suivi : suivi de l'équipe, campagnes, et panneau « Quêtes » de l'équipe — l'échange `QLOG`,
+  `P.GetCharacterQuests` et Quests.lua restent dans Polypode, qui prévient par `P.RegisterQuestLogCallback(fn)` (Sync.lua, 0.58.0) à
+  chaque journal reçu ou modifié —, message `SUIVI` à lui) et **Polypode Data**
   (`../Polypode_Data`, https://github.com/Baktov/polypode-data : données durables des personnages façon
   DataStore, messages `DATA` / `DATAV` / `DATAREQ` à lui) et **Polypode Profil** (`../Polypode_Profil`,
   https://github.com/Baktov/polypode-profil : chaînes d'export du mode Édition, des talents, de la transmogrification, des titres, des ensembles d'équipement, des options de WoW, des raccourcis, des fenêtres de discussion, de la liste des addons et des addons,
@@ -39,9 +38,9 @@ n'ajoute une fonctionnalité que si elle sert directement cet objectif.
   `P.MAX_MESSAGE_LENGTH` (Sync.lua). API publique qu'ils utilisent (voir leur CLAUDE.md) : `P.AddTitleButton`,
   `P.RegisterSlashCommand`, `P.optionsCategory`, `P.CreatePanel`, `P.CreateScrollList` (`opts.rowHeight`, signalé par `P.LIST_ROW_HEIGHT` : 0.56.0, grille d'icônes de Data), `P.SetListData`,
   `P.SkinFrame`, `P.SkinPanel`, `P.SkinButton`, `P.SkinDropdown`, `P.SkinCheckBox`, `P.ToggleOptionsPopup` (0.57.0 : petite fenêtre d'options au clic droit), `P.UnitNameParts`, `P.JoinSurname`, `P.GetCharacterStatus`,
-  `P.GetCharacterQuests`, `P.GetSelectedTeam`, `P.GetTeamLeader`, `P.GetTeamMembers`, `P.GetCharKey`,
+  `P.GetCharacterQuests`, `P.RegisterQuestLogCallback` (0.58.0), `P.GetSelectedTeam`, `P.GetTeamLeader`, `P.GetTeamMembers`, `P.GetCharKey`,
   `P.GetDisplayName`, `P.db.roster`, `P.SortedKeyItems`, `P.FormatCharacter`, `P.CharacterTooltip`,
-  `P.IsCharacterConnected` (règle « connecté » de « Personnages disponibles », 0.51.2), `P.GetTeamToken`, `P.RefreshUI`, `P.IsSoloMode` (0.54.0 : Suivi impose « Tous les personnages », Quêtes se ferme ; champ `hideInSolo` d'une spec de `P.AddTitleButton`), et les points
+  `P.IsCharacterConnected` (règle « connecté » de « Personnages disponibles », 0.51.2), `P.GetTeamToken`, `P.RefreshUI`, `P.IsSoloMode` (0.54.0 : Suivi impose « Tous les personnages » ; champ `hideInSolo` d'une spec de `P.AddTitleButton`), et les points
   d'extension de synchro ci-dessus : ne pas les renommer ni changer leur comportement sans adapter les
   compagnons.
 

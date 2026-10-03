@@ -486,8 +486,26 @@ function P.SendQuestLog(target)
 	end
 end
 
+-- Journal de quêtes reçu ou modifié : prévient les addons compagnons (panneau « Quêtes » de Polypode
+-- Suivi) par P.RegisterQuestLogCallback(fn) (0.58.0) ; P.RefreshTeamQuests (ancien addon Polypode
+-- Quêtes, obsolète) reste appelé s'il est défini.
+local questLogCallbacks = {}
+
+function P.RegisterQuestLogCallback(callback)
+	questLogCallbacks[#questLogCallbacks + 1] = callback
+end
+
+local function NotifyQuestLog()
+	if P.RefreshTeamQuests then
+		P.RefreshTeamQuests()
+	end
+	for _, callback in ipairs(questLogCallbacks) do
+		callback()
+	end
+end
+
 -- Journal modifié (quête acceptée, rendue, abandonnée ; Quests.lua) : envoi différé de 2 s,
--- puis mise à jour de la fenêtre « Quêtes de l'équipe ».
+-- puis les addons compagnons sont prévenus (NotifyQuestLog).
 function P.ScheduleQuestLog()
 	if questLogPending then
 		return
@@ -496,9 +514,7 @@ function P.ScheduleQuestLog()
 	C_Timer.After(2, function()
 		questLogPending = nil
 		P.SendQuestLog()
-		if P.RefreshTeamQuests then
-			P.RefreshTeamQuests()
-		end
+		NotifyQuestLog()
 	end)
 end
 
@@ -519,9 +535,7 @@ local function OnQuestLogMessage(rest)
 	for id in (list or ""):gmatch("%d+") do
 		log.ids[tonumber(id)] = true
 	end
-	if P.RefreshTeamQuests then
-		P.RefreshTeamQuests()
-	end
+	NotifyQuestLog()
 end
 
 -- Quêtes d'un personnage : { [questID] = true }, lues en direct pour le personnage joué, sinon

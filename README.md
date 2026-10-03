@@ -217,7 +217,7 @@ personnage.
   (niveau, niveau d'objet, vie, durabilité), même poignée, cadenas, croix et **colonne des boutons
   des modules**. Pas d'invitation ni de partage de position. Son affichage est mémorisé à part :
   la barre d'équipe revient en quittant le mode solo.
-- Modules : **Quêtes** est masqué (bouton et colonne de la barre) ; **Suivi** liste toujours tous
+- Modules : **Suivi** liste toujours tous
   les personnages (case « Tous les personnages » cochée et grisée) ; **Profils**, **Photo** et
   **Data** restent disponibles.
 
@@ -244,7 +244,7 @@ rien n'est sélectionné.
   déconnecté est estompée. Mis à jour en continu tant que la liste est dépliée.
 - **Boutons des modules** (option « Barre d'équipe : boutons des modules », cochée par
   défaut) : contre la barre, une colonne verticale de petits boutons reprend ceux des addons
-  compagnons installés (Data, Photo, Profils, Quêtes, Suivi...). Pour rester discrets, seules les
+  compagnons installés (Data, Photo, Profils, Suivi...). Pour rester discrets, seules les
   **trois premières lettres** du nom s'affichent, en petite police ; le clic et l'infobulle sont
   les mêmes que dans la fenêtre Polypode (Photo : clic droit = options). Colonne **à gauche**
   par défaut, **à droite** au choix (option « Barre d'équipe : côté des boutons des modules »).
@@ -290,23 +290,23 @@ multibox a sa propre barre) et retrouvés à la connexion.
 
 ## Addons compagnons (séparés)
 
-Cinq fonctions sont des addons séparés, qui dépendent de Polypode et se chargent ou non depuis
+Quatre fonctions sont des addons séparés, qui dépendent de Polypode et se chargent ou non depuis
 la liste des AddOns ; sans eux, Polypode fonctionne normalement. Chacun ajoute son bouton à la
-barre de titre de la fenêtre principale (à gauche de la croix) et sa commande `/poly` :
+barre de titre de la fenêtre principale (à gauche de la croix) et sa commande `/poly`.
+**Polypode Quêtes** est **obsolète** : ses quêtes de l'équipe sont dans le panneau **Quêtes** de
+Polypode Suivi ; il peut être désactivé (il ne fait plus que le rappeler).
 
-- **Polypode Quêtes** (https://github.com/Baktov/Polypode-quetes) : bouton **Quêtes** et
-  `/poly quetes`, fenêtre des quêtes du leader de l'équipe sélectionnée avec, pour chacune, les
-  membres qui ne l'ont pas. Polypode continue d'échanger les journaux de quêtes entre vos
-  clients (à la connexion et à chaque quête acceptée, rendue ou abandonnée), que la fenêtre
-  utilise ; l'acceptation, la validation et le partage automatiques restent dans Polypode.
 - **Polypode Photo** (https://github.com/Baktov/Polypode-Photo) : bouton **Photo** et
   `/poly photo`, membres du groupe en pied, côte à côte, sur un fond au choix.
 - **Polypode Suivi** (https://github.com/Baktov/polypode-suivi) : bouton **Suivi** et
   `/poly suivi`, tableau triable de l'équipe sélectionnée : grande chambre forte, écus, catalyseur,
   ressources, renommées, runes de pouvoir, activités de la semaine, courrier, et avancement des
   **campagnes** (chapitres, par extension, de Mists of Pandaria à Midnight) ; panneaux des
-  activités de l'extension et de toutes les campagnes (qui les a finies, commencées ou pas faites)
-  (informations échangées par Polypode, à installer sur chaque personnage suivi).
+  activités de l'extension, de toutes les campagnes (qui les a finies, commencées ou pas faites) et
+  des **quêtes** du leader (qui ne les a pas, `/poly quetes`) (informations échangées par Polypode,
+  à installer sur chaque personnage suivi). Polypode échange les journaux de quêtes entre vos
+  clients (à la connexion et à chaque quête acceptée, rendue ou abandonnée) ; l'acceptation, la
+  validation et le partage automatiques restent dans Polypode.
 - **Polypode Data** (https://github.com/Baktov/polypode-data) : bouton **Data** et `/poly data`,
   tableau triable des données durables de tous vos personnages (niveau, niveau d'objet, or, métiers
   et recettes, hauts faits, temps de jeu, équipement, sacs et banques), avec recherche d'objet et
@@ -329,7 +329,7 @@ barre de titre de la fenêtre principale (à gauche de la croix) et sa commande 
 | `/poly ui` | Ouvrir/fermer la fenêtre principale |
 | `/poly minimap` | Afficher/masquer l'icône de minimap |
 | `/poly options` | Ouvrir le panneau d'options (Options → AddOns → Polypode) |
-| `/poly quetes` | Fenêtre des quêtes du leader manquantes chez les membres (addon **Polypode Quêtes**, s'il est installé et activé) |
+| `/poly quetes` | Quêtes du leader manquantes chez les membres : panneau « Quêtes » de **Polypode Suivi**, s'il est installé et activé |
 | `/poly suivi` | Suivi de l'équipe : coffre, écus, ressources, renommées, runes (addon **Polypode Suivi**, s'il est installé et activé) |
 | `/poly data` | Données des personnages : niveau, or, métiers, équipement, sacs, banques, recherche d'objet (addon **Polypode Data**, s'il est installé et activé) |
 | `/poly profil` | Profils : chaînes d'export du mode Édition, des talents, de la transmogrification, des titres, des ensembles d'équipement, des options de WoW, des raccourcis, des fenêtres de discussion, de la liste des addons et des addons (addon **Polypode Profil**, s'il est installé et activé) |
@@ -466,6 +466,7 @@ commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, ba
 
 Du plus récent au plus ancien (d'après l'historique des commits).
 
+`0.58.0` : `P.RegisterQuestLogCallback` (journal de quêtes reçu ou modifié) pour le panneau « Quêtes » de Polypode Suivi ; Polypode Quêtes obsolète.
 `0.57.0` : petite fenêtre d'options au clic droit sur l'icône de la barre flottante (au lieu du panneau de WoW) ; `P.ToggleOptionsPopup` pour les modules.
 `0.56.1` : barre flottante : clic droit sur l'icône Polypode = options de Polypode.
 `0.56.0` : listes défilantes : hauteur de ligne réglable (`opts.rowHeight` de `P.CreateScrollList`), pour l'affichage en icônes de Polypode Data.

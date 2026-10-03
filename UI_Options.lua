@@ -138,8 +138,8 @@ function P.BuildOptions()
 	AddCheck(soloSetting,
 		"Pour jouer un seul personnage : la fenêtre Polypode ne garde que « Personnages disponibles » "
 		.. "(agrandi, fenêtre un peu plus étroite), sans les cadres d'équipe. Glissez votre personnage "
-		.. "hors de la liste pour en faire une barre flottante, avec les boutons des modules (Quêtes "
-		.. "masqué ; Suivi sur tous les personnages). Même case que « Solo » dans la fenêtre. Réglage "
+		.. "hors de la liste pour en faire une barre flottante, avec les boutons des modules (Suivi "
+		.. "sur tous les personnages). Même case que « Solo » dans la fenêtre. Réglage "
 		.. "propre à ce personnage.")
 
 	-- Canal dédié : champ de texte (élément personnalisé, pas de contrôle Settings standard).
@@ -516,7 +516,7 @@ function P.BuildOptions()
 	)
 	AddCheck(moduleButtonsSetting,
 		"Affiche contre la barre flottante d'équipe une colonne de petits boutons reprenant ceux des "
-		.. "modules (Data, Photo, Profils, Quêtes, Suivi... selon les addons installés) : trois premières "
+		.. "modules (Data, Photo, Profils, Suivi... selon les addons installés) : trois premières "
 		.. "lettres, même clic et même infobulle que dans la fenêtre Polypode. Réglage propre à ce "
 		.. "personnage.")
 

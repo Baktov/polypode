@@ -15,8 +15,8 @@ propre `CLAUDE.md` et son `README.md`** :
 | `Polypode_Data` | <https://github.com/Baktov/polypode-data> | données durables des personnages (bouton Data) |
 | `Polypode_Photo` | <https://github.com/Baktov/Polypode-Photo> | mode photo (bouton Photo) |
 | `Polypode_Profil` | <https://github.com/Baktov/polypode-profil> | bibliothèque de chaînes d'export (bouton Profils) |
-| `Polypode_Quetes` | <https://github.com/Baktov/Polypode-quetes> | quêtes de l'équipe (bouton Quêtes) |
-| `Polypode_Suivi` | <https://github.com/Baktov/polypode-suivi> | suivi de l'équipe et des campagnes (bouton Suivi) |
+| `Polypode_Quetes` | <https://github.com/Baktov/Polypode-quetes> | **obsolète** (1.3.0 : ne fait plus que le rappeler) : repris par le panneau « Quêtes » de Suivi |
+| `Polypode_Suivi` | <https://github.com/Baktov/polypode-suivi> | suivi de l'équipe, des activités, des campagnes et des quêtes (bouton Suivi) |
 
 Les compagnons dépendent de Polypode (`## Dependencies: Polypode`) et n'utilisent que son API
 publique `P.*`, listée dans la section « Dépendances vers Polypode » de leur `CLAUDE.md`.
