@@ -434,7 +434,7 @@ fenêtre principale) :
 | Barre d'équipe : boutons des modules | Oui | Colonne de petits boutons (trois premières lettres) reprenant ceux des addons compagnons contre la barre flottante : même clic, même infobulle que dans la fenêtre. Réglage **par personnage** |
 | Barre d'équipe : côté des boutons | À gauche | Liste : colonne à gauche ou à droite de la barre flottante, ou rangée horizontale au-dessus. Barre réduite : colonne sous l'icône (à gauche, à droite) ou rangée à sa droite (horizontal). Réglage **par personnage** |
 | Barre d'équipe : réduite à l'icône | Non | La barre flottante ne garde que l'icône Polypode, dans un cadre de la taille d'un bouton de module ; boutons des modules dessous (ou à droite en horizontal). Réglage **par personnage** |
-| Personnages disponibles : regrouper par compte | Non | Range les personnages disponibles sous un en-tête repliable par compte WoW (renseigné par le champ ci-dessous ou Alt + clic sur un personnage), puis « Compte non renseigné ». Réglage **par personnage** |
+| Personnages disponibles : regrouper par compte | Oui (nouveaux personnages) | Range les personnages disponibles sous un en-tête repliable par compte WoW (renseigné par le champ ci-dessous ou Alt + clic sur un personnage), puis « Compte non renseigné ». Réglage **par personnage** |
 | Compte WoW de ce personnage | vide | Champ de texte : nom du compte WoW sur lequel vous jouez ce personnage (enregistré à Entrée ou en quittant le champ, Échap annule ; vide = aucun compte). Visible dans la liste avec l'option « regrouper par compte ». Même réglage que Alt + clic dans la fenêtre ; partagé avec vos autres Polypode |
 | Groupage automatique de l'équipe | Oui | Leader : invite automatiquement dans son groupe les membres de son équipe sélectionnée qui se connectent, ou déjà connectés quand il se connecte lui-même. Membre : accepte automatiquement l'invitation de groupe du leader d'une de ses équipes. Réglage **par personnage** |
 
@@ -480,6 +480,7 @@ commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, ba
 
 ## Version
 
+`2.1.2` : « Personnages disponibles : regrouper par compte » coché par défaut sur les nouveaux personnages (les autres gardent leur réglage).
 Du plus récent au plus ancien (d'après l'historique des commits).
 
 `2.1.1` : présentation : remerciements, addons compagnons et mode solo (Monopode).

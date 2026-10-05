@@ -366,7 +366,7 @@ function P.BuildOptions()
 		"POLYPODE_GROUP_BY_ACCOUNT",
 		Settings.VarType.Boolean,
 		"Personnages disponibles : regrouper par compte",
-		Settings.Default.False,
+		Settings.Default.True,
 		function()
 			return P.charDb.groupByAccount
 		end,

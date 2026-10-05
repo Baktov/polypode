@@ -63,7 +63,7 @@ P.charDefaults = {
 	followLeaderSound = true, -- membre : appliquer le volume / la coupure du son du leader
 	autoGroup = true, -- inviter (leader) / accepter (membre) l'équipe à la connexion (AutoGroup.lua)
 	followAlert = true, -- alerte du leader quand un membre ne le suit plus (Follow.lua)
-	groupByAccount = false, -- « Personnages disponibles » regroupés par compte (UI_Main.lua)
+	groupByAccount = true, -- « Personnages disponibles » regroupés par compte (UI_Main.lua) ; défaut des nouveaux personnages
 	collapsedAccounts = {}, -- [clé de groupe] = true : groupe de compte replié
 	-- Barre flottante de l'équipe sélectionnée (UI_TeamBar.lua) : affichée, liste dépliée,
 	-- figée (Alt + clic) ; position (point, relativePoint, x, y), largeur (width) et hauteur
