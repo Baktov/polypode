@@ -317,7 +317,8 @@ Polypode Suivi ; il peut être désactivé (il ne fait plus que le rappeler).
   **campagnes** (chapitres, par extension, de Mists of Pandaria à Midnight) ; panneaux des
   activités de l'extension, de toutes les campagnes (qui les a finies, commencées ou pas faites) et
   des **quêtes** en cours de l'équipe (qui les a terminées, en cours ou à prendre, `/poly quetes`) ; sur **WoW Forever**, suivi de
-  l'**Héritage** (points gagnés, dépensés par arbre, à dépenser, défis) (informations échangées par Polypode,
+  l'**Héritage** (points gagnés, dépensés par arbre, à dépenser, défis) ; fenêtre **Grille** de tous
+  les personnages par compte WoW et équipe, et par race / classe (informations échangées par Polypode,
   à installer sur chaque personnage suivi). Polypode échange les journaux de quêtes entre vos
   clients (à la connexion et à chaque quête acceptée, rendue ou abandonnée) ; l'acceptation, la
   validation et le partage automatiques restent dans Polypode.

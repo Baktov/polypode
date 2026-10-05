@@ -25,7 +25,7 @@ n'ajoute une fonctionnalité que si elle sert directement cet objectif.
   (`../Polypode_Photo`, https://github.com/Baktov/Polypode-Photo : mode photo) et **Polypode Suivi** (`../Polypode_Suivi`,
   https://github.com/Baktov/polypode-suivi : suivi de l'équipe, campagnes, et panneau « Quêtes » de l'équipe — l'échange `QLOG`,
   `P.GetCharacterQuests` et Quests.lua restent dans Polypode, qui prévient par `P.RegisterQuestLogCallback(fn)` (Sync.lua, 0.58.0) à
-  chaque journal reçu ou modifié —, message `SUIVI` à lui) et **Polypode Data**
+  chaque journal reçu ou modifié —, messages `SUIVI` et `SUIVIGRID` — réglages de sa fenêtre « Grille » — à lui) et **Polypode Data**
   (`../Polypode_Data`, https://github.com/Baktov/polypode-data : données durables des personnages façon
   DataStore, messages `DATA` / `DATAV` / `DATAREQ` à lui) et **Polypode Profil** (`../Polypode_Profil`,
   https://github.com/Baktov/polypode-profil : chaînes d'export du mode Édition, des talents, de la transmogrification, des titres, des ensembles d'équipement, des options de WoW, des raccourcis, des fenêtres de discussion, de la liste des addons et des addons,
