@@ -481,6 +481,7 @@ commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, ba
 
 ## Version
 
+`2.2.1` : WoW Forever : les invitations de l'équipe (bouton, raccourci, barre, groupage automatique) passent par « Prénom Nom », comme le jeu l'attend ; le groupage automatique reconnaît aussi le leader sous ce nom.
 `2.2.0` : confirmation avant de retirer un personnage d'une équipe (clic gauche dans « Personnages disponibles », clic droit dans « Personnages de l'équipe »).
 `2.1.3` : annonce au groupe quand il s'agrandit : un personnage groupé après sa connexion (sans canal dédié ni guilde commune) reçoit désormais les équipes.
 `2.1.2` : « Personnages disponibles : regrouper par compte » coché par défaut sur les nouveaux personnages (les autres gardent leur réglage).

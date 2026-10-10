@@ -57,10 +57,10 @@ function P.OnTeamCharacterOnline(key)
 	lastInvite[key] = now
 
 	C_Timer.After(INVITE_DELAY, function()
-		local target = P.GetTargetName(entry)
-		if UnitInParty(target) or UnitInRaid(target) then
+		if P.IsEntryInGroup(entry) then
 			return
 		end
+		local target = P.GetInviteName(entry)
 		if IsInGroup() and not UnitIsGroupLeader("player")
 			and not (IsInRaid() and UnitIsGroupAssistant("player")) then
 			P.Debug("Groupage auto : " .. key .. " non invité, vous n'êtes pas chef du groupe")
@@ -77,14 +77,21 @@ end
 
 -- MEMBRE --------------------------------------------------------------------------------
 
+-- Vrai si inviterName désigne le personnage du roster key : « Nom-Royaume », ou sur WoW
+-- Forever « Prénom Nom » (P.GetInviteName).
+local function IsInviter(inviterName, key)
+	local entry = P.GetCharacter(key)
+	return FullNameOfKey(key) == FullName(inviterName)
+		or (entry ~= nil and P.GetInviteName(entry) == inviterName)
+end
+
 -- Vrai si inviterName est le leader d'une équipe dont ce personnage est membre.
 local function IsMyTeamLeader(inviterName)
 	local me = P.GetCharKey()
-	local inviter = FullName(inviterName)
 	for teamName, team in pairs(P.GetTeams()) do
 		local leader = team.leader
 		if leader and leader ~= me and team.members and team.members[me]
-			and FullNameOfKey(leader) == inviter then
+			and IsInviter(inviterName, leader) then
 			return true, teamName
 		end
 	end

@@ -1011,6 +1011,26 @@ function P.GetTargetName(entry)
 	return entry.name .. "-" .. (entry.realm:gsub("[%s%-]", ""))
 end
 
+-- Nom à passer à C_PartyInfo.InviteUnit : sur WoW Forever (noms uniques par région), le jeu
+-- invite par « Prénom Nom » (comme le menu contextuel de Blizzard), pas par « Prénom-Royaume » ;
+-- repli sur P.GetTargetName si le nom de famille n'est pas connu, et sur Retail.
+function P.GetInviteName(entry)
+	if P.HasSurnames() and entry.surname and entry.surname ~= "" then
+		return P.JoinSurname(entry.name, entry.surname)
+	end
+	return P.GetTargetName(entry)
+end
+
+-- Vrai si le personnage du roster est déjà dans le groupe ou le raid (sous l'un ou l'autre nom).
+function P.IsEntryInGroup(entry)
+	for _, name in ipairs({ P.GetInviteName(entry), P.GetTargetName(entry) }) do
+		if UnitInParty(name) or UnitInRaid(name) then
+			return true
+		end
+	end
+	return false
+end
+
 -- Membres de l'équipe à inviter : ni le personnage courant, ni ceux déjà dans le groupe.
 -- Renvoie une liste de noms d'invitation triée.
 function P.GetTeamInvitees(teamName)
@@ -1018,9 +1038,8 @@ function P.GetTeamInvitees(teamName)
 	for key in pairs(P.GetTeamMembers(teamName) or {}) do
 		local entry = P.GetCharacter(key)
 		if entry and entry.name and key ~= P.GetCharKey() then
-			local inviteName = P.GetTargetName(entry)
-			if not UnitInParty(inviteName) and not UnitInRaid(inviteName) then
-				invitees[#invitees + 1] = inviteName
+			if not P.IsEntryInGroup(entry) then
+				invitees[#invitees + 1] = P.GetInviteName(entry)
 			end
 		end
 	end
