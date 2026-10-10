@@ -38,7 +38,8 @@ annoncé.
 - Si vous êtes en groupe, en raid ou dans une guilde commune avec vos autres clients,
   Polypode annonce votre personnage (nom, classe, niveau) à vos autres clients, qui
   répondent en s'annonçant à leur tour : chaque roster connaît tous les personnages,
-  quel que soit l'ordre de connexion.
+  quel que soit l'ordre de connexion. Polypode s'annonce aussi au groupe chaque fois qu'il
+  s'agrandit : grouper un personnage déjà connecté suffit pour qu'il reçoive les équipes.
 - **Canal dédié** (optionnel) : le plus simple reste de grouper vos personnages à la première
   connexion (ou d'avoir une guilde commune), sans rien régler. Le canal dédié sert dans les autres
   cas : plusieurs comptes WoW ou Battle.net, personnages sans guilde commune, pas encore groupés.
@@ -480,6 +481,7 @@ commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, ba
 
 ## Version
 
+`2.1.3` : annonce au groupe quand il s'agrandit : un personnage groupé après sa connexion (sans canal dédié ni guilde commune) reçoit désormais les équipes.
 `2.1.2` : « Personnages disponibles : regrouper par compte » coché par défaut sur les nouveaux personnages (les autres gardent leur réglage).
 Du plus récent au plus ancien (d'après l'historique des commits).
 

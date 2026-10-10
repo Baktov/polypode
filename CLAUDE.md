@@ -206,7 +206,10 @@ type de réponse distinct (`HELLO` → `HI`) pour ne jamais boucler.
 `P.OnSyncMessage` lit `TYPE:token:reste` (`strsplit(":", message, 3)`) puis dispatche selon le type.
 Messages existants :
 - `HELLO` / `HI` : `TYPE:token:nom:royaume:classe:niveau:nomDeFamille` (canal groupe/raid/guilde ; nom de
-  famille vide sur Retail, ajouté en dernier pour rester lisible par les versions précédentes).
+  famille vide sur Retail, ajouté en dernier pour rester lisible par les versions précédentes). `HELLO` part à
+  `PLAYER_LOGIN`, à l'adhésion au canal dédié et au groupe/raid quand il s'agrandit (`P.OnGroupRosterHello`,
+  sur `GROUP_ROSTER_UPDATE`, différé 2 s) : sans canal dédié ni guilde, un personnage groupé après sa
+  connexion n'aurait jamais reçu d'annonce, donc ni roster ni équipes.
 - `TEAM` : `TEAM:token:flag:version:leader:membre1,membre2,...:nomÉquipe`, envoyé par
   `P.SyncTeam(teamName, target, select)` en **WHISPER**. `flag` = `N` (premier fragment), `S`
   (premier fragment + sélection chez le destinataire), `+` (suite) ou `D` (équipe supprimée : un seul

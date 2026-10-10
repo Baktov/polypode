@@ -202,6 +202,29 @@ function P.SayHello(kind, channel)
 		UnitName("player"), GetRealmName(), class, level, surname or ""), channel)
 end
 
+-- Groupe qui s'agrandit : s'y annonce (HELLO), car un client rejoint sans canal dédié ni
+-- guilde commune n'a jamais reçu notre annonce de connexion ; l'échange HELLO/HI qui suit
+-- synchronise roster et équipes. Différé pour regrouper les GROUP_ROSTER_UPDATE en rafale.
+local GROUP_HELLO_DELAY = 2 -- secondes
+local lastHelloGroupSize = 0
+local groupHelloPending = false
+
+function P.OnGroupRosterHello()
+	if groupHelloPending then
+		return
+	end
+	groupHelloPending = true
+	C_Timer.After(GROUP_HELLO_DELAY, function()
+		groupHelloPending = false
+		local size = IsInGroup() and GetNumGroupMembers() or 0
+		if size > lastHelloGroupSize then
+			P.SayHello("HELLO", IsInRaid() and "RAID" or "PARTY")
+			P.Debug("Annonce au groupe (" .. size .. " membres)")
+		end
+		lastHelloGroupSize = size
+	end)
+end
+
 -- ACTIONS DU LEADER (Quests.lua, Cinematics.lua) : le leader de l'équipe sélectionnée
 -- annonce au groupe/raid une action que les membres rejouent (cf. LEADER_ONLY).
 -- Envoie « kind:token:fields » une seule fois par fenêtre de dédoublonnage (window secondes)

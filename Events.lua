@@ -95,6 +95,7 @@ frame:SetScript("OnEvent", function(self, event, ...)
 		P.OnGroupEvent(event, ...)
 		if event == "GROUP_ROSTER_UPDATE" then
 			P.OnFollowRosterUpdate() -- raccourcis Barbare / Train
+			P.OnGroupRosterHello() -- annonce aux nouveaux membres (synchro des équipes)
 		end
 	elseif event == "CHAT_MSG_ADDON" then
 		local prefix, message, channel, sender = ...
