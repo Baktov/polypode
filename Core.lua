@@ -1025,9 +1025,10 @@ function P.GetTargetName(entry)
 	return entry.name .. "-" .. (entry.realm:gsub("[%s%-]", ""))
 end
 
--- Nom à passer à C_PartyInfo.InviteUnit : sur WoW Forever (noms uniques par région), le jeu
--- invite par « Prénom Nom » (comme le menu contextuel de Blizzard), pas par « Prénom-Royaume » ;
--- repli sur P.GetTargetName si le nom de famille n'est pas connu, et sur Retail.
+-- Nom à passer à C_PartyInfo.InviteUnit et aux macros /follow, /assist : sur WoW Forever (noms
+-- uniques par région), le jeu les attend en « Prénom Nom » (comme le menu contextuel de Blizzard),
+-- ni « Prénom-Royaume » ni « Prénom-Nom » (« unité inconnue ») ; repli sur P.GetTargetName si le
+-- nom de famille n'est pas connu, et sur Retail.
 function P.GetInviteName(entry)
 	if P.HasSurnames() and entry.surname and entry.surname ~= "" then
 		return P.JoinSurname(entry.name, entry.surname)

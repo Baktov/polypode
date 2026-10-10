@@ -481,6 +481,7 @@ commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, ba
 
 ## Version
 
+`2.2.4` : WoW Forever : les raccourcis Suivre et Assister visent le leader par « Prénom Nom » (« Prénom-Nom » donnait « Unité inconnue »).
 `2.2.3` : WoW Forever : les membres du groupe sont reconnus par prénom et nom de famille (barre d'équipe : état et barre de vie ; présence dans « Personnages disponibles » ; raccourcis Barbare et Train ; partage des quêtes ; disposition de la barre).
 `2.2.2` : WoW Forever : chuchotements de synchro (équipes, sélection à l'invitation...), macros Suivre / Assister et reconnaissance de l'expéditeur passent par « Prénom-Nom » (sur Forever, ce qui suit le tiret est le nom de famille, pas le royaume).
 `2.2.1` : WoW Forever : les invitations de l'équipe (bouton, raccourci, barre, groupage automatique) passent par « Prénom Nom », comme le jeu l'attend ; le groupage automatique reconnaît aussi le leader sous ce nom.

@@ -106,7 +106,8 @@ local function RefreshMacros()
 	else
 		local entry = P.GetCharacter(leader)
 		if entry then
-			leaderName = P.GetTargetName(entry)
+			-- « Prénom Nom » sur WoW Forever : /follow et /assist n'y connaissent pas « Prénom-Nom ».
+			leaderName = P.GetInviteName(entry)
 		else
 			local name, realm = strsplit("-", leader, 2)
 			leaderName = P.GetTargetName({ name = name, realm = realm or "" })

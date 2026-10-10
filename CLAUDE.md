@@ -11,7 +11,8 @@ Sur Forever, `UnitName(unit)` renvoie **prénom, nom de famille** (Retail : nom,
 son second résultat directement, passer par `P.UnitNameParts(unit)` (prénom, royaume, nom de famille).
 De même, dans un nom de joueur (chuchotement, expéditeur d'un message addon, `/follow`), ce qui suit le tiret
 est le **nom de famille** : `P.GetTargetName` renvoie « Prénom-Nom » sur Forever (nom de famille de l'entrée ou
-du roster), et `P.GetInviteName` « Prénom Nom » pour `C_PartyInfo.InviteUnit`.
+du roster), et `P.GetInviteName` « Prénom Nom » pour `C_PartyInfo.InviteUnit` et les macros `/follow` / `/assist` (UI_Keybinds.lua :
+« Prénom-Nom » y donne « Unité inconnue »).
 Unité du groupe ↔ personnage du roster : toujours par `P.KeyForUnit(unit)` / `P.FindGroupUnit(key)` / `P.IsEntryInGroup(entry)`
 (Core.lua : prénom + royaume, ou prénom + nom de famille sur Forever), jamais par `UnitInParty(nom)` ni en recollant
 `nom-royaume` depuis `UnitName`.
