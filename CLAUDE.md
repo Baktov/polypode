@@ -9,6 +9,9 @@ reste testée avant usage (`if C_X and C_X.Fn then`) pour se désactiver sur For
 `WOW_PROJECT_ID` (Forever est classé mainline). Pas de `ReloadUI()` depuis l'addon (bloqué sur Forever).
 Sur Forever, `UnitName(unit)` renvoie **prénom, nom de famille** (Retail : nom, royaume) : ne jamais lire
 son second résultat directement, passer par `P.UnitNameParts(unit)` (prénom, royaume, nom de famille).
+De même, dans un nom de joueur (chuchotement, expéditeur d'un message addon, `/follow`), ce qui suit le tiret
+est le **nom de famille** : `P.GetTargetName` renvoie « Prénom-Nom » sur Forever (nom de famille de l'entrée ou
+du roster), et `P.GetInviteName` « Prénom Nom » pour `C_PartyInfo.InviteUnit`.
 La clé de roster reste « Prénom-Royaume », le nom de famille est dans `entry.surname` (reçu en fin de
 HELLO/HI) ; tout affichage d'un personnage passe par `P.GetDisplayName(key [, withRealm])` (« Prénom Nom »
 si connu). `P.HasSurnames()` = `RegionalUniqueNamesEnabled()`.

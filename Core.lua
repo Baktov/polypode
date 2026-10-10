@@ -1004,7 +1004,21 @@ end
 -- Nom à passer aux API qui ciblent un joueur (invitation, chuchotement addon) : "Nom" sur
 -- notre royaume, sinon "Nom-Royaume" avec le royaume sous sa forme courte (sans espaces ni
 -- tirets, ex. "ArgentDawn"). entry : entrée du roster.
+-- WoW Forever (noms uniques par région) : ce qui suit le tiret est le nom de famille, pas le
+-- royaume (chuchotement « Prénom-Nom », expéditeur des messages addon, /follow) : "Prénom-Nom"
+-- si le nom de famille est connu (celui de l'entrée, sinon celui du roster pour une entrée
+-- reconstruite depuis une clé).
 function P.GetTargetName(entry)
+	if P.HasSurnames() then
+		local surname = entry.surname
+		if not surname and entry.name and entry.realm and P.db then
+			local known = P.db.roster[entry.name .. "-" .. entry.realm]
+			surname = known and known.surname
+		end
+		if surname and surname ~= "" then
+			return entry.name .. "-" .. surname
+		end
+	end
 	if entry.realm == GetRealmName() then
 		return entry.name
 	end
