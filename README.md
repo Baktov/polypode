@@ -144,7 +144,7 @@ côte à côte :
   s'il n'a pas Polypode (ex. un ami) ; il peut alors rejoindre une équipe et être invité
   avec elle. L'ajout est partagé avec vos autres Polypode connectés.
   Quand une équipe est sélectionnée : **clic droit** sur un personnage l'ajoute à l'équipe,
-  **clic gauche** l'en retire ; les membres de l'équipe sont surlignés en doré. Une infobulle au survol donne le nom du personnage, rappelle ces actions, puis liste les équipes dont il fait déjà partie (l'équipe sélectionnée en vert).
+  **clic gauche** l'en retire, après confirmation ; les membres de l'équipe sont surlignés en doré. Une infobulle au survol donne le nom du personnage, rappelle ces actions, puis liste les équipes dont il fait déjà partie (l'équipe sélectionnée en vert).
   **Maj + clic** sur un personnage le **supprime** de Polypode, après une confirmation qui liste
   ce qui part avec lui : ses équipes, son compte WoW nommé et les données des addons compagnons
   (relevés de Polypode Data et Polypode Suivi, profils de Polypode Profil rangés sous lui). La
@@ -177,8 +177,8 @@ côte à côte :
   présentation que les personnages disponibles.
   - **Clic gauche** sur un membre : il devient **leader de l'équipe** (surbrillance dorée et
     `[leader]`). Chaque équipe a son propre leader.
-  - **Clic droit** : retire le membre de l'équipe ; si c'était le leader, l'équipe n'a plus
-    de leader.
+  - **Clic droit** : retire le membre de l'équipe, après confirmation ; si c'était le leader,
+    l'équipe n'a plus de leader (la confirmation le rappelle).
   - L'infobulle au survol rappelle ces actions et liste les équipes du personnage, avec
     `(leader)` là où il l'est.
   - Bouton **Inviter l'équipe** (en haut du cadre) : invite dans votre groupe tous les
@@ -481,6 +481,7 @@ commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, ba
 
 ## Version
 
+`2.2.0` : confirmation avant de retirer un personnage d'une équipe (clic gauche dans « Personnages disponibles », clic droit dans « Personnages de l'équipe »).
 `2.1.3` : annonce au groupe quand il s'agrandit : un personnage groupé après sa connexion (sans canal dédié ni guilde commune) reçoit désormais les équipes.
 `2.1.2` : « Personnages disponibles : regrouper par compte » coché par défaut sur les nouveaux personnages (les autres gardent leur réglage).
 Du plus récent au plus ancien (d'après l'historique des commits).

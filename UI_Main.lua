@@ -132,6 +132,36 @@ local function ConfirmRemoveCharacter(key)
 	StaticPopup_Show(REMOVE_CHARACTER_POPUP, P.GetDisplayName(key, true), details, key)
 end
 
+-- RETRAIT D'UN MEMBRE (clic gauche dans « Personnages disponibles », clic droit dans
+-- « Personnages de l'équipe ») : confirmation, puis P.RemoveTeamMember (synchronisé).
+-- data = { team = nom de l'équipe, key = clé du personnage }.
+local REMOVE_MEMBER_POPUP = "POLYPODE_REMOVE_MEMBER"
+
+StaticPopupDialogs[REMOVE_MEMBER_POPUP] = {
+	text = "Retirer %s de l'équipe « %s » ?",
+	button1 = REMOVE or "Retirer",
+	button2 = CANCEL,
+	OnAccept = function(_, data)
+		P.RemoveTeamMember(data.team, data.key)
+		P.RefreshUI()
+	end,
+	timeout = 0,
+	whileDead = true,
+	hideOnEscape = true,
+	preferredIndex = 3,
+}
+
+-- Demande confirmation avant de retirer key de l'équipe teamName (rien s'il n'en est pas membre).
+local function ConfirmRemoveMember(teamName, key)
+	local members = P.GetTeamMembers(teamName)
+	if not members or not members[key] then
+		return
+	end
+	local extra = P.GetTeamLeader(teamName) == key and "\n\n(c'est le leader : l'équipe n'aura plus de leader)" or ""
+	StaticPopup_Show(REMOVE_MEMBER_POPUP, P.GetDisplayName(key, true), teamName .. extra,
+		{ team = teamName, key = key })
+end
+
 local function ShowAccountMenu(owner, key)
 	local function IsCurrent(label)
 		return (P.GetCharacterAccount(key) or "") == label
@@ -917,10 +947,10 @@ function P.BuildUI()
 			-- Clic droit = ajouter (comme la création d'équipe au clic droit), clic gauche = retirer.
 			if mouseButton == "RightButton" then
 				P.AddTeamMember(selectedTeam, data.key)
+				P.RefreshUI()
 			else
-				P.RemoveTeamMember(selectedTeam, data.key)
+				ConfirmRemoveMember(selectedTeam, data.key)
 			end
-			P.RefreshUI()
 		end,
 		isSelected = function(data)
 			if data.header or P.IsSoloMode() then
@@ -1100,11 +1130,11 @@ function P.BuildUI()
 				return
 			end
 			if mouseButton == "RightButton" then
-				P.RemoveTeamMember(selectedTeam, data.key)
+				ConfirmRemoveMember(selectedTeam, data.key)
 			else
 				P.SetTeamLeader(selectedTeam, data.key)
+				P.RefreshUI()
 			end
-			P.RefreshUI()
 		end,
 		isSelected = function(data)
 			return P.GetTeamLeader(selectedTeam) == data.key
