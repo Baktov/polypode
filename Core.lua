@@ -1035,14 +1035,84 @@ function P.GetInviteName(entry)
 	return P.GetTargetName(entry)
 end
 
--- Vrai si le personnage du roster est déjà dans le groupe ou le raid (sous l'un ou l'autre nom).
-function P.IsEntryInGroup(entry)
-	for _, name in ipairs({ P.GetInviteName(entry), P.GetTargetName(entry) }) do
-		if UnitInParty(name) or UnitInRaid(name) then
-			return true
+-- UNITÉS DU GROUPE ET ROSTER : un personnage du roster est reconnu sur une unité par son
+-- prénom et son royaume, ou sur WoW Forever par son prénom et son nom de famille (UnitName y
+-- renvoie le nom de famille à la place du royaume, et les noms y sont uniques par région).
+-- Royaumes comparés sans espaces (ceux de UnitName n'en ont pas, ceux de GetRealmName oui).
+
+-- Vrai si l'unité (nom déjà lu par P.UnitNameParts) est le personnage entry du roster.
+local function UnitMatchesEntry(entry, name, realm, surname)
+	if name ~= entry.name then
+		return false
+	end
+	if P.HasSurnames() and surname and entry.surname then
+		return surname == entry.surname
+	end
+	return ((realm or GetRealmName()):gsub("%s", "")) == ((entry.realm or ""):gsub("%s", ""))
+end
+
+-- Prénom, royaume et nom de famille lisibles d'une unité, ou nil (nom secret, unité vide).
+local function ReadableNameParts(unit)
+	local name, realm, surname = P.UnitNameParts(unit)
+	if not name or (issecretvalue and (issecretvalue(name) or issecretvalue(realm) or issecretvalue(surname))) then
+		return nil
+	end
+	return name, realm, surname
+end
+
+-- Unités du groupe ou du raid, « player » compris (noms préparés une fois : la barre
+-- d'équipe les parcourt plusieurs fois par seconde).
+local PARTY_UNITS, RAID_UNITS = {}, {}
+for i = 1, 4 do
+	PARTY_UNITS[i] = "party" .. i
+end
+for i = 1, 40 do
+	RAID_UNITS[i] = "raid" .. i
+end
+
+local function GroupUnits()
+	local units = { "player" }
+	local list, count = PARTY_UNITS, GetNumSubgroupMembers()
+	if IsInRaid() then
+		list, count = RAID_UNITS, GetNumGroupMembers()
+	end
+	for i = 1, math.min(count, #list) do
+		units[#units + 1] = list[i]
+	end
+	return units
+end
+
+-- Clé de roster du personnage affiché par unit, ou nil s'il n'est pas dans le roster.
+function P.KeyForUnit(unit)
+	local name, realm, surname = ReadableNameParts(unit)
+	if not name then
+		return nil
+	end
+	for key, entry in pairs(P.db.roster) do
+		if UnitMatchesEntry(entry, name, realm, surname) then
+			return key
 		end
 	end
-	return false
+end
+
+-- Unité du groupe (player, partyN, raidN) du personnage key, ou nil s'il n'est pas groupé.
+function P.FindGroupUnit(key)
+	local entry = P.db.roster[key]
+	if not entry then
+		local name, realm = strsplit("-", key, 2)
+		entry = { name = name, realm = realm }
+	end
+	for _, unit in ipairs(GroupUnits()) do
+		local name, realm, surname = ReadableNameParts(unit)
+		if name and UnitMatchesEntry(entry, name, realm, surname) then
+			return unit
+		end
+	end
+end
+
+-- Vrai si le personnage du roster est déjà dans le groupe ou le raid.
+function P.IsEntryInGroup(entry)
+	return P.FindGroupUnit(entry.name .. "-" .. entry.realm) ~= nil
 end
 
 -- Membres de l'équipe à inviter : ni le personnage courant, ni ceux déjà dans le groupe.

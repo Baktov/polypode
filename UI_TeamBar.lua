@@ -40,12 +40,6 @@ local function ShownKey()
 	return P.IsSoloMode() and "soloShown" or "shown"
 end
 
--- Clé nom-royaume comparable : les royaumes renvoyés par UnitName n'ont pas d'espace
--- (« Chantséternels »), ceux de GetRealmName (clés du roster) en ont.
-local function NormalizeKey(key)
-	return (key:gsub("%s", ""))
-end
-
 -- Durée écoulée depuis un instant GetTime(), en clair.
 local function FormatAgo(since)
 	local minutes = math.floor((GetTime() - since) / 60)
@@ -142,27 +136,9 @@ local function FormatDetailed(data)
 end
 
 -- Unité du groupe (player, partyN, raidN) correspondant à un personnage du roster, ou nil
--- s'il n'est pas groupé avec nous. Un nom rendu secret par WoW (issecretvalue) est ignoré.
+-- s'il n'est pas groupé avec nous (P.FindGroupUnit, Core.lua : aussi par nom de famille sur Forever).
 local function FindGroupUnit(key)
-	local wanted = NormalizeKey(key)
-	local units = { "player" }
-	if IsInRaid() then
-		for i = 1, GetNumGroupMembers() do
-			units[#units + 1] = "raid" .. i
-		end
-	else
-		for i = 1, GetNumSubgroupMembers() do
-			units[#units + 1] = "party" .. i
-		end
-	end
-	for _, unit in ipairs(units) do
-		local name, realm = P.UnitNameParts(unit)
-		if name and not (issecretvalue and (issecretvalue(name) or issecretvalue(realm))) then
-			if NormalizeKey(name .. "-" .. (realm or GetRealmName())) == wanted then
-				return unit
-			end
-		end
-	end
+	return P.FindGroupUnit(key)
 end
 
 -- Mémorise la position de la barre pour ce personnage.

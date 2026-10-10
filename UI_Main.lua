@@ -492,9 +492,9 @@ local function IsConnected(key)
 	end
 	local entry = P.GetCharacter(key)
 	if entry and entry.name then
-		local name = P.GetTargetName(entry)
-		if UnitInParty(name) or UnitInRaid(name) then
-			local connected = UnitIsConnected(name)
+		local unit = P.FindGroupUnit(key)
+		if unit then
+			local connected = UnitIsConnected(unit)
 			return not (issecretvalue and issecretvalue(connected)) and connected == true
 		end
 	end

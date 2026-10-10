@@ -587,9 +587,8 @@ function P.SyncTeamBarLayout(teamName, layout)
 	for key in pairs(P.GetTeamMembers(teamName) or {}) do
 		local entry = P.GetCharacter(key)
 		if entry and entry.name and key ~= P.GetCharKey() then
-			local name = P.GetTargetName(entry)
-			if P.IsCharacterOnline(key) or UnitInParty(name) or UnitInRaid(name) then
-				P.Broadcast(message, "WHISPER", name)
+			if P.IsCharacterOnline(key) or P.FindGroupUnit(key) then
+				P.Broadcast(message, "WHISPER", P.GetTargetName(entry))
 				sent = sent + 1
 			end
 		end

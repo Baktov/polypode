@@ -64,7 +64,9 @@ local function GroupMembers()
 		if not UnitIsUnit(unit, "player") and UnitIsConnected(unit) then
 			local name, realm = P.UnitNameParts(unit)
 			if name and not (issecretvalue and (issecretvalue(name) or issecretvalue(realm))) then
-				members[#members + 1] = { unit = unit, name = name, key = NormalizeKey(realm and name .. "-" .. realm or name) }
+				-- Clé du roster si connu (sur Forever, le second nom de UnitName est le nom de famille).
+				local key = P.KeyForUnit(unit) or (realm and name .. "-" .. realm or name)
+				members[#members + 1] = { unit = unit, name = name, key = NormalizeKey(key) }
 			end
 		end
 	end

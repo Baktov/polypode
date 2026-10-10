@@ -213,8 +213,7 @@ local function GroupedTeamMembers()
 	for key in pairs(P.GetTeamMembers(P.GetSelectedTeam()) or {}) do
 		local entry = P.GetCharacter(key)
 		if entry and entry.name and key ~= P.GetCharKey() then
-			local name = P.GetTargetName(entry)
-			if UnitInParty(name) or UnitInRaid(name) then
+			if P.FindGroupUnit(key) then
 				members[key] = P.GetDisplayName(key)
 			end
 		end
