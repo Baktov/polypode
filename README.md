@@ -492,6 +492,16 @@ commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, ba
 à activer seulement si le besoin se confirme (voir la règle de simplicité dans
 `CLAUDE.md`) :
 
+- **Ordre des comptes** (demandé le 2026-10-11 ; en attendant, préfixer les noms par un numéro,
+  « 1 baktov », « 2 wow1 »..., le tri étant alphabétique) : choisir l'ordre des comptes WoW dans
+  « Personnages disponibles » regroupés par compte. Deux variantes :
+  1. **Glisser/déposer** d'un en-tête de compte sur un autre (repère visuel pendant le glisser ;
+     cible trouvée au lâcher, pas de modèle Blizzard tout fait pour réordonner une ScrollBox).
+  2. **Menu Alt + clic sur l'en-tête** : « Monter », « Descendre » et « Renommer... » (le
+     renommage actuel passe dans ce menu).
+  Dans les deux cas : ordre commun au compte (`P.db`), versionné et synchronisé entre les clients
+  ouverts (nouveau message, comme `ACCT`) ; un compte absent de l'ordre va à la fin, avant
+  « Compte non renseigné » ; un renommage (`P.RenameAccount`) garde la place du compte.
 - Réannonce à l'entrée en groupe (`GROUP_ROSTER_UPDATE`) pour les personnages sans
   guilde commune connectés avant d'être groupés.
 - **Équipes** : usage des équipes (conversion en raid automatique, leader).
