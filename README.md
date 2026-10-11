@@ -511,6 +511,10 @@ commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, ba
      dans le roster n'est pas écrasé (sa première connexion complète le reste) : coller deux fois
      la même liste ne crée aucun doublon ni aucune nouvelle version à synchroniser. Un personnage
      retiré n'est pas recréé par l'import (seule sa connexion le fait revenir, comme aujourd'hui).
+     Fenêtre aussi ouverte par un bouton « Importer des personnages » du panneau d'options
+     (Options → AddOns → Polypode), près des réglages de compte : `CreateSettingsButtonInitializer`
+     de Blizzard (présent sur Retail et Forever, testé avant usage), infobulle qui rappelle
+     `/poly import` ; la fenêtre s'affiche devant le panneau, comme celle de « Gestion liste token ».
   3. **Actions de l'utilisateur** (ce sont les étapes que la notice décrira pour tout le monde) : créer un client sur <https://develop.battle.net> (redirection
      `http://localhost:8765/callback`), noter l'identifiant et le secret, installer Python et
      `requests` ; lancer le script et se connecter une seule fois, avec le compte Battle.net BAKTOV
