@@ -86,9 +86,10 @@ $env:BNET_CLIENT_ID = "votre client id"
 $env:BNET_CLIENT_SECRET = "votre client secret"
 ```
 
-Si le programme n'est pas dans le dossier `Interface\AddOns\Polypode\tools` d'une installation,
-indiquer le dossier du jeu avec `--wow-dir` (celui qui contient `WTF`, par exemple
-`--wow-dir "D:\Jeux\World of Warcraft\_retail_"`).
+Le dossier du jeu est trouvé seul quand le programme est dans `Interface\AddOns\Polypode\tools`,
+sinon par l'emplacement de Retail que Battle.net inscrit dans Windows. Pour une autre version
+(Classic) ou une installation déplacée, l'indiquer avec `--wow-dir` (le dossier qui contient
+`WTF`, par exemple `--wow-dir "D:\Jeux\World of Warcraft\_classic_era_"`).
 
 ## Étape 3 : importer dans le jeu
 

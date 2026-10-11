@@ -1,13 +1,16 @@
 # Modules Polypode : conventions communes et documentation
 
 Fichier partagé, **importé** (`@`) par le `CLAUDE.md` de Polypode, par celui de chaque compagnon
-(`@../Polypode/MODULES.md`) et par `Interface/AddOns/CLAUDE.md` : il est donc chargé quel que soit
+(`@../Polypode/MODULES.md`) et par le `CLAUDE.md` local du dossier des modules : il est donc chargé quel que soit
 le dossier ouvert. À garder court ; le détail propre à un module va dans son `CLAUDE.md`.
 
 ## Les modules
 
-Chaque module est un **dépôt git séparé** (dossier voisin dans `Interface/AddOns`) avec **son
-propre `CLAUDE.md` et son `README.md`** :
+Chaque module est un **dépôt git séparé** (dossiers voisins) avec **son propre `CLAUDE.md` et son
+`README.md`**. Sur le poste de développement, les modules sont dans `C:\PROJETS\CLAUDE\ADDONS_POLYPODE`
+(hors du dossier du jeu, que les mises à jour de Battle.net ne doivent pas trouver verrouillé),
+reliés à `Interface\AddOns` de Retail et de WoW Forever par des **jonctions** (`mklink /J`) ;
+travailler dans `ADDONS_POLYPODE` (son `CLAUDE.md` local importe ce fichier) :
 
 | Dossier | Dépôt | Rôle |
 |---|---|---|
@@ -94,11 +97,12 @@ Squelette prêt à copier : `Polypode/Modele/` (voir son `LISEZMOI.txt`). Démar
    section « Version » avec `` `1.0.0` : première version… ``).
 6. **Déclarer le module dans Polypode** (commit dans ce dépôt) : ligne du tableau « Les modules »
    ci-dessus, section « Addons compagnons » du `README.md` de Polypode (et son nombre), liste des
-   compagnons / API publique de son `CLAUDE.md` ; ajouter aussi le dossier dans
-   `Interface/AddOns/CLAUDE.md` (local).
+   compagnons / API publique de son `CLAUDE.md` ; ajouter aussi le dossier dans le `CLAUDE.md`
+   local de `ADDONS_POLYPODE`.
 7. **Vérifier et publier** : `luac -p`, linter WoW (`wow_lua_lint`), test en jeu (`/reload`, et
-   WoW Forever si pertinent) ; commit « Polypode X 1.0.0 : … » puis push ; installer le module sur
-   chaque installation (`git clone`) et l'activer sur les personnages concernés.
+   WoW Forever si pertinent) ; commit « Polypode X 1.0.0 : … » puis push ; le relier au jeu
+   (`mklink /J "<jeu>\Interface\AddOns\Polypode_X" "C:\PROJETS\CLAUDE\ADDONS_POLYPODE\Polypode_X"`, Retail
+   et Forever ; ailleurs : `git clone` dans `Interface\AddOns`) et l'activer sur les personnages concernés.
 
 ## Outillage (Windows)
 

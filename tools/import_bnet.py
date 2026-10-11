@@ -283,7 +283,9 @@ def parse_saved_variables(text):
 
 def find_wow_dir(explicit):
     """Dossier de la version du jeu (celui qui contient WTF) : donné, ou cherché depuis le script
-    (installé dans Interface/AddOns/Polypode/tools) puis depuis le dossier courant."""
+    (installé dans Interface/AddOns/Polypode/tools) puis depuis le dossier courant, sinon dossier
+    d'installation de Retail inscrit par Battle.net dans le registre Windows (addon développé
+    ailleurs et relié à Interface/AddOns par une jonction)."""
     if explicit:
         if not os.path.isdir(os.path.join(explicit, "WTF")):
             raise ScriptError("Pas de dossier WTF dans {}.".format(explicit))
@@ -297,6 +299,25 @@ def find_wow_dir(explicit):
             if parent == folder:
                 break
             folder = parent
+    installed = registry_install_path()
+    if installed and os.path.isdir(os.path.join(installed, "WTF", "Account")):
+        return installed
+    return None
+
+
+def registry_install_path():
+    """InstallPath de World of Warcraft (Retail) dans le registre Windows, ou None."""
+    try:
+        import winreg
+    except ImportError:
+        return None  # hors Windows
+    for view in (r"SOFTWARE\WOW6432Node\Blizzard Entertainment\World of Warcraft",
+                 r"SOFTWARE\Blizzard Entertainment\World of Warcraft"):
+        try:
+            with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, view) as key:
+                return os.path.normpath(winreg.QueryValueEx(key, "InstallPath")[0])
+        except OSError:
+            continue
     return None
 
 
