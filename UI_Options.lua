@@ -382,6 +382,16 @@ function P.BuildOptions()
 		.. "les autres vont dans « Compte non renseigné ». Réglage propre à ce personnage.")
 	-- Compte WoW du personnage connecté : champ de texte (élément personnalisé).
 	layout:AddInitializer(Settings.CreateElementInitializer("PolypodeAccountSettingTemplate", {}))
+	-- Import d'une liste de personnages (fenêtre UI_Import.lua, aussi par /poly import).
+	if CreateSettingsButtonInitializer then
+		layout:AddInitializer(CreateSettingsButtonInitializer("Importer des personnages", "Importer",
+			function()
+				P.ShowImportWindow()
+			end,
+			"Ouvre la fenêtre où coller la liste de vos personnages (produite par "
+			.. "Polypode\\tools\\import_bnet.py, voir tools\\IMPORT_BNET.md) pour les ajouter au roster "
+			.. "sans les connecter un par un. Aussi par la commande /poly import.", true))
+	end
 
 	-- Groupage automatique de l'équipe à la connexion (par personnage, cf. AutoGroup.lua).
 	local autoGroupSetting = Settings.RegisterProxySetting(

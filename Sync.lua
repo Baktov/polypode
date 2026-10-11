@@ -22,6 +22,13 @@ local function Hash(str)
 	return string.format("%08x", h)
 end
 
+-- Token d'un BattleTag donné (même calcul que P.GetTeamToken), ex. pour l'import de personnages.
+function P.TokenForBattleTag(battleTag)
+	if battleTag and battleTag ~= "" then
+		return Hash(battleTag)
+	end
+end
+
 -- Token partagé par tous les personnages d'un même compte Battle.net (tous les comptes
 -- WoW d'un Battle.net ont le même BattleTag). Autres comptes Battle.net : cf. comptes autorisés.
 function P.GetTeamToken()

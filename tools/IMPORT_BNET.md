@@ -42,7 +42,7 @@ nom de son dossier, et le programme signale les personnages à ranger à nouveau
   python.exe to PATH » à l'installation). Aucune autre bibliothèque n'est nécessaire.
 - **Un compte Battle.net avec l'authentificateur activé**, exigé par Blizzard pour créer un client
   développeur.
-- **Polypode** installé (le programme est livré dans son dossier `tools`).
+- **Polypode 2.3.0 ou plus récent** installé (le programme est livré dans son dossier `tools`).
 
 ## Étape 1 : créer un client Battle.net (une seule fois)
 

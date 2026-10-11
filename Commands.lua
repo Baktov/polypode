@@ -17,6 +17,7 @@ local function PrintHelp()
 	print("  /poly list         — lister les personnages connus")
 	print("  /poly addme        — ajouter le personnage courant au roster")
 	print("  /poly remove <nom-royaume> — retirer un personnage du roster")
+	print("  /poly import       — importer une liste de personnages (copier/coller)")
 	print("  /poly ui           — ouvrir/fermer la fenêtre")
 	print("  /poly minimap      — afficher/masquer l'icône de minimap")
 	print("  /poly options      — ouvrir le panneau d'options")
@@ -63,6 +64,8 @@ local function SlashHandler(msg)
 		else
 			print("Usage: /poly remove <nom-royaume>")
 		end
+	elseif sub == "import" then
+		P.ShowImportWindow()
 	elseif sub == "ui" then
 		P.ToggleUI()
 	elseif sub == "minimap" then

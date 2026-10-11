@@ -205,6 +205,27 @@ par défaut). Si la fenêtre est très réduite, le contenu est simplement tronq
 
 ---
 
+## Importer des personnages
+
+Polypode ne connaît un personnage qu'après sa première connexion avec l'addon. Pour composer des
+équipes à l'avance, on peut **importer la liste de ses personnages** :
+
+1. Hors du jeu, le programme [`tools/import_bnet.py`](tools/import_bnet.py) récupère auprès de
+   Blizzard (API Battle.net) tous les personnages des comptes WoW de votre compte Battle.net et
+   écrit `polypode_import.txt` (mode d'emploi : [`tools/IMPORT_BNET.md`](tools/IMPORT_BNET.md)).
+   Il ne sort que les personnages absents du roster et peut être relancé à volonté.
+2. Dans le jeu, `/poly import` ou le bouton **Importer des personnages** du panneau d'options ouvre
+   une fenêtre où coller ces lignes (Ctrl+V), puis **Importer**. On peut aussi taper une ligne par
+   personnage : `Nom-Royaume;CLASSE;niveau;compte` (seul le nom est obligatoire ; sans royaume,
+   celui du personnage connecté ; lignes vides et lignes commençant par `#` ignorées).
+
+Les personnages inconnus sont ajoutés au roster et partagés avec vos autres Polypode, rangés dans
+le compte WoW indiqué. Un personnage déjà connu n'est pas modifié (il reçoit seulement le compte
+indiqué s'il n'en a pas), un personnage retiré n'est pas recréé : importer deux fois la même liste
+ne crée aucun doublon. Le compte rendu (ajoutés, déjà connus, retirés, lignes illisibles)
+s'affiche sous la zone de texte. Un personnage importé apparaît sans être connecté ; sa première
+connexion complète le reste.
+
 ## Mode solo
 
 Pour jouer **un seul personnage** : case **Solo** (en rouge, à droite du champ Canal de la fenêtre
@@ -342,6 +363,7 @@ Polypode Suivi ; il peut être désactivé (il ne fait plus que le rappeler).
 | `/poly list` | Lister les personnages connus (roster) |
 | `/poly addme` | Ajouter/réannoncer le personnage courant |
 | `/poly remove <nom-royaume>` | Retirer un personnage du roster |
+| `/poly import` | Ouvrir la fenêtre d'import d'une liste de personnages (voir « Importer des personnages ») |
 | `/poly ui` | Ouvrir/fermer la fenêtre principale |
 | `/poly minimap` | Afficher/masquer l'icône de minimap |
 | `/poly options` | Ouvrir le panneau d'options (Options → AddOns → Polypode) |
@@ -437,6 +459,7 @@ fenêtre principale) :
 | Barre d'équipe : réduite à l'icône | Non | La barre flottante ne garde que l'icône Polypode, dans un cadre de la taille d'un bouton de module ; boutons des modules dessous (ou à droite en horizontal). Réglage **par personnage** |
 | Personnages disponibles : regrouper par compte | Oui (nouveaux personnages) | Range les personnages disponibles sous un en-tête repliable par compte WoW (renseigné par le champ ci-dessous ou Alt + clic sur un personnage), puis « Compte non renseigné ». Réglage **par personnage** |
 | Compte WoW de ce personnage | vide | Champ de texte : nom du compte WoW sur lequel vous jouez ce personnage (enregistré à Entrée ou en quittant le champ, Échap annule ; vide = aucun compte). Visible dans la liste avec l'option « regrouper par compte ». Même réglage que Alt + clic dans la fenêtre ; partagé avec vos autres Polypode |
+| Importer des personnages | — | Bouton : ouvre la fenêtre d'import d'une liste de personnages, comme `/poly import` (voir « Importer des personnages ») |
 | Groupage automatique de l'équipe | Oui | Leader : invite automatiquement dans son groupe les membres de son équipe sélectionnée qui se connectent, ou déjà connectés quand il se connecte lui-même. Membre : accepte automatiquement l'invitation de groupe du leader d'une de ses équipes. Réglage **par personnage** |
 
 ---
@@ -467,39 +490,6 @@ commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, ba
 à activer seulement si le besoin se confirme (voir la règle de simplicité dans
 `CLAUDE.md`) :
 
-- **Import de la liste des personnages** (en cours, demandé le 2026-10-11) : remplir le roster avec
-  tous les personnages des comptes, sans les connecter un par un, pour composer les équipes
-  d'avance. WoW ne donne pas cette liste aux addons ; l'API Profile de Blizzard
-  (`GET /profile/user/wow`) la donne par compte Battle.net, groupée par compte WoW (`wow_accounts`,
-  identifiés par un numéro, sans nom). Plan :
-  1. **Script Python** : **fait** — [`tools/import_bnet.py`](tools/import_bnet.py), notice
-     utilisateur [`tools/IMPORT_BNET.md`](tools/IMPORT_BNET.md) (ce qu'il fait, prérequis, client
-     Battle.net, lancement, options, versions du jeu, problèmes courants). Connexion OAuth
-     (`oauth.battle.net`, droits `openid wow.profile`), `/profile/user/wow` et BattleTag
-     (`/userinfo`) ; compte WoW relié à son dossier `WTF/Account/<compte>` par les identifiants de
-     `character-list-order.txt` ; nom du compte repris des comptes nommés de Polypode, sinon du
-     dossier ; ne sort que les personnages absents du roster (lu dans les SavedVariables, retirés
-     compris ; `--all`) ; `--check`, `--probe`, `--namespace`, `--wow-dir`... ; bibliothèque
-     standard de Python seulement, lecture seule, jeton jamais enregistré. Vérifié avec la vraie
-     API (`--check`, 2026-10-11) : 8 comptes WoW, 173 personnages, l'`id` des personnages est bien
-     celui de `character-list-order.txt` (5 comptes reliés à 100 % à leur dossier) ; un même nom
-     de compte Polypode sur deux comptes WoW n'est gardé que pour l'un (avertissement).
-  2. **Addon : `/poly import`** : fenêtre à zone de texte défilante où coller ces lignes (ou les
-     taper à la main) ; chaque ligne valide crée l'entrée comme un ajout manuel (`P.AddCharacter`,
-     puis version et synchro `CHAR` comme « Ajouter la cible »), range le personnage dans le compte
-     nommé (`P.SetCharacterAccount`) et renseigne `entry.token` (hash du BattleTag, comme
-     `P.GetTeamToken`) ; compte rendu ajoutés / déjà connus / lignes refusées ; un personnage déjà
-     dans le roster n'est pas écrasé (sa première connexion complète le reste) : coller deux fois
-     la même liste ne crée aucun doublon ni aucune nouvelle version à synchroniser. Un personnage
-     retiré n'est pas recréé par l'import (seule sa connexion le fait revenir, comme aujourd'hui).
-     Fenêtre aussi ouverte par un bouton « Importer des personnages » du panneau d'options
-     (Options → AddOns → Polypode), près des réglages de compte : `CreateSettingsButtonInitializer`
-     de Blizzard (présent sur Retail et Forever, testé avant usage), infobulle qui rappelle
-     `/poly import` ; la fenêtre s'affiche devant le panneau, comme celle de « Gestion liste token ».
-  3. **Actions de l'utilisateur** (étapes décrites pour tous par la notice) : créer un client sur <https://develop.battle.net> (redirection
-     `http://localhost:8765/callback`), noter l'identifiant et le secret, installer Python ; lancer le script et se connecter une seule fois, avec le compte Battle.net BAKTOV
-     (tous les comptes WoW — dossiers 360252#1, 360252#2, ALTHEANA, BAKTOV — y sont rattachés) ; coller le résultat dans `/poly import` ;
-     vérifier les comptes et classes affichés.
 - Réannonce à l'entrée en groupe (`GROUP_ROSTER_UPDATE`) pour les personnages sans
   guilde commune connectés avant d'être groupés.
 - **Équipes** : usage des équipes (conversion en raid automatique, leader).
@@ -514,6 +504,7 @@ commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, ba
 
 ## Version
 
+`2.3.0` : import d'une liste de personnages (`/poly import`, bouton « Importer des personnages » des options) et programme `tools/import_bnet.py` qui la récupère auprès de Blizzard.
 `2.2.4` : WoW Forever : les raccourcis Suivre et Assister visent le leader par « Prénom Nom » (« Prénom-Nom » donnait « Unité inconnue »).
 `2.2.3` : WoW Forever : les membres du groupe sont reconnus par prénom et nom de famille (barre d'équipe : état et barre de vie ; présence dans « Personnages disponibles » ; raccourcis Barbare et Train ; partage des quêtes ; disposition de la barre).
 `2.2.2` : WoW Forever : chuchotements de synchro (équipes, sélection à l'invitation...), macros Suivre / Assister et reconnaissance de l'expéditeur passent par « Prénom-Nom » (sur Forever, ce qui suit le tiret est le nom de famille, pas le royaume).

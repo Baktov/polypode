@@ -416,6 +416,21 @@ function P.AddTargetCharacter()
 	return true, key
 end
 
+-- Importe un personnage (liste collée dans la fenêtre d'import, UI_Import.lua) comme un ajout
+-- manuel partagé avec les autres Polypode. Un personnage déjà connu n'est pas touché, un
+-- personnage retiré n'est pas recréé (seule sa connexion le fait revenir) : importer deux fois
+-- la même liste ne change rien. Renvoie "added", "known" ou "removed", et la clé.
+function P.ImportCharacter(name, realm, class, level, token)
+	local key = P.GetCharKey(name, realm)
+	local entry = P.db.roster[key]
+	if entry then
+		return entry.removed and "removed" or "known", key
+	end
+	P.db.roster[key] = { name = name, realm = realm, class = class, level = level, token = token }
+	CharacterChanged(key)
+	return "added", key
+end
+
 -- Retire un personnage du roster (pierre tombale synchronisée). Renvoie true si retiré.
 -- DONNÉES LIÉES À UN PERSONNAGE (point d'extension des addons compagnons) : chacun déclare ce
 -- qu'il garde d'un personnage, pour que sa suppression (Maj + clic dans « Personnages
