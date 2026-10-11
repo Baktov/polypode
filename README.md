@@ -484,9 +484,17 @@ commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, ba
      client Battle.net passés en paramètres ou par variables d'environnement ; seulement la
      bibliothèque standard de Python et `requests` ; lecture seule (aucun fichier de WoW modifié,
      jeton OAuth gardé en mémoire et jamais enregistré) ; sans dossier `WTF` trouvé, le compte WoW
-     est nommé par son numéro d'ordre. **Notice utilisateur** `tools/IMPORT_BNET.md` (liée depuis
+     est nommé par son numéro d'ordre.
+     **Versions du jeu** : option `--namespace` (`profile-<région>` par défaut pour Retail,
+     `profile-classic-<région>` pour la version Classic actuelle, `profile-classic1x-<région>` pour
+     Classic Era) et mode qui essaie chaque espace et indique ceux qui répondent (la répartition
+     des serveurs Anniversary, Hardcore ou Mists Classic n'est pas documentée ; WoW Forever n'a pas
+     encore d'espace publié, à essayer quand il existera) ; le dossier de WoW (`_retail_`,
+     `_classic_`, `_classic_era_`...) reste un paramètre, la correspondance avec
+     `character-list-order.txt` y marche pareil. **Notice utilisateur** `tools/IMPORT_BNET.md` (liée depuis
      ce README) : ce que fait le script et ce qu'il lit, prérequis, création du client Battle.net,
-     installation, commande de lancement et ses options, exemple de sortie, import dans
+     installation, commande de lancement et ses options, versions couvertes (Retail et Classic,
+     pas encore Forever), exemple de sortie, import dans
      `/poly import`, problèmes courants (redirection refusée, région, personnages absents).
   2. **Addon : `/poly import`** : fenêtre à zone de texte défilante où coller ces lignes (ou les
      taper à la main) ; chaque ligne valide crée l'entrée comme un ajout manuel (`P.AddCharacter`,
@@ -498,7 +506,7 @@ commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, ba
      `http://localhost:8765/callback`), noter l'identifiant et le secret, installer Python et
      `requests` ; lancer le script et se connecter une seule fois, avec le compte Battle.net BAKTOV
      (tous les comptes WoW — dossiers 360252#1, 360252#2, ALTHEANA, BAKTOV — y sont rattachés) ; coller le résultat dans `/poly import` ;
-     vérifier les comptes et classes affichés. WoW Forever : probablement hors de l'API.
+     vérifier les comptes et classes affichés.
 - Réannonce à l'entrée en groupe (`GROUP_ROSTER_UPDATE`) pour les personnages sans
   guilde commune connectés avant d'être groupés.
 - **Équipes** : usage des équipes (conversion en raid automatique, leader).
