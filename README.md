@@ -479,13 +479,22 @@ commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, ba
      `0x0D6E24F3`) ; sortie : une ligne `Nom-Royaume;CLASSE;niveau;compte;BattleTag` par personnage.
      Première étape : n'afficher que la correspondance personnage → dossier, pour vérifier que
      l'`id` de l'API est bien celui de l'identifiant du personnage.
+     **Redistribuable** : rien de propre à notre installation dans le code (pas de chemin, de nom de
+     compte ni de secret écrit en dur) ; dossier de WoW, région (`eu`, `us`...) et identifiants du
+     client Battle.net passés en paramètres ou par variables d'environnement ; seulement la
+     bibliothèque standard de Python et `requests` ; lecture seule (aucun fichier de WoW modifié,
+     jeton OAuth gardé en mémoire et jamais enregistré) ; sans dossier `WTF` trouvé, le compte WoW
+     est nommé par son numéro d'ordre. **Notice utilisateur** `tools/IMPORT_BNET.md` (liée depuis
+     ce README) : ce que fait le script et ce qu'il lit, prérequis, création du client Battle.net,
+     installation, commande de lancement et ses options, exemple de sortie, import dans
+     `/poly import`, problèmes courants (redirection refusée, région, personnages absents).
   2. **Addon : `/poly import`** : fenêtre à zone de texte défilante où coller ces lignes (ou les
      taper à la main) ; chaque ligne valide crée l'entrée comme un ajout manuel (`P.AddCharacter`,
      puis version et synchro `CHAR` comme « Ajouter la cible »), range le personnage dans le compte
      nommé (`P.SetCharacterAccount`) et renseigne `entry.token` (hash du BattleTag, comme
      `P.GetTeamToken`) ; compte rendu ajoutés / déjà connus / lignes refusées ; un personnage déjà
      dans le roster n'est pas écrasé (sa première connexion complète le reste).
-  3. **Actions de l'utilisateur** : créer un client sur <https://develop.battle.net> (redirection
+  3. **Actions de l'utilisateur** (ce sont les étapes que la notice décrira pour tout le monde) : créer un client sur <https://develop.battle.net> (redirection
      `http://localhost:8765/callback`), noter l'identifiant et le secret, installer Python et
      `requests` ; lancer le script et se connecter une seule fois, avec le compte Battle.net BAKTOV
      (tous les comptes WoW — dossiers 360252#1, 360252#2, ALTHEANA, BAKTOV — y sont rattachés) ; coller le résultat dans `/poly import` ;
