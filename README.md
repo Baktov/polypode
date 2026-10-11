@@ -473,7 +473,7 @@ commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, ba
   (`GET /profile/user/wow`) la donne par compte Battle.net, groupée par compte WoW (`wow_accounts`,
   identifiés par un numéro, sans nom). Plan :
   1. **Script Python** (`tools/import_bnet.py`) : connexion OAuth (droit `wow.profile`, une fois
-     par compte Battle.net) ; lecture de `/profile/user/wow` et du BattleTag (`/oauth/userinfo`) ;
+     par compte Battle.net ; ici un seul) ; lecture de `/profile/user/wow` et du BattleTag (`/oauth/userinfo`) ;
      association de chaque compte WoW à son dossier `WTF/Account/<compte>` en comparant les `id`
      des personnages aux identifiants de `character-list-order.txt` (`1315-0D6E24F3` →
      `0x0D6E24F3`) ; sortie : une ligne `Nom-Royaume;CLASSE;niveau;compte;BattleTag` par personnage.
@@ -487,8 +487,8 @@ commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, ba
      dans le roster n'est pas écrasé (sa première connexion complète le reste).
   3. **Actions de l'utilisateur** : créer un client sur <https://develop.battle.net> (redirection
      `http://localhost:8765/callback`), noter l'identifiant et le secret, installer Python et
-     `requests` ; lancer le script et se connecter avec chaque compte Battle.net (360252, et
-     ALTHEANA / BAKTOV s'ils n'y sont pas rattachés) ; coller le résultat dans `/poly import` ;
+     `requests` ; lancer le script et se connecter une seule fois, avec le compte Battle.net BAKTOV
+     (tous les comptes WoW — dossiers 360252#1, 360252#2, ALTHEANA, BAKTOV — y sont rattachés) ; coller le résultat dans `/poly import` ;
      vérifier les comptes et classes affichés. WoW Forever : probablement hors de l'API.
 - Réannonce à l'entrée en groupe (`GROUP_ROSTER_UPDATE`) pour les personnages sans
   guilde commune connectés avant d'être groupés.
