@@ -467,42 +467,22 @@ commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, ba
 à activer seulement si le besoin se confirme (voir la règle de simplicité dans
 `CLAUDE.md`) :
 
-- **Import de la liste des personnages** (à faire, demandé le 2026-10-11) : remplir le roster avec
+- **Import de la liste des personnages** (en cours, demandé le 2026-10-11) : remplir le roster avec
   tous les personnages des comptes, sans les connecter un par un, pour composer les équipes
   d'avance. WoW ne donne pas cette liste aux addons ; l'API Profile de Blizzard
   (`GET /profile/user/wow`) la donne par compte Battle.net, groupée par compte WoW (`wow_accounts`,
   identifiés par un numéro, sans nom). Plan :
-  1. **Script Python** (`tools/import_bnet.py`) : connexion OAuth (droit `wow.profile`, une fois
-     par compte Battle.net ; ici un seul) ; lecture de `/profile/user/wow` et du BattleTag (`/oauth/userinfo`) ;
-     association de chaque compte WoW à son dossier `WTF/Account/<compte>` en comparant les `id`
-     des personnages aux identifiants de `character-list-order.txt` (`1315-0D6E24F3` →
-     `0x0D6E24F3`) ; sortie : une ligne `Nom-Royaume;CLASSE;niveau;compte;BattleTag` par personnage.
-     Première étape : n'afficher que la correspondance personnage → dossier, pour vérifier que
-     l'`id` de l'API est bien celui de l'identifiant du personnage.
-     **Redistribuable** : rien de propre à notre installation dans le code (pas de chemin, de nom de
-     compte ni de secret écrit en dur) ; dossier de WoW, région (`eu`, `us`...) et identifiants du
-     client Battle.net passés en paramètres ou par variables d'environnement ; seulement la
-     bibliothèque standard de Python et `requests` ; lecture seule (aucun fichier de WoW modifié,
-     jeton OAuth gardé en mémoire et jamais enregistré) ; sans dossier `WTF` trouvé, le compte WoW
-     est nommé par son numéro d'ordre.
-     **Versions du jeu** : option `--namespace` (`profile-<région>` par défaut pour Retail,
-     `profile-classic-<région>` pour la version Classic actuelle, `profile-classic1x-<région>` pour
-     Classic Era) et mode qui essaie chaque espace et indique ceux qui répondent (la répartition
-     des serveurs Anniversary, Hardcore ou Mists Classic n'est pas documentée ; WoW Forever n'a pas
-     encore d'espace publié, à essayer quand il existera) ; le dossier de WoW (`_retail_`,
-     `_classic_`, `_classic_era_`...) reste un paramètre, la correspondance avec
-     `character-list-order.txt` y marche pareil.
-     **Réentrant** : relançable à volonté, il ne sort que les personnages absents du roster. Il lit
-     pour cela (sans y écrire) le roster de Polypode dans `WTF/Account/*/SavedVariables/Polypode.lua`
-     (`PolypodeDB.roster`, clés « Nom-Royaume ») ; un personnage retiré (`removed = true`) compte
-     comme connu et n'est pas proposé à nouveau (option `--all` pour tout sortir quand même) ;
-     compte rendu « N nouveaux, M déjà dans le roster ». Le roster n'étant écrit qu'à la
-     déconnexion ou au `/reload`, l'addon reste de toute façon sans doublon (étape 2).
-     **Notice utilisateur** `tools/IMPORT_BNET.md` (liée depuis
-     ce README) : ce que fait le script et ce qu'il lit, prérequis, création du client Battle.net,
-     installation, commande de lancement et ses options, versions couvertes (Retail et Classic,
-     pas encore Forever), exemple de sortie, import dans
-     `/poly import`, problèmes courants (redirection refusée, région, personnages absents).
+  1. **Script Python** : **fait** — [`tools/import_bnet.py`](tools/import_bnet.py), notice
+     utilisateur [`tools/IMPORT_BNET.md`](tools/IMPORT_BNET.md) (ce qu'il fait, prérequis, client
+     Battle.net, lancement, options, versions du jeu, problèmes courants). Connexion OAuth
+     (`oauth.battle.net`, droits `openid wow.profile`), `/profile/user/wow` et BattleTag
+     (`/userinfo`) ; compte WoW relié à son dossier `WTF/Account/<compte>` par les identifiants de
+     `character-list-order.txt` ; nom du compte repris des comptes nommés de Polypode, sinon du
+     dossier ; ne sort que les personnages absents du roster (lu dans les SavedVariables, retirés
+     compris ; `--all`) ; `--check`, `--probe`, `--namespace`, `--wow-dir`... ; bibliothèque
+     standard de Python seulement, lecture seule, jeton jamais enregistré. Testé hors ligne sur
+     une réponse simulée ; reste à vérifier avec la vraie API (`--check`) que l'`id` des
+     personnages est bien celui de `character-list-order.txt`.
   2. **Addon : `/poly import`** : fenêtre à zone de texte défilante où coller ces lignes (ou les
      taper à la main) ; chaque ligne valide crée l'entrée comme un ajout manuel (`P.AddCharacter`,
      puis version et synchro `CHAR` comme « Ajouter la cible »), range le personnage dans le compte
@@ -515,9 +495,8 @@ commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, ba
      (Options → AddOns → Polypode), près des réglages de compte : `CreateSettingsButtonInitializer`
      de Blizzard (présent sur Retail et Forever, testé avant usage), infobulle qui rappelle
      `/poly import` ; la fenêtre s'affiche devant le panneau, comme celle de « Gestion liste token ».
-  3. **Actions de l'utilisateur** (ce sont les étapes que la notice décrira pour tout le monde) : créer un client sur <https://develop.battle.net> (redirection
-     `http://localhost:8765/callback`), noter l'identifiant et le secret, installer Python et
-     `requests` ; lancer le script et se connecter une seule fois, avec le compte Battle.net BAKTOV
+  3. **Actions de l'utilisateur** (étapes décrites pour tous par la notice) : créer un client sur <https://develop.battle.net> (redirection
+     `http://localhost:8765/callback`), noter l'identifiant et le secret, installer Python ; lancer le script et se connecter une seule fois, avec le compte Battle.net BAKTOV
      (tous les comptes WoW — dossiers 360252#1, 360252#2, ALTHEANA, BAKTOV — y sont rattachés) ; coller le résultat dans `/poly import` ;
      vérifier les comptes et classes affichés.
 - Réannonce à l'entrée en groupe (`GROUP_ROSTER_UPDATE`) pour les personnages sans

@@ -1,0 +1,4 @@
+# Fichiers produits par tools/import_bnet.py (données personnelles)
+tools/polypode_import.txt
+tools/*.json
+tools/__pycache__/
