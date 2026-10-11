@@ -412,17 +412,39 @@ def match_accounts(profile, accounts):
 
 def account_names(characters, matches, labels):
     """Nom de chaque compte WoW : compte déjà nommé dans Polypode (le plus fréquent parmi ses
-    personnages), sinon nom du dossier WTF, sinon « Compte N »."""
-    names = {}
-    for number in sorted({c[0] for c in characters} | set(matches)):
+    personnages), sinon nom du dossier WTF, sinon « Compte N ». Deux comptes WoW n'ont jamais le
+    même nom : un nom de Polypode revendiqué par plusieurs comptes reste à celui qui a le plus de
+    personnages rangés sous ce nom, les autres prennent leur nom de repli (avertissement)."""
+    numbers = sorted({c[0] for c in characters} | set(matches))
+    best_label = {}
+    for number in numbers:
         counts = Counter(labels[key] for n, _, char in characters if n == number
                          for key in [char_key(char)] if key in labels)
         if counts:
-            names[number] = counts.most_common(1)[0][0]
-        elif matches.get(number):
-            names[number] = matches[number][0]
+            best_label[number] = counts.most_common(1)[0]
+    owner = {}
+    for number, (label, count) in best_label.items():
+        if label.lower() not in owner or count > best_label[owner[label.lower()]][1]:
+            owner[label.lower()] = number
+
+    names = {}
+    used = set()
+    for number in numbers:
+        label = best_label.get(number, (None, 0))[0]
+        if label and owner[label.lower()] == number:
+            names[number] = label
         else:
+            if label:
+                stored = sorted(char_key(char) for n, _, char in characters
+                                if n == number and labels.get(char_key(char)) == label)
+                warn("Attention : compte « {} » de Polypode donné à des personnages de deux comptes "
+                     "WoW différents ; ici : {}. Nom gardé pour l'autre compte WoW : corriger le "
+                     "compte de ce(s) personnage(s) dans Polypode.".format(label, ", ".join(stored)))
+            names[number] = matches[number][0] if matches.get(number) else "Compte {}".format(number)
+        if names[number].lower() in used or (names[number].lower() in owner
+                                              and owner[names[number].lower()] != number):
             names[number] = "Compte {}".format(number)
+        used.add(names[number].lower())
     return names
 
 

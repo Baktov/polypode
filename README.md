@@ -480,9 +480,10 @@ commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, ba
      `character-list-order.txt` ; nom du compte repris des comptes nommés de Polypode, sinon du
      dossier ; ne sort que les personnages absents du roster (lu dans les SavedVariables, retirés
      compris ; `--all`) ; `--check`, `--probe`, `--namespace`, `--wow-dir`... ; bibliothèque
-     standard de Python seulement, lecture seule, jeton jamais enregistré. Testé hors ligne sur
-     une réponse simulée ; reste à vérifier avec la vraie API (`--check`) que l'`id` des
-     personnages est bien celui de `character-list-order.txt`.
+     standard de Python seulement, lecture seule, jeton jamais enregistré. Vérifié avec la vraie
+     API (`--check`, 2026-10-11) : 8 comptes WoW, 173 personnages, l'`id` des personnages est bien
+     celui de `character-list-order.txt` (5 comptes reliés à 100 % à leur dossier) ; un même nom
+     de compte Polypode sur deux comptes WoW n'est gardé que pour l'un (avertissement).
   2. **Addon : `/poly import`** : fenêtre à zone de texte défilante où coller ces lignes (ou les
      taper à la main) ; chaque ligne valide crée l'entrée comme un ajout manuel (`P.AddCharacter`,
      puis version et synchro `CHAR` comme « Ajouter la cible »), range le personnage dans le compte

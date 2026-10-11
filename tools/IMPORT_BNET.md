@@ -32,6 +32,9 @@ d'accès, qui reste en mémoire le temps du programme. Il n'envoie rien ailleurs
 **Nom des comptes WoW** : l'API ne donne pas le nom des comptes WoW, seulement un numéro. Le
 programme reprend le nom que vous avez déjà donné au compte dans Polypode (réglage « Compte WoW de
 ce personnage »), sinon le nom du dossier `WTF\Account\...`, sinon « Compte 1 », « Compte 2 »...
+Deux comptes WoW n'ont jamais le même nom : si des personnages de deux comptes WoW différents
+sont rangés sous le même nom dans Polypode, ce nom reste au compte qui en a le plus, l'autre prend le
+nom de son dossier, et le programme signale les personnages à ranger à nouveau dans Polypode.
 
 ## Prérequis
 
