@@ -491,7 +491,14 @@ commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, ba
      des serveurs Anniversary, Hardcore ou Mists Classic n'est pas documentée ; WoW Forever n'a pas
      encore d'espace publié, à essayer quand il existera) ; le dossier de WoW (`_retail_`,
      `_classic_`, `_classic_era_`...) reste un paramètre, la correspondance avec
-     `character-list-order.txt` y marche pareil. **Notice utilisateur** `tools/IMPORT_BNET.md` (liée depuis
+     `character-list-order.txt` y marche pareil.
+     **Réentrant** : relançable à volonté, il ne sort que les personnages absents du roster. Il lit
+     pour cela (sans y écrire) le roster de Polypode dans `WTF/Account/*/SavedVariables/Polypode.lua`
+     (`PolypodeDB.roster`, clés « Nom-Royaume ») ; un personnage retiré (`removed = true`) compte
+     comme connu et n'est pas proposé à nouveau (option `--all` pour tout sortir quand même) ;
+     compte rendu « N nouveaux, M déjà dans le roster ». Le roster n'étant écrit qu'à la
+     déconnexion ou au `/reload`, l'addon reste de toute façon sans doublon (étape 2).
+     **Notice utilisateur** `tools/IMPORT_BNET.md` (liée depuis
      ce README) : ce que fait le script et ce qu'il lit, prérequis, création du client Battle.net,
      installation, commande de lancement et ses options, versions couvertes (Retail et Classic,
      pas encore Forever), exemple de sortie, import dans
@@ -501,7 +508,9 @@ commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, ba
      puis version et synchro `CHAR` comme « Ajouter la cible »), range le personnage dans le compte
      nommé (`P.SetCharacterAccount`) et renseigne `entry.token` (hash du BattleTag, comme
      `P.GetTeamToken`) ; compte rendu ajoutés / déjà connus / lignes refusées ; un personnage déjà
-     dans le roster n'est pas écrasé (sa première connexion complète le reste).
+     dans le roster n'est pas écrasé (sa première connexion complète le reste) : coller deux fois
+     la même liste ne crée aucun doublon ni aucune nouvelle version à synchroniser. Un personnage
+     retiré n'est pas recréé par l'import (seule sa connexion le fait revenir, comme aujourd'hui).
   3. **Actions de l'utilisateur** (ce sont les étapes que la notice décrira pour tout le monde) : créer un client sur <https://develop.battle.net> (redirection
      `http://localhost:8765/callback`), noter l'identifiant et le secret, installer Python et
      `requests` ; lancer le script et se connecter une seule fois, avec le compte Battle.net BAKTOV
