@@ -664,8 +664,9 @@ function P.SetupChannelInput(editBox)
 end
 
 -- BOUTONS DE LA BARRE DE TITRE DES ADDONS COMPAGNONS (Polypode Photo, Polypode Quêtes) :
--- empilés de droite à gauche depuis la croix, dans l'ordre de leurs demandes. Créés dès que la
--- fenêtre existe (P.BuildUI la construit à la première ouverture).
+-- empilés de droite à gauche depuis la croix, dans l'ordre de leurs demandes ; ceux demandés avec
+-- spec.left (Grille de Polypode Suivi) vont à gauche du titre, de gauche à droite après la case
+-- « Solo ». Créés dès que la fenêtre existe (P.BuildUI la construit à la première ouverture).
 local titleButtonSpecs, titleButtons = {}, {}
 
 -- Vrai si le bouton d'un compagnon est affiché : spec.hideInSolo le masque en mode solo
@@ -674,16 +675,25 @@ function P.IsTitleButtonShown(spec)
 	return not (spec.hideInSolo and P.IsSoloMode())
 end
 
--- Place les boutons affichés de droite à gauche depuis la croix, sans trou pour les masqués.
+-- Place les boutons affichés de droite à gauche depuis la croix (ceux de spec.left de gauche à
+-- droite après le libellé « Solo »), sans trou pour les masqués.
 local function LayoutTitleButtons()
 	local previous = ui.closeButton
+	local previousLeft = ui.soloCheck and (ui.soloCheck.Text or ui.soloCheck.text or ui.soloCheck)
+	local leftGap = 10 -- après le libellé « Solo », puis 4 entre deux boutons
 	for index, button in ipairs(titleButtons) do
-		local shown = P.IsTitleButtonShown(titleButtonSpecs[index])
+		local spec = titleButtonSpecs[index]
+		local shown = P.IsTitleButtonShown(spec)
 		button:SetShown(shown)
 		if shown then
 			button:ClearAllPoints()
-			button:SetPoint("RIGHT", previous, "LEFT", -4, 0)
-			previous = button
+			if spec.left and previousLeft then
+				button:SetPoint("LEFT", previousLeft, "RIGHT", leftGap, 0)
+				previousLeft, leftGap = button, 4
+			else
+				button:SetPoint("RIGHT", previous, "LEFT", -4, 0)
+				previous = button
+			end
 		end
 	end
 end
@@ -722,7 +732,8 @@ end
 
 -- Ajoute un bouton à la barre de titre de la fenêtre principale (point d'extension des addons
 -- compagnons). spec = { text, width, onClick = fn(bouton, mouseButton), rightClick = clic droit
--- aussi, tooltip = { titre, lignes... }, onCreate = fn(bouton), hideInSolo = masqué en mode solo }.
+-- aussi, tooltip = { titre, lignes... }, onCreate = fn(bouton), hideInSolo = masqué en mode solo,
+-- left = à gauche du titre, après la case « Solo » (2.5.0) }.
 function P.AddTitleButton(spec)
 	titleButtonSpecs[#titleButtonSpecs + 1] = spec
 	if ui.frame then

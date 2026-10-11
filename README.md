@@ -341,7 +341,7 @@ Polypode Suivi ; il peut être désactivé (il ne fait plus que le rappeler).
   **campagnes** (chapitres, par extension, de Mists of Pandaria à Midnight) ; panneaux des
   activités de l'extension, de toutes les campagnes (qui les a finies, commencées ou pas faites) et
   des **quêtes** en cours de l'équipe (qui les a terminées, en cours ou à prendre, `/poly quetes`) ; sur **WoW Forever**, suivi de
-  l'**Héritage** (points gagnés, dépensés par arbre, à dépenser, défis) ; fenêtre **Grille** de tous
+  l'**Héritage** (points gagnés, dépensés par arbre, à dépenser, défis) ; fenêtre **Grille** (bouton **Grille** de la barre de titre, `/poly grille`) de tous
   les personnages par compte WoW et équipe, et par race / classe (informations échangées par Polypode,
   à installer sur chaque personnage suivi). Polypode échange les journaux de quêtes entre vos
   clients (à la connexion et à chaque quête acceptée, rendue ou abandonnée) ; l'acceptation, la
@@ -521,6 +521,7 @@ commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, ba
 
 ## Version
 
+`2.5.0` : les addons compagnons peuvent placer un bouton à gauche du titre, après la case « Solo » (bouton « Grille » de Polypode Suivi).
 `2.4.0` : Alt + clic sur l'en-tête d'un compte (« Personnages disponibles » regroupés par compte) : renommer le compte pour tous ses personnages, ou le regrouper avec un compte existant.
 `2.3.0` : import d'une liste de personnages (`/poly import`, bouton « Importer des personnages » des options) et programme `tools/import_bnet.py` qui la récupère auprès de Blizzard.
 `2.2.4` : WoW Forever : les raccourcis Suivre et Assister visent le leader par « Prénom Nom » (« Prénom-Nom » donnait « Unité inconnue »).
