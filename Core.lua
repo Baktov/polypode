@@ -893,6 +893,29 @@ function P.SetCharacterAccount(key, label)
 	end
 end
 
+-- Renomme un compte WoW nommé : tous ses personnages passent sous le nouveau nom (chacun
+-- versionné et synchronisé, comme P.SetCharacterAccount) ; un nom déjà utilisé fusionne les
+-- deux comptes. Renvoie true et le nombre de personnages, ou false et un message d'erreur.
+function P.RenameAccount(oldLabel, newLabel)
+	newLabel = strtrim(newLabel or "")
+	if newLabel == "" then
+		return false, "Nom de compte vide."
+	end
+	if newLabel == oldLabel then
+		return false, "Le nom n'a pas changé."
+	end
+	local keys = {}
+	for key, entry in pairs(P.db.accountLabels) do
+		if entry.label == oldLabel then
+			keys[#keys + 1] = key
+		end
+	end
+	for _, key in ipairs(keys) do
+		P.SetCharacterAccount(key, newLabel)
+	end
+	return true, #keys
+end
+
 -- Applique un rangement reçu d'un autre client, s'il est plus récent. Renvoie true si appliqué.
 function P.ApplyAccountLabelSync(key, updated, label)
 	local entry = P.db.accountLabels[key]

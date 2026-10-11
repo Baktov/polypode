@@ -102,6 +102,54 @@ StaticPopupDialogs[NEW_ACCOUNT_POPUP] = {
 	preferredIndex = 3,
 }
 
+-- Fenêtre de renommage d'un compte WoW nommé (Alt + clic sur son en-tête dans « Personnages
+-- disponibles »). data = ancien nom. Un nom existant fusionne les deux comptes ; l'état replié
+-- du compte suit son nouveau nom. Une erreur (nom vide, inchangé) garde la fenêtre ouverte.
+local RENAME_ACCOUNT_POPUP = "POLYPODE_RENAME_ACCOUNT"
+
+local function SubmitRenameAccount(popup, oldLabel)
+	local newLabel = strtrim(PopupEditBox(popup):GetText() or "")
+	local ok, result = P.RenameAccount(oldLabel, newLabel)
+	if not ok then
+		UIErrorsFrame:AddMessage(result, 1, 0.1, 0.1)
+		return true -- reste ouverte
+	end
+	local collapsed = P.charDb.collapsedAccounts
+	collapsed["m:" .. newLabel] = collapsed["m:" .. newLabel] or collapsed["m:" .. oldLabel]
+	collapsed["m:" .. oldLabel] = nil
+	UIErrorsFrame:AddMessage("Compte « " .. oldLabel .. " » renommé en « " .. newLabel .. " » ("
+		.. result .. " personnage(s)).", 1, 0.82, 0)
+	P.RefreshUI()
+end
+
+StaticPopupDialogs[RENAME_ACCOUNT_POPUP] = {
+	text = "Nouveau nom du compte WoW « %s » (un nom existant regroupe les deux comptes) :",
+	button1 = "Renommer",
+	button2 = "Annuler",
+	hasEditBox = true,
+	maxLetters = 32,
+	OnShow = function(self, oldLabel)
+		local editBox = PopupEditBox(self)
+		editBox:SetText(oldLabel or "")
+		editBox:HighlightText()
+		editBox:SetFocus()
+	end,
+	OnAccept = SubmitRenameAccount,
+	EditBoxOnEnterPressed = function(editBox, oldLabel)
+		local popup = editBox:GetParent()
+		if not SubmitRenameAccount(popup, oldLabel) then
+			popup:Hide()
+		end
+	end,
+	EditBoxOnEscapePressed = function(editBox)
+		editBox:GetParent():Hide()
+	end,
+	timeout = 0,
+	whileDead = true,
+	hideOnEscape = true,
+	preferredIndex = 3,
+}
+
 -- Menu Alt + clic d'un personnage : le ranger dans un compte WoW nommé, en créer un, ou le
 -- retirer de tout compte. Partagé avec les autres Polypode.
 -- SUPPRESSION D'UN PERSONNAGE (Maj + clic dans « Personnages disponibles ») : confirmation
@@ -912,6 +960,12 @@ function P.BuildUI()
 	end, HEADER_HEIGHT + INPUT_HEIGHT, {
 		onClick = function(data, mouseButton)
 			if data.header then
+				if IsAltKeyDown() then
+					if data.groupKey ~= NO_ACCOUNT_GROUP then
+						StaticPopup_Show(RENAME_ACCOUNT_POPUP, data.label, nil, data.label)
+					end
+					return
+				end
 				P.charDb.collapsedAccounts[data.groupKey] = not data.collapsed or nil
 				P.RefreshUI()
 				return
@@ -961,8 +1015,12 @@ function P.BuildUI()
 		end,
 		tooltip = function(data)
 			if data.header then
-				return { data.label, data.online .. " connecté(s) sur " .. #data.items,
+				local lines = { data.label, data.online .. " connecté(s) sur " .. #data.items,
 					"Clic : " .. (data.collapsed and "déplier" or "replier") }
+				if data.groupKey ~= NO_ACCOUNT_GROUP then
+					lines[#lines + 1] = "Alt + clic : renommer le compte (tous ses personnages)"
+				end
+				return lines
 			end
 			local presence = data.first and "|cff40ff40Connecté|r" or "|cff999999Déconnecté (ou pas vu cette session)|r"
 			local account = "Compte WoW : " .. (P.GetCharacterAccount(data.key) or "non renseigné")

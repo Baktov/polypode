@@ -136,7 +136,9 @@ côte à côte :
   replié) ; il n'apparaît qu'avec cette option. WoW ne donne pas le nom du
   compte WoW aux addons : il se renseigne sur chaque personnage, dans les options (champ **Compte
   WoW de ce personnage**, une fois par personnage) ou par **Alt + clic** sur un personnage dans la
-  fenêtre (menu : comptes existants, « Nouveau compte... », « Aucun compte »). Ce rangement est
+  fenêtre (menu : comptes existants, « Nouveau compte... », « Aucun compte »). **Alt + clic sur
+  l'en-tête** d'un compte le **renomme** pour tous ses personnages (un nom existant regroupe les deux
+  comptes ; sans effet sur « Compte non renseigné »). Ce rangement est
   partagé avec vos autres Polypode (le plus récent l'emporte). Vos fichiers de compte étant
   communs (jonctions), le nom ne peut être retenu que par personnage. Nom en couleur de classe, puis classe et niveau ;
   `(vous)` marque le personnage courant.
@@ -504,6 +506,7 @@ commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, ba
 
 ## Version
 
+`2.4.0` : Alt + clic sur l'en-tête d'un compte (« Personnages disponibles » regroupés par compte) : renommer le compte pour tous ses personnages, ou le regrouper avec un compte existant.
 `2.3.0` : import d'une liste de personnages (`/poly import`, bouton « Importer des personnages » des options) et programme `tools/import_bnet.py` qui la récupère auprès de Blizzard.
 `2.2.4` : WoW Forever : les raccourcis Suivre et Assister visent le leader par « Prénom Nom » (« Prénom-Nom » donnait « Unité inconnue »).
 `2.2.3` : WoW Forever : les membres du groupe sont reconnus par prénom et nom de famille (barre d'équipe : état et barre de vie ; présence dans « Personnages disponibles » ; raccourcis Barbare et Train ; partage des quêtes ; disposition de la barre).
