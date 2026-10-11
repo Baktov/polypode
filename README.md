@@ -327,7 +327,7 @@ multibox a sa propre barre) et retrouvés à la connexion.
 
 ## Addons compagnons (séparés)
 
-Quatre fonctions sont des addons séparés, qui dépendent de Polypode et se chargent ou non depuis
+Cinq fonctions sont des addons séparés, qui dépendent de Polypode et se chargent ou non depuis
 la liste des AddOns ; sans eux, Polypode fonctionne normalement. Chacun ajoute son bouton à la
 barre de titre de la fenêtre principale (à gauche de la croix) et sa commande `/poly`.
 **Polypode Quêtes** est **obsolète** : ses quêtes de l'équipe sont dans le panneau **Quêtes** de
@@ -351,6 +351,11 @@ Polypode Suivi ; il peut être désactivé (il ne fait plus que le rappeler).
   et recettes, hauts faits, temps de jeu, équipement, sacs et banques), avec recherche d'objet et
   de recette et rangement automatique en banque, dans l'esprit de DataStore / WoWthing (à installer
   sur chaque personnage).
+- **Polypode Histoire** (https://github.com/Baktov/polypode-histoire) : bouton **Histoire** et
+  `/poly histoire`, journal chronologique commun de tous vos personnages (connexions, équipe
+  groupée, gouffres, donjons, clés M+, boss de raid, hauts faits, niveaux, niveau d'objet), par
+  année, mois et jour repliables, échangé entre vos clients ; export des mois anciens vers une
+  archive (à installer sur chaque personnage, avec Polypode Histoire Archive).
 - **Polypode Profil** (https://github.com/Baktov/polypode-profil) : bouton **Profils** et
   `/poly profil`, bibliothèque des chaînes d'export du mode Édition, des talents, de la transmogrification, des titres, des ensembles d'équipement, des options de WoW, des raccourcis, des fenêtres de discussion, de la liste des addons et des addons
   (EllesmereUI, ElvUI, Baganator, MySlots, Simple Addon Manager...), communes à tous vos personnages et échangées entre

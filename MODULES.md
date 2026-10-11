@@ -16,6 +16,7 @@ travailler dans `ADDONS_POLYPODE` (son `CLAUDE.md` local importe ce fichier) :
 |---|---|---|
 | `Polypode` | <https://github.com/Baktov/polypode> | cœur : roster, équipes, synchro, fenêtre, API des compagnons |
 | `Polypode_Data` | <https://github.com/Baktov/polypode-data> | données durables des personnages (bouton Data) |
+| `Polypode_Histoire` | <https://github.com/Baktov/polypode-histoire> | journal chronologique commun des personnages (bouton Histoire) ; sous-dossier `Polypode_Histoire_Archive` = addon chargé à la demande, relié au jeu par sa propre jonction |
 | `Polypode_Photo` | <https://github.com/Baktov/Polypode-Photo> | mode photo (bouton Photo) |
 | `Polypode_Profil` | <https://github.com/Baktov/polypode-profil> | bibliothèque de chaînes d'export (bouton Profils) |
 | `Polypode_Quetes` | <https://github.com/Baktov/Polypode-quetes> | **obsolète** (1.3.0 : ne fait plus que le rappeler), dépôt **archivé** sur GitHub (lecture seule) : repris par le panneau « Quêtes » de Suivi |
