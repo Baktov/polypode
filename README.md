@@ -327,7 +327,7 @@ multibox a sa propre barre) et retrouvés à la connexion.
 
 ## Addons compagnons (séparés)
 
-Cinq fonctions sont des addons séparés, qui dépendent de Polypode et se chargent ou non depuis
+Six fonctions sont des addons séparés, qui dépendent de Polypode et se chargent ou non depuis
 la liste des AddOns ; sans eux, Polypode fonctionne normalement. Chacun ajoute son bouton à la
 barre de titre de la fenêtre principale (à gauche de la croix) et sa commande `/poly`.
 **Polypode Quêtes** est **obsolète** : ses quêtes de l'équipe sont dans le panneau **Quêtes** de
@@ -360,6 +360,11 @@ Polypode Suivi ; il peut être désactivé (il ne fait plus que le rappeler).
   `/poly profil`, bibliothèque des chaînes d'export du mode Édition, des talents, de la transmogrification, des titres, des ensembles d'équipement, des options de WoW, des raccourcis, des fenêtres de discussion, de la liste des addons et des addons
   (EllesmereUI, ElvUI, Baganator, MySlots, Simple Addon Manager...), communes à tous vos personnages et échangées entre
   vos clients connectés.
+- **Polypode Map** (https://github.com/Baktov/polypode-map) : bouton **Map** et `/poly map`,
+  petite carte de zone permanente (redimensionnable, zoomable, estompable) qui montre les
+  personnages de l'équipe sélectionnée, même hors du groupe (positions échangées entre vos
+  clients), avec les quêtes, les expéditions, les points TomTom, HandyNotes et un ping au clic ;
+  remplace EnhanceBattlefieldMinimap, sans librairie (à installer sur chaque personnage).
 
 ---
 

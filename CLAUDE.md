@@ -38,7 +38,9 @@ n'ajoute une fonctionnalité que si elle sert directement cet objectif.
   https://github.com/Baktov/polypode-profil : chaînes d'export du mode Édition, des talents, de la transmogrification, des titres, des ensembles d'équipement, des options de WoW, des raccourcis, des fenêtres de discussion, de la liste des addons et des addons,
   messages `PROF` / `PROFV` / `PROFREQ` à lui) et **Polypode Histoire** (`../Polypode_Histoire`,
   https://github.com/Baktov/polypode-histoire : journal chronologique commun des personnages, message `HIST` à lui ;
-  utilise aussi `P.GetTeams` et `P.FindGroupUnit`). Polypode n'en sait
+  utilise aussi `P.GetTeams` et `P.FindGroupUnit`) et **Polypode Map** (`../Polypode_Map`,
+  https://github.com/Baktov/polypode-map : petite carte de zone permanente, messages `MAPPOS` / `MAPPING` à lui ;
+  utilise aussi `P.FindGroupUnit`, `P.GetTargetName`, `P.IsCharacterOnline`, `P.GetTeamLeader`). Polypode n'en sait
   rien : chacun ajoute son bouton de barre de titre par `P.AddTitleButton` (UI_Main.lua, empilés de droite à
   gauche depuis la croix) et sa commande par `P.RegisterSlashCommand` ; un compagnon échange ses propres
   messages par `P.RegisterMessageHandler(type, fn(reste, expéditeur))` (appelé par `P.OnSyncMessage` après
