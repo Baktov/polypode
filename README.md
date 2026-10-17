@@ -357,8 +357,8 @@ Polypode Suivi ; il peut être désactivé (il ne fait plus que le rappeler).
   année, mois et jour repliables, échangé entre vos clients ; export des mois anciens vers une
   archive (à installer sur chaque personnage, avec Polypode Histoire Archive).
 - **Polypode Profil** (https://github.com/Baktov/polypode-profil) : bouton **Profils** et
-  `/poly profil`, bibliothèque des chaînes d'export du mode Édition, des talents, de la transmogrification, des titres, des ensembles d'équipement, des options de WoW, des raccourcis, des fenêtres de discussion, de la liste des addons et des addons
-  (EllesmereUI, ElvUI, Baganator, MySlots, Simple Addon Manager...), communes à tous vos personnages et échangées entre
+  `/poly profil`, bibliothèque des chaînes d'export du mode Édition, des talents, de la transmogrification, des titres, des ensembles d'équipement, des macros, des barres d'action, des options de WoW, des raccourcis, des fenêtres de discussion, de la liste des addons et des addons
+  (EllesmereUI, ElvUI, Baganator, Simple Addon Manager...), communes à tous vos personnages et échangées entre
   vos clients connectés.
 - **Polypode Map** (https://github.com/Baktov/polypode-map) : bouton **Map** et `/poly map`,
   petite carte de zone permanente (redimensionnable, zoomable, estompable) qui montre les
