@@ -354,7 +354,8 @@ Polypode Suivi ; il peut être désactivé (il ne fait plus que le rappeler).
 - **Polypode Histoire** (https://github.com/Baktov/polypode-histoire) : bouton **Histoire** et
   `/poly histoire`, journal chronologique commun de tous vos personnages (connexions, équipe
   groupée, gouffres, donjons, clés M+, boss de raid, hauts faits, niveaux, niveau d'objet), par
-  année, mois et jour repliables, échangé entre vos clients ; export des mois anciens vers une
+  année, mois et jour repliables ou en frise chronologique (jour, semaine, mois), échangé entre
+  vos clients ; export des mois anciens vers une
   archive (à installer sur chaque personnage, avec Polypode Histoire Archive).
 - **Polypode Profil** (https://github.com/Baktov/polypode-profil) : bouton **Profils** et
   `/poly profil`, bibliothèque des chaînes d'export du mode Édition, des talents, de la transmogrification, des titres, des ensembles d'équipement, des macros, des barres d'action, des options de WoW, des raccourcis, des fenêtres de discussion, de la liste des addons et des addons
