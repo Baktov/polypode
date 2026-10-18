@@ -34,6 +34,7 @@ publique `P.*`, listée dans la section « Dépendances vers Polypode » de leur
   « Glisser », « glisser/déposer »...) est en **bleu**
   (`P.CLICK_COLOR`) : afficher une infobulle par `P.ShowTooltip()`, jamais `GameTooltip:Show()`
   (repli local si la fonction manque) ; descriptions d'options passées par `P.ColorClicks(texte)`.
+- **Textes affichés en jeu** : caractères latins courants seulement (accents, « », ·, × : oui) ; pas de flèches ni de symboles (→, ⇒, ✓, …) : absents des polices du jeu, ils s'affichent en carré vide (vu le 2026-10-18 dans la frise d'Histoire).
 - **Pas de `print()`** : `P.Debug(msg)` (mode debug), ou `UIErrorsFrame:AddMessage` pour un message
   à l'écran.
 - Bloc de commentaire en tête de chaque fichier : `-- Polypode X: Fichier — rôle`.
