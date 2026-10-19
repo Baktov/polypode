@@ -74,6 +74,25 @@ Dans **son** dépôt, sans attendre qu'on le demande :
 (`git log --format=%s`) a sa ligne dans la section « Version » du README, et chaque `P.X` utilisé
 par un compagnon (hors fonctions qu'il définit) figure dans ses dépendances.
 
+## Publier une version (release GitHub)
+
+Seulement quand on le demande. Après commit et push du module :
+
+```
+python Polypode\tools\publier_version.py <dossier du module>           # depuis ADDONS_POLYPODE
+python Polypode\tools\publier_version.py <dossier du module> --essai   # ZIP et notes, sans publier
+```
+
+Crée la version `v<## Version du .toc>` sur GitHub (étiquette sur HEAD) et y joint
+**`<Module>-<version>.zip`**, qui contient directement le ou les dossiers d'addon à leur nom exact
+(addon imbriqué, comme `Polypode_Histoire_Archive`, sorti au premier niveau), sans fichiers de
+développement (`CLAUDE.md`, `MODULES.md`, `Modele/`, `tools/` de Photo, ce programme) : le joueur
+décompresse dans `Interface\AddOns` sans rien renommer (le ZIP « Source code » de GitHub, lui,
+contient `polypode-x-1.2.3` à renommer). Notes : installation, dépendances (`## Dependencies`),
+lignes de la section « Version » du README depuis la version publiée précédente. Contrôles :
+arbre propre, HEAD poussé, version pas encore publiée. Un nouveau fichier de développement à ne
+pas livrer s'ajoute aux exclusions en tête du programme.
+
 ## Créer un nouveau module
 
 Squelette prêt à copier : `Polypode/Modele/` (voir son `LISEZMOI.txt`). Démarche, pour un module
