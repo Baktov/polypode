@@ -14,8 +14,16 @@ Avec la prise en compte de ces addons est venue l'envie de faire un mode Solo (M
 
 ## Installation
 
-1. Le dossier `Polypode` doit se trouver dans :
-   `World of Warcraft/_retail_/Interface/AddOns/Polypode`
+1. Télécharger **`Polypode-<version>.zip`** de la [dernière version](https://github.com/Baktov/polypode/releases/latest)
+   (pas « Source code », dont le dossier serait à renommer) et le décompresser dans
+   `World of Warcraft/_retail_/Interface/AddOns/` : il contient directement le dossier `Polypode`.
+   Addons compagnons, même procédure (chacun nécessite Polypode) :
+   [Data](https://github.com/Baktov/polypode-data/releases/latest),
+   [Histoire](https://github.com/Baktov/polypode-histoire/releases/latest),
+   [Map](https://github.com/Baktov/polypode-map/releases/latest),
+   [Photo](https://github.com/Baktov/Polypode-Photo/releases/latest),
+   [Profil](https://github.com/Baktov/polypode-profil/releases/latest),
+   [Suivi](https://github.com/Baktov/polypode-suivi/releases/latest).
 2. Activer l'addon dans l'écran de sélection de personnage (AddOns).
 3. Répéter sur chaque fenêtre/client WoW que vous utilisez pour multiboxer.
 
