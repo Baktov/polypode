@@ -128,7 +128,8 @@ annoncé.
 ## Fenêtre principale
 
 Ouverte par `/poly ui`, le raccourci clavier ou le bouton de minimap. Le bouton **Options** (en haut
-à gauche de la barre de titre) ouvre directement le panneau d'options de Polypode. À sa droite, le
+à gauche de la barre de titre) ouvre directement le panneau d'options de Polypode ; **clic droit** :
+les raccourcis clavier de WoW, ouverts sur la section **Polypode** dépliée. À sa droite, le
 champ **Canal** puis la case **Solo** (en rouge, voir « Mode solo » ci-dessous). Trois cadres
 côte à côte :
 
@@ -408,7 +409,8 @@ Le nom d'un personnage dans le roster est au format `Nom-Royaume` (ex. `Arthas-H
 
 ## Raccourcis clavier
 
-Configurable dans le menu des raccourcis WoW, catégorie **Polypode** :
+Configurable dans le menu des raccourcis WoW, catégorie **Polypode** (accès direct : **clic droit**
+sur le bouton **Options** de la fenêtre principale) :
 
 | Raccourci | Action |
 |---|---|
@@ -539,6 +541,7 @@ commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, ba
 
 ## Version
 
+`2.7.0` : clic droit sur le bouton « Options » de la fenêtre principale : raccourcis clavier de WoW, ouverts sur la section Polypode.
 `2.6.0` : personnages disponibles : bouton « En Jeu » (à gauche de « Tout replier »), qui n'affiche que les personnages connectés ; actif par défaut en mode solo, inactif sinon, mémorisé pour chaque mode.
 `2.5.0` : les addons compagnons peuvent placer un bouton à gauche du titre, après la case « Solo » (bouton « Grille » de Polypode Suivi).
 `2.4.0` : Alt + clic sur l'en-tête d'un compte (« Personnages disponibles » regroupés par compte) : renommer le compte pour tous ses personnages, ou le regrouper avec un compte existant.

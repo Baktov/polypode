@@ -584,3 +584,24 @@ function P.OpenOptions()
 		Settings.OpenToCategory(P.optionsCategory:GetID())
 	end
 end
+
+-- Raccourcis clavier de WoW, ouverts sur la section « Polypode » dépliée (comme le bouton
+-- « Raccourcis » du système de ping de Blizzard). La section porte le nom de la catégorie de
+-- Bindings.xml, « Polypode », égal à BINDING_HEADER_POLYPODE.
+function P.OpenKeybindings()
+	local id = Settings.KEYBINDINGS_CATEGORY_ID
+	if not id then
+		return
+	end
+	local category = SettingsPanel and SettingsPanel:GetCategory(id)
+	local layout = category and SettingsPanel:GetLayout(category)
+	if layout then
+		for _, initializer in layout:EnumerateInitializers() do
+			if initializer:GetName() == BINDING_HEADER_POLYPODE then
+				initializer.data.expanded = true
+				break
+			end
+		end
+	end
+	Settings.OpenToCategory(id, BINDING_HEADER_POLYPODE)
+end
