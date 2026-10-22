@@ -12,7 +12,7 @@ Nécessite **Polypode 0.54.0** ou plus récent.
 
 1. Installer d'abord **Polypode** (dépendance obligatoire).
 2. Placer le dossier `Polypode_Modele` dans `World of Warcraft/_retail_/Interface/AddOns/`
-   (et, pour **WoW Forever**, dans `World of Warcraft/_classic_beta_/Interface/AddOns/`, par
+   (et, pour **WoW Forever**, dans `World of Warcraft/_forever_/Interface/AddOns/`, par
    exemple par une jonction `mklink /J`).
 3. Cocher « Polypode Modele » dans la liste des AddOns, **sur chaque personnage** dont vous
    voulez voir les informations : chacun envoie les siennes.

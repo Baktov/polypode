@@ -122,7 +122,7 @@ def main():
         f'**{title} {version}**',
         '',
         f'**Installation** : télécharger **{zip_name}** ci-dessous (pas « Source code »), puis le décompresser '
-        'dans `World of Warcraft\\_retail_\\Interface\\AddOns\\` (WoW Forever : `_classic_beta_` au lieu de `_retail_`). '
+        'dans `World of Warcraft\\_retail_\\Interface\\AddOns\\` (WoW Forever : `_forever_` au lieu de `_retail_`). '
         f'Il contient directement {"le dossier" if len(folders) == 1 else "les dossiers"} '
         f'{", ".join(f"`{f}`" for f in folders)}, à garder tel{"" if len(folders) == 1 else "s"} quel{"" if len(folders) == 1 else "s"}.',
     ]

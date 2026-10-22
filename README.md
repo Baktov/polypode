@@ -27,9 +27,9 @@ Avec la prise en compte de ces addons est venue l'envie de faire un mode Solo (M
 2. Activer l'addon dans l'écran de sélection de personnage (AddOns).
 3. Répéter sur chaque fenêtre/client WoW que vous utilisez pour multiboxer.
 
-**WoW Forever** (actuellement le dossier `_classic_beta_`) est aussi pris en charge : ce mode
+**WoW Forever** (dossier `_forever_`) est aussi pris en charge : ce mode
 tourne sur le même moteur que Retail (12.1) avec le contenu d'origine. Copier (ou relier par une
-jonction) le dossier `Polypode` dans `World of Warcraft/_classic_beta_/Interface/AddOns/`. Les
+jonction) le dossier `Polypode` dans `World of Warcraft/_forever_/Interface/AddOns/`. Les
 fonctions liées à du contenu absent de Forever (gouffres, expéditions, spécialisations...) s'y
 désactivent d'elles-mêmes. Les personnages Forever et Retail ne se voient pas entre eux (jeux
 et serveurs séparés) : chaque mode a ses propres équipes. Sur Forever, les personnages ont un

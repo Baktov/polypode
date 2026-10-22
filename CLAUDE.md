@@ -3,7 +3,7 @@
 ## Contexte du projet
 
 Addon World of Warcraft Retail (Interface 120000) et **WoW Forever** (Interface 16001, type de jeu
-« camelot », dossier `_classic_beta_` : moteur 12.1 de Retail avec le contenu Vanilla, même API)
+« camelot », dossier `_forever_` : moteur 12.1 de Retail avec le contenu Vanilla, même API)
 dédié au **multiboxing**. Toute API liée à du contenu récent (gouffres, expéditions, spécialisations...)
 reste testée avant usage (`if C_X and C_X.Fn then`) pour se désactiver sur Forever ; ne pas se fier à
 `WOW_PROJECT_ID` (Forever est classé mainline). Pas de `ReloadUI()` depuis l'addon (bloqué sur Forever).
