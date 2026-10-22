@@ -141,7 +141,11 @@ côte à côte :
   en-tête par compte WoW (« - Nom du compte (connectés/total) »), repliable ou dépliable d'un clic,
   puis « Compte non renseigné » pour les personnages sans compte. Un bouton **Tout replier** à droite du titre
   « Personnages disponibles » replie tous les comptes (il devient **Tout déplier** quand tout est
-  replié) ; il n'apparaît qu'avec cette option. WoW ne donne pas le nom du
+  replié) ; il n'apparaît qu'avec cette option. Le bouton **En Jeu** (à sa gauche, ou seul à
+  droite du titre sans regroupement) n'affiche que les personnages **connectés** (simple filtre
+  d'affichage, les comptes sans connecté sont masqués) ; actif, il passe sur fond bleu. Il est
+  actif par défaut en mode solo (Monopode) et inactif par défaut sinon ; le choix est mémorisé
+  pour chaque mode et chaque personnage. WoW ne donne pas le nom du
   compte WoW aux addons : il se renseigne sur chaque personnage, dans les options (champ **Compte
   WoW de ce personnage**, une fois par personnage) ou par **Alt + clic** sur un personnage dans la
   fenêtre (menu : comptes existants, « Nouveau compte... », « Aucun compte »). **Alt + clic sur
@@ -535,6 +539,7 @@ commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, ba
 
 ## Version
 
+`2.6.0` : personnages disponibles : bouton « En Jeu » (à gauche de « Tout replier »), qui n'affiche que les personnages connectés ; actif par défaut en mode solo, inactif sinon, mémorisé pour chaque mode.
 `2.5.0` : les addons compagnons peuvent placer un bouton à gauche du titre, après la case « Solo » (bouton « Grille » de Polypode Suivi).
 `2.4.0` : Alt + clic sur l'en-tête d'un compte (« Personnages disponibles » regroupés par compte) : renommer le compte pour tous ses personnages, ou le regrouper avec un compte existant.
 `2.3.0` : import d'une liste de personnages (`/poly import`, bouton « Importer des personnages » des options) et programme `tools/import_bnet.py` qui la récupère auprès de Blizzard.

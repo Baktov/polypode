@@ -65,6 +65,9 @@ P.charDefaults = {
 	followAlert = true, -- alerte du leader quand un membre ne le suit plus (Follow.lua)
 	groupByAccount = true, -- « Personnages disponibles » regroupés par compte (UI_Main.lua) ; défaut des nouveaux personnages
 	collapsedAccounts = {}, -- [clé de groupe] = true : groupe de compte replié
+	-- Bouton « En Jeu » (UI_Main.lua) : « Personnages disponibles » limité aux connectés,
+	-- mémorisé à part en mode solo (Monopode) et hors mode solo.
+	inGameOnly = { solo = true, multi = false },
 	-- Barre flottante de l'équipe sélectionnée (UI_TeamBar.lua) : affichée, liste dépliée,
 	-- figée (Alt + clic) ; position (point, relativePoint, x, y), largeur (width) et hauteur
 	-- de la liste (listHeight, sinon automatique) ajoutées au premier placement / redimensionnement.

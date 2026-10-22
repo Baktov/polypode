@@ -527,6 +527,15 @@ local function AllAccountsCollapsed()
 	return true
 end
 
+-- Bouton « En Jeu » : réglage du mode courant (solo ou non), dans P.charDb.inGameOnly.
+local function InGameModeKey()
+	return P.IsSoloMode() and "solo" or "multi"
+end
+
+local function IsInGameOnly()
+	return P.charDb.inGameOnly[InGameModeKey()] == true
+end
+
 -- Ordre des groupes : comptes nommés (alphabétique), puis « Compte non renseigné ».
 local function GroupRank(groupKey)
 	return groupKey == NO_ACCOUNT_GROUP and 2 or 1
@@ -933,6 +942,26 @@ function P.BuildUI()
 	collapseAllBtn:SetScript("OnLeave", GameTooltip_Hide)
 	collapseAllBtn:Hide()
 
+	-- « En Jeu » : filtre d'affichage, seulement les personnages connectés. À gauche de « Tout
+	-- replier » (ou à sa place s'il est masqué), placé par RefreshUI ; voile bleu quand actif.
+	local inGameBtn = CreateFrame("Button", nil, charPanel, "UIPanelButtonTemplate")
+	inGameBtn:SetSize(60, 18)
+	inGameBtn:SetText("En Jeu")
+	inGameBtn:SetScript("OnClick", function()
+		P.charDb.inGameOnly[InGameModeKey()] = not IsInGameOnly()
+		P.RefreshUI()
+	end)
+	inGameBtn:SetScript("OnEnter", function(self)
+		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+		GameTooltip:AddLine("En Jeu")
+		GameTooltip:AddLine("N'affiche que les personnages connectés (filtre d'affichage seulement).",
+			1, 1, 1, true)
+		GameTooltip:AddLine("Mémorisé à part en mode solo (actif par défaut) et hors mode solo "
+			.. "(inactif par défaut).", 0.8, 0.8, 0.8, true)
+		P.ShowTooltip()
+	end)
+	inGameBtn:SetScript("OnLeave", GameTooltip_Hide)
+
 	-- Bouton d'ajout du joueur ciblé (personnage sans Polypode, ex. un ami) au roster.
 	local addTargetBtn = CreateFrame("Button", nil, charPanel, "UIPanelButtonTemplate")
 	addTargetBtn:SetHeight(22)
@@ -1227,6 +1256,7 @@ function P.BuildUI()
 	ui.resizeGrip = grip
 	ui.charPanel = charPanel
 	ui.collapseAccountsButton = collapseAllBtn
+	ui.inGameButton = inGameBtn
 	ui.teamPanel = teamPanel
 	ui.teamInput = teamInput
 	ui.teamCreateButton = createBtn
@@ -1244,10 +1274,19 @@ function P.BuildUI()
 		P.SkinButton(inviteBtn)
 		P.SkinButton(addTargetBtn)
 		P.SkinButton(collapseAllBtn)
+		P.SkinButton(inGameBtn)
 		P.SkinButton(optionsBtn)
 		P.SkinEditBox(channelInput)
 		P.SkinCheckBox(soloCheck)
 	end
+	-- Voile bleu doux de « En Jeu » actif (comme les boutons de Polypode Suivi), posé après le
+	-- skin pour rester visible avec EllesmereUI / ElvUI ; affiché par RefreshUI.
+	local inGameTint = inGameBtn:CreateTexture(nil, "OVERLAY")
+	inGameTint:SetPoint("TOPLEFT", 2, -2)
+	inGameTint:SetPoint("BOTTOMRIGHT", -2, 2)
+	inGameTint:SetColorTexture(0.3, 0.65, 1, 0.25)
+	inGameTint:Hide()
+	inGameBtn.activeTint = inGameTint
 	-- Libellé « Solo » écarté de la case (après le skin : EllesmereUI le collait à son cadre).
 	local soloLabel = soloCheck.Text or soloCheck.text
 	if soloLabel then
@@ -1300,6 +1339,17 @@ function P.RefreshUI()
 	-- Connectés en tête, puis déconnectés ; ordre alphabétique dans chaque groupe. Avec
 	-- l'option, un en-tête repliable par compte précède ses personnages.
 	local characters = SortedKeyItems(P.GetRoster(), IsConnected)
+	local inGameOnly = IsInGameOnly()
+	if inGameOnly and not P.charDb.groupByAccount then
+		-- « En Jeu » : connectés seuls (ils sont en tête de la liste triée).
+		local online = {}
+		for _, item in ipairs(characters) do
+			if item.first then
+				online[#online + 1] = item
+			end
+		end
+		characters = online
+	end
 	if P.charDb.groupByAccount then
 		local groups, order = {}, {}
 		for _, item in ipairs(characters) do
@@ -1322,24 +1372,37 @@ function P.RefreshUI()
 		characters = {}
 		wipe(accountGroupKeys)
 		for _, group in ipairs(order) do
-			accountGroupKeys[#accountGroupKeys + 1] = group.groupKey
-			group.collapsed = P.charDb.collapsedAccounts[group.groupKey] or false
-			group.first = true -- en-tête jamais estompé
-			characters[#characters + 1] = group
-			if not group.collapsed then
-				for _, item in ipairs(group.items) do
-					characters[#characters + 1] = item
+			-- « En Jeu » : compte sans connecté masqué, et ses déconnectés omis
+			-- (l'en-tête garde le décompte connectés/total).
+			if not inGameOnly or group.online > 0 then
+				accountGroupKeys[#accountGroupKeys + 1] = group.groupKey
+				group.collapsed = P.charDb.collapsedAccounts[group.groupKey] or false
+				group.first = true -- en-tête jamais estompé
+				characters[#characters + 1] = group
+				if not group.collapsed then
+					for _, item in ipairs(group.items) do
+						if item.first or not inGameOnly then
+							characters[#characters + 1] = item
+						end
+					end
 				end
 			end
 		end
 	end
 	SetListData(ui.charPanel, characters)
-	-- Bouton « Tout replier » : seulement regroupé par compte ; le titre lui laisse la place.
+	-- Bouton « Tout replier » : seulement regroupé par compte ; « En Jeu » à sa gauche (ou à sa
+	-- place), le titre leur laisse la place.
 	local grouped = P.charDb.groupByAccount and #accountGroupKeys > 0
 	ui.collapseAccountsButton:SetShown(grouped)
 	ui.collapseAccountsButton:SetText(AllAccountsCollapsed() and "Tout déplier" or "Tout replier")
-	ui.charPanel.header:SetPoint("RIGHT", grouped and ui.collapseAccountsButton or ui.charPanel,
-		grouped and "LEFT" or "RIGHT", grouped and -6 or -10, 0)
+	ui.inGameButton:ClearAllPoints()
+	if grouped then
+		ui.inGameButton:SetPoint("RIGHT", ui.collapseAccountsButton, "LEFT", -4, 0)
+	else
+		ui.inGameButton:SetPoint("TOPRIGHT", -6, -4)
+	end
+	ui.inGameButton.activeTint:SetShown(inGameOnly)
+	ui.charPanel.header:SetPoint("RIGHT", ui.inGameButton, "LEFT", -6, 0)
 
 	local teams = {}
 	for name in pairs(P.GetTeams()) do
