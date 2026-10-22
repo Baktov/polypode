@@ -1,7 +1,7 @@
 ## Interface: 120000, 16001
 ## Title: Polypode
 ## Notes: Gestion simple de plusieurs personnages multiboxés (roster, équipes et leader, sync entre clients). Commandes slash: /poly
-## Author: Generated
+## Author: Baktov
 ## Version: 2.6.0
 ## SavedVariables: PolypodeDB
 ## SavedVariablesPerCharacter: PolypodeCharDB
