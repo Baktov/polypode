@@ -554,6 +554,7 @@ aliases (`/poly accounts`, `/poly remove-account`); debug messages stay in Frenc
 
 ## Version
 
+`2.8.1` : en anglais, options citant les modules sous leur nom anglais (Tracker, Profiles...).
 `2.8.0` : Polypode en anglais (langue du jeu, anglais pour les autres langues), alias anglais des commandes `/poly comptes` et `/poly retirer-compte`, traductions ouvertes aux addons compagnons ; « Maj + clic » après un retour à la ligne d'une infobulle de nouveau entièrement en bleu. *Polypode in English (game language, English for other languages).*
 `2.7.0` : clic droit sur le bouton « Options » de la fenêtre principale : raccourcis clavier de WoW, ouverts sur la section Polypode.
 `2.6.0` : personnages disponibles : bouton « En Jeu » (à gauche de « Tout replier »), qui n'affiche que les personnages connectés ; actif par défaut en mode solo, inactif sinon, mémorisé pour chaque mode.

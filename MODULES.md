@@ -63,6 +63,22 @@ langue). Outils dans Polypode 2.8.0 (`Locale.lua`) : `P.NewLocale()`, `P.AddTran
   Polypode est trop ancien : table dont `__index` renvoie la clé), puis `Locales\enUS.lua` :
   `P.AddTranslations(L, "enUS", { ["texte français"] = "English text", ... })`, groupé par fichier
   (`-- Fichier.lua`). Une autre langue : `Locales\deDE.lua`, même forme, ajouté au `.toc`.
+- **Noms des modules traduits** (décision du 2026-10-23) : bouton de la barre de titre
+  (`P.AddTitleButton`, `text = L["Suivi"]`), titre de sa fenêtre et textes qui le citent ; la
+  colonne de la barre flottante en reprend les trois premières lettres (Dat, His, Map, Pho, Pro,
+  Tra : toutes différentes). Titre dans la liste des addons : `## Title:` anglais,
+  `## Title-frFR:` français. Les commandes `/poly suivi`... gardent leur nom français, avec l'alias
+  anglais (`/poly tracker`...). Noms anglais :
+
+  | Français | Anglais |
+  |---|---|
+  | Data | Data |
+  | Histoire | History |
+  | Map | Map |
+  | Photo | Photo |
+  | Profils | Profiles |
+  | Suivi (et sa fenêtre Grille) | Tracker (Grid) |
+
 - **Hors table** : noms donnés par le jeu (classes par `LOCALIZED_CLASS_NAMES_MALE`, zones,
   royaumes, quêtes, renommées : déjà dans la langue du client), noms propres (Polypode, Monopode),
   messages `P.Debug` (restent en français), noms des commandes slash (français ; alias anglais
