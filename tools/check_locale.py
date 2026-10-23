@@ -6,8 +6,9 @@ Lit les .lua du module (hors Locales/) et les tables de Locales/*.lua, puis sign
 - les clés L["..."] du code sans traduction dans une langue (enUS obligatoire) ;
 - les traductions dont la clé n'est plus utilisée dans le code ;
 - les traductions dont les spécificateurs de format (%s, %d, %%...) diffèrent de la clé (ordre compris) ;
-- les textes français restés hors de L[...] (accents ou plusieurs mots ; hors P.Debug et
-  commentaires) : liste à relire, tous ne sont pas des textes affichés.
+- les textes français restés hors de L[...] (accents ou plusieurs mots ; hors P.Debug, commentaires
+  et fichiers marqués « -- check_locale: noms propres ») : liste à relire, tous ne sont pas des
+  textes affichés.
 Code de sortie 1 s'il manque une traduction anglaise ou si un format diffère.
 """
 import pathlib
@@ -125,6 +126,9 @@ def main(module):
         keys, loose = scan_code(path)
         for key, lines in keys.items():
             used.setdefault(key, []).extend(f"{rel}:{line}" for line in lines)
+        # Fichier de noms propres (lieux...) traduits autrement que par L[...] : pas à relire.
+        if "-- check_locale: noms propres" in path.read_text(encoding="utf-8"):
+            continue
         for line, value, in_debug in loose:
             if not in_debug and (FRENCH.search(value) or re.search(r"[a-z]{2,} [a-z]{2,} [a-z]{2,}", value)):
                 suspects.append(f"{rel}:{line}: {value[:100]!r}")
