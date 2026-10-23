@@ -8,7 +8,14 @@ local L = P.L
 local extraCommands = {}
 
 -- Alias anglais des sous-commandes françaises de Polypode.
-local ALIASES = { accounts = "comptes", ["remove-account"] = "retirer-compte" }
+local ALIASES = { accounts = "comptes", ["remove-account"] = "retirer-compte", language = "langue" }
+
+-- Mots acceptés par /poly langue → préférence (P.LANGUAGES, Locale.lua).
+local LANGUAGE_WORDS = {
+	auto = "auto",
+	fr = "frFR", frfr = "frFR", francais = "frFR", ["français"] = "frFR", french = "frFR",
+	en = "enUS", enus = "enUS", anglais = "enUS", english = "enUS",
+}
 
 -- Ajoute une sous-commande /poly <nom> ; handler reçoit les mots qui suivent ; help nil =
 -- alias absent de l'aide. Point d'extension pour les addons qui dépendent de Polypode.
@@ -28,6 +35,7 @@ local function PrintHelp()
 	print(L["  /poly comptes      — lister les autres comptes Battle.net autorisés"])
 	print(L["  /poly retirer-compte <n°> — retirer l'autorisation d'un compte"])
 	print(L["  /poly debug        — activer/désactiver le mode debug"])
+	print("  /poly langue auto|fr|en — langue de Polypode / Polypode language (/reload)")
 	for name, command in pairs(extraCommands) do
 		if command.help then -- sans aide : alias (ex. « quêtes » pour « quetes »)
 			print(string.format("  /poly %-12s — %s", name, command.help))
@@ -99,6 +107,14 @@ local function SlashHandler(msg)
 	elseif sub == "debug" then
 		P.SetDebug(not P.debugEnabled)
 		print(P.debugEnabled and L["Polypode : mode debug activé."] or L["Polypode : mode debug désactivé."])
+	elseif sub == "langue" then
+		-- Messages dans les deux langues : celui qui change de langue ne lit peut-être pas l'autre.
+		local preference = LANGUAGE_WORDS[(args[2] or ""):lower()]
+		if preference then
+			P.SetLanguagePreference(preference)
+		end
+		print(string.format("Polypode : langue / language = %s (%s). /poly langue auto|fr|en, puis/then /reload",
+			P.GetLanguagePreference(), P.GetLanguage()))
 	elseif extraCommands[sub] then
 		extraCommands[sub].handler({ select(2, unpack(args)) })
 	else

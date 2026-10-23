@@ -51,8 +51,11 @@ publique `P.*`, listée dans la section « Dépendances vers Polypode » de leur
 
 ## Langues
 
-Les modules s'affichent dans la langue du jeu : français, sinon anglais (repli de toute autre
-langue). Outils dans Polypode 2.8.0 (`Locale.lua`) : `P.NewLocale()`, `P.AddTranslations`, `P.LOCALE`.
+Les modules s'affichent dans la langue choisie dans Polypode (option « Langue / Language »,
+`/poly langue`, `P.db.language`, après `/reload`), par défaut celle du jeu ; anglais pour une langue
+sans traduction. Outils de Polypode (`Locale.lua`, 2.8.0 ; sélecteur 2.9.0) : `P.NewLocale()`,
+`P.AddTranslations`, `P.GetLanguage()` (langue d'affichage), `P.OnLanguageApplied(fn)`, `P.LOCALE`
+(langue du jeu, à ne pas utiliser pour choisir un texte).
 
 - **Clé = texte français** : `L["Inviter l'équipe"]` ; en français la table est vide et renvoie la
   clé. Une phrase avec des valeurs est un **format**, `L["Équipe « %s » créée."]:format(nom)`, jamais
@@ -84,8 +87,10 @@ langue). Outils dans Polypode 2.8.0 (`Locale.lua`) : `P.NewLocale()`, `P.AddTran
   messages `P.Debug` (restent en français), noms des commandes slash (français ; alias anglais
   enregistrés en plus, sans aide).
 - **XML** : pas d'attribut `text=` ; le texte est posé dans l'`OnLoad` par `L[...]`. Les textes
-  définis au chargement (`BINDING_NAME_*`, `StaticPopupDialogs`) peuvent utiliser `L` : les fichiers
-  de langue sont chargés avant.
+  rangés au chargement d'un fichier (`BINDING_NAME_*`, `StaticPopupDialogs`, tables de libellés) se
+  posent dans `P.OnLanguageApplied(function() ... end)` : la langue choisie n'est connue qu'à
+  l'`ADDON_LOADED` de Polypode (SavedVariables lues après les fichiers) ; la fonction est appelée tout
+  de suite si elle l'est déjà. `L[...]` lu au moment de l'affichage n'a besoin de rien.
 - **Infobulles anglaises** : `P.ColorClicks` reconnaît « click », « clicks », « clickable »,
   « Right-click », « Left-click », « Double-click », « drag » (« drags », « dragging », « dragged »,
   « drag and drop ») ; modificateurs écrits « Shift + », « Alt + », « Ctrl + ».

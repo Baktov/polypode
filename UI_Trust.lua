@@ -17,35 +17,37 @@ local refused = {} -- [token] = true : refusé pendant cette session
 
 local ShowNext
 
-StaticPopupDialogs[POPUP] = {
-	text = "%s",
-	button1 = L["Autoriser"],
-	button2 = L["Refuser"],
-	OnAccept = function(_, request)
-		P.TrustToken(request.token, request.label)
-		P.Debug("Compte autorisé : " .. request.label)
-		-- Traite l'annonce reçue (roster, synchro, réponse HI s'il s'agissait d'un HELLO).
-		P.OnSyncMessage(request.message, request.channel, request.sender)
-		if request.kind == "HI" then
-			-- Il a répondu à notre annonce : on s'annonce de nouveau pour qu'il nous traite aussi.
-			P.SayHello("HELLO", "CHANNEL")
-		end
-		if P.RefreshUI then
-			P.RefreshUI()
-		end
-	end,
-	OnCancel = function(_, request)
-		refused[request.token] = true
-		P.Debug("Compte refusé pour cette session : " .. request.label)
-	end,
-	OnHide = function()
-		C_Timer.After(0, ShowNext)
-	end,
-	timeout = 0,
-	whileDead = true,
-	hideOnEscape = true,
-	preferredIndex = 3,
-}
+P.OnLanguageApplied(function()
+	StaticPopupDialogs[POPUP] = {
+		text = "%s",
+		button1 = L["Autoriser"],
+		button2 = L["Refuser"],
+		OnAccept = function(_, request)
+			P.TrustToken(request.token, request.label)
+			P.Debug("Compte autorisé : " .. request.label)
+			-- Traite l'annonce reçue (roster, synchro, réponse HI s'il s'agissait d'un HELLO).
+			P.OnSyncMessage(request.message, request.channel, request.sender)
+			if request.kind == "HI" then
+				-- Il a répondu à notre annonce : on s'annonce de nouveau pour qu'il nous traite aussi.
+				P.SayHello("HELLO", "CHANNEL")
+			end
+			if P.RefreshUI then
+				P.RefreshUI()
+			end
+		end,
+		OnCancel = function(_, request)
+			refused[request.token] = true
+			P.Debug("Compte refusé pour cette session : " .. request.label)
+		end,
+		OnHide = function()
+			C_Timer.After(0, ShowNext)
+		end,
+		timeout = 0,
+		whileDead = true,
+		hideOnEscape = true,
+		preferredIndex = 3,
+	}
+end)
 
 -- Affiche la prochaine demande en attente, si aucune n'est affichée.
 ShowNext = function()

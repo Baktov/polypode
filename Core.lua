@@ -8,15 +8,18 @@ P.SYNC_PREFIX = "POLYPODE"
 P.debugEnabled = false
 
 BINDING_HEADER_POLYPODE = "Polypode"
-_G["BINDING_NAME_POLYPODE_TOGGLEUI"] = L["Ouvrir/Fermer l'interface"]
-_G["BINDING_NAME_POLYPODE_SETLEADER"] = L["Se nommer leader de l'équipe"]
-_G["BINDING_NAME_POLYPODE_FOLLOW"] = L["Suivre le leader"]
-_G["BINDING_NAME_POLYPODE_ASSIST"] = L["Assister le leader"]
-_G["BINDING_NAME_POLYPODE_BARBARE"] = L["Barbare : suivre un joueur du groupe au hasard"]
-_G["BINDING_NAME_POLYPODE_TRAIN"] = L["Train : suivre un joueur du groupe que personne ne suit"]
-_G["BINDING_NAME_POLYPODE_INVITE"] = L["Inviter l'équipe"]
-_G["BINDING_NAME_POLYPODE_SENDVOLUME"] = L["Envoyer le volume à l'équipe"]
-_G["BINDING_NAME_POLYPODE_TOGGLESOUND"] = L["Couper/rétablir le son de l'équipe"]
+-- Textes posés quand la langue d'affichage est connue (Locale.lua, P.OnLanguageApplied).
+P.OnLanguageApplied(function()
+	_G["BINDING_NAME_POLYPODE_TOGGLEUI"] = L["Ouvrir/Fermer l'interface"]
+	_G["BINDING_NAME_POLYPODE_SETLEADER"] = L["Se nommer leader de l'équipe"]
+	_G["BINDING_NAME_POLYPODE_FOLLOW"] = L["Suivre le leader"]
+	_G["BINDING_NAME_POLYPODE_ASSIST"] = L["Assister le leader"]
+	_G["BINDING_NAME_POLYPODE_BARBARE"] = L["Barbare : suivre un joueur du groupe au hasard"]
+	_G["BINDING_NAME_POLYPODE_TRAIN"] = L["Train : suivre un joueur du groupe que personne ne suit"]
+	_G["BINDING_NAME_POLYPODE_INVITE"] = L["Inviter l'équipe"]
+	_G["BINDING_NAME_POLYPODE_SENDVOLUME"] = L["Envoyer le volume à l'équipe"]
+	_G["BINDING_NAME_POLYPODE_TOGGLESOUND"] = L["Couper/rétablir le son de l'équipe"]
+end)
 
 P.defaults = {
 	roster = {}, -- [nom-royaume] = { name, realm, class, level, lastSeen }
@@ -46,6 +49,9 @@ P.defaults = {
 	-- [nom-royaume] = { label = nom du compte | nil (aucun), updated = version }.
 	-- Versionné et synchronisé (message ACCT) ; label nil = pierre tombale du rangement.
 	accountLabels = {},
+	-- Langue de Polypode et de ses modules : "auto" (langue du jeu) ou une langue de
+	-- P.LANGUAGES (Locale.lua) ; commune à tous les personnages, appliquée au chargement (/reload).
+	language = "auto",
 }
 
 -- Par personnage : réglages propres à une fenêtre de multibox (et à l'abri du fichier de
@@ -123,6 +129,7 @@ end
 function P.InitDB()
 	PolypodeDB = CopyDefaults(P.defaults, PolypodeDB or {})
 	PolypodeCharDB = CopyDefaults(P.charDefaults, PolypodeCharDB or {})
+	P.ApplyLanguage(PolypodeDB.language)
 	P.db = PolypodeDB
 	P.charDb = PolypodeCharDB
 

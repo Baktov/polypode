@@ -127,6 +127,22 @@ function P.BuildOptions()
 		popupItems[#popupItems + 1] = { kind = "dropdown", setting = setting, values = values, tooltip = tooltip }
 	end
 
+	-- Langue de Polypode et de ses modules (tous les personnages) : libellé dans les deux langues,
+	-- pour être trouvé quelle que soit la langue affichée.
+	local languageSetting = Settings.RegisterProxySetting(
+		category,
+		"POLYPODE_LANGUAGE",
+		Settings.VarType.String,
+		"Langue / Language",
+		"auto",
+		P.GetLanguagePreference,
+		P.SetLanguagePreference
+	)
+	AddDropdown(languageSetting, P.LANGUAGES,
+		"Langue de Polypode et de ses modules (Auto : celle du jeu), pour tous vos personnages ; "
+		.. "appliquée après /reload. / Language of Polypode and its modules (Auto: the game's), "
+		.. "for all your characters; applied after /reload.")
+
 	-- Mode solo, en tête et en rouge (par personnage) : même réglage que la case « Solo » de la
 	-- fenêtre (P.SetSoloMode, UI_Main.lua).
 	local soloSetting = Settings.RegisterProxySetting(

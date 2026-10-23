@@ -1,40 +1,96 @@
--- Polypode: Locale — langue du jeu et tables de traductions (Polypode et ses modules)
+-- Polypode: Locale — langue d'affichage et tables de traductions (Polypode et ses modules)
 
 Polypode = Polypode or {}
 local P = Polypode
 
 -- Langue du client (frFR, enUS, enGB, deDE...). Les textes sont écrits en français dans le code :
 -- le texte français est la clé, L["Inviter l'équipe"] ; une table de traductions par langue
--- (Locales/enUS.lua...) associe chaque clé à son texte. Résolution : langue du jeu, sinon anglais,
--- sinon la clé (texte français). En français, aucune table n'est chargée.
+-- (Locales/enUS.lua...) associe chaque clé à son texte. Résolution à chaque lecture : langue
+-- d'affichage, sinon anglais, sinon la clé (texte français).
 P.LOCALE = GetLocale()
 
--- Nouvelle table de textes d'un addon : L[texte français] → texte à afficher.
-function P.NewLocale()
-	return setmetatable({}, {
-		__index = function(_, key)
-			return key
-		end,
-	})
+-- Langues proposées par le sélecteur (options, /poly langue) ; "auto" = langue du jeu. Libellés
+-- dans leur propre langue, pour être reconnus quelle que soit la langue affichée.
+P.LANGUAGES = {
+	{ "auto", "Auto" },
+	{ "frFR", "Français" },
+	{ "enUS", "English" },
+}
+
+-- Langue d'affichage : celle du jeu jusqu'à ce que P.ApplyLanguage applique la préférence
+-- enregistrée (ADDON_LOADED de Polypode : les SavedVariables ne sont lues qu'après les fichiers).
+local language = P.LOCALE
+local applied = false
+local appliedCallbacks = {}
+local translations = setmetatable({}, { __mode = "k" }) -- [table L] = { [langue] = textes }
+
+function P.GetLanguage()
+	return language
 end
 
--- Ajoute à L les traductions d'une langue : celles de la langue du jeu l'emportent, l'anglais
--- comble les clés restantes (repli des langues sans traduction). L'ordre de chargement des
--- fichiers de langue est donc indifférent.
-function P.AddTranslations(L, locale, strings)
-	if P.LOCALE == "frFR" then
+-- Applique la préférence ("auto", nil ou une langue de P.LANGUAGES) puis rappelle les fonctions
+-- de P.OnLanguageApplied. Appelé une fois par session : changer de langue demande un /reload,
+-- les fenêtres déjà construites gardant leurs textes.
+function P.ApplyLanguage(preference)
+	language = (preference and preference ~= "auto") and preference or P.LOCALE
+	applied = true
+	for _, fn in ipairs(appliedCallbacks) do
+		fn()
+	end
+end
+
+-- Préférence enregistrée (P.db.language) : "auto" ou une langue de P.LANGUAGES.
+function P.GetLanguagePreference()
+	return P.db and P.db.language or "auto"
+end
+
+-- Enregistre la préférence (sélecteur des options, /poly langue) ; prise en compte au prochain
+-- /reload (pas de ReloadUI depuis l'addon : bloqué sur WoW Forever). Message dans les deux
+-- langues : celui qui change de langue ne lit peut-être pas la langue affichée.
+function P.SetLanguagePreference(preference)
+	if preference == P.GetLanguagePreference() then
 		return
 	end
-	if locale == P.LOCALE then
-		for key, text in pairs(strings) do
-			L[key] = text
-		end
-	elseif locale == "enUS" then
-		for key, text in pairs(strings) do
-			if rawget(L, key) == nil then
-				L[key] = text
+	P.db.language = preference
+	UIErrorsFrame:AddMessage("Polypode : tapez /reload pour changer de langue. / Type /reload to change the language.",
+		1, 0.82, 0)
+end
+
+-- Textes rangés au chargement d'un fichier (BINDING_NAME_*, StaticPopupDialogs...) : à poser dans
+-- fn, appelée quand la langue d'affichage est connue (tout de suite si elle l'est déjà).
+function P.OnLanguageApplied(fn)
+	appliedCallbacks[#appliedCallbacks + 1] = fn
+	if applied then
+		fn()
+	end
+end
+
+-- Nouvelle table de textes d'un addon : L[texte français] → texte dans la langue d'affichage.
+function P.NewLocale()
+	local L = setmetatable({}, {
+		__index = function(self, key)
+			if language == "frFR" then
+				return key
 			end
-		end
+			local byLanguage = translations[self]
+			local text = byLanguage[language] and byLanguage[language][key]
+			if text == nil and byLanguage.enUS then
+				text = byLanguage.enUS[key] -- repli des langues sans traduction
+			end
+			return text or key
+		end,
+	})
+	translations[L] = {}
+	return L
+end
+
+-- Ajoute à L les traductions d'une langue (toutes gardées : la langue d'affichage peut différer
+-- de celle du jeu).
+function P.AddTranslations(L, locale, strings)
+	local byLanguage = translations[L]
+	byLanguage[locale] = byLanguage[locale] or {}
+	for key, text in pairs(strings) do
+		byLanguage[locale][key] = text
 	end
 end
 

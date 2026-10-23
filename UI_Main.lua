@@ -34,33 +34,35 @@ local function SubmitRename(popup, oldName)
 	P.RefreshUI()
 end
 
-StaticPopupDialogs[RENAME_POPUP] = {
-	text = L["Nouveau nom de l'équipe « %s » :"],
-	button1 = L["Renommer"],
-	button2 = L["Annuler"],
-	hasEditBox = true,
-	maxLetters = 32,
-	OnShow = function(self, oldName)
-		local editBox = PopupEditBox(self)
-		editBox:SetText(oldName or "")
-		editBox:HighlightText()
-		editBox:SetFocus()
-	end,
-	OnAccept = SubmitRename,
-	EditBoxOnEnterPressed = function(editBox, oldName)
-		local popup = editBox:GetParent()
-		if not SubmitRename(popup, oldName) then
-			popup:Hide()
-		end
-	end,
-	EditBoxOnEscapePressed = function(editBox)
-		editBox:GetParent():Hide()
-	end,
-	timeout = 0,
-	whileDead = true,
-	hideOnEscape = true,
-	preferredIndex = 3,
-}
+P.OnLanguageApplied(function()
+	StaticPopupDialogs[RENAME_POPUP] = {
+		text = L["Nouveau nom de l'équipe « %s » :"],
+		button1 = L["Renommer"],
+		button2 = L["Annuler"],
+		hasEditBox = true,
+		maxLetters = 32,
+		OnShow = function(self, oldName)
+			local editBox = PopupEditBox(self)
+			editBox:SetText(oldName or "")
+			editBox:HighlightText()
+			editBox:SetFocus()
+		end,
+		OnAccept = SubmitRename,
+		EditBoxOnEnterPressed = function(editBox, oldName)
+			local popup = editBox:GetParent()
+			if not SubmitRename(popup, oldName) then
+				popup:Hide()
+			end
+		end,
+		EditBoxOnEscapePressed = function(editBox)
+			editBox:GetParent():Hide()
+		end,
+		timeout = 0,
+		whileDead = true,
+		hideOnEscape = true,
+		preferredIndex = 3,
+	}
+end)
 
 -- Fenêtre de saisie d'un nouveau compte WoW nommé (menu Alt + clic d'un personnage).
 -- data = clé du personnage à y ranger.
@@ -76,32 +78,34 @@ local function SubmitNewAccount(popup, key)
 	P.RefreshUI()
 end
 
-StaticPopupDialogs[NEW_ACCOUNT_POPUP] = {
-	text = L["Nom du compte WoW de %s :"],
-	button1 = L["Créer"],
-	button2 = L["Annuler"],
-	hasEditBox = true,
-	maxLetters = 32,
-	OnShow = function(self)
-		local editBox = PopupEditBox(self)
-		editBox:SetText("")
-		editBox:SetFocus()
-	end,
-	OnAccept = SubmitNewAccount,
-	EditBoxOnEnterPressed = function(editBox, key)
-		local popup = editBox:GetParent()
-		if not SubmitNewAccount(popup, key) then
-			popup:Hide()
-		end
-	end,
-	EditBoxOnEscapePressed = function(editBox)
-		editBox:GetParent():Hide()
-	end,
-	timeout = 0,
-	whileDead = true,
-	hideOnEscape = true,
-	preferredIndex = 3,
-}
+P.OnLanguageApplied(function()
+	StaticPopupDialogs[NEW_ACCOUNT_POPUP] = {
+		text = L["Nom du compte WoW de %s :"],
+		button1 = L["Créer"],
+		button2 = L["Annuler"],
+		hasEditBox = true,
+		maxLetters = 32,
+		OnShow = function(self)
+			local editBox = PopupEditBox(self)
+			editBox:SetText("")
+			editBox:SetFocus()
+		end,
+		OnAccept = SubmitNewAccount,
+		EditBoxOnEnterPressed = function(editBox, key)
+			local popup = editBox:GetParent()
+			if not SubmitNewAccount(popup, key) then
+				popup:Hide()
+			end
+		end,
+		EditBoxOnEscapePressed = function(editBox)
+			editBox:GetParent():Hide()
+		end,
+		timeout = 0,
+		whileDead = true,
+		hideOnEscape = true,
+		preferredIndex = 3,
+	}
+end)
 
 -- Fenêtre de renommage d'un compte WoW nommé (Alt + clic sur son en-tête dans « Personnages
 -- disponibles »). data = ancien nom. Un nom existant fusionne les deux comptes ; l'état replié
@@ -123,33 +127,35 @@ local function SubmitRenameAccount(popup, oldLabel)
 	P.RefreshUI()
 end
 
-StaticPopupDialogs[RENAME_ACCOUNT_POPUP] = {
-	text = L["Nouveau nom du compte WoW « %s » (un nom existant regroupe les deux comptes) :"],
-	button1 = L["Renommer"],
-	button2 = L["Annuler"],
-	hasEditBox = true,
-	maxLetters = 32,
-	OnShow = function(self, oldLabel)
-		local editBox = PopupEditBox(self)
-		editBox:SetText(oldLabel or "")
-		editBox:HighlightText()
-		editBox:SetFocus()
-	end,
-	OnAccept = SubmitRenameAccount,
-	EditBoxOnEnterPressed = function(editBox, oldLabel)
-		local popup = editBox:GetParent()
-		if not SubmitRenameAccount(popup, oldLabel) then
-			popup:Hide()
-		end
-	end,
-	EditBoxOnEscapePressed = function(editBox)
-		editBox:GetParent():Hide()
-	end,
-	timeout = 0,
-	whileDead = true,
-	hideOnEscape = true,
-	preferredIndex = 3,
-}
+P.OnLanguageApplied(function()
+	StaticPopupDialogs[RENAME_ACCOUNT_POPUP] = {
+		text = L["Nouveau nom du compte WoW « %s » (un nom existant regroupe les deux comptes) :"],
+		button1 = L["Renommer"],
+		button2 = L["Annuler"],
+		hasEditBox = true,
+		maxLetters = 32,
+		OnShow = function(self, oldLabel)
+			local editBox = PopupEditBox(self)
+			editBox:SetText(oldLabel or "")
+			editBox:HighlightText()
+			editBox:SetFocus()
+		end,
+		OnAccept = SubmitRenameAccount,
+		EditBoxOnEnterPressed = function(editBox, oldLabel)
+			local popup = editBox:GetParent()
+			if not SubmitRenameAccount(popup, oldLabel) then
+				popup:Hide()
+			end
+		end,
+		EditBoxOnEscapePressed = function(editBox)
+			editBox:GetParent():Hide()
+		end,
+		timeout = 0,
+		whileDead = true,
+		hideOnEscape = true,
+		preferredIndex = 3,
+	}
+end)
 
 -- Menu Alt + clic d'un personnage : le ranger dans un compte WoW nommé, en créer un, ou le
 -- retirer de tout compte. Partagé avec les autres Polypode.
@@ -158,18 +164,20 @@ StaticPopupDialogs[RENAME_ACCOUNT_POPUP] = {
 -- P.DescribeCharacterData), puis P.RemoveCharacter (synchronisé avec les autres clients).
 local REMOVE_CHARACTER_POPUP = "POLYPODE_REMOVE_CHARACTER"
 
-StaticPopupDialogs[REMOVE_CHARACTER_POPUP] = {
-	text = L["Supprimer %s de Polypode ?%s\n\n(sur tous vos clients connectés ; il reviendra s'il se reconnecte avec Polypode)"],
-	button1 = DELETE or L["Supprimer"],
-	button2 = CANCEL,
-	OnAccept = function(_, key)
-		P.RemoveCharacter(key)
-		P.RefreshUI()
-	end,
-	timeout = 0,
-	whileDead = true,
-	hideOnEscape = true,
-}
+P.OnLanguageApplied(function()
+	StaticPopupDialogs[REMOVE_CHARACTER_POPUP] = {
+		text = L["Supprimer %s de Polypode ?%s\n\n(sur tous vos clients connectés ; il reviendra s'il se reconnecte avec Polypode)"],
+		button1 = DELETE or L["Supprimer"],
+		button2 = CANCEL,
+		OnAccept = function(_, key)
+			P.RemoveCharacter(key)
+			P.RefreshUI()
+		end,
+		timeout = 0,
+		whileDead = true,
+		hideOnEscape = true,
+	}
+end)
 
 local function ConfirmRemoveCharacter(key)
 	if key == P.GetCharKey() then
@@ -186,19 +194,21 @@ end
 -- data = { team = nom de l'équipe, key = clé du personnage }.
 local REMOVE_MEMBER_POPUP = "POLYPODE_REMOVE_MEMBER"
 
-StaticPopupDialogs[REMOVE_MEMBER_POPUP] = {
-	text = L["Retirer %s de l'équipe « %s » ?"],
-	button1 = REMOVE or L["Retirer"],
-	button2 = CANCEL,
-	OnAccept = function(_, data)
-		P.RemoveTeamMember(data.team, data.key)
-		P.RefreshUI()
-	end,
-	timeout = 0,
-	whileDead = true,
-	hideOnEscape = true,
-	preferredIndex = 3,
-}
+P.OnLanguageApplied(function()
+	StaticPopupDialogs[REMOVE_MEMBER_POPUP] = {
+		text = L["Retirer %s de l'équipe « %s » ?"],
+		button1 = REMOVE or L["Retirer"],
+		button2 = CANCEL,
+		OnAccept = function(_, data)
+			P.RemoveTeamMember(data.team, data.key)
+			P.RefreshUI()
+		end,
+		timeout = 0,
+		whileDead = true,
+		hideOnEscape = true,
+		preferredIndex = 3,
+	}
+end)
 
 -- Demande confirmation avant de retirer key de l'équipe teamName (rien s'il n'en est pas membre).
 local function ConfirmRemoveMember(teamName, key)
