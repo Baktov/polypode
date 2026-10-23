@@ -1,6 +1,7 @@
 -- Polypode: UI_TeamBar — barre flottante de l'équipe sélectionnée (sortie de la fenêtre par glisser)
 
 local P = Polypode
+local L = P.L
 
 -- Une équipe glissée hors du cadre « Équipes » de la fenêtre principale devient la sélection
 -- et s'affiche dans une petite barre posée où on la lâche (P.StartTeamBarDrag). La barre
@@ -44,11 +45,11 @@ end
 local function FormatAgo(since)
 	local minutes = math.floor((GetTime() - since) / 60)
 	if minutes < 1 then
-		return "à l'instant"
+		return L["à l'instant"]
 	elseif minutes < 60 then
-		return "il y a " .. minutes .. " min"
+		return L["il y a %d min"]:format(minutes)
 	end
-	return "il y a " .. math.floor(minutes / 60) .. " h"
+	return L["il y a %d h"]:format(math.floor(minutes / 60))
 end
 
 -- Lignes d'infobulle d'un personnage non groupé, à la manière de la liste d'amis : niveau,
@@ -62,7 +63,7 @@ local function StatusLines(key)
 	local identity = {}
 	local level = status and status.level or entry.level
 	if level then
-		identity[#identity + 1] = "Niveau " .. level
+		identity[#identity + 1] = L["Niveau %s"]:format(level)
 	end
 	if status and status.race then
 		identity[#identity + 1] = status.race
@@ -84,29 +85,29 @@ local function StatusLines(key)
 			lines[#lines + 1] = "|cff40ff40<" .. status.guild .. ">|r"
 		end
 		if status.zone then
-			lines[#lines + 1] = "Zone : " .. status.zone
+			lines[#lines + 1] = L["Zone : %s"]:format(status.zone)
 		end
 		if status.ilvl and status.ilvl > 0 then
-			lines[#lines + 1] = "Niveau d'objet : " .. status.ilvl
+			lines[#lines + 1] = L["Niveau d'objet : %s"]:format(status.ilvl)
 		end
 		if status.durability then
 			local low = status.durability < P.charDb.teamBar.durabilityThreshold
-			lines[#lines + 1] = "Durabilité : " .. (low and "|cffff4040" or "") .. status.durability .. " %"
+			lines[#lines + 1] = L["Durabilité : %s %%"]:format((low and "|cffff4040" or "") .. status.durability)
 				.. (low and "|r" or "")
 		end
 		if P.IsCharacterOnline(key) then
-			lines[#lines + 1] = "|cff40ff40En ligne|r |cff999999(infos " .. FormatAgo(status.received) .. ")|r"
+			lines[#lines + 1] = "|cff40ff40" .. L["En ligne"] .. "|r |cff999999" .. L["(infos %s)"]:format(FormatAgo(status.received)) .. "|r"
 		else
-			lines[#lines + 1] = "|cff999999Hors ligne (dernières infos " .. FormatAgo(status.received) .. ")|r"
+			lines[#lines + 1] = "|cff999999" .. L["Hors ligne (dernières infos %s)"]:format(FormatAgo(status.received)) .. "|r"
 		end
 	else
-		lines[#lines + 1] = "|cff999999Pas encore d'infos de son Polypode cette session|r"
+		lines[#lines + 1] = "|cff999999" .. L["Pas encore d'infos de son Polypode cette session"] .. "|r"
 		if entry.lastSeen then
-			lines[#lines + 1] = "|cff999999Vu le " .. date("%d/%m à %H:%M", entry.lastSeen) .. "|r"
+			lines[#lines + 1] = "|cff999999" .. L["Vu le %s"]:format(date(L["%d/%m à %H:%M"], entry.lastSeen)) .. "|r"
 		end
 	end
 
-	lines[#lines + 1] = "|cff999999Infobulle complète une fois groupé|r"
+	lines[#lines + 1] = "|cff999999" .. L["Infobulle complète une fois groupé"] .. "|r"
 	return lines
 end
 
@@ -236,7 +237,7 @@ end
 local function ToggleLocked()
 	local state = P.charDb.teamBar
 	state.locked = not state.locked
-	UIErrorsFrame:AddMessage(state.locked and "Barre d'équipe figée." or "Barre d'équipe libérée.", 1, 0.82, 0)
+	UIErrorsFrame:AddMessage(state.locked and L["Barre d'équipe figée."] or L["Barre d'équipe libérée."], 1, 0.82, 0)
 	P.RefreshTeamBar()
 end
 
@@ -261,20 +262,20 @@ end
 local function MemberState(key, unit)
 	if not unit then
 		if P.IsCharacterOnline(key) then
-			return "|cff999999hors groupe|r", 1
+			return "|cff999999" .. L["hors groupe"] .. "|r", 1
 		end
-		return "|cff777777hors ligne|r", 0.5
+		return "|cff777777" .. L["hors ligne"] .. "|r", 0.5
 	end
 	if Known(UnitIsConnected(unit)) == false then
-		return "|cff777777déconnecté|r", 0.5
+		return "|cff777777" .. L["déconnecté"] .. "|r", 0.5
 	end
 	if Known(UnitIsDeadOrGhost(unit)) then
-		return "|cffff4040mort|r", 1
+		return "|cffff4040" .. L["mort"] .. "|r", 1
 	end
 	if unit ~= "player" then
 		local inRange, checked = UnitInRange(unit)
 		if Known(checked) and Known(inRange) == false then
-			return "|cffff9900loin|r", 0.7
+			return "|cffff9900" .. L["loin"] .. "|r", 0.7
 		end
 	end
 	return "", 1
@@ -344,7 +345,7 @@ end
 local function ShareLayout()
 	local team = P.GetSelectedTeam()
 	if not team then
-		UIErrorsFrame:AddMessage("Sélectionnez d'abord une équipe.", 1, 0.1, 0.1)
+		UIErrorsFrame:AddMessage(L["Sélectionnez d'abord une équipe."], 1, 0.1, 0.1)
 		return
 	end
 	local screenWidth, screenHeight = UIParent:GetWidth(), UIParent:GetHeight()
@@ -357,9 +358,9 @@ local function ShareLayout()
 		expanded = state.expanded,
 	})
 	if sent > 0 then
-		UIErrorsFrame:AddMessage("Position de la barre envoyée à " .. sent .. " personnage(s) de l'équipe.", 1, 0.82, 0)
+		UIErrorsFrame:AddMessage(L["Position de la barre envoyée à %d personnage(s) de l'équipe."]:format(sent), 1, 0.82, 0)
 	else
-		UIErrorsFrame:AddMessage("Aucun autre personnage de l'équipe connecté.", 1, 0.1, 0.1)
+		UIErrorsFrame:AddMessage(L["Aucun autre personnage de l'équipe connecté."], 1, 0.1, 0.1)
 	end
 end
 
@@ -370,33 +371,33 @@ local function ShowBarTooltip(self)
 	GameTooltip:SetOwner(self, "ANCHOR_TOP")
 	local solo = P.IsSoloMode()
 	if solo then
-		GameTooltip:AddLine(P.GetDisplayName(P.GetCharKey()) .. " |cffff4040(mode solo)|r")
-		GameTooltip:AddLine("Clic droit : déplier / replier la ligne du personnage", 1, 1, 1)
+		GameTooltip:AddLine(P.GetDisplayName(P.GetCharKey()) .. " |cffff4040" .. L["(mode solo)"] .. "|r")
+		GameTooltip:AddLine(L["Clic droit : déplier / replier la ligne du personnage"], 1, 1, 1)
 	else
-		GameTooltip:AddLine(P.GetSelectedTeam() or "Aucune équipe sélectionnée")
-		GameTooltip:AddLine("Clic gauche : inviter l'équipe (comme le bouton « Inviter l'équipe »)", 1, 1, 1)
+		GameTooltip:AddLine(P.GetSelectedTeam() or L["Aucune équipe sélectionnée"])
+		GameTooltip:AddLine(L["Clic gauche : inviter l'équipe (comme le bouton « Inviter l'équipe »)"], 1, 1, 1)
 		local reason = P.GetInviteBlockedReason(P.GetSelectedTeam())
 		if reason then
 			GameTooltip:AddLine(reason, 1, 0.1, 0.1, true)
 		end
-		GameTooltip:AddLine("Clic droit : déplier / replier la liste des personnages", 1, 1, 1)
+		GameTooltip:AddLine(L["Clic droit : déplier / replier la liste des personnages"], 1, 1, 1)
 	end
 	if P.charDb.teamBar.locked then
-		GameTooltip:AddLine("Barre figée (position et taille)", 1, 0.82, 0)
-		GameTooltip:AddLine("Alt + clic : libérer", 1, 1, 1)
+		GameTooltip:AddLine(L["Barre figée (position et taille)"], 1, 0.82, 0)
+		GameTooltip:AddLine(L["Alt + clic : libérer"], 1, 1, 1)
 	else
-		GameTooltip:AddLine("Glisser : déplacer la barre", 1, 1, 1)
-		GameTooltip:AddLine("Poignée du coin : redimensionner", 1, 1, 1)
-		GameTooltip:AddLine("Alt + clic : figer la position et la taille", 1, 1, 1)
+		GameTooltip:AddLine(L["Glisser : déplacer la barre"], 1, 1, 1)
+		GameTooltip:AddLine(L["Poignée du coin : redimensionner"], 1, 1, 1)
+		GameTooltip:AddLine(L["Alt + clic : figer la position et la taille"], 1, 1, 1)
 	end
 	if solo then
-		GameTooltip:AddLine("Croix : masquer (glisser votre personnage hors de la fenêtre Polypode "
-			.. "pour la réafficher)", 1, 1, 1, true)
+		GameTooltip:AddLine(L["Croix : masquer (glisser votre personnage hors de la fenêtre Polypode "
+			.. "pour la réafficher)"], 1, 1, 1, true)
 	else
-		GameTooltip:AddLine("Maj + clic : envoyer cette position et cette taille aux personnages de "
-			.. "l'équipe dont la barre est masquée", 1, 1, 1, true)
-		GameTooltip:AddLine("Croix : masquer (glisser une équipe hors de la fenêtre Polypode pour "
-			.. "la réafficher)", 1, 1, 1, true)
+		GameTooltip:AddLine(L["Maj + clic : envoyer cette position et cette taille aux personnages de "
+			.. "l'équipe dont la barre est masquée"], 1, 1, 1, true)
+		GameTooltip:AddLine(L["Croix : masquer (glisser une équipe hors de la fenêtre Polypode pour "
+			.. "la réafficher)"], 1, 1, 1, true)
 	end
 	P.ShowTooltip()
 end
@@ -613,12 +614,12 @@ local function Build()
 		end
 		GameTooltip:SetOwner(self, "ANCHOR_TOP")
 		GameTooltip:AddLine("Polypode")
-		GameTooltip:AddLine("Clic : ouvrir / fermer la fenêtre Polypode", 1, 1, 1)
-		GameTooltip:AddLine("Clic droit : options de Polypode", 1, 1, 1)
+		GameTooltip:AddLine(L["Clic : ouvrir / fermer la fenêtre Polypode"], 1, 1, 1)
+		GameTooltip:AddLine(L["Clic droit : options de Polypode"], 1, 1, 1)
 		if P.charDb.teamBar.compact then
-			GameTooltip:AddLine(P.charDb.teamBar.locked and "Barre figée — Alt + clic : libérer"
-				or "Glisser : déplacer la barre — Alt + clic : figer", 1, 1, 1)
-			GameTooltip:AddLine("Maj + clic droit : masquer la barre", 1, 1, 1)
+			GameTooltip:AddLine(P.charDb.teamBar.locked and L["Barre figée — Alt + clic : libérer"]
+				or L["Glisser : déplacer la barre — Alt + clic : figer"], 1, 1, 1)
+			GameTooltip:AddLine(L["Maj + clic droit : masquer la barre"], 1, 1, 1)
 		end
 		P.ShowTooltip()
 	end)
@@ -752,10 +753,10 @@ function P.RefreshTeamBar()
 		bar.header:SetText(color and color:WrapTextInColorCode(name) or name)
 	elseif team then
 		bar.header:SetText(team .. " |cff999999(" .. #items .. ")|r")
-		listPanel.emptyText:SetText("Aucun personnage dans l'équipe")
+		listPanel.emptyText:SetText(L["Aucun personnage dans l'équipe"])
 	else
-		bar.header:SetText("|cff999999Aucune équipe|r")
-		listPanel.emptyText:SetText("Sélectionnez une équipe")
+		bar.header:SetText("|cff999999" .. L["Aucune équipe"] .. "|r")
+		listPanel.emptyText:SetText(L["Sélectionnez une équipe"])
 	end
 
 	toggleIcon:SetTexture(state.expanded and "Interface\\Buttons\\UI-MinusButton-Up"

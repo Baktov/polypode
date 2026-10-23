@@ -1,6 +1,7 @@
 -- Polypode: Quests — quêtes et dialogues de PNJ du leader rejoués par les membres
 
 local P = Polypode
+local L = P.L
 
 -- Fonctionnement (repris de TeamManager). Le leader de l'équipe sélectionnée annonce ses
 -- actions de quête au groupe/raid ; les membres les rejouent. Chaque message peut arriver
@@ -264,8 +265,8 @@ local function StartShareTracking(questID)
 			P.Debug("Quête " .. questID .. " partagée (manquante : " .. table.concat(missing, ", ") .. ")")
 		else
 			track.reported = true
-			ShowLeaderInfo("Quête « " .. QuestTitle(questID) .. " » non partageable : à prendre "
-				.. "au PNJ pour " .. table.concat(missing, ", ") .. ".")
+			ShowLeaderInfo(L["Quête « %s » non partageable : à prendre au PNJ pour %s."]:format(QuestTitle(questID),
+				table.concat(missing, ", ")))
 		end
 	end)
 
@@ -273,8 +274,8 @@ local function StartShareTracking(questID)
 		shareTracks[questID] = nil
 		local missing = MissingMembers(track)
 		if not track.reported and #missing > 0 then
-			ShowLeaderInfo("Quête « " .. QuestTitle(questID) .. " » non acceptée (ou sans "
-				.. "confirmation) par " .. table.concat(missing, ", ") .. ".")
+			ShowLeaderInfo(L["Quête « %s » non acceptée (ou sans confirmation) par %s."]:format(QuestTitle(questID),
+				table.concat(missing, ", ")))
 		end
 	end)
 end

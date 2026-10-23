@@ -1,10 +1,14 @@
 -- Polypode: Commands — commandes slash /polypode et /poly, keybindings globaux
 
 local P = Polypode
+local L = P.L
 
 -- Sous-commandes ajoutées par des addons compagnons (ex. Polypode Photo) :
 -- [nom] = { handler = fn(args), help = texte }.
 local extraCommands = {}
+
+-- Alias anglais des sous-commandes françaises de Polypode.
+local ALIASES = { accounts = "comptes", ["remove-account"] = "retirer-compte" }
 
 -- Ajoute une sous-commande /poly <nom> ; handler reçoit les mots qui suivent ; help nil =
 -- alias absent de l'aide. Point d'extension pour les addons qui dépendent de Polypode.
@@ -13,17 +17,17 @@ function P.RegisterSlashCommand(name, handler, help)
 end
 
 local function PrintHelp()
-	print("|cff33ff99Polypode|r — commandes :")
-	print("  /poly list         — lister les personnages connus")
-	print("  /poly addme        — ajouter le personnage courant au roster")
-	print("  /poly remove <nom-royaume> — retirer un personnage du roster")
-	print("  /poly import       — importer une liste de personnages (copier/coller)")
-	print("  /poly ui           — ouvrir/fermer la fenêtre")
-	print("  /poly minimap      — afficher/masquer l'icône de minimap")
-	print("  /poly options      — ouvrir le panneau d'options")
-	print("  /poly comptes      — lister les autres comptes Battle.net autorisés")
-	print("  /poly retirer-compte <n°> — retirer l'autorisation d'un compte")
-	print("  /poly debug        — activer/désactiver le mode debug")
+	print(L["|cff33ff99Polypode|r — commandes :"])
+	print(L["  /poly list         — lister les personnages connus"])
+	print(L["  /poly addme        — ajouter le personnage courant au roster"])
+	print(L["  /poly remove <nom-royaume> — retirer un personnage du roster"])
+	print(L["  /poly import       — importer une liste de personnages (copier/coller)"])
+	print(L["  /poly ui           — ouvrir/fermer la fenêtre"])
+	print(L["  /poly minimap      — afficher/masquer l'icône de minimap"])
+	print(L["  /poly options      — ouvrir le panneau d'options"])
+	print(L["  /poly comptes      — lister les autres comptes Battle.net autorisés"])
+	print(L["  /poly retirer-compte <n°> — retirer l'autorisation d'un compte"])
+	print(L["  /poly debug        — activer/désactiver le mode debug"])
 	for name, command in pairs(extraCommands) do
 		if command.help then -- sans aide : alias (ex. « quêtes » pour « quetes »)
 			print(string.format("  /poly %-12s — %s", name, command.help))
@@ -37,32 +41,33 @@ local function SlashHandler(msg)
 		table.insert(args, word)
 	end
 	local sub = (args[1] or ""):lower()
+	sub = ALIASES[sub] or sub
 
 	if sub == "list" then
 		local roster = P.GetRoster()
 		local count = 0
 		for key, entry in pairs(roster) do
 			count = count + 1
-			print(string.format("  - %s (%s, niv. %s)", key, entry.class or "?", entry.level or "?"))
+			print(L["  - %s (%s, niv. %s)"]:format(key, entry.class or "?", entry.level or "?"))
 		end
 		if count == 0 then
-			print("  Aucun personnage enregistré. Utilisez /poly addme")
+			print(L["  Aucun personnage enregistré. Utilisez /poly addme"])
 		end
 	elseif sub == "addme" then
 		local key = P.AddCharacter()
 		P.SayHello()
-		print("Polypode: " .. key .. " ajouté au roster.")
+		print(L["Polypode : %s ajouté au roster."]:format(key))
 	elseif sub == "remove" then
 		local target = args[2]
 		if target then
 			if P.RemoveCharacter(target) then
 				P.RefreshUI()
-				print("Polypode: " .. target .. " retiré du roster.")
+				print(L["Polypode : %s retiré du roster."]:format(target))
 			else
-				print("Polypode: " .. target .. " absent du roster.")
+				print(L["Polypode : %s absent du roster."]:format(target))
 			end
 		else
-			print("Usage: /poly remove <nom-royaume>")
+			print(L["Usage : /poly remove <nom-royaume>"])
 		end
 	elseif sub == "import" then
 		P.ShowImportWindow()
@@ -71,15 +76,15 @@ local function SlashHandler(msg)
 	elseif sub == "minimap" then
 		local show = P.db.minimap.hide
 		P.SetMinimapButtonShown(show)
-		print("Polypode: icône de minimap " .. (show and "affichée" or "masquée"))
+		print(show and L["Polypode : icône de minimap affichée."] or L["Polypode : icône de minimap masquée."])
 	elseif sub == "options" then
 		P.OpenOptions()
 	elseif sub == "comptes" then
 		local list = P.GetTrustedTokens()
 		if #list == 0 then
-			print("Polypode: aucun autre compte autorisé.")
+			print(L["Polypode : aucun autre compte autorisé."])
 		else
-			print("Polypode: comptes autorisés (personnage vu à l'autorisation) :")
+			print(L["Polypode : comptes autorisés (personnage vu à l'autorisation) :"])
 			for i, account in ipairs(list) do
 				print(string.format("  %d. %s", i, account.label))
 			end
@@ -87,13 +92,13 @@ local function SlashHandler(msg)
 	elseif sub == "retirer-compte" then
 		local account = P.GetTrustedTokens()[tonumber(args[2] or "")]
 		if account and P.UntrustToken(account.token) then
-			print("Polypode: autorisation retirée pour le compte de " .. account.label .. ".")
+			print(L["Polypode : autorisation retirée pour le compte de %s."]:format(account.label))
 		else
-			print("Usage: /poly retirer-compte <n°> (numéro donné par /poly comptes)")
+			print(L["Usage : /poly retirer-compte <n°> (numéro donné par /poly comptes)"])
 		end
 	elseif sub == "debug" then
 		P.SetDebug(not P.debugEnabled)
-		print("Polypode: debug " .. (P.debugEnabled and "activé" or "désactivé"))
+		print(P.debugEnabled and L["Polypode : mode debug activé."] or L["Polypode : mode debug désactivé."])
 	elseif extraCommands[sub] then
 		extraCommands[sub].handler({ select(2, unpack(args)) })
 	else
@@ -144,14 +149,14 @@ end
 function POLYPODE_SETLEADER()
 	local team = P.GetSelectedTeam()
 	if not team then
-		ShowError("Polypode : aucune équipe sélectionnée.")
+		ShowError(L["Polypode : aucune équipe sélectionnée."])
 		return
 	end
 	local key = P.GetCharKey()
 	P.AddTeamMember(team, key)
 	P.SetTeamLeader(team, key)
 	P.RefreshUI()
-	ShowInfo("Vous êtes le leader de l'équipe « " .. team .. " ».")
+	ShowInfo(L["Vous êtes le leader de l'équipe « %s »."]:format(team))
 end
 
 -- Suivre / Assister / Barbare / Train : la touche est normalement redirigée vers un bouton sécurisé
@@ -159,7 +164,7 @@ end
 -- redirection n'est pas encore en place (ex. touche choisie pendant un combat).
 function POLYPODE_FOLLOW()
 	P.UpdateLeaderMacros()
-	ShowError("Polypode : raccourci en cours d'activation, appuyez de nouveau (hors combat).")
+	ShowError(L["Polypode : raccourci en cours d'activation, appuyez de nouveau (hors combat)."])
 end
 
 function POLYPODE_ASSIST()

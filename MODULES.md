@@ -34,6 +34,8 @@ publique `P.*`, listée dans la section « Dépendances vers Polypode » de leur
   « Glisser », « glisser/déposer »...) est en **bleu**
   (`P.CLICK_COLOR`) : afficher une infobulle par `P.ShowTooltip()`, jamais `GameTooltip:Show()`
   (repli local si la fonction manque) ; descriptions d'options passées par `P.ColorClicks(texte)`.
+- **Langues** : tout texte affiché passe par la table de textes du module, `L["texte français"]`
+  (section « Langues » ci-dessous) ; jamais de texte affiché écrit en dur.
 - **Textes affichés en jeu** : caractères latins courants seulement (accents, « », ·, × : oui) ; pas de flèches ni de symboles (→, ⇒, ✓, …) : absents des polices du jeu, ils s'affichent en carré vide (vu le 2026-10-18 dans la frise d'Histoire).
 - **Pas de `print()`** : `P.Debug(msg)` (mode debug), ou `UIErrorsFrame:AddMessage` pour un message
   à l'écran.
@@ -46,6 +48,36 @@ publique `P.*`, listée dans la section « Dépendances vers Polypode » de leur
   moitié implémentée.
 - Toujours **lire** le fichier cible avant de le modifier ; vérifier les API WoW avec les serveurs
   MCP `wow` / `wow-addon-api` / `wow-api` plutôt que de mémoire.
+
+## Langues
+
+Les modules s'affichent dans la langue du jeu : français, sinon anglais (repli de toute autre
+langue). Outils dans Polypode 2.8.0 (`Locale.lua`) : `P.NewLocale()`, `P.AddTranslations`, `P.LOCALE`.
+
+- **Clé = texte français** : `L["Inviter l'équipe"]` ; en français la table est vide et renvoie la
+  clé. Une phrase avec des valeurs est un **format**, `L["Équipe « %s » créée."]:format(nom)`, jamais
+  des morceaux de phrase concaténés (l'ordre des mots change d'une langue à l'autre). Codes couleur
+  (`|cff...|r`) laissés hors de la clé quand c'est simple ; `|n` (retour à la ligne) peut y rester.
+- **Fichiers** : Polypode utilise `local L = P.L`. Un compagnon crée sa table dans un `Locale.lua`
+  chargé en premier par son `.toc` (`L = P.NewLocale()`, rangée dans la table d'addon ; repli si
+  Polypode est trop ancien : table dont `__index` renvoie la clé), puis `Locales\enUS.lua` :
+  `P.AddTranslations(L, "enUS", { ["texte français"] = "English text", ... })`, groupé par fichier
+  (`-- Fichier.lua`). Une autre langue : `Locales\deDE.lua`, même forme, ajouté au `.toc`.
+- **Hors table** : noms donnés par le jeu (classes par `LOCALIZED_CLASS_NAMES_MALE`, zones,
+  royaumes, quêtes, renommées : déjà dans la langue du client), noms propres (Polypode, Monopode),
+  messages `P.Debug` (restent en français), noms des commandes slash (français ; alias anglais
+  enregistrés en plus, sans aide).
+- **XML** : pas d'attribut `text=` ; le texte est posé dans l'`OnLoad` par `L[...]`. Les textes
+  définis au chargement (`BINDING_NAME_*`, `StaticPopupDialogs`) peuvent utiliser `L` : les fichiers
+  de langue sont chargés avant.
+- **Infobulles anglaises** : `P.ColorClicks` reconnaît « click », « clicks », « clickable »,
+  « Right-click », « Left-click », « Double-click », « drag » (« drags », « dragging », « dragged »,
+  « drag and drop ») ; modificateurs écrits « Shift + », « Alt + », « Ctrl + ».
+- **`.toc`** : `## Notes:` en anglais, `## Notes-frFR:` en français.
+- **Contrôle** avant chaque commit qui touche des textes, depuis `ADDONS_POLYPODE` :
+  `python Polypode\tools\check_locale.py <dossier du module>`. Il doit afficher 0 clé sans
+  traduction anglaise et 0 format différent. Les textes français hors `L[...]` qu'il liste sont à
+  relire.
 
 ## Avant de toucher un module
 

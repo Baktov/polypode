@@ -24,7 +24,7 @@ import tempfile
 import zipfile
 
 # Fichiers de développement jamais livrés (nom de fichier, ou dossier de premier niveau avec /).
-EXCLUDE_NAMES = {'CLAUDE.md', 'MODULES.md', '.gitignore', '.gitattributes', 'publier_version.py'}
+EXCLUDE_NAMES = {'CLAUDE.md', 'MODULES.md', '.gitignore', '.gitattributes', 'publier_version.py', 'check_locale.py'}
 EXCLUDE_DIRS = {'Modele/', '.vscode/', '.kilo/'}
 # Dossiers propres à un module : outils de développement (Polypode garde tools/ : import_bnet.py
 # est présenté aux joueurs dans son README).

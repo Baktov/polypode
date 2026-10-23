@@ -2,6 +2,7 @@
 -- « Barbare » et « Train »
 
 local P = Polypode
+local L = P.L
 
 -- Suivre et assister sont des actions protégées : un addon ne peut pas les déclencher
 -- lui-même. Chaque raccourci est donc redirigé (SetOverrideBindingClick) vers un bouton
@@ -98,11 +99,11 @@ local function RefreshMacros()
 	local leader = team and P.GetTeamLeader(team)
 	local problem, leaderName
 	if not team then
-		problem = "Polypode : aucune équipe sélectionnée."
+		problem = L["Polypode : aucune équipe sélectionnée."]
 	elseif not leader then
-		problem = "Polypode : l'équipe « " .. team .. " » n'a pas de leader."
+		problem = L["Polypode : l'équipe « %s » n'a pas de leader."]:format(team)
 	elseif leader == P.GetCharKey() then
-		problem = "Polypode : vous êtes le leader de l'équipe « " .. team .. " »."
+		problem = L["Polypode : vous êtes le leader de l'équipe « %s »."]:format(team)
 	else
 		local entry = P.GetCharacter(leader)
 		if entry then

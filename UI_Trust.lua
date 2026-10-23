@@ -1,6 +1,7 @@
 -- Polypode: UI_Trust — demande d'autorisation d'un autre compte Battle.net vu sur le canal dédié
 
 local P = Polypode
+local L = P.L
 
 -- Une annonce de connexion (HELLO/HI) reçue sur le canal dédié avec un token inconnu
 -- (Sync.lua) ouvre une fenêtre : canal (nom, numéro), personnage, classe, niveau.
@@ -18,8 +19,8 @@ local ShowNext
 
 StaticPopupDialogs[POPUP] = {
 	text = "%s",
-	button1 = "Autoriser",
-	button2 = "Refuser",
+	button1 = L["Autoriser"],
+	button2 = L["Refuser"],
 	OnAccept = function(_, request)
 		P.TrustToken(request.token, request.label)
 		P.Debug("Compte autorisé : " .. request.label)
@@ -73,10 +74,10 @@ function P.PromptTrust(token, message, channel, sender)
 	local className = class and LOCALIZED_CLASS_NAMES_MALE and LOCALIZED_CLASS_NAMES_MALE[class] or class or "?"
 	local channelName = P.GetSyncChannelName()
 	local text = string.format(
-		"Polypode : un personnage d'un autre compte Battle.net s'annonce sur le canal dédié.\n\n"
+		L["Polypode : un personnage d'un autre compte Battle.net s'annonce sur le canal dédié.\n\n"
 			.. "Canal : %s (n° %d)\nPersonnage : %s\nClasse : %s, niveau %s\n\n"
 			.. "Autoriser ce compte à échanger avec Polypode (roster, équipes, groupage, "
-			.. "actions du leader) ?",
+			.. "actions du leader) ?"],
 		channelName, GetChannelName(channelName), label, className, level or "?")
 
 	queue[#queue + 1] = {

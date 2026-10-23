@@ -2,6 +2,7 @@
 -- (raccourcis « Barbare » et « Train »)
 
 local P = Polypode
+local L = P.L
 
 -- Membre : le suivi automatique (/follow, raccourci « Suivre le leader ») commence avec
 -- AUTOFOLLOW_BEGIN (nom suivi) et s'arrête avec AUTOFOLLOW_END (obstacle, saut, distance,
@@ -126,7 +127,7 @@ end
 function P.GetBarbareFollowUnit()
 	local members = GroupMembers()
 	if #members == 0 then
-		return nil, "Polypode : aucun autre joueur connecté dans le groupe."
+		return nil, L["Polypode : aucun autre joueur connecté dans le groupe."]
 	end
 	local current = followState[OwnKey()]
 	local choices = {}
@@ -147,7 +148,7 @@ end
 function P.GetTrainFollowUnit()
 	local members = GroupMembers()
 	if #members == 0 then
-		return nil, "Polypode : aucun autre joueur connecté dans le groupe."
+		return nil, L["Polypode : aucun autre joueur connecté dans le groupe."]
 	end
 	local own = OwnKey()
 	local inGroup = { [own] = true }
@@ -173,7 +174,7 @@ function P.GetTrainFollowUnit()
 		end
 	end
 	if #choices == 0 then
-		return nil, "Polypode : tous les joueurs du groupe sont déjà suivis."
+		return nil, L["Polypode : tous les joueurs du groupe sont déjà suivis."]
 	end
 	local pool = #preferred > 0 and preferred or choices
 	return pool[math.random(#pool)].unit
@@ -246,6 +247,6 @@ function P.OnFollowEndMessage(key)
 		return
 	end
 	lastAlert[key] = now
-	UIErrorsFrame:AddMessage(P.GetDisplayName(key) .. " ne vous suit plus.", 1, 0.5, 0)
+	UIErrorsFrame:AddMessage(L["%s ne vous suit plus."]:format(P.GetDisplayName(key)), 1, 0.5, 0)
 	PlaySound(SOUNDKIT.RAID_WARNING)
 end

@@ -2,20 +2,21 @@
 
 Polypode = Polypode or {}
 local P = Polypode
+local L = P.L
 
 P.SYNC_PREFIX = "POLYPODE"
 P.debugEnabled = false
 
 BINDING_HEADER_POLYPODE = "Polypode"
-_G["BINDING_NAME_POLYPODE_TOGGLEUI"] = "Ouvrir/Fermer l'interface"
-_G["BINDING_NAME_POLYPODE_SETLEADER"] = "Se nommer leader de l'équipe"
-_G["BINDING_NAME_POLYPODE_FOLLOW"] = "Suivre le leader"
-_G["BINDING_NAME_POLYPODE_ASSIST"] = "Assister le leader"
-_G["BINDING_NAME_POLYPODE_BARBARE"] = "Barbare : suivre un joueur du groupe au hasard"
-_G["BINDING_NAME_POLYPODE_TRAIN"] = "Train : suivre un joueur du groupe que personne ne suit"
-_G["BINDING_NAME_POLYPODE_INVITE"] = "Inviter l'équipe"
-_G["BINDING_NAME_POLYPODE_SENDVOLUME"] = "Envoyer le volume à l'équipe"
-_G["BINDING_NAME_POLYPODE_TOGGLESOUND"] = "Couper/rétablir le son de l'équipe"
+_G["BINDING_NAME_POLYPODE_TOGGLEUI"] = L["Ouvrir/Fermer l'interface"]
+_G["BINDING_NAME_POLYPODE_SETLEADER"] = L["Se nommer leader de l'équipe"]
+_G["BINDING_NAME_POLYPODE_FOLLOW"] = L["Suivre le leader"]
+_G["BINDING_NAME_POLYPODE_ASSIST"] = L["Assister le leader"]
+_G["BINDING_NAME_POLYPODE_BARBARE"] = L["Barbare : suivre un joueur du groupe au hasard"]
+_G["BINDING_NAME_POLYPODE_TRAIN"] = L["Train : suivre un joueur du groupe que personne ne suit"]
+_G["BINDING_NAME_POLYPODE_INVITE"] = L["Inviter l'équipe"]
+_G["BINDING_NAME_POLYPODE_SENDVOLUME"] = L["Envoyer le volume à l'équipe"]
+_G["BINDING_NAME_POLYPODE_TOGGLESOUND"] = L["Couper/rétablir le son de l'équipe"]
 
 P.defaults = {
 	roster = {}, -- [nom-royaume] = { name, realm, class, level, lastSeen }
@@ -195,24 +196,36 @@ local function ActiveColor(text, pos)
 end
 
 -- Fin de l'expression de souris commençant à first (mot reconnu jusqu'à last) : côté (« gauche »,
--- « droit ») d'un clic, « /déposer » ou « -déposer » d'un glisser.
+-- « droit ») d'un clic, « /déposer » ou « -déposer » d'un glisser (anglais : « and drop »).
 local function ExtendRight(text, last, isDrag)
 	local tail
 	if isDrag then
 		tail = text:match("^/[Dd]époser", last + 1) or text:match("^%-[Dd]époser", last + 1)
+			or text:match("^ and drop", last + 1) or text:match("^%-and%-drop", last + 1)
 	else
 		tail = text:match("^ gauche", last + 1) or text:match("^ droit", last + 1)
 	end
 	return tail and last + #tail or last
 end
 
--- Début de l'expression : « double- » et touches de modification (« Maj + », « Alt + Maj + »...).
+-- Début de l'expression : « double- » (anglais : « right- », « left- ») et touches de modification
+-- (« Maj + », « Alt + Maj + »...).
 local function ExtendLeft(text, start)
+	for _, prefix in ipairs({ "right-", "left-" }) do
+		if text:sub(start - #prefix, start - 1):lower() == prefix then
+			start = start - #prefix
+			break
+		end
+	end
 	if text:sub(start - 7, start - 1):lower() == "double-" then
 		start = start - 7
 	end
 	while true do
 		local word = text:sub(1, start - 1):match("(%a+) %+ $")
+		-- Après un saut de ligne « |n » : « nMaj » → « Maj ».
+		if word and word:sub(1, 1) == "n" and text:sub(start - #word - 4, start - #word - 4) == "|" then
+			word = word:sub(2)
+		end
 		if not (word and CLICK_MODIFIERS[word]) then
 			return start
 		end
@@ -222,12 +235,17 @@ end
 
 -- Prochain mot de souris à partir de pos : début, fin, vrai si c'est un glisser ; nil s'il n'y en
 -- a plus. Mots entiers : « clic », « clics », « cliquable(s) », « glisser » et ses formes
--- (« glissez », « glissé »...) ; pas « clique », « cliquer ».
+-- (« glissez », « glissé »...) ; pas « clique », « cliquer ». Anglais : « click », « clicks »,
+-- « clickable », « drag », « drags », « dragging », « dragged » (pas « dragon »).
+local function Earliest(a, b)
+	return a and (not b or a < b) and a or b
+end
+
 local function NextMouseWord(text, pos)
 	while true do
-		local clickFirst = text:find("[Cc]li[cq]", pos) -- « clic », « cliquable »
-		local dragFirst = text:find("[Gg]liss", pos)
-		local first = clickFirst and (not dragFirst or clickFirst < dragFirst) and clickFirst or dragFirst
+		local clickFirst = text:find("[Cc]li[cq]", pos) -- « clic », « cliquable », « click »
+		local dragFirst = Earliest(text:find("[Gg]liss", pos), text:find("[Dd]rag", pos))
+		local first = Earliest(clickFirst, dragFirst)
 		if not first then
 			return nil
 		end
@@ -235,11 +253,13 @@ local function NextMouseWord(text, pos)
 		local before = text:sub(first - 1, first - 1)
 		local word = text:match("^[%a\128-\255]+", first) -- mot entier (lettres accentuées comprises)
 		local valid = not before:find("[%a\128-\255]")
+		local lower = word:lower()
 		if isDrag then
-			valid = valid and word:lower():find("^gliss") ~= nil
+			valid = valid and (lower:find("^gliss") ~= nil or lower == "drag" or lower == "drags"
+				or lower == "dragging" or lower == "dragged")
 		else
-			local lower = word:lower()
-			valid = valid and (lower == "clic" or lower == "clics" or lower == "cliquable" or lower == "cliquables")
+			valid = valid and (lower == "clic" or lower == "clics" or lower == "cliquable" or lower == "cliquables"
+				or lower == "click" or lower == "clicks" or lower == "clickable")
 		end
 		if valid then
 			return first, first + #word - 1, isDrag
@@ -250,7 +270,7 @@ end
 
 function P.ColorClicks(text)
 	if type(text) ~= "string" or (issecretvalue and issecretvalue(text))
-		or not (text:find("[Cc]li[cq]") or text:find("[Gg]liss")) then
+		or not (text:find("[Cc]li[cq]") or text:find("[Gg]liss") or text:find("[Dd]rag")) then
 		return text
 	end
 	local out, pos = {}, 1
@@ -395,13 +415,13 @@ end
 -- avec les autres Polypode. Renvoie true et la clé, ou false et un message d'erreur.
 function P.AddTargetCharacter()
 	if not UnitExists("target") or not UnitIsPlayer("target") then
-		return false, "Ciblez d'abord un joueur."
+		return false, L["Ciblez d'abord un joueur."]
 	end
 	local name, realm, surname = P.UnitNameParts("target")
 	realm = realm or GetRealmName()
 	local key = P.GetCharKey(name, realm)
 	if P.GetCharacter(key) then
-		return false, key .. " est déjà dans la liste."
+		return false, L["%s est déjà dans la liste."]:format(key)
 	end
 
 	local entry = P.db.roster[key] or {}
@@ -451,15 +471,15 @@ function P.DescribeCharacterData(key)
 	local lines = {}
 	local teams = P.GetCharacterTeams(key)
 	if #teams > 0 then
-		lines[#lines + 1] = "Polypode : membre de " .. table.concat(teams, ", ")
+		lines[#lines + 1] = L["Polypode : membre de %s"]:format(table.concat(teams, ", "))
 	end
 	if P.GetCharacterAccount(key) then
-		lines[#lines + 1] = "Polypode : compte WoW « " .. P.GetCharacterAccount(key) .. " »"
+		lines[#lines + 1] = L["Polypode : compte WoW « %s »"]:format(P.GetCharacterAccount(key))
 	end
 	for _, handler in ipairs(characterDataHandlers) do
 		local ok, text = pcall(handler.describe, key)
 		if ok and text then
-			lines[#lines + 1] = handler.name .. " : " .. text
+			lines[#lines + 1] = L["%s : %s"]:format(handler.name, text)
 		end
 	end
 	return lines
@@ -568,13 +588,13 @@ end
 local function CheckTeamName(name)
 	name = strtrim(name or "")
 	if name == "" then
-		return nil, "Nom d'équipe vide."
+		return nil, L["Nom d'équipe vide."]
 	end
 	if name:find(":", 1, true) then
-		return nil, "Nom d'équipe invalide : pas de « : »."
+		return nil, L["Nom d'équipe invalide : pas de « : »."]
 	end
 	if ActiveTeam(name) then
-		return nil, "L'équipe « " .. name .. " » existe déjà."
+		return nil, L["L'équipe « %s » existe déjà."]:format(name)
 	end
 	return name
 end
@@ -609,10 +629,10 @@ end
 function P.RenameTeam(oldName, newName)
 	local team = ActiveTeam(oldName)
 	if not team then
-		return false, "Équipe introuvable."
+		return false, L["Équipe introuvable."]
 	end
 	if strtrim(newName or "") == oldName then
-		return false, "Le nom n'a pas changé."
+		return false, L["Le nom n'a pas changé."]
 	end
 	local err
 	newName, err = CheckTeamName(newName)
@@ -902,10 +922,10 @@ end
 function P.RenameAccount(oldLabel, newLabel)
 	newLabel = strtrim(newLabel or "")
 	if newLabel == "" then
-		return false, "Nom de compte vide."
+		return false, L["Nom de compte vide."]
 	end
 	if newLabel == oldLabel then
-		return false, "Le nom n'a pas changé."
+		return false, L["Le nom n'a pas changé."]
 	end
 	local keys = {}
 	for key, entry in pairs(P.db.accountLabels) do
@@ -946,13 +966,13 @@ function P.CheckSyncChannelName(name)
 		return ""
 	end
 	if name:find("[%s:]") then
-		return nil, "Nom de canal invalide : pas d'espace ni de « : »."
+		return nil, L["Nom de canal invalide : pas d'espace ni de « : »."]
 	end
 	if name:find("^%d") then
-		return nil, "Nom de canal invalide : il ne doit pas commencer par un chiffre."
+		return nil, L["Nom de canal invalide : il ne doit pas commencer par un chiffre."]
 	end
 	if #name > 31 then
-		return nil, "Nom de canal trop long (31 caractères au plus)."
+		return nil, L["Nom de canal trop long (31 caractères au plus)."]
 	end
 	return name
 end
@@ -1025,21 +1045,21 @@ end
 -- bouton « Inviter l'équipe » et au raccourci clavier.
 function P.GetInviteBlockedReason(teamName)
 	if not teamName then
-		return "Sélectionnez d'abord une équipe."
+		return L["Sélectionnez d'abord une équipe."]
 	end
 	local leader = P.GetTeamLeader(teamName)
 	if not leader then
-		return "L'équipe n'a pas de leader : clic gauche sur un de ses personnages pour le désigner."
+		return L["L'équipe n'a pas de leader : clic gauche sur un de ses personnages pour le désigner."]
 	end
 	if leader ~= P.GetCharKey() then
-		return "Seul le leader de l'équipe (" .. leader .. ") peut inviter l'équipe."
+		return L["Seul le leader de l'équipe (%s) peut inviter l'équipe."]:format(leader)
 	end
 	for key in pairs(P.GetTeamMembers(teamName) or {}) do
 		if key ~= P.GetCharKey() then
 			return nil
 		end
 	end
-	return "L'équipe ne compte aucun autre membre que vous."
+	return L["L'équipe ne compte aucun autre membre que vous."]
 end
 
 -- Nom à passer aux API qui ciblent un joueur (invitation, chuchotement addon) : "Nom" sur
@@ -1179,12 +1199,12 @@ end
 function P.InviteTeam(teamName)
 	if IsInGroup() and not UnitIsGroupLeader("player")
 		and not (IsInRaid() and UnitIsGroupAssistant("player")) then
-		return false, "Seul le chef du groupe peut inviter."
+		return false, L["Seul le chef du groupe peut inviter."]
 	end
 
 	local invitees = P.GetTeamInvitees(teamName)
 	if #invitees == 0 then
-		return false, "Aucun membre de l'équipe à inviter."
+		return false, L["Aucun membre de l'équipe à inviter."]
 	end
 
 	local slots = #invitees
@@ -1196,10 +1216,9 @@ function P.InviteTeam(teamName)
 		P.Debug("Invitation : " .. invitees[i])
 	end
 
-	local message = slots .. " invitation(s) envoyée(s)."
+	local message = L["%d invitation(s) envoyée(s)."]:format(slots)
 	if slots < #invitees then
-		message = message .. " Groupe complet : convertissez-le en raid puis réinvitez les "
-			.. (#invitees - slots) .. " restant(s)."
+		message = message .. " " .. L["Groupe complet : convertissez-le en raid puis réinvitez les %d restant(s)."]:format(#invitees - slots)
 	end
 	return true, message
 end

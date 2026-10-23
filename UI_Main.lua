@@ -1,6 +1,7 @@
 -- Polypode: UI_Main — fenêtre principale : BuildUI, RefreshUI, ToggleUI
 
 local P = Polypode
+local L = P.L
 local ui = {}
 P.ui = ui
 
@@ -29,14 +30,14 @@ local function SubmitRename(popup, oldName)
 		UIErrorsFrame:AddMessage(result, 1, 0.1, 0.1)
 		return true -- reste ouverte
 	end
-	UIErrorsFrame:AddMessage("Équipe « " .. oldName .. " » renommée en « " .. result .. " ».", 1, 0.82, 0)
+	UIErrorsFrame:AddMessage(L["Équipe « %s » renommée en « %s »."]:format(oldName, result), 1, 0.82, 0)
 	P.RefreshUI()
 end
 
 StaticPopupDialogs[RENAME_POPUP] = {
-	text = "Nouveau nom de l'équipe « %s » :",
-	button1 = "Renommer",
-	button2 = "Annuler",
+	text = L["Nouveau nom de l'équipe « %s » :"],
+	button1 = L["Renommer"],
+	button2 = L["Annuler"],
 	hasEditBox = true,
 	maxLetters = 32,
 	OnShow = function(self, oldName)
@@ -68,7 +69,7 @@ local NEW_ACCOUNT_POPUP = "POLYPODE_NEW_ACCOUNT"
 local function SubmitNewAccount(popup, key)
 	local label = strtrim(PopupEditBox(popup):GetText() or "")
 	if label == "" then
-		UIErrorsFrame:AddMessage("Nom de compte vide.", 1, 0.1, 0.1)
+		UIErrorsFrame:AddMessage(L["Nom de compte vide."], 1, 0.1, 0.1)
 		return true -- reste ouverte
 	end
 	P.SetCharacterAccount(key, label)
@@ -76,9 +77,9 @@ local function SubmitNewAccount(popup, key)
 end
 
 StaticPopupDialogs[NEW_ACCOUNT_POPUP] = {
-	text = "Nom du compte WoW de %s :",
-	button1 = "Créer",
-	button2 = "Annuler",
+	text = L["Nom du compte WoW de %s :"],
+	button1 = L["Créer"],
+	button2 = L["Annuler"],
 	hasEditBox = true,
 	maxLetters = 32,
 	OnShow = function(self)
@@ -117,15 +118,15 @@ local function SubmitRenameAccount(popup, oldLabel)
 	local collapsed = P.charDb.collapsedAccounts
 	collapsed["m:" .. newLabel] = collapsed["m:" .. newLabel] or collapsed["m:" .. oldLabel]
 	collapsed["m:" .. oldLabel] = nil
-	UIErrorsFrame:AddMessage("Compte « " .. oldLabel .. " » renommé en « " .. newLabel .. " » ("
-		.. result .. " personnage(s)).", 1, 0.82, 0)
+	UIErrorsFrame:AddMessage(L["Compte « %s » renommé en « %s » (%d personnage(s))."]:format(oldLabel, newLabel, result),
+		1, 0.82, 0)
 	P.RefreshUI()
 end
 
 StaticPopupDialogs[RENAME_ACCOUNT_POPUP] = {
-	text = "Nouveau nom du compte WoW « %s » (un nom existant regroupe les deux comptes) :",
-	button1 = "Renommer",
-	button2 = "Annuler",
+	text = L["Nouveau nom du compte WoW « %s » (un nom existant regroupe les deux comptes) :"],
+	button1 = L["Renommer"],
+	button2 = L["Annuler"],
 	hasEditBox = true,
 	maxLetters = 32,
 	OnShow = function(self, oldLabel)
@@ -158,8 +159,8 @@ StaticPopupDialogs[RENAME_ACCOUNT_POPUP] = {
 local REMOVE_CHARACTER_POPUP = "POLYPODE_REMOVE_CHARACTER"
 
 StaticPopupDialogs[REMOVE_CHARACTER_POPUP] = {
-	text = "Supprimer %s de Polypode ?%s\n\n(sur tous vos clients connectés ; il reviendra s'il se reconnecte avec Polypode)",
-	button1 = DELETE or "Supprimer",
+	text = L["Supprimer %s de Polypode ?%s\n\n(sur tous vos clients connectés ; il reviendra s'il se reconnecte avec Polypode)"],
+	button1 = DELETE or L["Supprimer"],
 	button2 = CANCEL,
 	OnAccept = function(_, key)
 		P.RemoveCharacter(key)
@@ -172,11 +173,11 @@ StaticPopupDialogs[REMOVE_CHARACTER_POPUP] = {
 
 local function ConfirmRemoveCharacter(key)
 	if key == P.GetCharKey() then
-		UIErrorsFrame:AddMessage("Le personnage joué ne peut pas être supprimé.", 1, 0.1, 0.1)
+		UIErrorsFrame:AddMessage(L["Le personnage joué ne peut pas être supprimé."], 1, 0.1, 0.1)
 		return
 	end
 	local lines = P.DescribeCharacterData(key)
-	local details = #lines > 0 and ("\n\nSeront aussi supprimés :\n" .. table.concat(lines, "\n")) or ""
+	local details = #lines > 0 and ("\n\n" .. L["Seront aussi supprimés :"] .. "\n" .. table.concat(lines, "\n")) or ""
 	StaticPopup_Show(REMOVE_CHARACTER_POPUP, P.GetDisplayName(key, true), details, key)
 end
 
@@ -186,8 +187,8 @@ end
 local REMOVE_MEMBER_POPUP = "POLYPODE_REMOVE_MEMBER"
 
 StaticPopupDialogs[REMOVE_MEMBER_POPUP] = {
-	text = "Retirer %s de l'équipe « %s » ?",
-	button1 = REMOVE or "Retirer",
+	text = L["Retirer %s de l'équipe « %s » ?"],
+	button1 = REMOVE or L["Retirer"],
 	button2 = CANCEL,
 	OnAccept = function(_, data)
 		P.RemoveTeamMember(data.team, data.key)
@@ -205,7 +206,7 @@ local function ConfirmRemoveMember(teamName, key)
 	if not members or not members[key] then
 		return
 	end
-	local extra = P.GetTeamLeader(teamName) == key and "\n\n(c'est le leader : l'équipe n'aura plus de leader)" or ""
+	local extra = P.GetTeamLeader(teamName) == key and "\n\n" .. L["(c'est le leader : l'équipe n'aura plus de leader)"] or ""
 	StaticPopup_Show(REMOVE_MEMBER_POPUP, P.GetDisplayName(key, true), teamName .. extra,
 		{ team = teamName, key = key })
 end
@@ -219,12 +220,12 @@ local function ShowAccountMenu(owner, key)
 		P.RefreshUI()
 	end
 	MenuUtil.CreateContextMenu(owner, function(_, root)
-		root:CreateTitle("Compte WoW de " .. P.GetDisplayName(key))
-		root:CreateRadio("Aucun compte", IsCurrent, Assign, "")
+		root:CreateTitle(L["Compte WoW de %s"]:format(P.GetDisplayName(key)))
+		root:CreateRadio(L["Aucun compte"], IsCurrent, Assign, "")
 		for _, label in ipairs(P.GetAccountLabels()) do
 			root:CreateRadio(label, IsCurrent, Assign, label)
 		end
-		root:CreateButton("Nouveau compte...", function()
+		root:CreateButton(L["Nouveau compte..."], function()
 			StaticPopup_Show(NEW_ACCOUNT_POPUP, P.GetDisplayName(key), nil, key)
 		end)
 	end)
@@ -511,7 +512,7 @@ local function AccountGroup(key)
 	if label then
 		return "m:" .. label, label
 	end
-	return NO_ACCOUNT_GROUP, "Compte non renseigné"
+	return NO_ACCOUNT_GROUP, L["Compte non renseigné"]
 end
 
 -- Clés des comptes affichés au dernier RefreshUI (bouton « Tout replier / déplier »).
@@ -569,16 +570,16 @@ local function CharacterTooltip(key, hints)
 
 	local teams = P.GetCharacterTeams(key)
 	if #teams == 0 then
-		lines[#lines + 1] = "|cff999999Dans aucune équipe|r"
+		lines[#lines + 1] = "|cff999999" .. L["Dans aucune équipe"] .. "|r"
 	else
-		lines[#lines + 1] = "|cffffd200Équipes :|r"
+		lines[#lines + 1] = "|cffffd200" .. L["Équipes :"] .. "|r"
 		for _, name in ipairs(teams) do
 			local line = name
 			if name == selectedTeam then
 				line = "|cff00ff00" .. name .. "|r"
 			end
 			if P.GetTeamLeader(name) == key then
-				line = line .. " |cffffd200(leader)|r"
+				line = line .. " |cffffd200" .. L["(leader)"] .. "|r"
 			end
 			lines[#lines + 1] = "  " .. line
 		end
@@ -611,17 +612,17 @@ local function FormatCharacter(data, teamName)
 		details[#details + 1] = LOCALIZED_CLASS_NAMES_MALE and LOCALIZED_CLASS_NAMES_MALE[entry.class] or entry.class
 	end
 	if entry.level then
-		details[#details + 1] = "niv. " .. entry.level
+		details[#details + 1] = L["niv. %s"]:format(entry.level)
 	end
 	if #details > 0 then
 		label = label .. " |cff999999" .. table.concat(details, " ") .. "|r"
 	end
 
 	if key == P.GetCharKey() then
-		label = label .. " |cff999999(vous)|r"
+		label = label .. " |cff999999" .. L["(vous)"] .. "|r"
 	end
 	if teamName and P.GetTeamLeader(teamName) == key then
-		label = label .. " |cffffd200[leader]|r"
+		label = label .. " |cffffd200" .. L["[leader]"] .. "|r"
 	end
 	return label
 end
@@ -641,8 +642,8 @@ function P.SetupChannelInput(editBox)
 		local ok, err = P.SetSyncChannel(self:GetText())
 		if ok then
 			local name = P.GetSyncChannelName()
-			UIErrorsFrame:AddMessage(name == "" and "Canal dédié désactivé."
-				or "Canal dédié : " .. name .. ".", 1, 0.82, 0)
+			UIErrorsFrame:AddMessage(name == "" and L["Canal dédié désactivé."]
+				or L["Canal dédié : %s."]:format(name), 1, 0.82, 0)
 			self:ClearFocus()
 			P.RefreshUI()
 		else
@@ -655,18 +656,18 @@ function P.SetupChannelInput(editBox)
 	end)
 	editBox:SetScript("OnEnter", function(self)
 		GameTooltip:SetOwner(self, "ANCHOR_BOTTOM")
-		GameTooltip:AddLine("Canal dédié (optionnel)")
-		GameTooltip:AddLine("Le plus simple : grouper vos personnages à la première connexion. "
+		GameTooltip:AddLine(L["Canal dédié (optionnel)"])
+		GameTooltip:AddLine(L["Le plus simple : grouper vos personnages à la première connexion. "
 			.. "Vos Polypode se trouvent alors par le groupe (ou par une guilde commune), sans "
-			.. "rien régler ici.", 1, 1, 1, true)
+			.. "rien régler ici."], 1, 1, 1, true)
 		GameTooltip:AddLine(" ")
-		GameTooltip:AddLine("Le canal dédié sert dans les autres cas : plusieurs comptes WoW ou "
+		GameTooltip:AddLine(L["Le canal dédié sert dans les autres cas : plusieurs comptes WoW ou "
 			.. "Battle.net, personnages sans guilde commune, pas encore groupés. C'est un canal de "
 			.. "discussion commun à vos comptes, rejoint automatiquement et invisible dans le chat, "
-			.. "où vos Polypode se trouvent dès la connexion.", 1, 1, 1, true)
+			.. "où vos Polypode se trouvent dès la connexion."], 1, 1, 1, true)
 		GameTooltip:AddLine(" ")
-		GameTooltip:AddLine("Entrée pour valider, vide pour désactiver. Partagé avec vos autres "
-			.. "Polypode connectés.", 0.8, 0.8, 0.8, true)
+		GameTooltip:AddLine(L["Entrée pour valider, vide pour désactiver. Partagé avec vos autres "
+			.. "Polypode connectés."], 0.8, 0.8, 0.8, true)
 		P.ShowTooltip()
 	end)
 	editBox:SetScript("OnLeave", GameTooltip_Hide)
@@ -847,7 +848,7 @@ function P.BuildUI()
 	local optionsBtn = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
 	optionsBtn:SetSize(70, 20)
 	optionsBtn:SetPoint("TOPLEFT", 6, -3)
-	optionsBtn:SetText("Options")
+	optionsBtn:SetText(L["Options"])
 	optionsBtn:RegisterForClicks("LeftButtonUp", "RightButtonUp")
 	optionsBtn:SetScript("OnClick", function(_, mouseButton)
 		if mouseButton == "RightButton" then
@@ -858,9 +859,9 @@ function P.BuildUI()
 	end)
 	optionsBtn:SetScript("OnEnter", function(self)
 		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-		GameTooltip:AddLine("Options")
-		GameTooltip:AddLine("Clic gauche : options de Polypode (Options > AddOns > Polypode).", 1, 1, 1, true)
-		GameTooltip:AddLine("Clic droit : raccourcis clavier de Polypode.", 1, 1, 1, true)
+		GameTooltip:AddLine(L["Options"])
+		GameTooltip:AddLine(L["Clic gauche : options de Polypode (Options > AddOns > Polypode)."], 1, 1, 1, true)
+		GameTooltip:AddLine(L["Clic droit : raccourcis clavier de Polypode."], 1, 1, 1, true)
 		P.ShowTooltip()
 	end)
 	optionsBtn:SetScript("OnLeave", GameTooltip_Hide)
@@ -868,7 +869,7 @@ function P.BuildUI()
 	-- Canal dédié (barre de titre, à droite de Options) : validé par Entrée, Échap annule.
 	local channelLabel = f:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
 	channelLabel:SetPoint("LEFT", optionsBtn, "RIGHT", 10, 0)
-	channelLabel:SetText("Canal :")
+	channelLabel:SetText(L["Canal :"])
 
 	local channelInput = CreateFrame("EditBox", nil, f, "InputBoxTemplate")
 	channelInput:SetSize(110, 18)
@@ -882,18 +883,18 @@ function P.BuildUI()
 	local soloText = soloCheck.Text or soloCheck.text
 	if soloText then
 		soloText:SetFontObject("GameFontNormalSmall")
-		soloText:SetText("|cffff4040Solo|r")
+		soloText:SetText("|cffff4040" .. L["Solo"] .. "|r")
 	end
 	soloCheck:SetScript("OnClick", function(self)
 		P.SetSoloMode(self:GetChecked())
 	end)
 	soloCheck:SetScript("OnEnter", function(self)
 		GameTooltip:SetOwner(self, "ANCHOR_BOTTOM")
-		GameTooltip:AddLine("Mode solo")
-		GameTooltip:AddLine("Pour jouer un seul personnage : la fenêtre ne garde que « Personnages "
+		GameTooltip:AddLine(L["Mode solo"])
+		GameTooltip:AddLine(L["Pour jouer un seul personnage : la fenêtre ne garde que « Personnages "
 			.. "disponibles », sans les équipes. Glissez votre personnage hors de la liste pour en "
-			.. "faire une barre flottante, avec les boutons des modules.", 1, 1, 1, true)
-		GameTooltip:AddLine("Réglage propre à ce personnage (aussi dans les options).", 0.8, 0.8, 0.8, true)
+			.. "faire une barre flottante, avec les boutons des modules."], 1, 1, 1, true)
+		GameTooltip:AddLine(L["Réglage propre à ce personnage (aussi dans les options)."], 0.8, 0.8, 0.8, true)
 		P.ShowTooltip()
 	end)
 	soloCheck:SetScript("OnLeave", GameTooltip_Hide)
@@ -917,7 +918,7 @@ function P.BuildUI()
 	-- Trois cadres côte à côte, chacun sur un tiers de la largeur : les deux premiers
 	-- reçoivent leur largeur au redimensionnement, le dernier s'étire jusqu'au bord droit.
 	-- 1. Personnages disponibles (roster alimenté par la sync).
-	local charPanel = CreatePanel(f, "Personnages disponibles")
+	local charPanel = CreatePanel(f, L["Personnages disponibles"])
 	charPanel:SetPoint("TOPLEFT", PANEL_MARGIN, PANEL_TOP)
 	charPanel:SetPoint("BOTTOMLEFT", PANEL_MARGIN, PANEL_MARGIN)
 
@@ -926,7 +927,7 @@ function P.BuildUI()
 	local collapseAllBtn = CreateFrame("Button", nil, charPanel, "UIPanelButtonTemplate")
 	collapseAllBtn:SetSize(90, 18)
 	collapseAllBtn:SetPoint("TOPRIGHT", -6, -4)
-	collapseAllBtn:SetText("Tout replier")
+	collapseAllBtn:SetText(L["Tout replier"])
 	collapseAllBtn:SetScript("OnClick", function()
 		local collapsed = P.charDb.collapsedAccounts
 		if AllAccountsCollapsed() then
@@ -940,8 +941,8 @@ function P.BuildUI()
 	end)
 	collapseAllBtn:SetScript("OnEnter", function(self)
 		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-		GameTooltip:AddLine("Tout replier / déplier")
-		GameTooltip:AddLine("Replie tous les comptes pour ne voir que leurs en-têtes, ou les déplie tous.",
+		GameTooltip:AddLine(L["Tout replier / déplier"])
+		GameTooltip:AddLine(L["Replie tous les comptes pour ne voir que leurs en-têtes, ou les déplie tous."],
 			1, 1, 1, true)
 		P.ShowTooltip()
 	end)
@@ -952,18 +953,18 @@ function P.BuildUI()
 	-- replier » (ou à sa place s'il est masqué), placé par RefreshUI ; voile bleu quand actif.
 	local inGameBtn = CreateFrame("Button", nil, charPanel, "UIPanelButtonTemplate")
 	inGameBtn:SetSize(60, 18)
-	inGameBtn:SetText("En Jeu")
+	inGameBtn:SetText(L["En Jeu"])
 	inGameBtn:SetScript("OnClick", function()
 		P.charDb.inGameOnly[InGameModeKey()] = not IsInGameOnly()
 		P.RefreshUI()
 	end)
 	inGameBtn:SetScript("OnEnter", function(self)
 		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-		GameTooltip:AddLine("En Jeu")
-		GameTooltip:AddLine("N'affiche que les personnages connectés (filtre d'affichage seulement).",
+		GameTooltip:AddLine(L["En Jeu"])
+		GameTooltip:AddLine(L["N'affiche que les personnages connectés (filtre d'affichage seulement)."],
 			1, 1, 1, true)
-		GameTooltip:AddLine("Mémorisé à part en mode solo (actif par défaut) et hors mode solo "
-			.. "(inactif par défaut).", 0.8, 0.8, 0.8, true)
+		GameTooltip:AddLine(L["Mémorisé à part en mode solo (actif par défaut) et hors mode solo "
+			.. "(inactif par défaut)."], 0.8, 0.8, 0.8, true)
 		P.ShowTooltip()
 	end)
 	inGameBtn:SetScript("OnLeave", GameTooltip_Hide)
@@ -973,11 +974,11 @@ function P.BuildUI()
 	addTargetBtn:SetHeight(22)
 	addTargetBtn:SetPoint("TOPLEFT", 10, -HEADER_HEIGHT + 2)
 	addTargetBtn:SetPoint("RIGHT", -10, 0)
-	addTargetBtn:SetText("Ajouter la cible")
+	addTargetBtn:SetText(L["Ajouter la cible"])
 	addTargetBtn:SetScript("OnClick", function()
 		local ok, result = P.AddTargetCharacter()
 		if ok then
-			UIErrorsFrame:AddMessage(result .. " ajouté à la liste.", 1, 0.82, 0)
+			UIErrorsFrame:AddMessage(L["%s ajouté à la liste."]:format(result), 1, 0.82, 0)
 			P.RefreshUI()
 		else
 			UIErrorsFrame:AddMessage(result, 1, 0.1, 0.1)
@@ -985,11 +986,11 @@ function P.BuildUI()
 	end)
 	addTargetBtn:SetScript("OnEnter", function(self)
 		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-		GameTooltip:AddLine("Ajouter la cible")
-		GameTooltip:AddLine("Ajoute le joueur ciblé à la liste des personnages disponibles : il peut "
+		GameTooltip:AddLine(L["Ajouter la cible"])
+		GameTooltip:AddLine(L["Ajoute le joueur ciblé à la liste des personnages disponibles : il peut "
 			.. "ensuite rejoindre une équipe (clic droit avec l'équipe sélectionnée) et être "
-			.. "invité avec elle.", 1, 1, 1, true)
-		GameTooltip:AddLine("Partagé avec vos autres Polypode connectés.", 1, 1, 1, true)
+			.. "invité avec elle."], 1, 1, 1, true)
+		GameTooltip:AddLine(L["Partagé avec vos autres Polypode connectés."], 1, 1, 1, true)
 		P.ShowTooltip()
 	end)
 	addTargetBtn:SetScript("OnLeave", GameTooltip_Hide)
@@ -1032,15 +1033,15 @@ function P.BuildUI()
 					-- Sans équipe sélectionnée : nouvelle équipe à son nom, avec lui pour leader.
 					local teamName, err = P.CreateTeamWithLeader(data.key)
 					if teamName then
-						UIErrorsFrame:AddMessage("Équipe « " .. teamName .. " » créée, leader : "
-							.. P.GetDisplayName(data.key) .. ".", 1, 0.82, 0)
+						UIErrorsFrame:AddMessage(L["Équipe « %s » créée, leader : %s."]:format(teamName, P.GetDisplayName(data.key)),
+							1, 0.82, 0)
 						ChooseTeam(teamName)
 					else
 						UIErrorsFrame:AddMessage(err, 1, 0.1, 0.1)
 					end
 				else
-					UIErrorsFrame:AddMessage("Sélectionnez d'abord une équipe (ou clic droit pour en "
-						.. "créer une avec ce personnage pour leader).", 1, 0.1, 0.1)
+					UIErrorsFrame:AddMessage(L["Sélectionnez d'abord une équipe (ou clic droit pour en "
+						.. "créer une avec ce personnage pour leader)."], 1, 0.1, 0.1)
 				end
 				return
 			end
@@ -1061,34 +1062,35 @@ function P.BuildUI()
 		end,
 		tooltip = function(data)
 			if data.header then
-				local lines = { data.label, data.online .. " connecté(s) sur " .. #data.items,
-					"Clic : " .. (data.collapsed and "déplier" or "replier") }
+				local lines = { data.label, L["%d connecté(s) sur %d"]:format(data.online, #data.items),
+					data.collapsed and L["Clic : déplier"] or L["Clic : replier"] }
 				if data.groupKey ~= NO_ACCOUNT_GROUP then
-					lines[#lines + 1] = "Alt + clic : renommer le compte (tous ses personnages)"
+					lines[#lines + 1] = L["Alt + clic : renommer le compte (tous ses personnages)"]
 				end
 				return lines
 			end
-			local presence = data.first and "|cff40ff40Connecté|r" or "|cff999999Déconnecté (ou pas vu cette session)|r"
-			local account = "Compte WoW : " .. (P.GetCharacterAccount(data.key) or "non renseigné")
-			local hint = "Alt + clic : ranger dans un compte WoW|nMaj + clic : supprimer ce personnage et ses données"
+			local presence = data.first and "|cff40ff40" .. L["Connecté"] .. "|r"
+				or "|cff999999" .. L["Déconnecté (ou pas vu cette session)"] .. "|r"
+			local account = L["Compte WoW : %s"]:format(P.GetCharacterAccount(data.key) or L["non renseigné"])
+			local hint = L["Alt + clic : ranger dans un compte WoW|nMaj + clic : supprimer ce personnage et ses données"]
 			if P.IsSoloMode() then
 				local lines = { P.GetDisplayName(data.key, true), presence, account }
 				if data.key == P.GetCharKey() then
-					lines[#lines + 1] = "Glisser : afficher en barre flottante"
+					lines[#lines + 1] = L["Glisser : afficher en barre flottante"]
 				end
 				lines[#lines + 1] = hint
 				return lines
 			end
 			if not selectedTeam then
 				return CharacterTooltip(data.key, { presence, account,
-					"Sélectionnez d'abord une équipe pour y ajouter ce personnage.",
-					"Clic droit : créer une équipe à son nom, avec lui pour leader", hint })
+					L["Sélectionnez d'abord une équipe pour y ajouter ce personnage."],
+					L["Clic droit : créer une équipe à son nom, avec lui pour leader"], hint })
 			end
 			return CharacterTooltip(data.key, {
 				presence,
 				account,
-				"Clic droit : ajouter à l'équipe « " .. selectedTeam .. " »",
-				"Clic gauche : retirer de l'équipe « " .. selectedTeam .. " »",
+				L["Clic droit : ajouter à l'équipe « %s »"]:format(selectedTeam),
+				L["Clic gauche : retirer de l'équipe « %s »"]:format(selectedTeam),
 				hint,
 			})
 		end,
@@ -1103,17 +1105,17 @@ function P.BuildUI()
 			end
 		end,
 	})
-	charPanel.emptyText:SetText("Aucun personnage disponible")
+	charPanel.emptyText:SetText(L["Aucun personnage disponible"])
 
 	-- 2. Équipes : saisie d'un nom + liste des équipes créées.
-	local teamPanel = CreatePanel(f, "Équipes")
+	local teamPanel = CreatePanel(f, L["Équipes"])
 	teamPanel:SetPoint("TOPLEFT", charPanel, "TOPRIGHT", PANEL_GAP, 0)
 	teamPanel:SetPoint("BOTTOMLEFT", charPanel, "BOTTOMRIGHT", PANEL_GAP, 0)
 
 	local createBtn = CreateFrame("Button", nil, teamPanel, "UIPanelButtonTemplate")
 	createBtn:SetSize(60, 22)
 	createBtn:SetPoint("TOPRIGHT", -10, -HEADER_HEIGHT + 2)
-	createBtn:SetText("Créer")
+	createBtn:SetText(L["Créer"])
 
 	local teamInput = CreateFrame("EditBox", nil, teamPanel, "InputBoxInstructionsTemplate")
 	teamInput:SetHeight(20)
@@ -1122,7 +1124,7 @@ function P.BuildUI()
 	teamInput:SetAutoFocus(false)
 	teamInput:SetMaxLetters(32)
 	if teamInput.Instructions then
-		teamInput.Instructions:SetText("Nom de l'équipe")
+		teamInput.Instructions:SetText(L["Nom de l'équipe"])
 	end
 
 	-- Valide la saisie (Entrée ou bouton) : crée l'équipe, ou affiche l'erreur à l'écran.
@@ -1148,7 +1150,7 @@ function P.BuildUI()
 		onClick = function(data, mouseButton)
 			if mouseButton == "LeftButton" and IsShiftKeyDown() then
 				if P.DeleteTeam(data.name) then
-					UIErrorsFrame:AddMessage("Équipe « " .. data.name .. " » supprimée.", 1, 0.82, 0)
+					UIErrorsFrame:AddMessage(L["Équipe « %s » supprimée."]:format(data.name), 1, 0.82, 0)
 					if P.charDb.selectedTeam == data.name then
 						ChooseTeam(nil)
 					else
@@ -1168,13 +1170,13 @@ function P.BuildUI()
 			local created = P.GetTeamCreated(data.name)
 			return {
 				data.name,
-				created and ("|cff999999Créée le " .. date("%d/%m/%Y à %H:%M", created) .. "|r")
-					or "|cff999999Date de création inconnue (équipe plus ancienne)|r",
-				"Clic gauche : sélectionner l'équipe",
-				"Clic droit : désélectionner",
-				"Double-clic : renommer l'équipe",
-				"Maj + clic gauche : supprimer l'équipe",
-				"Glisser : sélectionner et afficher en barre flottante",
+				created and ("|cff999999" .. L["Créée le %s"]:format(date(L["%d/%m/%Y à %H:%M"], created)) .. "|r")
+					or "|cff999999" .. L["Date de création inconnue (équipe plus ancienne)"] .. "|r",
+				L["Clic gauche : sélectionner l'équipe"],
+				L["Clic droit : désélectionner"],
+				L["Double-clic : renommer l'équipe"],
+				L["Maj + clic gauche : supprimer l'équipe"],
+				L["Glisser : sélectionner et afficher en barre flottante"],
 			}
 		end,
 		-- Double-clic gauche : renommer (le premier clic a sélectionné l'équipe). Double-clic
@@ -1191,10 +1193,10 @@ function P.BuildUI()
 			P.StartTeamBarDrag()
 		end,
 	})
-	teamPanel.emptyText:SetText("Aucune équipe")
+	teamPanel.emptyText:SetText(L["Aucune équipe"])
 
 	-- 3. Personnages de l'équipe sélectionnée (texte vide renseigné par RefreshUI).
-	local memberPanel = CreatePanel(f, "Personnages de l'équipe")
+	local memberPanel = CreatePanel(f, L["Personnages de l'équipe"])
 	memberPanel:SetPoint("TOPLEFT", teamPanel, "TOPRIGHT", PANEL_GAP, 0)
 	memberPanel:SetPoint("BOTTOMRIGHT", -PANEL_MARGIN, PANEL_MARGIN)
 
@@ -1203,19 +1205,19 @@ function P.BuildUI()
 	inviteBtn:SetHeight(22)
 	inviteBtn:SetPoint("TOPLEFT", 10, -HEADER_HEIGHT + 2)
 	inviteBtn:SetPoint("RIGHT", -10, 0)
-	inviteBtn:SetText("Inviter l'équipe")
+	inviteBtn:SetText(L["Inviter l'équipe"])
 	inviteBtn:SetMotionScriptsWhileDisabled(true) -- infobulle même désactivé
 	inviteBtn:SetScript("OnClick", function()
 		P.InviteSelectedTeam() -- même action que le raccourci clavier (Commands.lua)
 	end)
 	inviteBtn:SetScript("OnEnter", function(self)
 		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-		GameTooltip:AddLine("Inviter l'équipe")
+		GameTooltip:AddLine(L["Inviter l'équipe"])
 		if selectedTeam then
-			GameTooltip:AddLine("Invite dans votre groupe les membres de l'équipe « " .. selectedTeam
-				.. " », sauf vous et ceux déjà groupés.", 1, 1, 1, true)
-			GameTooltip:AddLine("L'équipe (nom, membres, leader) est aussi envoyée aux Polypode "
-				.. "de ses membres.", 1, 1, 1, true)
+			GameTooltip:AddLine(L["Invite dans votre groupe les membres de l'équipe « %s », sauf vous et ceux déjà groupés."]
+				:format(selectedTeam), 1, 1, 1, true)
+			GameTooltip:AddLine(L["L'équipe (nom, membres, leader) est aussi envoyée aux Polypode "
+				.. "de ses membres."], 1, 1, 1, true)
 		end
 		local reason = InviteBlockedReason()
 		if reason then
@@ -1246,8 +1248,8 @@ function P.BuildUI()
 		tooltip = function(data)
 			local team = selectedTeam or ""
 			return CharacterTooltip(data.key, {
-				"Clic gauche : définir comme leader de l'équipe « " .. team .. " »",
-				"Clic droit : retirer de l'équipe « " .. team .. " »",
+				L["Clic gauche : définir comme leader de l'équipe « %s »"]:format(team),
+				L["Clic droit : retirer de l'équipe « %s »"]:format(team),
 			})
 		end,
 	})
@@ -1400,7 +1402,7 @@ function P.RefreshUI()
 	-- place), le titre leur laisse la place.
 	local grouped = P.charDb.groupByAccount and #accountGroupKeys > 0
 	ui.collapseAccountsButton:SetShown(grouped)
-	ui.collapseAccountsButton:SetText(AllAccountsCollapsed() and "Tout déplier" or "Tout replier")
+	ui.collapseAccountsButton:SetText(AllAccountsCollapsed() and L["Tout déplier"] or L["Tout replier"])
 	ui.inGameButton:ClearAllPoints()
 	if grouped then
 		ui.inGameButton:SetPoint("RIGHT", ui.collapseAccountsButton, "LEFT", -4, 0)
@@ -1426,9 +1428,9 @@ function P.RefreshUI()
 		return key == leader
 	end))
 	if not members then
-		ui.memberPanel.emptyText:SetText("Sélectionnez une équipe")
+		ui.memberPanel.emptyText:SetText(L["Sélectionnez une équipe"])
 	else
-		ui.memberPanel.emptyText:SetText("Clic droit sur un personnage disponible pour l'ajouter")
+		ui.memberPanel.emptyText:SetText(L["Clic droit sur un personnage disponible pour l'ajouter"])
 	end
 
 	-- L'état du groupe, qui change sans rafraîchir la fenêtre, est vérifié au clic par P.InviteTeam.

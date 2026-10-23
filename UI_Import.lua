@@ -1,6 +1,7 @@
 -- Polypode: UI_Import — fenêtre d'import d'une liste de personnages (/poly import)
 
 local P = Polypode
+local L = P.L
 
 -- Ouverte par /poly import ou le bouton « Importer des personnages » du panneau d'options.
 -- Zone de texte défilante où coller les lignes produites par tools/import_bnet.py, ou les
@@ -66,14 +67,14 @@ end
 -- Compte rendu affiché sous la zone de texte.
 local function FormatResult(result)
 	local parts = {
-		"|cff33ff33" .. result.added .. " ajouté(s)|r",
-		result.known .. " déjà connu(s)",
+		"|cff33ff33" .. L["%d ajouté(s)"]:format(result.added) .. "|r",
+		L["%d déjà connu(s)"]:format(result.known),
 	}
 	if result.removed > 0 then
-		parts[#parts + 1] = result.removed .. " retiré(s), ignoré(s)"
+		parts[#parts + 1] = L["%d retiré(s), ignoré(s)"]:format(result.removed)
 	end
 	if result.accounts > 0 then
-		parts[#parts + 1] = result.accounts .. " rangé(s) dans un compte"
+		parts[#parts + 1] = L["%d rangé(s) dans un compte"]:format(result.accounts)
 	end
 	local text = table.concat(parts, ", ") .. "."
 	if #result.refused > 0 then
@@ -81,7 +82,7 @@ local function FormatResult(result)
 		for i = 1, math.min(#result.refused, 10) do
 			shown[i] = result.refused[i]
 		end
-		text = text .. "\n|cffff6060Lignes illisibles : " .. table.concat(shown, ", ")
+		text = text .. "\n|cffff6060" .. L["Lignes illisibles : %s"]:format(table.concat(shown, ", "))
 			.. (#result.refused > 10 and "..." or "") .. "|r"
 	end
 	return text
@@ -92,7 +93,7 @@ local function OnImport()
 	statusText:SetText(FormatResult(result))
 	if result.added > 0 or result.accounts > 0 then
 		P.RefreshUI()
-		UIErrorsFrame:AddMessage("Polypode : " .. result.added .. " personnage(s) importé(s).", 1, 0.82, 0)
+		UIErrorsFrame:AddMessage(L["Polypode : %d personnage(s) importé(s)."]:format(result.added), 1, 0.82, 0)
 	end
 end
 
@@ -134,7 +135,7 @@ local function Build()
 
 	local title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
 	title:SetPoint("TOP", 0, -14)
-	title:SetText("Importer des personnages")
+	title:SetText(L["Importer des personnages"])
 	frame.TitleText = title
 
 	local closeBtn = CreateFrame("Button", nil, frame, "UIPanelCloseButton")
@@ -145,13 +146,13 @@ local function Build()
 	help:SetPoint("TOPLEFT", 16, -40)
 	help:SetPoint("RIGHT", -16, 0)
 	help:SetJustifyH("LEFT")
-	help:SetText("Collez (Ctrl+V) les lignes du fichier polypode_import.txt produit par "
+	help:SetText(L["Collez (Ctrl+V) les lignes du fichier polypode_import.txt produit par "
 		.. "Polypode\\tools\\import_bnet.py, ou tapez une ligne par personnage : "
 		.. "|cffffd200Nom-Royaume;CLASSE;niveau;compte|r (seul le nom est obligatoire). "
 		.. "Les personnages déjà connus ne sont pas modifiés : importer deux fois la même liste "
-		.. "ne crée aucun doublon.")
+		.. "ne crée aucun doublon."])
 
-	local panel = P.CreatePanel(frame, "Lignes à importer")
+	local panel = P.CreatePanel(frame, L["Lignes à importer"])
 	panel:SetPoint("TOPLEFT", 12, -100)
 	panel:SetPoint("BOTTOMRIGHT", -12, 76)
 
@@ -188,13 +189,13 @@ local function Build()
 	statusText:SetPoint("RIGHT", -16, 0)
 	statusText:SetJustifyH("LEFT")
 
-	local importButton = AddButton("Importer", 110, "Importer",
-		"Ajoute au roster les personnages inconnus de la liste et les partage avec vos autres "
+	local importButton = AddButton(L["Importer"], 110, L["Importer"],
+		L["Ajoute au roster les personnages inconnus de la liste et les partage avec vos autres "
 		.. "Polypode ; un personnage déjà connu n'est pas modifié (il reçoit seulement le compte "
-		.. "WoW indiqué s'il n'en a pas).", OnImport)
+		.. "WoW indiqué s'il n'en a pas)."], OnImport)
 	importButton:SetPoint("BOTTOMRIGHT", -14, 14)
 
-	local clearButton = AddButton("Effacer", 90, "Effacer", "Vide la zone de texte.", function()
+	local clearButton = AddButton(L["Effacer"], 90, L["Effacer"], L["Vide la zone de texte."], function()
 		editBox:SetText("")
 		statusText:SetText("")
 		editBox:SetFocus()

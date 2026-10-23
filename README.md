@@ -398,8 +398,8 @@ Polypode Suivi ; il peut être désactivé (il ne fait plus que le rappeler).
 | `/poly data` | Données des personnages : niveau, or, métiers, équipement, sacs, banques, recherche d'objet (addon **Polypode Data**, s'il est installé et activé) |
 | `/poly profil` | Profils : chaînes d'export du mode Édition, des talents, de la transmogrification, des titres, des ensembles d'équipement, des options de WoW, des raccourcis, des fenêtres de discussion, de la liste des addons et des addons (addon **Polypode Profil**, s'il est installé et activé) |
 | `/poly photo` | Mode photo (addon **Polypode Photo**, s'il est installé et activé) |
-| `/poly comptes` | Lister les autres comptes Battle.net autorisés (numérotés) |
-| `/poly retirer-compte <n°>` | Retirer l'autorisation d'un compte (numéro donné par `/poly comptes`) |
+| `/poly comptes` (ou `/poly accounts`) | Lister les autres comptes Battle.net autorisés (numérotés) |
+| `/poly retirer-compte <n°>` (ou `/poly remove-account <n°>`) | Retirer l'autorisation d'un compte (numéro donné par `/poly comptes`) |
 | `/poly debug` | Activer/désactiver les messages de debug (mémorisé pour ce personnage, comme la case du panneau d'options) |
 | `/poly` (sans argument) | Afficher l'aide |
 
@@ -539,8 +539,22 @@ commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, ba
 
 ---
 
+## Langues (Languages)
+
+Polypode s'affiche dans la langue du jeu : **français** ou **anglais** (toute autre langue du jeu
+utilise l'anglais en attendant sa traduction). Les noms donnés par le jeu (classes, zones...) restent
+ceux du client. Les commandes `/poly` gardent leur nom français, avec des alias anglais
+(`/poly accounts`, `/poly remove-account`) ; les messages du mode debug restent en français.
+
+*Polypode follows the game language: French or English (any other client language falls back to
+English until it gets its own translation). `/poly` commands keep their French names, with English
+aliases (`/poly accounts`, `/poly remove-account`); debug messages stay in French.*
+
+---
+
 ## Version
 
+`2.8.0` : Polypode en anglais (langue du jeu, anglais pour les autres langues), alias anglais des commandes `/poly comptes` et `/poly retirer-compte`, traductions ouvertes aux addons compagnons ; « Maj + clic » après un retour à la ligne d'une infobulle de nouveau entièrement en bleu. *Polypode in English (game language, English for other languages).*
 `2.7.0` : clic droit sur le bouton « Options » de la fenêtre principale : raccourcis clavier de WoW, ouverts sur la section Polypode.
 `2.6.0` : personnages disponibles : bouton « En Jeu » (à gauche de « Tout replier »), qui n'affiche que les personnages connectés ; actif par défaut en mode solo, inactif sinon, mémorisé pour chaque mode.
 `2.5.0` : les addons compagnons peuvent placer un bouton à gauche du titre, après la case « Solo » (bouton « Grille » de Polypode Suivi).

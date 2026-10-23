@@ -1,6 +1,7 @@
 -- Polypode: UI_OptionsPopup — petite fenêtre d'options (clic droit sur l'icône et les boutons des modules)
 
 local P = Polypode
+local L = P.L
 
 -- Rappel des options d'un panneau (Options → AddOns) dans une petite fenêtre près du bouton
 -- cliqué, comme celle de Polypode Photo. Les réglages sont ceux du panneau
@@ -171,7 +172,7 @@ local function BuildPopup(popup)
 	local allBtn = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
 	allBtn:SetSize(150, 22)
 	allBtn:SetPoint("BOTTOM", 0, 10)
-	allBtn:SetText("Toutes les options")
+	allBtn:SetText(L["Toutes les options"])
 	allBtn:SetScript("OnClick", function()
 		frame:Hide()
 		if popup.category and Settings and Settings.OpenToCategory then

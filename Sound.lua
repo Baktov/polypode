@@ -1,6 +1,7 @@
 -- Polypode: Sound — volume et activation du son des membres, pilotés par le leader
 
 local P = Polypode
+local L = P.L
 
 -- Le leader de l'équipe sélectionnée envoie au groupe/raid (raccourcis clavier) :
 --   VOLUME:token:pourcentage — volume principal (0 à 100), réglé par l'option « Volume
@@ -26,13 +27,13 @@ end
 -- Raison pour laquelle ce personnage ne peut pas piloter le son de l'équipe, ou nil.
 local function SendBlockedReason()
 	if not P.GetSelectedTeam() then
-		return "Polypode : aucune équipe sélectionnée."
+		return L["Polypode : aucune équipe sélectionnée."]
 	end
 	if not P.IsTeamLeader() then
-		return "Polypode : seul le leader de l'équipe pilote le son de l'équipe."
+		return L["Polypode : seul le leader de l'équipe pilote le son de l'équipe."]
 	end
 	if not IsInGroup() then
-		return "Polypode : l'équipe doit être groupée pour recevoir le son."
+		return L["Polypode : l'équipe doit être groupée pour recevoir le son."]
 	end
 end
 
@@ -47,7 +48,7 @@ function P.SendTeamVolume()
 	end
 	local percent = P.charDb.sentVolume
 	P.BroadcastLeaderAction("VOLUME", tostring(percent), "VOLUME" .. percent, SEND_DEDUP, "raccourci")
-	ShowInfo("Volume de l'équipe réglé à " .. percent .. " %.")
+	ShowInfo(L["Volume de l'équipe réglé à %d %%."]:format(percent))
 end
 
 -- Coupe ou rétablit le son des autres membres (alterne à chaque appel).
@@ -60,7 +61,7 @@ function P.ToggleTeamSound()
 	teamSoundOn = not teamSoundOn
 	local flag = teamSoundOn and "1" or "0"
 	P.BroadcastLeaderAction("SOUND", flag, "SOUND" .. flag, SEND_DEDUP, "raccourci")
-	ShowInfo(teamSoundOn and "Son de l'équipe rétabli." or "Son de l'équipe coupé.")
+	ShowInfo(teamSoundOn and L["Son de l'équipe rétabli."] or L["Son de l'équipe coupé."])
 end
 
 -- MEMBRES (Sync.lua) ------------------------------------------------------------------

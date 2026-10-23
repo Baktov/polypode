@@ -1,6 +1,7 @@
 -- Polypode: UI_Minimap — bouton autour de la minimap (clic : fenêtre, glisser : déplacer)
 
 local P = Polypode
+local L = P.L
 
 local ICON = "Interface\\Icons\\spell_holy_layonhands" -- une main (Imposition des mains)
 P.ICON = ICON -- partagée avec la barre flottante d'équipe (UI_TeamBar.lua)
@@ -86,8 +87,8 @@ function P.BuildMinimapButton()
 	b:SetScript("OnEnter", function(self)
 		GameTooltip:SetOwner(self, "ANCHOR_LEFT")
 		GameTooltip:AddLine("Polypode")
-		GameTooltip:AddLine("Clic : ouvrir/fermer la fenêtre", 1, 1, 1)
-		GameTooltip:AddLine("Glisser : déplacer le bouton", 1, 1, 1)
+		GameTooltip:AddLine(L["Clic : ouvrir/fermer la fenêtre"], 1, 1, 1)
+		GameTooltip:AddLine(L["Glisser : déplacer le bouton"], 1, 1, 1)
 		P.ShowTooltip()
 	end)
 	b:SetScript("OnLeave", function()

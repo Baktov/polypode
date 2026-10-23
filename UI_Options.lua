@@ -1,21 +1,24 @@
 -- Polypode: UI_Options — panneau de paramètres dans Options > AddOns (API Settings Blizzard)
 
 local P = Polypode
+local L = P.L
 
 -- Élément « Canal dédié » du panneau (modèle PolypodeChannelSettingTemplate, UI_Options.xml).
 -- Mélangé au cadre par son OnLoad ; le panneau appelle Init à chaque affichage de l'élément.
 P.ChannelSettingMixin = {}
 
 function P.ChannelSettingMixin:OnLoad()
+	self.Text:SetText(L["Canal dédié"])
+	self.ManageButton:SetText(L["Gestion liste token"])
 	P.SetupChannelInput(self.EditBox)
 	self.ManageButton:SetScript("OnClick", function()
 		P.ShowTokensWindow()
 	end)
 	self.ManageButton:SetScript("OnEnter", function(button)
 		GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
-		GameTooltip:AddLine("Gestion liste token")
-		GameTooltip:AddLine("Ouvre la liste des autres comptes Battle.net autorisés sur le canal "
-			.. "dédié, pour voir leurs personnages et révoquer une autorisation.", 1, 1, 1, true)
+		GameTooltip:AddLine(L["Gestion liste token"])
+		GameTooltip:AddLine(L["Ouvre la liste des autres comptes Battle.net autorisés sur le canal "
+			.. "dédié, pour voir leurs personnages et révoquer une autorisation."], 1, 1, 1, true)
 		P.ShowTooltip()
 	end)
 	self.ManageButton:SetScript("OnLeave", GameTooltip_Hide)
@@ -39,16 +42,17 @@ local function CommitAccountName(box)
 		return
 	end
 	P.SetCharacterAccount(P.GetCharKey(), label)
-	local message = label == "" and "Compte WoW : non renseigné."
-		or "Compte WoW de ce personnage : " .. label .. "."
+	local message = label == "" and L["Compte WoW : non renseigné."]
+		or L["Compte WoW de ce personnage : %s."]:format(label)
 	if not P.charDb.groupByAccount then
-		message = message .. " Cochez « Personnages disponibles : regrouper par compte » pour voir les comptes."
+		message = message .. " " .. L["Cochez « Personnages disponibles : regrouper par compte » pour voir les comptes."]
 	end
 	UIErrorsFrame:AddMessage(message, 1, 0.82, 0)
 	P.RefreshUI()
 end
 
 function P.AccountSettingMixin:OnLoad()
+	self.Text:SetText(L["Compte WoW de ce personnage"])
 	local editBox = self.EditBox
 	editBox:SetAutoFocus(false)
 	editBox:SetMaxLetters(32)
@@ -64,12 +68,12 @@ function P.AccountSettingMixin:OnLoad()
 	end)
 	editBox:SetScript("OnEnter", function(box)
 		GameTooltip:SetOwner(box, "ANCHOR_BOTTOM")
-		GameTooltip:AddLine("Compte WoW de ce personnage")
-		GameTooltip:AddLine("Nom du compte WoW sur lequel vous jouez ce personnage (ex. WoW1). WoW ne "
+		GameTooltip:AddLine(L["Compte WoW de ce personnage"])
+		GameTooltip:AddLine(L["Nom du compte WoW sur lequel vous jouez ce personnage (ex. WoW1). WoW ne "
 			.. "le donne pas aux addons : à saisir une fois par personnage. Sert au regroupement par "
 			.. "compte des personnages disponibles ; partagé avec vos autres Polypode. Enregistré à "
 			.. "Entrée ou en quittant le champ ; Échap annule ; vide = aucun compte. Même réglage que "
-			.. "Alt + clic sur un personnage dans la fenêtre Polypode.", 1, 1, 1, true)
+			.. "Alt + clic sur un personnage dans la fenêtre Polypode."], 1, 1, 1, true)
 		P.ShowTooltip()
 	end)
 	editBox:SetScript("OnLeave", GameTooltip_Hide)
@@ -129,7 +133,7 @@ function P.BuildOptions()
 		category,
 		"POLYPODE_SOLO_MODE",
 		Settings.VarType.Boolean,
-		"|cffff4040Mode solo|r",
+		"|cffff4040" .. L["Mode solo"] .. "|r",
 		Settings.Default.False,
 		function()
 			return P.IsSoloMode()
@@ -139,11 +143,11 @@ function P.BuildOptions()
 		end
 	)
 	AddCheck(soloSetting,
-		"Pour jouer un seul personnage : la fenêtre Polypode ne garde que « Personnages disponibles » "
+		L["Pour jouer un seul personnage : la fenêtre Polypode ne garde que « Personnages disponibles » "
 		.. "(agrandi, fenêtre un peu plus étroite), sans les cadres d'équipe. Glissez votre personnage "
 		.. "hors de la liste pour en faire une barre flottante, avec les boutons des modules (Suivi "
 		.. "sur tous les personnages). Même case que « Solo » dans la fenêtre. Réglage "
-		.. "propre à ce personnage.")
+		.. "propre à ce personnage."])
 
 	-- Canal dédié : champ de texte (élément personnalisé, pas de contrôle Settings standard).
 	layout:AddInitializer(Settings.CreateElementInitializer("PolypodeChannelSettingTemplate", {}))
@@ -154,7 +158,7 @@ function P.BuildOptions()
 		category,
 		"POLYPODE_MINIMAP_ICON",
 		Settings.VarType.Boolean,
-		"Afficher l'icône de minimap",
+		L["Afficher l'icône de minimap"],
 		Settings.Default.True,
 		function()
 			return not P.db.minimap.hide
@@ -164,14 +168,14 @@ function P.BuildOptions()
 		end
 	)
 	AddCheck(minimapSetting,
-		"Affiche le bouton Polypode autour de la minimap (équivalent de /poly minimap).")
+		L["Affiche le bouton Polypode autour de la minimap (équivalent de /poly minimap)."])
 
 	-- Mode debug, par personnage (P.charDb.debug) ; même valeur que /poly debug.
 	local debugSetting = Settings.RegisterProxySetting(
 		category,
 		"POLYPODE_DEBUG",
 		Settings.VarType.Boolean,
-		"Mode debug",
+		L["Mode debug"],
 		Settings.Default.False,
 		function()
 			return P.debugEnabled
@@ -181,15 +185,15 @@ function P.BuildOptions()
 		end
 	)
 	AddCheck(debugSetting,
-		"Affiche dans le chat les messages de diagnostic de Polypode (synchro, invitations...). "
-		.. "Réglage propre à ce personnage (équivalent de /poly debug).")
+		L["Affiche dans le chat les messages de diagnostic de Polypode (synchro, invitations...). "
+		.. "Réglage propre à ce personnage (équivalent de /poly debug)."])
 
 	-- Raccourci « Assister le leader » : attaquer ou non la cible prise (par personnage).
 	local startAttackSetting = Settings.RegisterProxySetting(
 		category,
 		"POLYPODE_ASSIST_STARTATTACK",
 		Settings.VarType.Boolean,
-		"Attaquer après l'assistance",
+		L["Attaquer après l'assistance"],
 		Settings.Default.True,
 		function()
 			return P.charDb.assistStartAttack
@@ -200,16 +204,16 @@ function P.BuildOptions()
 		end
 	)
 	AddCheck(startAttackSetting,
-		"Le raccourci « Assister le leader » lance aussi l'attaque automatique (/startattack) sur "
+		L["Le raccourci « Assister le leader » lance aussi l'attaque automatique (/startattack) sur "
 		.. "la cible prise, si elle est hostile. Décoché : prend seulement la cible du leader. "
-		.. "Réglage propre à ce personnage.")
+		.. "Réglage propre à ce personnage."])
 
 	-- Acceptation automatique des quêtes du leader (par personnage, cf. Quests.lua).
 	local questSetting = Settings.RegisterProxySetting(
 		category,
 		"POLYPODE_AUTO_ACCEPT_QUEST",
 		Settings.VarType.Boolean,
-		"Accepter automatiquement les quêtes",
+		L["Accepter automatiquement les quêtes"],
 		Settings.Default.True,
 		function()
 			return P.charDb.autoAcceptQuest
@@ -219,16 +223,16 @@ function P.BuildOptions()
 		end
 	)
 	AddCheck(questSetting,
-		"Quand le leader de l'équipe accepte une quête, ce personnage l'accepte aussi dès qu'elle "
+		L["Quand le leader de l'équipe accepte une quête, ce personnage l'accepte aussi dès qu'elle "
 		.. "lui est proposée (PNJ ouvert, jusqu'à 30 secondes après). Sur le leader, annonce ses "
-		.. "quêtes acceptées au groupe. Réglage propre à ce personnage.")
+		.. "quêtes acceptées au groupe. Réglage propre à ce personnage."])
 
 	-- Validation automatique des quêtes du leader (par personnage, cf. Quests.lua).
 	local validateSetting = Settings.RegisterProxySetting(
 		category,
 		"POLYPODE_AUTO_VALIDATE_QUEST",
 		Settings.VarType.Boolean,
-		"Valider automatiquement les quêtes",
+		L["Valider automatiquement les quêtes"],
 		Settings.Default.True,
 		function()
 			return P.charDb.autoValidateQuest
@@ -238,17 +242,17 @@ function P.BuildOptions()
 		end
 	)
 	AddCheck(validateSetting,
-		"Quand le leader de l'équipe rend une quête (« Continuer » puis « Terminer la quête »), "
+		L["Quand le leader de l'équipe rend une quête (« Continuer » puis « Terminer la quête »), "
 		.. "ce personnage la rend aussi, avec le même choix de récompense, dès que le PNJ est ouvert "
 		.. "(jusqu'à 60 secondes après). Sur le leader, annonce ses validations au groupe. "
-		.. "Réglage propre à ce personnage.")
+		.. "Réglage propre à ce personnage."])
 
 	-- Dialogues de PNJ du leader : quêtes, options, fermeture (par personnage, cf. Quests.lua).
 	local gossipSetting = Settings.RegisterProxySetting(
 		category,
 		"POLYPODE_AUTO_SELECT_GOSSIP",
 		Settings.VarType.Boolean,
-		"Suivre les dialogues de PNJ du leader",
+		L["Suivre les dialogues de PNJ du leader"],
 		Settings.Default.True,
 		function()
 			return P.charDb.autoSelectGossip
@@ -258,18 +262,18 @@ function P.BuildOptions()
 		end
 	)
 	AddCheck(gossipSetting,
-		"Quand le leader de l'équipe choisit une quête (disponible ou à rendre) ou une option dans "
+		L["Quand le leader de l'équipe choisit une quête (disponible ou à rendre) ou une option dans "
 		.. "le dialogue d'un PNJ, ce personnage fait le même choix si son dialogue avec le PNJ est "
 		.. "ouvert ; quand le leader ferme DialogueUI, il le ferme aussi. L'acceptation ou la "
 		.. "validation automatique prend ensuite le relais. Sur le leader, annonce ses choix au "
-		.. "groupe. Réglage propre à ce personnage.")
+		.. "groupe. Réglage propre à ce personnage."])
 
 	-- Cinématiques passées par le leader (par personnage, cf. Cinematics.lua).
 	local cinematicSetting = Settings.RegisterProxySetting(
 		category,
 		"POLYPODE_AUTO_SKIP_CINEMATIC",
 		Settings.VarType.Boolean,
-		"Passer automatiquement les cinématiques",
+		L["Passer automatiquement les cinématiques"],
 		Settings.Default.True,
 		function()
 			return P.charDb.autoSkipCinematic
@@ -279,16 +283,16 @@ function P.BuildOptions()
 		end
 	)
 	AddCheck(cinematicSetting,
-		"Quand le leader de l'équipe passe une cinématique ou une vidéo, ce personnage la passe "
+		L["Quand le leader de l'équipe passe une cinématique ou une vidéo, ce personnage la passe "
 		.. "aussi (dès qu'elle s'affiche, jusqu'à 15 secondes après). Sur le leader, annonce ses "
-		.. "cinématiques passées au groupe. Réglage propre à ce personnage.")
+		.. "cinématiques passées au groupe. Réglage propre à ce personnage."])
 
 	-- Vol pris par le leader chez un maître de vol (par personnage, cf. Taxi.lua).
 	local taxiSetting = Settings.RegisterProxySetting(
 		category,
 		"POLYPODE_AUTO_TAXI",
 		Settings.VarType.Boolean,
-		"Prendre automatiquement le vol du leader",
+		L["Prendre automatiquement le vol du leader"],
 		Settings.Default.True,
 		function()
 			return P.charDb.autoTaxi
@@ -298,16 +302,16 @@ function P.BuildOptions()
 		end
 	)
 	AddCheck(taxiSetting,
-		"Quand le leader de l'équipe prend un vol chez un maître de vol, ce personnage prend le "
+		L["Quand le leader de l'équipe prend un vol chez un maître de vol, ce personnage prend le "
 		.. "même vol si sa carte de vol est ouverte et qu'il connaît la destination. Sur le leader, "
-		.. "annonce ses vols au groupe. Réglage propre à ce personnage.")
+		.. "annonce ses vols au groupe. Réglage propre à ce personnage."])
 
 	-- Gouffres (entrée, sortie) et portails d'instance (par personnage, cf. Instances.lua).
 	local instanceSetting = Settings.RegisterProxySetting(
 		category,
 		"POLYPODE_AUTO_ENTER_INSTANCE",
 		Settings.VarType.Boolean,
-		"Entrer automatiquement en instance (gouffre, portail)",
+		L["Entrer automatiquement en instance (gouffre, portail)"],
 		Settings.Default.True,
 		function()
 			return P.charDb.autoEnterInstance
@@ -317,18 +321,18 @@ function P.BuildOptions()
 		end
 	)
 	AddCheck(instanceSetting,
-		"Quand le leader de l'équipe choisit le palier d'un gouffre, ce personnage choisit le même "
+		L["Quand le leader de l'équipe choisit le palier d'un gouffre, ce personnage choisit le même "
 		.. "si sa fenêtre de palier est ouverte ; quand le leader vote la sortie du gouffre, il vote "
 		.. "« Oui » aussi (jusqu'à 30 secondes après) ; quand le leader confirme l'entrée par un "
 		.. "portail d'instance, il confirme aussi. Sur le leader, annonce ces actions au groupe. "
-		.. "Réglage propre à ce personnage.")
+		.. "Réglage propre à ce personnage."])
 
 	-- Leader : volume envoyé à l'équipe par le raccourci « Envoyer le volume à l'équipe ».
 	local volumeSetting = Settings.RegisterProxySetting(
 		category,
 		"POLYPODE_SENT_VOLUME",
 		Settings.VarType.Number,
-		"Volume envoyé",
+		L["Volume envoyé"],
 		50,
 		function()
 			return P.charDb.sentVolume
@@ -338,15 +342,15 @@ function P.BuildOptions()
 		end
 	)
 	AddSlider(volumeSetting, 0, 100, 5,
-		"Volume principal (en %) que le raccourci « Envoyer le volume à l'équipe » applique aux "
-		.. "autres membres quand ce personnage est le leader. Réglage propre à ce personnage.")
+		L["Volume principal (en %) que le raccourci « Envoyer le volume à l'équipe » applique aux "
+		.. "autres membres quand ce personnage est le leader. Réglage propre à ce personnage."])
 
 	-- Membre : appliquer le volume et la coupure du son envoyés par le leader (cf. Sound.lua).
 	local followSoundSetting = Settings.RegisterProxySetting(
 		category,
 		"POLYPODE_FOLLOW_LEADER_SOUND",
 		Settings.VarType.Boolean,
-		"Suivre le son du leader",
+		L["Suivre le son du leader"],
 		Settings.Default.True,
 		function()
 			return P.charDb.followLeaderSound
@@ -356,16 +360,16 @@ function P.BuildOptions()
 		end
 	)
 	AddCheck(followSoundSetting,
-		"Applique à ce personnage le volume envoyé par le leader de l'équipe et la coupure ou le "
+		L["Applique à ce personnage le volume envoyé par le leader de l'équipe et la coupure ou le "
 		.. "rétablissement du son (raccourcis du leader). Décoché : ce client garde son propre son. "
-		.. "Réglage propre à ce personnage.")
+		.. "Réglage propre à ce personnage."])
 
 	-- « Personnages disponibles » regroupés par compte (par personnage, cf. UI_Main.lua).
 	local groupByAccountSetting = Settings.RegisterProxySetting(
 		category,
 		"POLYPODE_GROUP_BY_ACCOUNT",
 		Settings.VarType.Boolean,
-		"Personnages disponibles : regrouper par compte",
+		L["Personnages disponibles : regrouper par compte"],
 		Settings.Default.True,
 		function()
 			return P.charDb.groupByAccount
@@ -376,21 +380,21 @@ function P.BuildOptions()
 		end
 	)
 	AddCheck(groupByAccountSetting,
-		"Dans la fenêtre Polypode, range les personnages disponibles sous un en-tête par compte WoW, "
+		L["Dans la fenêtre Polypode, range les personnages disponibles sous un en-tête par compte WoW, "
 		.. "repliable d'un clic. WoW ne donne pas le nom du compte WoW aux addons : renseignez-le sur "
 		.. "chaque personnage (champ ci-dessous, ou Alt + clic sur un personnage dans la fenêtre) ; "
-		.. "les autres vont dans « Compte non renseigné ». Réglage propre à ce personnage.")
+		.. "les autres vont dans « Compte non renseigné ». Réglage propre à ce personnage."])
 	-- Compte WoW du personnage connecté : champ de texte (élément personnalisé).
 	layout:AddInitializer(Settings.CreateElementInitializer("PolypodeAccountSettingTemplate", {}))
 	-- Import d'une liste de personnages (fenêtre UI_Import.lua, aussi par /poly import).
 	if CreateSettingsButtonInitializer then
-		layout:AddInitializer(CreateSettingsButtonInitializer("Importer des personnages", "Importer",
+		layout:AddInitializer(CreateSettingsButtonInitializer(L["Importer des personnages"], L["Importer"],
 			function()
 				P.ShowImportWindow()
 			end,
-			"Ouvre la fenêtre où coller la liste de vos personnages (produite par "
+			L["Ouvre la fenêtre où coller la liste de vos personnages (produite par "
 			.. "Polypode\\tools\\import_bnet.py, voir tools\\IMPORT_BNET.md) pour les ajouter au roster "
-			.. "sans les connecter un par un. Aussi par la commande /poly import.", true))
+			.. "sans les connecter un par un. Aussi par la commande /poly import."], true))
 	end
 
 	-- Groupage automatique de l'équipe à la connexion (par personnage, cf. AutoGroup.lua).
@@ -398,7 +402,7 @@ function P.BuildOptions()
 		category,
 		"POLYPODE_AUTO_GROUP",
 		Settings.VarType.Boolean,
-		"Groupage automatique de l'équipe",
+		L["Groupage automatique de l'équipe"],
 		Settings.Default.True,
 		function()
 			return P.charDb.autoGroup
@@ -408,16 +412,16 @@ function P.BuildOptions()
 		end
 	)
 	AddCheck(autoGroupSetting,
-		"Leader : invite automatiquement dans son groupe les membres de l'équipe qui se connectent "
+		L["Leader : invite automatiquement dans son groupe les membres de l'équipe qui se connectent "
 		.. "(ou déjà connectés quand il se connecte). Membre : accepte automatiquement l'invitation "
-		.. "de groupe du leader d'une de ses équipes. Réglage propre à ce personnage.")
+		.. "de groupe du leader d'une de ses équipes. Réglage propre à ce personnage."])
 
 	-- Alerte « ne suit plus » (par personnage, cf. Follow.lua).
 	local followAlertSetting = Settings.RegisterProxySetting(
 		category,
 		"POLYPODE_FOLLOW_ALERT",
 		Settings.VarType.Boolean,
-		"Alerte quand un membre ne suit plus",
+		L["Alerte quand un membre ne suit plus"],
 		Settings.Default.True,
 		function()
 			return P.charDb.followAlert
@@ -427,17 +431,17 @@ function P.BuildOptions()
 		end
 	)
 	AddCheck(followAlertSetting,
-		"Membre : quand il arrête de suivre le leader de l'équipe (obstacle, saut, distance, "
+		L["Membre : quand il arrête de suivre le leader de l'équipe (obstacle, saut, distance, "
 		.. "mouvement manuel...), il le signale au leader. Leader : affiche « X ne vous suit plus. » "
 		.. "à l'écran avec un son d'alerte. Réglage propre à ce personnage, à cocher sur le leader "
-		.. "et les membres.")
+		.. "et les membres."])
 
 	-- Détails des membres dans la barre flottante d'équipe (par personnage, UI_TeamBar.lua).
 	local teamBarDetailsSetting = Settings.RegisterProxySetting(
 		category,
 		"POLYPODE_TEAMBAR_DETAILS",
 		Settings.VarType.Boolean,
-		"Barre d'équipe : niveau, niveau d'objet et progression",
+		L["Barre d'équipe : niveau, niveau d'objet et progression"],
 		Settings.Default.True,
 		function()
 			return P.charDb.teamBar.details
@@ -448,17 +452,17 @@ function P.BuildOptions()
 		end
 	)
 	AddCheck(teamBarDetailsSetting,
-		"Dans la liste de la barre flottante d'équipe, affiche à gauche de chaque personnage son "
+		L["Dans la liste de la barre flottante d'équipe, affiche à gauche de chaque personnage son "
 		.. "niveau, le pourcentage d'avancement dans ce niveau (sauf au niveau maximum) et son "
 		.. "niveau d'objet équipé. Infos envoyées par le Polypode de chaque personnage (« ? » tant "
-		.. "qu'elles ne sont pas reçues). Réglage propre à ce personnage.")
+		.. "qu'elles ne sont pas reçues). Réglage propre à ce personnage."])
 
 	-- Barre de vie des membres dans la barre flottante d'équipe (par personnage, UI_TeamBar.lua).
 	local teamBarHealthSetting = Settings.RegisterProxySetting(
 		category,
 		"POLYPODE_TEAMBAR_HEALTH",
 		Settings.VarType.Boolean,
-		"Barre d'équipe : barre de vie des membres",
+		L["Barre d'équipe : barre de vie des membres"],
 		Settings.Default.True,
 		function()
 			return P.charDb.teamBar.healthBar
@@ -469,16 +473,16 @@ function P.BuildOptions()
 		end
 	)
 	AddCheck(teamBarHealthSetting,
-		"Dans la liste de la barre flottante d'équipe, souligne chaque membre groupé d'une fine "
+		L["Dans la liste de la barre flottante d'équipe, souligne chaque membre groupé d'une fine "
 		.. "barre de vie. Décochée : seul le libellé d'état (hors groupe, mort, loin...) reste. "
-		.. "Réglage propre à ce personnage.")
+		.. "Réglage propre à ce personnage."])
 
 	-- Clignotement des membres à durabilité faible dans la barre flottante (par personnage).
 	local durabilityAlertSetting = Settings.RegisterProxySetting(
 		category,
 		"POLYPODE_TEAMBAR_DURABILITY_ALERT",
 		Settings.VarType.Boolean,
-		"Barre d'équipe : clignoter si la durabilité est faible",
+		L["Barre d'équipe : clignoter si la durabilité est faible"],
 		Settings.Default.True,
 		function()
 			return P.charDb.teamBar.durabilityAlert
@@ -489,15 +493,15 @@ function P.BuildOptions()
 		end
 	)
 	AddCheck(durabilityAlertSetting,
-		"Dans la liste de la barre flottante d'équipe, fait clignoter en rouge un personnage dont "
+		L["Dans la liste de la barre flottante d'équipe, fait clignoter en rouge un personnage dont "
 		.. "la pièce d'équipement la plus usée est sous le seuil de durabilité ci-dessous. Durabilité "
-		.. "envoyée par le Polypode de chaque personnage. Réglage propre à ce personnage.")
+		.. "envoyée par le Polypode de chaque personnage. Réglage propre à ce personnage."])
 
 	local durabilityThresholdSetting = Settings.RegisterProxySetting(
 		category,
 		"POLYPODE_TEAMBAR_DURABILITY_THRESHOLD",
 		Settings.VarType.Number,
-		"Barre d'équipe : seuil de durabilité",
+		L["Barre d'équipe : seuil de durabilité"],
 		25,
 		function()
 			return P.charDb.teamBar.durabilityThreshold
@@ -508,16 +512,16 @@ function P.BuildOptions()
 		end
 	)
 	AddSlider(durabilityThresholdSetting, 5, 95, 5,
-		"Un personnage clignote dans la barre flottante d'équipe quand la durabilité de sa pièce la "
+		L["Un personnage clignote dans la barre flottante d'équipe quand la durabilité de sa pièce la "
 		.. "plus usée est inférieure à ce pourcentage (de 5 à 95 %, par pas de 5). Réglage propre à "
-		.. "ce personnage.")
+		.. "ce personnage."])
 
 	-- Boutons des addons compagnons en colonne contre la barre flottante (par personnage).
 	local moduleButtonsSetting = Settings.RegisterProxySetting(
 		category,
 		"POLYPODE_TEAMBAR_MODULE_BUTTONS",
 		Settings.VarType.Boolean,
-		"Barre d'équipe : boutons des modules",
+		L["Barre d'équipe : boutons des modules"],
 		Settings.Default.True,
 		function()
 			return P.charDb.teamBar.moduleButtons
@@ -528,16 +532,16 @@ function P.BuildOptions()
 		end
 	)
 	AddCheck(moduleButtonsSetting,
-		"Affiche contre la barre flottante d'équipe une colonne de petits boutons reprenant ceux des "
+		L["Affiche contre la barre flottante d'équipe une colonne de petits boutons reprenant ceux des "
 		.. "modules (Data, Photo, Profils, Suivi... selon les addons installés) : trois premières "
 		.. "lettres, même clic et même infobulle que dans la fenêtre Polypode. Réglage propre à ce "
-		.. "personnage.")
+		.. "personnage."])
 
 	local moduleSideSetting = Settings.RegisterProxySetting(
 		category,
 		"POLYPODE_TEAMBAR_MODULE_SIDE",
 		Settings.VarType.String,
-		"Barre d'équipe : côté des boutons",
+		L["Barre d'équipe : côté des boutons"],
 		"left",
 		function()
 			return P.charDb.teamBar.moduleSide
@@ -547,17 +551,17 @@ function P.BuildOptions()
 			P.RefreshTeamBar()
 		end
 	)
-	AddDropdown(moduleSideSetting, { { "left", "À gauche" }, { "right", "À droite" }, { "horizontal", "Horizontal" } },
-		"Place des boutons des modules : colonne à gauche ou à droite de la barre flottante d'équipe, "
+	AddDropdown(moduleSideSetting, { { "left", L["À gauche"] }, { "right", L["À droite"] }, { "horizontal", L["Horizontal"] } },
+		L["Place des boutons des modules : colonne à gauche ou à droite de la barre flottante d'équipe, "
 		.. "ou rangée horizontale au-dessus. Barre réduite : colonne sous l'icône (à gauche, à droite), "
-		.. "ou rangée à sa droite (horizontal). Réglage propre à ce personnage.")
+		.. "ou rangée à sa droite (horizontal). Réglage propre à ce personnage."])
 
 	-- Barre réduite à l'icône Polypode (par personnage, UI_TeamBar.lua).
 	local compactSetting = Settings.RegisterProxySetting(
 		category,
 		"POLYPODE_TEAMBAR_COMPACT",
 		Settings.VarType.Boolean,
-		"Barre d'équipe : réduite à l'icône",
+		L["Barre d'équipe : réduite à l'icône"],
 		Settings.Default.False,
 		function()
 			return P.charDb.teamBar.compact
@@ -568,15 +572,15 @@ function P.BuildOptions()
 		end
 	)
 	AddCheck(compactSetting,
-		"La barre flottante d'équipe ne garde que l'icône Polypode, dans un cadre de la taille d'un "
+		L["La barre flottante d'équipe ne garde que l'icône Polypode, dans un cadre de la taille d'un "
 		.. "bouton de module (nom, liste des personnages et croix masqués) ; les boutons des modules "
 		.. "sont dessous en colonne, ou à droite en rangée avec « Horizontal ». Icône : clic = fenêtre "
 		.. "Polypode, clic droit = options, glisser = déplacer, Alt + clic = figer. Réglage propre à ce "
-		.. "personnage.")
+		.. "personnage."])
 
 	Settings.RegisterAddOnCategory(category)
 	P.optionsCategory = category
-	P.optionsPopup = { key = "Polypode", title = "Options de Polypode", items = popupItems, category = category }
+	P.optionsPopup = { key = "Polypode", title = L["Options de Polypode"], items = popupItems, category = category }
 end
 
 function P.OpenOptions()

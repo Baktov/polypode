@@ -8,7 +8,7 @@
 		<Size y="30"/>
 		<Layers>
 			<Layer level="ARTWORK">
-				<FontString parentKey="Text" inherits="GameFontNormal" justifyH="LEFT" text="Canal dédié">
+				<FontString parentKey="Text" inherits="GameFontNormal" justifyH="LEFT">
 					<Anchors>
 						<Anchor point="LEFT" x="37" y="0"/>
 					</Anchors>
@@ -23,7 +23,7 @@
 				</Anchors>
 			</EditBox>
 			<!-- Ouvre la fenêtre des comptes autorisés (UI_Tokens.lua). -->
-			<Button parentKey="ManageButton" inherits="UIPanelButtonTemplate" text="Gestion liste token">
+			<Button parentKey="ManageButton" inherits="UIPanelButtonTemplate">
 				<Size x="150" y="22"/>
 				<Anchors>
 					<Anchor point="LEFT" relativeKey="$parent.EditBox" relativePoint="RIGHT" x="12" y="0"/>
@@ -44,7 +44,7 @@
 		<Size y="30"/>
 		<Layers>
 			<Layer level="ARTWORK">
-				<FontString parentKey="Text" inherits="GameFontNormal" justifyH="LEFT" text="Compte WoW de ce personnage">
+				<FontString parentKey="Text" inherits="GameFontNormal" justifyH="LEFT">
 					<Anchors>
 						<Anchor point="LEFT" x="37" y="0"/>
 					</Anchors>

@@ -1,6 +1,7 @@
 -- Polypode: UI_Tokens — fenêtre des comptes Battle.net autorisés (liste, révocation)
 
 local P = Polypode
+local L = P.L
 
 -- Ouverte par le bouton « Gestion liste token » du panneau d'options (UI_Options.xml).
 -- Liste défilante des comptes autorisés (P.GetTrustedTokens) : libellé (personnage vu à
@@ -18,18 +19,18 @@ end
 
 -- Infobulle d'un compte : libellé, token abrégé, personnages connus, rappel du bouton.
 local function AccountTooltip(data)
-	local lines = { data.label, "|cff999999Token " .. data.token .. "|r", " " }
+	local lines = { data.label, "|cff999999" .. L["Token %s"]:format(data.token) .. "|r", " " }
 	local characters = P.GetTokenCharacters(data.token)
 	if #characters == 0 then
-		lines[#lines + 1] = "|cff999999Aucun personnage connu (il apparaîtra à sa prochaine connexion)|r"
+		lines[#lines + 1] = "|cff999999" .. L["Aucun personnage connu (il apparaîtra à sa prochaine connexion)"] .. "|r"
 	else
-		lines[#lines + 1] = "|cffffd200Personnages :|r"
+		lines[#lines + 1] = "|cffffd200" .. L["Personnages :"] .. "|r"
 		for _, key in ipairs(characters) do
 			lines[#lines + 1] = "  " .. key
 		end
 	end
 	lines[#lines + 1] = " "
-	lines[#lines + 1] = "Bouton « Révoquer » : retirer l'autorisation de ce compte"
+	lines[#lines + 1] = L["Bouton « Révoquer » : retirer l'autorisation de ce compte"]
 	return lines
 end
 
@@ -55,31 +56,31 @@ local function Build()
 
 	local title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
 	title:SetPoint("TOP", 0, -14)
-	title:SetText("Comptes autorisés")
+	title:SetText(L["Comptes autorisés"])
 	frame.TitleText = title
 
 	local closeBtn = CreateFrame("Button", nil, frame, "UIPanelCloseButton")
 	closeBtn:SetPoint("TOPRIGHT", -4, -4)
 	frame.CloseButton = closeBtn
 
-	listPanel = P.CreatePanel(frame, "Autres comptes Battle.net")
+	listPanel = P.CreatePanel(frame, L["Autres comptes Battle.net"])
 	listPanel:SetPoint("TOPLEFT", 12, -36)
 	listPanel:SetPoint("BOTTOMRIGHT", -12, 12)
 	P.CreateScrollList(listPanel, FormatAccount, nil, {
 		tooltip = AccountTooltip,
 		button = {
-			text = "Révoquer",
+			text = L["Révoquer"],
 			width = 80,
-			tooltip = "Retire l'autorisation de ce compte (aussi sur vos autres Polypode).",
+			tooltip = L["Retire l'autorisation de ce compte (aussi sur vos autres Polypode)."],
 			onClick = function(data)
 				if P.UntrustToken(data.token) then
-					UIErrorsFrame:AddMessage("Autorisation retirée : " .. data.label .. ".", 1, 0.82, 0)
+					UIErrorsFrame:AddMessage(L["Autorisation retirée : %s."]:format(data.label), 1, 0.82, 0)
 					P.RefreshTokensWindow()
 				end
 			end,
 		},
 	})
-	listPanel.emptyText:SetText("Aucun compte autorisé")
+	listPanel.emptyText:SetText(L["Aucun compte autorisé"])
 
 	P.ui.tokensFrame = frame
 	P.ui.tokensPanel = listPanel
