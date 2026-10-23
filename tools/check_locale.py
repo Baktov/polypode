@@ -142,9 +142,12 @@ def main(module):
         missing = [k for k in used if k not in table]
         unused = [k for k in table if k not in used]
         # Même suite de formats, dans le même ordre : string.format de Lua est positionnel. Formats
-        # de date() (avec %H) : mêmes éléments, ordre libre (jour/mois selon la langue).
+        # de date() (%H, %m ou %Y, inconnus de string.format) : mêmes éléments, ordre libre
+        # (jour/mois selon la langue).
+        def is_date(key):
+            return any(code in key for code in ("%H", "%m", "%Y"))
         bad_format = [k for k, v in table.items()
-                      if (sorted(FORMAT.findall(k)) != sorted(FORMAT.findall(v)) if "%H" in k
+                      if (sorted(FORMAT.findall(k)) != sorted(FORMAT.findall(v)) if is_date(k)
                           else FORMAT.findall(k) != FORMAT.findall(v))]
         print(f"== {name} : {len(table)} traductions, {len(missing)} manquantes, {len(unused)} inutilisées, "
               f"{len(bad_format)} formats différents")
