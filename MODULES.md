@@ -90,11 +90,13 @@ Outils de Polypode (`Locale.lua`, 2.8.0 ; sélecteur 2.9.0 ; allemand et espagno
   royaumes, quêtes, renommées : déjà dans la langue du client), noms propres (Polypode, Monopode),
   messages `P.Debug` (restent en français), noms des commandes slash (français ; alias anglais
   enregistrés en plus, sans aide).
-- **XML** : pas d'attribut `text=` ; le texte est posé dans l'`OnLoad` par `L[...]`. Les textes
-  rangés au chargement d'un fichier (`BINDING_NAME_*`, `StaticPopupDialogs`, tables de libellés) se
-  posent dans `P.OnLanguageApplied(function() ... end)` : la langue choisie n'est connue qu'à
-  l'`ADDON_LOADED` de Polypode (SavedVariables lues après les fichiers) ; la fonction est appelée tout
-  de suite si elle l'est déjà. `L[...]` lu au moment de l'affichage n'a besoin de rien.
+- **XML** : pas d'attribut `text=` ; le texte est posé dans l'`OnLoad` par `L[...]`. Textes rangés au
+  chargement d'un fichier (`BINDING_NAME_*`, `StaticPopupDialogs`, tables de libellés, bouton de
+  barre de titre) : `L[...]` y donne déjà la langue choisie, Polypode l'appliquant dès son
+  `Locale.lua` (2.11.1, `## LoadSavedVariablesFirst: 1`) et les modules se chargeant après lui.
+  `P.OnLanguageApplied` reste disponible (repli : `ADDON_LOADED` de Polypode au premier lancement).
+- **`.toc`** : fichiers de langue avec des barres obliques (`Locales/enUS.lua`), l'antislash
+  échoue sur macOS.
 - **Guillemets** : « » en français, espagnol et italien, " " en anglais et en portugais, » « en allemand (les guillemets
   „ " ne sont pas sûrs dans les polices du jeu).
 - **Mots de souris** reconnus par `P.ColorClicks` (liste `MOUSE_WORDS` de Core.lua), à employer

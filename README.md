@@ -562,6 +562,7 @@ aliases (`/poly accounts`, `/poly remove-account`); debug messages stay in Frenc
 
 ## Version
 
+`2.11.1` : langue choisie appliquée dès le chargement de Polypode (SavedVariables lues avant les fichiers : `LoadSavedVariablesFirst`), pour tous les textes de Polypode et de ses modules ; chemins des fichiers de langue compatibles macOS.
 `2.11.0` : Polypode en italien et en portugais du Brésil ; mots de souris italiens et portugais en bleu dans les infobulles. *Italian and Brazilian Portuguese translations.*
 `2.10.0` : Polypode en allemand et en espagnol (l'espagnol d'Amérique latine aussi), au choix dans « Langue / Language » ; mots de souris allemands et espagnols en bleu dans les infobulles. *German and Spanish translations.*
 `2.9.0` : sélecteur de langue propre à Polypode et à ses modules, indépendant de celle du jeu (option « Langue / Language », `/poly langue fr|en|auto`, après `/reload`). *Language selector, independent from the game's.*

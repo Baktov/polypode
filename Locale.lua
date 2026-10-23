@@ -25,7 +25,8 @@ P.LANGUAGES = {
 local NEIGHBOUR = { esMX = "esES" }
 
 -- Langue d'affichage : celle du jeu jusqu'à ce que P.ApplyLanguage applique la préférence
--- enregistrée (ADDON_LOADED de Polypode : les SavedVariables ne sont lues qu'après les fichiers).
+-- enregistrée, dès la fin de ce fichier (## LoadSavedVariablesFirst : PolypodeDB est déjà lu), ou
+-- à défaut à l'ADDON_LOADED de Polypode (P.InitDB).
 local language = P.LOCALE
 local applied = false
 local appliedCallbacks = {}
@@ -36,9 +37,13 @@ function P.GetLanguage()
 end
 
 -- Applique la préférence ("auto", nil ou une langue de P.LANGUAGES) puis rappelle les fonctions
--- de P.OnLanguageApplied. Appelé une fois par session : changer de langue demande un /reload,
--- les fenêtres déjà construites gardant leurs textes.
+-- de P.OnLanguageApplied. Effet une seule fois par session (les appels suivants sont ignorés :
+-- les rappels, dont des boutons de modules, ne doivent pas être rejoués) ; changer de langue
+-- demande un /reload, les fenêtres déjà construites gardant leurs textes.
 function P.ApplyLanguage(preference)
+	if applied then
+		return
+	end
 	language = (preference and preference ~= "auto") and preference or P.LOCALE
 	applied = true
 	for _, fn in ipairs(appliedCallbacks) do
@@ -106,3 +111,10 @@ function P.AddTranslations(L, locale, strings)
 end
 
 P.L = P.NewLocale()
+
+-- Préférence appliquée dès le chargement (## LoadSavedVariablesFirst : PolypodeDB est lu avant les
+-- fichiers) : tous les textes, y compris ceux que Polypode et ses modules rangent au chargement de
+-- leurs fichiers, sont dans la langue choisie. Premier lancement (pas encore de PolypodeDB) : P.InitDB.
+if type(PolypodeDB) == "table" then
+	P.ApplyLanguage(PolypodeDB.language)
+end
