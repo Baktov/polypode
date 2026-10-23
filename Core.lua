@@ -181,13 +181,35 @@ end
 
 -- INFOBULLES : règle commune à Polypode et à ses modules, toute notion de souris (« Clic », « clic
 -- gauche », « Clic droit », « Maj + clic », « Alt + clic droit », « double-clic », « cliquable »,
--- « Glisser », « glisser/déposer », « glissez »...) est en bleu
+-- « Glisser », « glisser/déposer », « glissez »..., et leurs équivalents anglais, allemands et
+-- espagnols : MOUSE_WORDS) est en bleu
 -- (P.CLICK_COLOR). P.ColorClicks(texte) colore un texte ; P.ShowTooltip([infobulle]) colore toutes
 -- les lignes de l'infobulle (GameTooltip par défaut) puis l'affiche, à appeler à la place de
 -- GameTooltip:Show(). Descriptions du panneau d'options : passées par P.ColorClicks.
 P.CLICK_COLOR = "|cff4da6ff"
 
-local CLICK_MODIFIERS = { Maj = true, Alt = true, Ctrl = true, Shift = true }
+-- Mots de souris reconnus, en minuscules et entiers : true = clic, "drag" = glisser. Le français
+-- « glisser » l'est sous toutes ses formes (début « gliss » : « glissez », « glissé »...) ; pas
+-- « clique », « cliquer », « klicken », « dragon ».
+local MOUSE_WORDS = {
+	-- français (l'espagnol « clic » aussi)
+	clic = true, clics = true, cliquable = true, cliquables = true,
+	-- anglais
+	click = true, clicks = true, clickable = true,
+	drag = "drag", drags = "drag", dragging = "drag", dragged = "drag",
+	-- allemand
+	klick = true, klicks = true, linksklick = true, rechtsklick = true, doppelklick = true,
+	klickbar = true, anklickbar = true, ziehen = "drag",
+	-- espagnol
+	arrastrar = "drag", arrastra = "drag", arrastrando = "drag",
+}
+-- Débuts de mots cherchés dans le texte ; le mot entier qui les contient est comparé à
+-- MOUSE_WORDS (« Rechtsklick » est trouvé par « klick »).
+local MOUSE_STEMS = { "[Cc]li[cq]", "[Gg]liss", "[Dd]rag", "[Kk]lick", "[Zz]ieh", "[Aa]rrastr" }
+
+-- Touches de modification avant « + » (« Maj + clic », « Umschalt + Klick », « Mayús + clic »).
+local CLICK_MODIFIERS = { Maj = true, Alt = true, Ctrl = true, Shift = true, Strg = true, Umschalt = true,
+	["Mayús"] = true }
 
 -- Couleur active (|cffxxxxxx) à la position pos de text, ou nil (couleur de la ligne).
 local function ActiveColor(text, pos)
@@ -202,21 +224,24 @@ local function ActiveColor(text, pos)
 	return color
 end
 
--- Fin de l'expression de souris commençant à first (mot reconnu jusqu'à last) : côté (« gauche »,
--- « droit ») d'un clic, « /déposer » ou « -déposer » d'un glisser (anglais : « and drop »).
+-- Fin de l'expression de souris commençant à first (mot reconnu jusqu'à last) : côté d'un clic
+-- (« gauche », « droit », espagnol « izquierdo », « derecho »), suite d'un glisser (« /déposer »,
+-- « -déposer », « and drop », « und ablegen », « y soltar »).
+local CLICK_TAILS = { "^ gauche", "^ droit", "^ izquierdo", "^ derecho" }
+local DRAG_TAILS = { "^/[Dd]époser", "^%-[Dd]époser", "^ and drop", "^%-and%-drop", "^ und ablegen", "^ y soltar" }
+
 local function ExtendRight(text, last, isDrag)
-	local tail
-	if isDrag then
-		tail = text:match("^/[Dd]époser", last + 1) or text:match("^%-[Dd]époser", last + 1)
-			or text:match("^ and drop", last + 1) or text:match("^%-and%-drop", last + 1)
-	else
-		tail = text:match("^ gauche", last + 1) or text:match("^ droit", last + 1)
+	for _, tail in ipairs(isDrag and DRAG_TAILS or CLICK_TAILS) do
+		local found = text:match(tail, last + 1)
+		if found then
+			return last + #found
+		end
 	end
-	return tail and last + #tail or last
+	return last
 end
 
--- Début de l'expression : « double- » (anglais : « right- », « left- ») et touches de modification
--- (« Maj + », « Alt + Maj + »...).
+-- Début de l'expression : « right- », « left- », « double- », espagnol « doble » (« Doble clic »)
+-- et touches de modification (« Maj + », « Alt + Maj + »...).
 local function ExtendLeft(text, start)
 	for _, prefix in ipairs({ "right-", "left-" }) do
 		if text:sub(start - #prefix, start - 1):lower() == prefix then
@@ -224,11 +249,14 @@ local function ExtendLeft(text, start)
 			break
 		end
 	end
-	if text:sub(start - 7, start - 1):lower() == "double-" then
-		start = start - 7
+	for _, prefix in ipairs({ "double-", "doble " }) do
+		if text:sub(start - #prefix, start - 1):lower() == prefix then
+			start = start - #prefix
+			break
+		end
 	end
 	while true do
-		local word = text:sub(1, start - 1):match("(%a+) %+ $")
+		local word = text:sub(1, start - 1):match("([%a\128-\255]+) %+ $")
 		-- Après un saut de ligne « |n » : « nMaj » → « Maj ».
 		if word and word:sub(1, 1) == "n" and text:sub(start - #word - 4, start - #word - 4) == "|" then
 			word = word:sub(2)
@@ -241,43 +269,46 @@ local function ExtendLeft(text, start)
 end
 
 -- Prochain mot de souris à partir de pos : début, fin, vrai si c'est un glisser ; nil s'il n'y en
--- a plus. Mots entiers : « clic », « clics », « cliquable(s) », « glisser » et ses formes
--- (« glissez », « glissé »...) ; pas « clique », « cliquer ». Anglais : « click », « clicks »,
--- « clickable », « drag », « drags », « dragging », « dragged » (pas « dragon »).
-local function Earliest(a, b)
-	return a and (not b or a < b) and a or b
-end
-
+-- a plus.
 local function NextMouseWord(text, pos)
 	while true do
-		local clickFirst = text:find("[Cc]li[cq]", pos) -- « clic », « cliquable », « click »
-		local dragFirst = Earliest(text:find("[Gg]liss", pos), text:find("[Dd]rag", pos))
-		local first = Earliest(clickFirst, dragFirst)
-		if not first then
+		local found
+		for _, stem in ipairs(MOUSE_STEMS) do
+			local at = text:find(stem, pos)
+			if at and (not found or at < found) then
+				found = at
+			end
+		end
+		if not found then
 			return nil
 		end
-		local isDrag = first == dragFirst
-		local before = text:sub(first - 1, first - 1)
-		local word = text:match("^[%a\128-\255]+", first) -- mot entier (lettres accentuées comprises)
-		local valid = not before:find("[%a\128-\255]")
-		local lower = word:lower()
-		if isDrag then
-			valid = valid and (lower:find("^gliss") ~= nil or lower == "drag" or lower == "drags"
-				or lower == "dragging" or lower == "dragged")
-		else
-			valid = valid and (lower == "clic" or lower == "clics" or lower == "cliquable" or lower == "cliquables"
-				or lower == "click" or lower == "clicks" or lower == "clickable")
+		-- Mot entier autour du début trouvé (lettres accentuées comprises).
+		local first = found
+		while first > pos and text:sub(first - 1, first - 1):find("[%a\128-\255]") do
+			first = first - 1
 		end
-		if valid then
-			return first, first + #word - 1, isDrag
+		local last = found + #text:match("^[%a\128-\255]*", found) - 1
+		local lower = text:sub(first, last):lower()
+		local kind = MOUSE_WORDS[lower] or (lower:find("^gliss") and "drag")
+		if kind and not text:sub(first - 1, first - 1):find("[%a\128-\255]") then
+			return first, last, kind == "drag"
 		end
-		pos = first + #word
+		pos = last + 1
 	end
+end
+
+local function HasMouseStem(text)
+	for _, stem in ipairs(MOUSE_STEMS) do
+		if text:find(stem) then
+			return true
+		end
+	end
+	return false
 end
 
 function P.ColorClicks(text)
 	if type(text) ~= "string" or (issecretvalue and issecretvalue(text))
-		or not (text:find("[Cc]li[cq]") or text:find("[Gg]liss") or text:find("[Dd]rag")) then
+		or not HasMouseStem(text) then
 		return text
 	end
 	local out, pos = {}, 1

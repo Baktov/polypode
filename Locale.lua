@@ -6,7 +6,7 @@ local P = Polypode
 -- Langue du client (frFR, enUS, enGB, deDE...). Les textes sont écrits en français dans le code :
 -- le texte français est la clé, L["Inviter l'équipe"] ; une table de traductions par langue
 -- (Locales/enUS.lua...) associe chaque clé à son texte. Résolution à chaque lecture : langue
--- d'affichage, sinon anglais, sinon la clé (texte français).
+-- d'affichage, sinon langue voisine (esMX : esES), sinon anglais, sinon la clé (texte français).
 P.LOCALE = GetLocale()
 
 -- Langues proposées par le sélecteur (options, /poly langue) ; "auto" = langue du jeu. Libellés
@@ -15,7 +15,12 @@ P.LANGUAGES = {
 	{ "auto", "Auto" },
 	{ "frFR", "Français" },
 	{ "enUS", "English" },
+	{ "deDE", "Deutsch" },
+	{ "esES", "Español" },
 }
+
+-- Langue voisine essayée avant l'anglais (client espagnol d'Amérique latine).
+local NEIGHBOUR = { esMX = "esES" }
 
 -- Langue d'affichage : celle du jeu jusqu'à ce que P.ApplyLanguage applique la préférence
 -- enregistrée (ADDON_LOADED de Polypode : les SavedVariables ne sont lues qu'après les fichiers).
@@ -74,6 +79,10 @@ function P.NewLocale()
 			end
 			local byLanguage = translations[self]
 			local text = byLanguage[language] and byLanguage[language][key]
+			local neighbour = NEIGHBOUR[language]
+			if text == nil and neighbour and byLanguage[neighbour] then
+				text = byLanguage[neighbour][key]
+			end
 			if text == nil and byLanguage.enUS then
 				text = byLanguage.enUS[key] -- repli des langues sans traduction
 			end

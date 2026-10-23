@@ -3,13 +3,15 @@
 ## Notes: Simple management of several multiboxed characters (roster, teams and leader, sync between clients). Slash command: /poly
 ## Notes-frFR: Gestion simple de plusieurs personnages multiboxés (roster, équipes et leader, sync entre clients). Commandes slash: /poly
 ## Author: Baktov
-## Version: 2.9.0
+## Version: 2.10.0
 ## SavedVariables: PolypodeDB
 ## SavedVariablesPerCharacter: PolypodeCharDB
 ## OptionalDeps: EllesmereUI, ElvUI
 
 Locale.lua
 Locales\enUS.lua
+Locales\deDE.lua
+Locales\esES.lua
 Core.lua
 Sync.lua
 Quests.lua

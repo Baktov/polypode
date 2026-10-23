@@ -5,7 +5,7 @@
 Lit les .lua du module (hors Locales/) et les tables de Locales/*.lua, puis signale :
 - les clés L["..."] du code sans traduction dans une langue (enUS obligatoire) ;
 - les traductions dont la clé n'est plus utilisée dans le code ;
-- les traductions dont les spécificateurs de format (%s, %d, %%...) diffèrent de la clé ;
+- les traductions dont les spécificateurs de format (%s, %d, %%...) diffèrent de la clé (ordre compris) ;
 - les textes français restés hors de L[...] (accents ou plusieurs mots ; hors P.Debug et
   commentaires) : liste à relire, tous ne sont pas des textes affichés.
 Code de sortie 1 s'il manque une traduction anglaise ou si un format diffère.
@@ -137,7 +137,11 @@ def main(module):
     for name, table in locales.items():
         missing = [k for k in used if k not in table]
         unused = [k for k in table if k not in used]
-        bad_format = [k for k, v in table.items() if sorted(FORMAT.findall(k)) != sorted(FORMAT.findall(v))]
+        # Même suite de formats, dans le même ordre : string.format de Lua est positionnel. Formats
+        # de date() (avec %H) : mêmes éléments, ordre libre (jour/mois selon la langue).
+        bad_format = [k for k, v in table.items()
+                      if (sorted(FORMAT.findall(k)) != sorted(FORMAT.findall(v)) if "%H" in k
+                          else FORMAT.findall(k) != FORMAT.findall(v))]
         print(f"== {name} : {len(table)} traductions, {len(missing)} manquantes, {len(unused)} inutilisées, "
               f"{len(bad_format)} formats différents")
         for k in missing:
