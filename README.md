@@ -400,7 +400,7 @@ Polypode Suivi ; il peut être désactivé (il ne fait plus que le rappeler).
 | `/poly photo` | Mode photo (addon **Polypode Photo**, s'il est installé et activé) |
 | `/poly comptes` (ou `/poly accounts`) | Lister les autres comptes Battle.net autorisés (numérotés) |
 | `/poly retirer-compte <n°>` (ou `/poly remove-account <n°>`) | Retirer l'autorisation d'un compte (numéro donné par `/poly comptes`) |
-| `/poly langue auto\|fr\|en\|de\|es` (ou `/poly language`) | Choisir la langue de Polypode et de ses modules (Auto = celle du jeu), appliquée après `/reload` ; sans argument, affiche le choix actuel |
+| `/poly langue auto\|fr\|en\|de\|es\|it\|pt` (ou `/poly language`) | Choisir la langue de Polypode et de ses modules (Auto = celle du jeu), appliquée après `/reload` ; sans argument, affiche le choix actuel |
 | `/poly debug` | Activer/désactiver les messages de debug (mémorisé pour ce personnage, comme la case du panneau d'options) |
 | `/poly` (sans argument) | Afficher l'aide |
 
@@ -464,7 +464,7 @@ fenêtre principale) :
 
 | Option | Défaut | Effet |
 |---|---|---|
-| **Langue / Language** (en tête) | Auto | Langue de Polypode et de ses modules : Auto (celle du jeu), Français, English, Deutsch ou Español ; appliquée après `/reload` (voir « Langues »). Pour **tous vos personnages** |
+| **Langue / Language** (en tête) | Auto | Langue de Polypode et de ses modules : Auto (celle du jeu), Français, English, Deutsch, Español, Italiano ou Português (Brasil) ; appliquée après `/reload` (voir « Langues »). Pour **tous vos personnages** |
 | **Mode solo** (en rouge) | Non | Un seul personnage : fenêtre réduite à « Personnages disponibles », barre flottante du personnage joué, Quêtes masqué, Suivi sur tous les personnages (voir « Mode solo »). Même case que **Solo** dans la fenêtre. Réglage **par personnage** |
 | Canal dédié | vide | Optionnel : nom du canal de discussion commun à vos comptes, utile sans groupe ni guilde commune (voir Fonctionnement ; l'infobulle du champ le rappelle). Aussi modifiable dans la fenêtre principale. À droite, bouton « Gestion liste token » : liste et révocation des comptes autorisés. Pour tout le compte, synchronisé entre vos clients |
 | Afficher l'icône de minimap | Oui | Affiche le bouton Polypode autour de la minimap |
@@ -543,18 +543,18 @@ commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, ba
 
 ## Langues (Languages)
 
-Polypode s'affiche dans la langue du jeu : **français**, **anglais**, **allemand** ou **espagnol**
-(l'espagnol d'Amérique latine prend l'espagnol ; toute autre langue utilise l'anglais en attendant sa
+Polypode s'affiche dans la langue du jeu : **français**, **anglais**, **allemand**, **espagnol**,
+**italien** ou **portugais du Brésil** (l'espagnol d'Amérique latine prend l'espagnol ; toute autre langue utilise l'anglais en attendant sa
 traduction). On peut aussi choisir sa langue, indépendamment de
 celle du jeu (ex. jeu en anglais, Polypode en français) : option **Langue / Language** en tête du
-panneau d'options, ou `/poly langue fr` (`en`, `de`, `es`, `auto`), puis `/reload`. Le choix vaut pour tous vos
+panneau d'options, ou `/poly langue fr` (`en`, `de`, `es`, `it`, `pt`, `auto`), puis `/reload`. Le choix vaut pour tous vos
 personnages et pour les addons compagnons. Les noms donnés par le jeu (classes, zones...) restent
 ceux du client. Les commandes `/poly` gardent leur nom français, avec des alias anglais
 (`/poly accounts`, `/poly remove-account`) ; les messages du mode debug restent en français.
 
-*Polypode follows the game language: French, English, German or Spanish (any other client language
+*Polypode follows the game language: French, English, German, Spanish, Italian or Brazilian Portuguese (any other client language
 falls back to English until it gets its own translation). You can also pick its language regardless of the game's:
-**Langue / Language** option at the top of the options panel, or `/poly language en` (`fr`, `de`, `es`, `auto`),
+**Langue / Language** option at the top of the options panel, or `/poly language en` (`fr`, `de`, `es`, `it`, `pt`, `auto`),
 then `/reload`; it applies to all your characters and to the companion addons. `/poly` commands keep their French names, with English
 aliases (`/poly accounts`, `/poly remove-account`); debug messages stay in French.*
 
@@ -562,6 +562,7 @@ aliases (`/poly accounts`, `/poly remove-account`); debug messages stay in Frenc
 
 ## Version
 
+`2.11.0` : Polypode en italien et en portugais du Brésil ; mots de souris italiens et portugais en bleu dans les infobulles. *Italian and Brazilian Portuguese translations.*
 `2.10.0` : Polypode en allemand et en espagnol (l'espagnol d'Amérique latine aussi), au choix dans « Langue / Language » ; mots de souris allemands et espagnols en bleu dans les infobulles. *German and Spanish translations.*
 `2.9.0` : sélecteur de langue propre à Polypode et à ses modules, indépendant de celle du jeu (option « Langue / Language », `/poly langue fr|en|auto`, après `/reload`). *Language selector, independent from the game's.*
 `2.8.1` : en anglais, options citant les modules sous leur nom anglais (Tracker, Profiles...).

@@ -17,6 +17,8 @@ P.LANGUAGES = {
 	{ "enUS", "English" },
 	{ "deDE", "Deutsch" },
 	{ "esES", "Español" },
+	{ "itIT", "Italiano" },
+	{ "ptBR", "Português (Brasil)" },
 }
 
 -- Langue voisine essayée avant l'anglais (client espagnol d'Amérique latine).

@@ -202,14 +202,24 @@ local MOUSE_WORDS = {
 	klickbar = true, anklickbar = true, ziehen = "drag",
 	-- espagnol
 	arrastrar = "drag", arrastra = "drag", arrastrando = "drag",
+	-- italien (« clic » : voir français)
+	trascina = "drag", trascinare = "drag", trascinando = "drag",
+	-- portugais (« clique » : MOUSE_WORDS_BY_LANGUAGE)
+	arrastar = "drag", arraste = "drag",
+}
+-- Mots reconnus seulement dans une langue d'affichage : le portugais « clique » est aussi un verbe
+-- français, qui ne doit pas être coloré.
+local MOUSE_WORDS_BY_LANGUAGE = {
+	ptBR = { clique = true, cliques = true },
 }
 -- Débuts de mots cherchés dans le texte ; le mot entier qui les contient est comparé à
 -- MOUSE_WORDS (« Rechtsklick » est trouvé par « klick »).
-local MOUSE_STEMS = { "[Cc]li[cq]", "[Gg]liss", "[Dd]rag", "[Kk]lick", "[Zz]ieh", "[Aa]rrastr" }
+local MOUSE_STEMS = { "[Cc]li[cq]", "[Gg]liss", "[Dd]rag", "[Kk]lick", "[Zz]ieh", "[Aa]rrast", "[Tt]rascin" }
 
--- Touches de modification avant « + » (« Maj + clic », « Umschalt + Klick », « Mayús + clic »).
+-- Touches de modification avant « + » (« Maj + clic », « Umschalt + Klick », « Mayús + clic »,
+-- « Maiusc + clic »).
 local CLICK_MODIFIERS = { Maj = true, Alt = true, Ctrl = true, Shift = true, Strg = true, Umschalt = true,
-	["Mayús"] = true }
+	["Mayús"] = true, Maiusc = true }
 
 -- Couleur active (|cffxxxxxx) à la position pos de text, ou nil (couleur de la ligne).
 local function ActiveColor(text, pos)
@@ -225,9 +235,11 @@ local function ActiveColor(text, pos)
 end
 
 -- Fin de l'expression de souris commençant à first (mot reconnu jusqu'à last) : côté d'un clic
--- (« gauche », « droit », espagnol « izquierdo », « derecho »), suite d'un glisser (« /déposer »,
+-- (« gauche », « droit », espagnol « izquierdo », « derecho », italien « sinistro », « destro »,
+-- portugais « esquerdo », « direito », « duplo »), suite d'un glisser (« /déposer »,
 -- « -déposer », « and drop », « und ablegen », « y soltar »).
-local CLICK_TAILS = { "^ gauche", "^ droit", "^ izquierdo", "^ derecho" }
+local CLICK_TAILS = { "^ gauche", "^ droit", "^ izquierdo", "^ derecho", "^ sinistro", "^ destro", "^ esquerdo",
+	"^ direito", "^ duplo" }
 local DRAG_TAILS = { "^/[Dd]époser", "^%-[Dd]époser", "^ and drop", "^%-and%-drop", "^ und ablegen", "^ y soltar" }
 
 local function ExtendRight(text, last, isDrag)
@@ -240,7 +252,8 @@ local function ExtendRight(text, last, isDrag)
 	return last
 end
 
--- Début de l'expression : « right- », « left- », « double- », espagnol « doble » (« Doble clic »)
+-- Début de l'expression : « right- », « left- », « double- », espagnol « doble » (« Doble clic »),
+-- italien « doppio »
 -- et touches de modification (« Maj + », « Alt + Maj + »...).
 local function ExtendLeft(text, start)
 	for _, prefix in ipairs({ "right-", "left-" }) do
@@ -249,7 +262,7 @@ local function ExtendLeft(text, start)
 			break
 		end
 	end
-	for _, prefix in ipairs({ "double-", "doble " }) do
+	for _, prefix in ipairs({ "double-", "doble ", "doppio " }) do
 		if text:sub(start - #prefix, start - 1):lower() == prefix then
 			start = start - #prefix
 			break
@@ -289,7 +302,8 @@ local function NextMouseWord(text, pos)
 		end
 		local last = found + #text:match("^[%a\128-\255]*", found) - 1
 		local lower = text:sub(first, last):lower()
-		local kind = MOUSE_WORDS[lower] or (lower:find("^gliss") and "drag")
+		local byLanguage = MOUSE_WORDS_BY_LANGUAGE[P.GetLanguage()]
+		local kind = MOUSE_WORDS[lower] or (byLanguage and byLanguage[lower]) or (lower:find("^gliss") and "drag")
 		if kind and not text:sub(first - 1, first - 1):find("[%a\128-\255]") then
 			return first, last, kind == "drag"
 		end

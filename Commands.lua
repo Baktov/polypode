@@ -16,6 +16,9 @@ local LANGUAGE_WORDS = {
 	fr = "frFR", frfr = "frFR", francais = "frFR", ["français"] = "frFR", french = "frFR",
 	en = "enUS", enus = "enUS", anglais = "enUS", english = "enUS",
 	de = "deDE", dede = "deDE", allemand = "deDE", deutsch = "deDE", german = "deDE",
+	it = "itIT", itit = "itIT", italien = "itIT", italiano = "itIT", italian = "itIT",
+	pt = "ptBR", ptbr = "ptBR", br = "ptBR", portugais = "ptBR", ["português"] = "ptBR", portugues = "ptBR",
+	portuguese = "ptBR",
 	es = "esES", eses = "esES", espagnol = "esES", ["español"] = "esES", espanol = "esES", spanish = "esES",
 }
 
@@ -37,7 +40,7 @@ local function PrintHelp()
 	print(L["  /poly comptes      — lister les autres comptes Battle.net autorisés"])
 	print(L["  /poly retirer-compte <n°> — retirer l'autorisation d'un compte"])
 	print(L["  /poly debug        — activer/désactiver le mode debug"])
-	print("  /poly langue auto|fr|en|de|es — langue de Polypode / Polypode language (/reload)")
+	print("  /poly langue auto|fr|en|de|es|it|pt — langue de Polypode / Polypode language (/reload)")
 	for name, command in pairs(extraCommands) do
 		if command.help then -- sans aide : alias (ex. « quêtes » pour « quetes »)
 			print(string.format("  /poly %-12s — %s", name, command.help))
@@ -115,7 +118,7 @@ local function SlashHandler(msg)
 		if preference then
 			P.SetLanguagePreference(preference)
 		end
-		print(string.format("Polypode : langue / language = %s (%s). /poly langue auto|fr|en|de|es, puis/then /reload",
+		print(string.format("Polypode : langue / language = %s (%s). /poly langue auto|fr|en|de|es|it|pt, puis/then /reload",
 			P.GetLanguagePreference(), P.GetLanguage()))
 	elseif extraCommands[sub] then
 		extraCommands[sub].handler({ select(2, unpack(args)) })

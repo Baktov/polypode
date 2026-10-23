@@ -54,8 +54,10 @@ publique `P.*`, listée dans la section « Dépendances vers Polypode » de leur
 Les modules s'affichent dans la langue choisie dans Polypode (option « Langue / Language »,
 `/poly langue`, `P.db.language`, après `/reload`), par défaut celle du jeu ; anglais pour une langue
 sans traduction. **Langues livrées** : français (référence), anglais, allemand, espagnol (le client
-`esMX` prend l'espagnol) ; chaque module fournit `Locales\enUS.lua`, `deDE.lua` et `esES.lua`.
-Outils de Polypode (`Locale.lua`, 2.8.0 ; sélecteur 2.9.0 ; allemand et espagnol 2.10.0) : `P.NewLocale()`,
+`esMX` prend l'espagnol), italien, portugais du Brésil ; chaque module fournit `Locales\enUS.lua`,
+`deDE.lua`, `esES.lua`, `itIT.lua` et `ptBR.lua`. Pas de russe, coréen ni chinois (caractères absents
+des polices des clients latins, règle des caractères latins).
+Outils de Polypode (`Locale.lua`, 2.8.0 ; sélecteur 2.9.0 ; allemand et espagnol 2.10.0 ; italien et portugais 2.11.0) : `P.NewLocale()`,
 `P.AddTranslations`, `P.GetLanguage()` (langue d'affichage), `P.OnLanguageApplied(fn)`, `P.LOCALE`
 (langue du jeu, à ne pas utiliser pour choisir un texte).
 
@@ -75,14 +77,14 @@ Outils de Polypode (`Locale.lua`, 2.8.0 ; sélecteur 2.9.0 ; allemand et espagno
   `## Title-frFR:` français. Les commandes `/poly suivi`... gardent leur nom français, avec l'alias
   anglais (`/poly tracker`...). Noms (trois premières lettres toutes différentes dans chaque langue) :
 
-  | Français | Anglais | Allemand | Espagnol |
-  |---|---|---|---|
-  | Data | Data | Data | Data |
-  | Histoire | History | Chronik | Historia |
-  | Map | Map | Karte | Mapa |
-  | Photo | Photo | Foto | Foto |
-  | Profils | Profiles | Profile | Perfiles |
-  | Suivi (et sa fenêtre Grille) | Tracker (Grid) | Tracker (Raster) | Seguimiento (Cuadrícula) |
+  | Français | Anglais | Allemand | Espagnol | Italien | Portugais |
+  |---|---|---|---|---|---|
+  | Data | Data | Data | Data | Data | Data |
+  | Histoire | History | Chronik | Historia | Storia | Histórico |
+  | Map | Map | Karte | Mapa | Mappa | Mapa |
+  | Photo | Photo | Foto | Foto | Foto | Foto |
+  | Profils | Profiles | Profile | Perfiles | Profili | Perfis |
+  | Suivi (Grille) | Tracker (Grid) | Tracker (Raster) | Seguimiento (Cuadrícula) | Monitoraggio (Griglia) | Acompanhamento (Grade) |
 
 - **Hors table** : noms donnés par le jeu (classes par `LOCALIZED_CLASS_NAMES_MALE`, zones,
   royaumes, quêtes, renommées : déjà dans la langue du client), noms propres (Polypode, Monopode),
@@ -93,13 +95,16 @@ Outils de Polypode (`Locale.lua`, 2.8.0 ; sélecteur 2.9.0 ; allemand et espagno
   posent dans `P.OnLanguageApplied(function() ... end)` : la langue choisie n'est connue qu'à
   l'`ADDON_LOADED` de Polypode (SavedVariables lues après les fichiers) ; la fonction est appelée tout
   de suite si elle l'est déjà. `L[...]` lu au moment de l'affichage n'a besoin de rien.
-- **Guillemets** : « » en français et en espagnol, " " en anglais, » « en allemand (les guillemets
+- **Guillemets** : « » en français, espagnol et italien, " " en anglais et en portugais, » « en allemand (les guillemets
   „ " ne sont pas sûrs dans les polices du jeu).
 - **Mots de souris** reconnus par `P.ColorClicks` (liste `MOUSE_WORDS` de Core.lua), à employer
   tels quels : anglais « Click », « Left-click », « Right-click », « Double-click », « Drag »
   (« drag and drop ») ; allemand « Klick », « Linksklick », « Rechtsklick », « Doppelklick »,
-  « Ziehen » ; espagnol « Clic », « Clic izquierdo », « Clic derecho », « Doble clic », « Arrastrar ».
-  Modificateurs : « Shift + » / « Umschalt + » / « Mayús + », « Alt + », « Ctrl + » / « Strg + ».
+  « Ziehen » ; espagnol « Clic », « Clic izquierdo », « Clic derecho », « Doble clic », « Arrastrar » ;
+  italien « Clic », « Clic sinistro », « Clic destro », « Doppio clic », « Trascina » ; portugais
+  « Clique », « Clique esquerdo », « Clique direito », « Clique duplo », « Arrastar » (« clique »
+  reconnu seulement en portugais : `MOUSE_WORDS_BY_LANGUAGE`). Modificateurs : « Shift + » /
+  « Umschalt + » / « Mayús + » / « Maiusc + », « Alt + », « Ctrl + » / « Strg + ».
 - **`.toc`** : `## Notes:` en anglais, `## Notes-frFR:` en français.
 - **Contrôle** avant chaque commit qui touche des textes, depuis `ADDONS_POLYPODE` :
   `python Polypode\tools\check_locale.py <dossier du module>`. Il doit afficher 0 clé sans
