@@ -128,6 +128,14 @@ def main():
     ]
     if deps:
         lines += ['', f'Nécessite : {", ".join(f"**{d.strip()}**" for d in deps.split(","))} (même procédure).']
+    # Joueurs non francophones : installation en anglais (le README anglais détaille le reste).
+    lines += [
+        '',
+        f'*English: download **{zip_name}** below (not "Source code") and unzip it into '
+        '`World of Warcraft\\_retail_\\Interface\\AddOns\\` (WoW Forever: `_forever_`).'
+        + (f' Requires {", ".join(d.strip() for d in deps.split(","))} (same procedure).' if deps else '')
+        + ' See README.en.md.*',
+    ]
     news = changes(repo, previous[1:] if previous else None)
     if news:
         lines += ['', f'**Nouveautés depuis {previous}** :' if previous else '**Versions** :', *news]

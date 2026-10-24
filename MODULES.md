@@ -160,7 +160,7 @@ Crée la version `v<## Version du .toc>` sur GitHub (étiquette sur HEAD) et y j
 (addon imbriqué, comme `Polypode_Histoire_Archive`, sorti au premier niveau), sans fichiers de
 développement (`CLAUDE.md`, `MODULES.md`, `Modele/`, `tools/` de Photo, ce programme) : le joueur
 décompresse dans `Interface\AddOns` sans rien renommer (le ZIP « Source code » de GitHub, lui,
-contient `polypode-x-1.2.3` à renommer). Notes : installation, dépendances (`## Dependencies`),
+contient `polypode-x-1.2.3` à renommer). Notes : installation (en français, puis une ligne en anglais), dépendances (`## Dependencies`),
 lignes de la section « Version » du README depuis la version publiée précédente. Contrôles :
 arbre propre, HEAD poussé, version pas encore publiée. Un nouveau fichier de développement à ne
 pas livrer s'ajoute aux exclusions en tête du programme.
