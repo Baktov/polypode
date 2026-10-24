@@ -7,7 +7,8 @@ complète est dans ../MODULES.md, section « Créer un nouveau module ».
 
 Exemple fourni, fonctionnel : la fenêtre liste les personnages du roster avec leur zone actuelle,
 échangée entre clients. Il montre chaque branchement sur Polypode (bouton, commande /poly, option,
-liste défilante, skin, synchro, sauvegarde, oubli d'un personnage supprimé) : garder les
+liste défilante, skin, synchro, sauvegarde, oubli d'un personnage supprimé) et les textes
+traduits (Locale.lua, Locales/ : anglais, allemand, espagnol, italien, portugais du Brésil) : garder les
 branchements utiles, remplacer l'exemple par la vraie fonction.
 
 Pour créer « Polypode X » (dossier Polypode_X) :
@@ -18,12 +19,16 @@ Pour créer « Polypode X » (dossier Polypode_X) :
      Modele.lua           ->  X.lua            (et la ligne correspondante du .toc)
      CLAUDE.modele.md     ->  CLAUDE.md
      README.modele.md     ->  README.md
+     README.en.modele.md  ->  README.en.md
    puis supprimer ce LISEZMOI.txt.
 3. Remplacer partout, en respectant la casse :
      Modele / modele / MODELE  ->  X / x / X (type de message de synchro propre au module)
    ce qui renomme aussi les SavedVariables (PolypodeXData, PolypodeXDB), la fenêtre
    (PolypodeXFrame), les fonctions (P.ToggleX, P.RefreshX), la commande (/poly x), le réglage
-   (POLYPODE_X_SHOW_REALM) et l'adresse du dépôt dans CLAUDE.md.
+   (POLYPODE_X_SHOW_REALM) et l'adresse du dépôt dans CLAUDE.md et les README.
+   Dans Locales/*.lua et les lignes ## Title-xxXX du .toc, remplacer aussi le nom traduit du
+   modèle (Template, Vorlage, Plantilla, Modello, Modelo) par celui du module, et l'alias
+   anglais /poly template de Modele.lua par le nom anglais.
 4. git init, git remote add origin https://github.com/Baktov/polypode-x.git
 5. Suivre les étapes 4 à 7 de « Créer un nouveau module » (../MODULES.md) : branchement,
    documentation, déclaration dans Polypode, vérification et publication.

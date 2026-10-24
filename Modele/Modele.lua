@@ -2,6 +2,7 @@
 
 local _, ns = ...
 local P = Polypode -- dépendance obligatoire (## Dependencies: Polypode), chargée avant nous
+local L = ns.L -- table de textes (Locale.lua) : L["texte français"], traductions dans Locales/
 
 -- MODÈLE À COPIER (voir LISEZMOI.txt) : remplacer partout « Modele » / « modele » / « MODELE » par
 -- le nom du module, puis remplacer l'exemple par la vraie fonction. Chaque branchement sur
@@ -13,7 +14,8 @@ local P = Polypode -- dépendance obligatoire (## Dependencies: Polypode), charg
 --   MODELE:token:nom-royaume:zone (P.RegisterMessageHandler, expéditeur vérifié par P.IsSender),
 --   envoyé à chaque client qui s'annonce (P.RegisterPeerCallback) et à chaque changement de zone
 --   (P.WhisperOnline) ; données sauvegardées par personnage dans PolypodeModeleData (fichier de
---   compte), oubliées quand le personnage est supprimé dans Polypode (P.RegisterCharacterData).
+--   compte), oubliées quand le personnage est supprimé dans Polypode (P.RegisterCharacterData) ;
+--   textes traduits (L[...], Locale.lua et Locales/, MODULES.md « Langues »).
 -- Exemple : la fenêtre liste les personnages du roster avec leur zone actuelle (GetRealZoneText).
 
 local MESSAGE_TYPE = "MODELE" -- type de message propre au module (ne pas réutiliser celui d'un autre)
@@ -85,7 +87,7 @@ local function FormatItem(item)
 	local known = data[item.key]
 	local name = P.GetDisplayName(item.key, ModeleSettings().showRealm)
 	if not known then
-		return name .. "  |cff999999pas d'infos|r"
+		return name .. "  |cff999999" .. L["pas d'infos"] .. "|r"
 	end
 	return name .. "  |cffffd200" .. (known.zone ~= "" and known.zone or "?") .. "|r"
 end
@@ -93,9 +95,10 @@ end
 local function ItemTooltip(item)
 	local known = data[item.key]
 	local lines = { P.GetDisplayName(item.key, true) }
-	lines[#lines + 1] = known and ("Zone : " .. known.zone) or "|cff999999Pas d'infos (module absent ou pas encore reçu).|r"
+	lines[#lines + 1] = known and L["Zone : %s"]:format(known.zone)
+		or "|cff999999" .. L["Pas d'infos (module absent ou pas encore reçu)."] .. "|r"
 	if known and item.key ~= P.GetCharKey() then
-		lines[#lines + 1] = "|cff999999Reçu le " .. date("%d/%m à %H:%M", known.at) .. "|r"
+		lines[#lines + 1] = "|cff999999" .. L["Reçu le %s"]:format(date(L["%d/%m à %H:%M"], known.at)) .. "|r"
 	end
 	return lines
 end
@@ -122,14 +125,14 @@ local function Build()
 
 	local title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
 	title:SetPoint("TOP", 0, -14)
-	title:SetText("Polypode Modele")
+	title:SetText(L["Polypode Modele"])
 	frame.TitleText = title
 
 	local closeBtn = CreateFrame("Button", nil, frame, "UIPanelCloseButton")
 	closeBtn:SetPoint("TOPRIGHT", -4, -4)
 	frame.CloseButton = closeBtn
 
-	listPanel = P.CreatePanel(frame, "Zone actuelle des personnages")
+	listPanel = P.CreatePanel(frame, L["Zone actuelle des personnages"])
 	listPanel:SetPoint("TOPLEFT", 12, -36)
 	listPanel:SetPoint("BOTTOMRIGHT", -12, 12)
 	P.CreateScrollList(listPanel, FormatItem, nil, { tooltip = ItemTooltip })
@@ -173,12 +176,12 @@ local function BuildSettingsPanel()
 	end
 	local category
 	if P.optionsCategory and Settings.RegisterVerticalLayoutSubcategory then
-		category = Settings.RegisterVerticalLayoutSubcategory(P.optionsCategory, "Modele")
+		category = Settings.RegisterVerticalLayoutSubcategory(P.optionsCategory, L["Modele"])
 	else
-		category = Settings.RegisterVerticalLayoutCategory("Polypode Modele")
+		category = Settings.RegisterVerticalLayoutCategory(L["Polypode Modele"])
 	end
 	local setting = Settings.RegisterProxySetting(category, "POLYPODE_MODELE_SHOW_REALM",
-		Settings.VarType.Boolean, "Afficher le royaume", DEFAULTS.showRealm,
+		Settings.VarType.Boolean, L["Afficher le royaume"], DEFAULTS.showRealm,
 		function()
 			return ModeleSettings().showRealm
 		end,
@@ -187,30 +190,34 @@ local function BuildSettingsPanel()
 			P.RefreshModele()
 		end)
 	Settings.CreateCheckbox(category, setting,
-		"Affiche le royaume à côté du nom de chaque personnage. Réglage propre à ce personnage.")
+		L["Affiche le royaume à côté du nom de chaque personnage. Réglage propre à ce personnage."])
 	Settings.RegisterAddOnCategory(category)
 end
 
 -- INTÉGRATION À POLYPODE ------------------------------------------------------------------------
 
-if P.AddTitleButton then
-	P.AddTitleButton({
-		text = "Modele",
-		width = 70,
-		onClick = function()
-			P.ToggleModele()
-		end,
-		tooltip = { "Polypode Modele", "Zone actuelle de chaque personnage (exemple)." },
-		onCreate = function(button)
-			P.ui.modeleButton = button
-		end,
-		hideInSolo = false, -- true si le module n'a pas de sens en mode solo (Polypode 0.54.0)
-	})
-end
-
-if P.RegisterSlashCommand then
-	P.RegisterSlashCommand("modele", P.ToggleModele, "zone actuelle de chaque personnage (exemple)")
-end
+-- Bouton et commande : textes rangés au chargement, posés quand la langue est connue.
+ns.OnLanguageApplied(function()
+	if P.AddTitleButton then
+		P.AddTitleButton({
+			text = L["Modele"], -- nom du module traduit (MODULES.md, « Langues »)
+			width = 70,
+			onClick = function()
+				P.ToggleModele()
+			end,
+			tooltip = { L["Polypode Modele"], L["Zone actuelle de chaque personnage (exemple)."] },
+			onCreate = function(button)
+				P.ui.modeleButton = button
+			end,
+			hideInSolo = false, -- true si le module n'a pas de sens en mode solo (Polypode 0.54.0)
+		})
+	end
+	if P.RegisterSlashCommand then
+		-- Nom de commande en français ; alias anglais enregistré en plus, sans aide.
+		P.RegisterSlashCommand("modele", P.ToggleModele, L["zone actuelle de chaque personnage (exemple)"])
+		P.RegisterSlashCommand("template", P.ToggleModele)
+	end
+end)
 
 if P.RegisterMessageHandler then
 	P.RegisterMessageHandler(MESSAGE_TYPE, OnMessage)
@@ -225,7 +232,7 @@ if P.RegisterCharacterData then
 		name = "Polypode Modele",
 		describe = function(key)
 			if data[key] and key ~= P.GetCharKey() then
-				return "zone relevée"
+				return L["zone relevée"]
 			end
 		end,
 		remove = function(key)

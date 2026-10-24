@@ -1,5 +1,7 @@
 # Polypode
 
+*English version: [README.en.md](README.en.md)*
+
 Addon World of Warcraft pour **gérer simplement plusieurs personnages joués dans
 plusieurs fenêtres WoW sur le même PC** (multiboxing).
 
@@ -9,6 +11,11 @@ automatique de base entre vos clients — sans configuration complexe.
 Des addons compagnons ont étendu les fonctionnalités en s'inspirant également d'addons connus mais adaptés au contexte multibox (MySlot, myAlts, SavedInstances, AlterEgo, Altoholic, CharacterInfo, Narcissus, etc.).
 
 Avec la prise en compte de ces addons est venue l'envie de faire un mode Solo (Monopode :D) qui revient à avoir un équivalent des addons précités (tout en gardant la philosophie de Polypode) : la boucle est bouclée.
+
+> **Langues** : français, anglais, allemand, espagnol, italien et portugais du Brésil, selon la
+> langue choisie dans Polypode (option « Langue / Language »). Les traductions ont été faites avec
+> l'aide de Claude, l'IA d'Anthropic : les retours de joueurs dont c'est la langue maternelle sont
+> les bienvenus ([issue GitHub](https://github.com/Baktov/polypode/issues)).
 
 ---
 

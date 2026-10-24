@@ -6,8 +6,8 @@ le dossier ouvert. À garder court ; le détail propre à un module va dans son 
 
 ## Les modules
 
-Chaque module est un **dépôt git séparé** (dossiers voisins) avec **son propre `CLAUDE.md` et son
-`README.md`**. Sur le poste de développement, les modules sont dans `C:\PROJETS\CLAUDE\ADDONS_POLYPODE`
+Chaque module est un **dépôt git séparé** (dossiers voisins) avec **son propre `CLAUDE.md`, son
+`README.md` (français) et son `README.en.md` (anglais)**. Sur le poste de développement, les modules sont dans `C:\PROJETS\CLAUDE\ADDONS_POLYPODE`
 (hors du dossier du jeu, que les mises à jour de Battle.net ne doivent pas trouver verrouillé),
 reliés à `Interface\AddOns` de Retail et de WoW Forever par des **jonctions** (`mklink /J`) ;
 travailler dans `ADDONS_POLYPODE` (son `CLAUDE.md` local importe ce fichier) :
@@ -73,8 +73,8 @@ Outils de Polypode (`Locale.lua`, 2.8.0 ; sélecteur 2.9.0 ; allemand et espagno
 - **Noms des modules traduits** (décision du 2026-10-23) : bouton de la barre de titre
   (`P.AddTitleButton`, `text = L["Suivi"]`), titre de sa fenêtre et textes qui le citent ; la
   colonne de la barre flottante en reprend les trois premières lettres (Dat, His, Map, Pho, Pro,
-  Tra : toutes différentes). Titre dans la liste des addons : `## Title:` anglais,
-  `## Title-frFR:` français. Les commandes `/poly suivi`... gardent leur nom français, avec l'alias
+  Tra : toutes différentes). Titre dans la liste des addons : `## Title:` français (nom du dépôt et des versions
+  publiées), `## Title-enUS:` / `-enGB:` anglais et une ligne par autre langue (`## Title-deDE:`...). Les commandes `/poly suivi`... gardent leur nom français, avec l'alias
   anglais (`/poly tracker`...). Noms (trois premières lettres toutes différentes dans chaque langue) :
 
   | Français | Anglais | Allemand | Espagnol | Italien | Portugais |
@@ -108,6 +108,11 @@ Outils de Polypode (`Locale.lua`, 2.8.0 ; sélecteur 2.9.0 ; allemand et espagno
   reconnu seulement en portugais : `MOUSE_WORDS_BY_LANGUAGE`). Modificateurs : « Shift + » /
   « Umschalt + » / « Mayús + » / « Maiusc + », « Alt + », « Ctrl + » / « Strg + ».
 - **`.toc`** : `## Notes:` en anglais, `## Notes-frFR:` en français.
+- **README** : `README.md` en français, `README.en.md` en anglais (mêmes sections, sans
+  l'historique des versions : renvoi vers la section « Version » du README français), liés l'un
+  à l'autre en tête. Tous deux portent, après la présentation, l'encadré « Langues » : langues
+  livrées, traductions faites avec l'aide de Claude (IA d'Anthropic), retours de locuteurs natifs
+  bienvenus par une issue GitHub du dépôt (modèle : `Modele/README.modele.md`).
 - **Contrôle** avant chaque commit qui touche des textes, depuis `ADDONS_POLYPODE` :
   `python Polypode\tools\check_locale.py <dossier du module>`. Il doit afficher 0 clé sans
   traduction anglaise et 0 format différent. Les textes français hors `L[...]` qu'il liste sont à
@@ -126,7 +131,8 @@ Dans **son** dépôt, sans attendre qu'on le demande :
    Un commit de documentation seule ne change pas de version.
 2. **README.md** : ajouter en tête de la section « Version » la ligne `` `x.y.z` : description. ``
    (du plus récent au plus ancien), et mettre à jour les sections d'utilisation concernées
-   (colonnes, boutons, infobulles, options, commandes, fonctionnement).
+   (colonnes, boutons, infobulles, options, commandes, fonctionnement), dans `README.md` et
+   `README.en.md`.
 3. **CLAUDE.md** du module : architecture (fichiers, fonctions, sections de données,
    SavedVariables, messages) et « Dépendances vers Polypode » si une nouvelle fonction `P.*` est
    utilisée.
@@ -170,7 +176,8 @@ Squelette prêt à copier : `Polypode/Modele/` (voir son `LISEZMOI.txt`). Démar
 2. **Dépôt** : créer le dépôt GitHub ; dans `AddOns/Polypode_X` : `git init`, `git remote add origin`.
 3. **Fichiers** : copier `Polypode/Modele/` vers `AddOns/Polypode_X`, renommer (`Polypode_Modele.toc`
    → `Polypode_X.toc`, `Modele.lua` → `X.lua`, `CLAUDE.modele.md` → `CLAUDE.md`,
-   `README.modele.md` → `README.md`, supprimer `LISEZMOI.txt`) et remplacer partout `Modele` /
+   `README.modele.md` → `README.md`, `README.en.modele.md` → `README.en.md`, supprimer
+   `LISEZMOI.txt`) et remplacer partout `Modele` /
    `modele` par le nom (SavedVariables `PolypodeXDB`, fenêtre `PolypodeXFrame`, `P.ToggleX`...).
 4. **Branchement** : uniquement par l'API publique de Polypode, chaque fonction testée avant usage
    (`P.AddTitleButton`, `P.RegisterSlashCommand`, sous-catégorie de `P.optionsCategory` — et ses
@@ -181,8 +188,9 @@ Squelette prêt à copier : `Polypode/Modele/` (voir son `LISEZMOI.txt`). Démar
    qui manque s'ajoute **d'abord dans Polypode** (nouvelle version), et le README du module indique
    « Nécessite Polypode x.y ».
 5. **Documentation dès la 1.0.0** : `CLAUDE.md` (import `@../Polypode/MODULES.md`, architecture,
-   « Dépendances vers Polypode », pistes) et `README.md` (installation, utilisation, options,
-   section « Version » avec `` `1.0.0` : première version… ``).
+   « Dépendances vers Polypode », pistes), `README.md` (installation, utilisation, options,
+   section « Version » avec `` `1.0.0` : première version… ``) et `README.en.md` ; textes
+   traduits dans `Locales/` (section « Langues »).
 6. **Déclarer le module dans Polypode** (commit dans ce dépôt) : ligne du tableau « Les modules »
    ci-dessus, section « Addons compagnons » du `README.md` de Polypode (et son nombre), liste des
    compagnons / API publique de son `CLAUDE.md` ; ajouter aussi le dossier dans le `CLAUDE.md`

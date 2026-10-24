@@ -1,10 +1,17 @@
 # Polypode Modele
 
+*English version: [README.en.md](README.en.md)*
+
 (Présentation en deux phrases : ce que le module affiche ou fait, pour qui.) Addon compagnon de
 [Polypode](https://github.com/Baktov/polypode), séparé : chargé ou non depuis la liste des AddOns
 de WoW, par personnage.
 
 Nécessite **Polypode 0.54.0** ou plus récent.
+
+> **Langues** : français, anglais, allemand, espagnol, italien et portugais du Brésil, selon la
+> langue choisie dans Polypode (option « Langue / Language »). Les traductions ont été faites avec
+> l'aide de Claude, l'IA d'Anthropic : les retours de joueurs dont c'est la langue maternelle sont
+> les bienvenus ([issue GitHub](https://github.com/Baktov/polypode-modele/issues)).
 
 ---
 

@@ -1,6 +1,14 @@
 ## Interface: 120000, 16001
 ## Title: Polypode Modele
-## Notes: Modèle d'addon compagnon de Polypode : zone actuelle de chaque personnage (exemple à remplacer).
+## Title-enUS: Polypode Template
+## Title-enGB: Polypode Template
+## Title-deDE: Polypode Vorlage
+## Title-esES: Polypode Plantilla
+## Title-esMX: Polypode Plantilla
+## Title-itIT: Polypode Modello
+## Title-ptBR: Polypode Modelo
+## Notes: Polypode companion addon template: current zone of each character (example to replace).
+## Notes-frFR: Modèle d'addon compagnon de Polypode : zone actuelle de chaque personnage (exemple à remplacer).
 ## Author: Baktov
 ## Version: 1.0.0
 ## Dependencies: Polypode
@@ -8,4 +16,10 @@
 ## SavedVariablesPerCharacter: PolypodeModeleDB
 ## Category: Polypode
 
+Locale.lua
+Locales/enUS.lua
+Locales/deDE.lua
+Locales/esES.lua
+Locales/itIT.lua
+Locales/ptBR.lua
 Modele.lua
