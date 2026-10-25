@@ -49,7 +49,7 @@ n'ajoute une fonctionnalité que si elle sert directement cet objectif.
   `P.MAX_MESSAGE_LENGTH` (Sync.lua). API publique qu'ils utilisent (voir leur CLAUDE.md) : `P.AddTitleButton`,
   `P.RegisterSlashCommand`, `P.optionsCategory`, `P.CreatePanel`, `P.CreateScrollList` (`opts.rowHeight`, signalé par `P.LIST_ROW_HEIGHT` : 0.56.0, grille d'icônes de Data), `P.SetListData`,
   `P.SkinFrame`, `P.SkinPanel`, `P.SkinButton`, `P.SkinDropdown`, `P.SkinCheckBox`, `P.ShowTooltip`, `P.ColorClicks` (0.60.0 : clics en bleu dans les infobulles), `P.ToggleOptionsPopup` (0.57.0 : petite fenêtre d'options au clic droit), `P.UnitNameParts`, `P.JoinSurname`, `P.KeyForUnit` (2.2.3, Photo), `P.GetCharacterStatus`,
-  `P.GetCharacterQuests`, `P.RegisterQuestLogCallback` (0.58.0), `P.GetSelectedTeam`, `P.GetTeamLeader`, `P.GetTeamMembers`, `P.GetCharKey`,
+  `P.GetCharacterQuests`, `P.RegisterQuestLogCallback` (0.58.0), `P.GetCharacterAccount`, `P.GetAccountLabels` (Data : temps de jeu par compte), `P.GetSelectedTeam`, `P.GetTeamLeader`, `P.GetTeamMembers`, `P.GetCharKey`,
   `P.GetDisplayName`, `P.db.roster`, `P.SortedKeyItems`, `P.FormatCharacter`, `P.CharacterTooltip`,
   `P.IsCharacterConnected` (règle « connecté » de « Personnages disponibles », 0.51.2), `P.GetTeamToken`, `P.RefreshUI`, `P.IsSoloMode` (0.54.0 : Suivi impose « Tous les personnages » ; champ `hideInSolo` d'une spec de `P.AddTitleButton`), `P.NewLocale`, `P.AddTranslations`, `P.LOCALE`, `P.GetLanguage`, `P.OnLanguageApplied` (2.8.0 / 2.9.0, Locale.lua : traductions des compagnons), et les points
   d'extension de synchro ci-dessus : ne pas les renommer ni changer leur comportement sans adapter les

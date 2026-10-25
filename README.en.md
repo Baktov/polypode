@@ -350,7 +350,7 @@ of that).
 - **Polypode Data** (https://github.com/Baktov/polypode-data): **Data** button and `/poly data`,
   sortable table of the lasting data of all your characters (level, item level, gold, professions
   and recipes, achievements, play time, equipment, bags and banks), with item and recipe search, play
-  time by class (like AccountPlayed) and automatic bank sorting, in the spirit of DataStore / WoWthing (to install on each character).
+  time by class or by race and by account (like AccountPlayed) and automatic bank sorting, in the spirit of DataStore / WoWthing (to install on each character).
 - **Polypode History** (Polypode Histoire, https://github.com/Baktov/polypode-histoire): **History**
   button and `/poly histoire`, shared chronological journal of all your characters (logins, grouped
   team, delves, dungeons, M+ keys, raid bosses, achievements, levels, item level), by collapsible
