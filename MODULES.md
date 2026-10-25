@@ -47,6 +47,10 @@ publique `P.*`, listée dans la section « Dépendances vers Polypode » de leur
 - Toute fenêtre **redimensionnable** revient à sa taille par défaut par un **double-clic sur sa barre de
   titre** : `P.EnableTitleDoubleClick(fenêtre, remise)` (Polypode 2.12, testée avant usage), `remise` remet la
   taille par défaut et l'enregistre.
+- Fenêtre redimensionnable **retenue dans l'écran** (`SetClampedToScreen`) : au début du redimensionnement,
+  ancre `TOPLEFT` (coin haut-gauche fixe), `SetResizeBounds` maximum = place jusqu'aux bords de l'écran et
+  `StartSizing("BOTTOMRIGHT", true)` ; sinon le jeu la repousse et elle s'agrandit d'un coup hors de l'écran
+  (vu dans Histoire, 1.14.1).
 - **Simplicité** : n'ajouter une fonctionnalité que si elle sert directement le module ; jamais à
   moitié implémentée.
 - Toujours **lire** le fichier cible avant de le modifier ; vérifier les API WoW avec les serveurs
