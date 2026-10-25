@@ -369,7 +369,7 @@ Polypode Suivi ; il peut être désactivé (il ne fait plus que le rappeler).
 - **Polypode Data** (https://github.com/Baktov/polypode-data) : bouton **Data** et `/poly data`,
   tableau triable des données durables de tous vos personnages (niveau, niveau d'objet, or, métiers
   et recettes, hauts faits, temps de jeu, équipement, sacs et banques), avec recherche d'objet et
-  de recette et rangement automatique en banque, dans l'esprit de DataStore / WoWthing (à installer
+  de recette, temps de jeu par classe (comme AccountPlayed) et rangement automatique en banque, dans l'esprit de DataStore / WoWthing (à installer
   sur chaque personnage).
 - **Polypode Histoire** (https://github.com/Baktov/polypode-histoire) : bouton **Histoire** et
   `/poly histoire`, journal chronologique commun de tous vos personnages (connexions, équipe
