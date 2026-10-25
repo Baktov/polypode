@@ -44,6 +44,9 @@ publique `P.*`, listée dans la section « Dépendances vers Polypode » de leur
 - Retail (Interface 120000) et **WoW Forever** (16001) : tester l'existence de toute API récente
   (`if C_X and C_X.Fn then`), lectures fragiles sous `pcall` ; ne pas se fier à `WOW_PROJECT_ID`.
 - Tout contenu de taille variable **défile** (`P.CreateScrollList` / `P.SetListData`).
+- Toute fenêtre **redimensionnable** revient à sa taille par défaut par un **double-clic sur sa barre de
+  titre** : `P.EnableTitleDoubleClick(fenêtre, remise)` (Polypode 2.12, testée avant usage), `remise` remet la
+  taille par défaut et l'enregistre.
 - **Simplicité** : n'ajouter une fonctionnalité que si elle sert directement le module ; jamais à
   moitié implémentée.
 - Toujours **lire** le fichier cible avant de le modifier ; vérifier les API WoW avec les serveurs

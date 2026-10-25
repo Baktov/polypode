@@ -48,7 +48,7 @@ n'ajoute une fonctionnalité que si elle sert directement cet objectif.
   `P.WhisperOnline(message, cible)` (à cible, sinon aux clients connectés), et déclare les données qu'il garde d'un personnage par `P.RegisterCharacterData({ name, describe(clé) → texte|nil, remove(clé, fromSync) })` (Core.lua, 0.53.0 : appelé par `P.RemoveCharacter` — Maj + clic dans « Personnages disponibles », confirmation `POLYPODE_REMOVE_CHARACTER` listant `P.DescribeCharacterData(clé)` — et par `P.ApplyCharacterSync` à la réception d'une suppression, `fromSync` vrai), avec `P.IsSender` et
   `P.MAX_MESSAGE_LENGTH` (Sync.lua). API publique qu'ils utilisent (voir leur CLAUDE.md) : `P.AddTitleButton`,
   `P.RegisterSlashCommand`, `P.optionsCategory`, `P.CreatePanel`, `P.CreateScrollList` (`opts.rowHeight`, signalé par `P.LIST_ROW_HEIGHT` : 0.56.0, grille d'icônes de Data), `P.SetListData`,
-  `P.SkinFrame`, `P.SkinPanel`, `P.SkinButton`, `P.SkinDropdown`, `P.SkinCheckBox`, `P.ShowTooltip`, `P.ColorClicks` (0.60.0 : clics en bleu dans les infobulles), `P.ToggleOptionsPopup` (0.57.0 : petite fenêtre d'options au clic droit), `P.UnitNameParts`, `P.JoinSurname`, `P.KeyForUnit` (2.2.3, Photo), `P.GetCharacterStatus`,
+  `P.SkinFrame`, `P.SkinPanel`, `P.SkinButton`, `P.SkinDropdown`, `P.SkinCheckBox`, `P.ShowTooltip`, `P.ColorClicks` (0.60.0 : clics en bleu dans les infobulles), `P.ToggleOptionsPopup` (0.57.0 : petite fenêtre d'options au clic droit), `P.EnableTitleDoubleClick` (2.12.0 : double-clic sur la barre de titre, taille par défaut), `P.UnitNameParts`, `P.JoinSurname`, `P.KeyForUnit` (2.2.3, Photo), `P.GetCharacterStatus`,
   `P.GetCharacterQuests`, `P.RegisterQuestLogCallback` (0.58.0), `P.GetCharacterAccount`, `P.GetAccountLabels` (Data : temps de jeu par compte), `P.GetSelectedTeam`, `P.GetTeamLeader`, `P.GetTeamMembers`, `P.GetCharKey`,
   `P.GetDisplayName`, `P.db.roster`, `P.SortedKeyItems`, `P.FormatCharacter`, `P.CharacterTooltip`,
   `P.IsCharacterConnected` (règle « connecté » de « Personnages disponibles », 0.51.2), `P.GetTeamToken`, `P.RefreshUI`, `P.IsSoloMode` (0.54.0 : Suivi impose « Tous les personnages » ; champ `hideInSolo` d'une spec de `P.AddTitleButton`), `P.NewLocale`, `P.AddTranslations`, `P.LOCALE`, `P.GetLanguage`, `P.OnLanguageApplied` (2.8.0 / 2.9.0, Locale.lua : traductions des compagnons), et les points
@@ -124,7 +124,10 @@ en tête de chaque fichier). Ex. `P.db` (= `PolypodeDB`), `P.charDb` (= `Polypod
     étant recyclées, tout état visuel se recalcule dans l'initializer, jamais stocké sur la ligne)
     (ScrollBox Blizzard virtualisée + `MinimalScrollBar`, skinnée via `P.SkinScrollBar`).
 13. **Fenêtres redimensionnables** : la fenêtre principale se redimensionne (poignée bas-droite,
-    `SetResizeBounds`, taille dans `P.db.mainFrame`). Tout contenu s'ancre en relatif aux bords
+    `SetResizeBounds`, taille dans `P.db.mainFrame`) ; double-clic sur sa barre de titre = taille par défaut
+    (`P.EnableTitleDoubleClick(région, remise, hauteur)`, UI_Main.lua : accroche `OnMouseDown`, deux clics gauches en
+    moins de 0,4 s dans les `hauteur` pixels du haut — 30 par défaut —, boutons et champs exclus car ils prennent la
+    souris ; remise = largeur du mode courant et hauteur de `P.defaults.mainFrame`). Tout contenu s'ancre en relatif aux bords
     (pas de largeur fixe calculée) ; trop petite, on tronque sans réorganiser : textes sur une
     ligne (`SetWordWrap(false)` + ancres gauche/droite). Pas de `SetClipsChildren` sur la fenêtre
     skinnée (risque de rogner la bordure du skin).

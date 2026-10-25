@@ -211,8 +211,8 @@ The three lists scroll (mouse wheel or scroll bar), with no limit on their size;
 only shows when the list overflows the frame.
 
 The window is **resized** with the bottom-right corner grip; the three frames share the width
-equally and the size is remembered for the account (720 × 320 by default). If the window is made
-very small, the content is simply cut off.
+equally and the size is remembered for the account (720 × 320 by default; **double-click** its title bar: back to the default size, solo mode width included). If the window is
+made very small, the content is simply cut off.
 
 ---
 

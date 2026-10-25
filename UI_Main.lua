@@ -459,6 +459,33 @@ local function SetListData(panel, items)
 	panel.emptyText:SetShown(#items == 0)
 end
 
+-- Double-clic gauche dans la barre de titre d'une fenêtre (les bandHeight pixels du haut de region,
+-- TITLE_BAND par défaut ; boutons, cases et champs y prennent la souris et n'en font pas partie) :
+-- appelle resetSize(), qui remet la fenêtre à sa taille par défaut. Le déplacement par glisser reste
+-- celui de la fenêtre (un glisser ne commence qu'en bougeant).
+local TITLE_BAND = 30
+local DOUBLE_CLICK_DELAY = 0.4
+
+function P.EnableTitleDoubleClick(region, resetSize, bandHeight)
+	local lastClick = 0
+	region:HookScript("OnMouseDown", function(self, mouseButton)
+		local top = self:GetTop()
+		local _, cursorY = GetCursorPosition()
+		if mouseButton ~= "LeftButton" or not top
+			or top - cursorY / self:GetEffectiveScale() > (bandHeight or TITLE_BAND) then
+			lastClick = 0
+			return
+		end
+		local now = GetTime()
+		if now - lastClick <= DOUBLE_CLICK_DELAY then
+			lastClick = 0
+			resetSize()
+		else
+			lastClick = now
+		end
+	end)
+end
+
 -- Partagés avec les autres fenêtres (UI_*.lua) : cadre à en-tête et liste défilante.
 P.CreatePanel = CreatePanel
 P.CreateScrollList = CreateScrollList
@@ -923,6 +950,14 @@ function P.BuildUI()
 	grip:SetScript("OnMouseUp", function()
 		f:StopMovingOrSizing()
 		P.db.mainFrame[WidthKey()], P.db.mainFrame.height = f:GetSize()
+	end)
+
+	-- Double-clic sur la barre de titre : taille par défaut (largeur du mode courant, solo ou non).
+	P.EnableTitleDoubleClick(f, function()
+		local key = WidthKey()
+		P.db.mainFrame[key] = P.defaults.mainFrame[key]
+		P.db.mainFrame.height = P.defaults.mainFrame.height
+		f:SetSize(P.db.mainFrame[key], P.db.mainFrame.height)
 	end)
 
 	-- Trois cadres côte à côte, chacun sur un tiers de la largeur : les deux premiers
