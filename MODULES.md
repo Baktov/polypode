@@ -22,6 +22,7 @@ travailler dans `ADDONS_POLYPODE` (son `CLAUDE.md` local importe ce fichier) :
 | `Polypode_Profil` | <https://github.com/Baktov/polypode-profil> | bibliothèque de chaînes d'export (bouton Profils) |
 | `Polypode_Quetes` | <https://github.com/Baktov/Polypode-quetes> | **obsolète** (1.3.0 : ne fait plus que le rappeler), dépôt **archivé** sur GitHub (lecture seule) : repris par le panneau « Quêtes » de Suivi |
 | `Polypode_Suivi` | <https://github.com/Baktov/polypode-suivi> | suivi de l'équipe, des activités, des campagnes et des quêtes (bouton Suivi) |
+| `Polypode_Teleport` | <https://github.com/Baktov/polypode-teleport> | téléports de l'équipe, prêts ou en recharge, et boutons sécurisés pour utiliser le sien (bouton Téléports) |
 
 Les compagnons dépendent de Polypode (`## Dependencies: Polypode`) et n'utilisent que son API
 publique `P.*`, listée dans la section « Dépendances vers Polypode » de leur `CLAUDE.md`.
@@ -80,7 +81,7 @@ Outils de Polypode (`Locale.lua`, 2.8.0 ; sélecteur 2.9.0 ; allemand et espagno
 - **Noms des modules traduits** (décision du 2026-10-23) : bouton de la barre de titre
   (`P.AddTitleButton`, `text = L["Suivi"]`), titre de sa fenêtre et textes qui le citent ; la
   colonne de la barre flottante en reprend les trois premières lettres (Dat, His, Map, Pho, Pro,
-  Tra : toutes différentes). Titre dans la liste des addons : `## Title:` français (nom du dépôt et des versions
+  Tra, Tél : toutes différentes). Titre dans la liste des addons : `## Title:` français (nom du dépôt et des versions
   publiées), `## Title-enUS:` / `-enGB:` anglais et une ligne par autre langue (`## Title-deDE:`...). Les commandes `/poly suivi`... gardent leur nom français, avec l'alias
   anglais (`/poly tracker`...). Noms (trois premières lettres toutes différentes dans chaque langue) :
 
@@ -92,6 +93,7 @@ Outils de Polypode (`Locale.lua`, 2.8.0 ; sélecteur 2.9.0 ; allemand et espagno
   | Photo | Photo | Foto | Foto | Foto | Foto |
   | Profils | Profiles | Profile | Perfiles | Profili | Perfis |
   | Suivi (Grille) | Tracker (Grid) | Tracker (Raster) | Seguimiento (Cuadrícula) | Monitoraggio (Griglia) | Acompanhamento (Grade) |
+  | Téléports | Teleports | Teleporter | Teletransportes | Teletrasporti | Teleportes |
 
 - **Hors table** : noms donnés par le jeu (classes par `LOCALIZED_CLASS_NAMES_MALE`, zones,
   royaumes, quêtes, renommées : déjà dans la langue du client), noms propres (Polypode, Monopode),

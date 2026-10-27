@@ -327,7 +327,7 @@ window has its own bar) and restored at login.
 
 ## Companion addons (separate)
 
-Six features are separate addons, which depend on Polypode and are enabled or not in the AddOns
+Seven features are separate addons, which depend on Polypode and are enabled or not in the AddOns
 list; without them, Polypode works normally. Each adds its button to the title bar of the main
 window (left of the close button) and its `/poly` command. **Polypode Quêtes** is **obsolete**: its
 team quests are in the **Quests** panel of Polypode Tracker; it can be disabled (it only reminds you
@@ -366,6 +366,11 @@ of that).
   even outside the group (positions exchanged between your clients), with quests, world quests,
   TomTom waypoints, HandyNotes and a ping on click; replaces EnhanceBattlefieldMinimap, with no
   library (to install on each character).
+- **Polypode Teleports** (Polypode Téléports, https://github.com/Baktov/polypode-teleport):
+  **Teleports** button and `/poly teleport`, teleports of the selected team (hearthstone and its
+  toys, class spells, mage teleports, wormholes): ready or on cooldown for each member, where each
+  one is bound, click to use your best option and a `/click` macro to send the whole team (to
+  install on each character).
 
 ---
 

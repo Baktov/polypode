@@ -347,7 +347,7 @@ multibox a sa propre barre) et retrouvés à la connexion.
 
 ## Addons compagnons (séparés)
 
-Six fonctions sont des addons séparés, qui dépendent de Polypode et se chargent ou non depuis
+Sept fonctions sont des addons séparés, qui dépendent de Polypode et se chargent ou non depuis
 la liste des AddOns ; sans eux, Polypode fonctionne normalement. Chacun ajoute son bouton à la
 barre de titre de la fenêtre principale (à gauche de la croix) et sa commande `/poly`.
 **Polypode Quêtes** est **obsolète** : ses quêtes de l'équipe sont dans le panneau **Quêtes** de
@@ -386,6 +386,11 @@ Polypode Suivi ; il peut être désactivé (il ne fait plus que le rappeler).
   personnages de l'équipe sélectionnée, même hors du groupe (positions échangées entre vos
   clients), avec les quêtes, les expéditions, les points TomTom, HandyNotes et un ping au clic ;
   remplace EnhanceBattlefieldMinimap, sans librairie (à installer sur chaque personnage).
+- **Polypode Téléports** (https://github.com/Baktov/polypode-teleport) : bouton **Téléports** et
+  `/poly teleport`, téléports de l'équipe sélectionnée (pierre de foyer et ses jouets, sorts de
+  classe, téléportations de mage, trous de ver) : prêts ou en recharge pour chaque membre, lieu de
+  lien de chacun, clic pour utiliser son meilleur moyen et macro `/click` pour faire partir toute
+  l'équipe (à installer sur chaque personnage).
 
 ---
 
