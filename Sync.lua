@@ -336,10 +336,21 @@ local characterStatus = {} -- [nom-royaume] = { level, ilvl, race, spec, guild, 
 local lastStatusSent
 local statusPending
 
+-- Niveau maximum du personnage (celui de son extension, comme le calcule l'interface de WoW),
+-- ou nil s'il est inconnu.
+local function EffectiveMaxLevel()
+	if GameRulesUtil and GameRulesUtil.GetEffectiveMaxLevelForPlayer then
+		return GameRulesUtil.GetEffectiveMaxLevelForPlayer()
+	elseif GetMaxLevelForPlayerExpansion then
+		return GetMaxLevelForPlayerExpansion()
+	end
+	return MAX_PLAYER_LEVEL
+end
+
 -- % d'XP du niveau en cours (entier), ou nil au niveau maximum (ou XP désactivée).
 local function ExperiencePercent()
-	if (IsPlayerAtEffectiveMaxLevel and IsPlayerAtEffectiveMaxLevel())
-		or (IsXPUserDisabled and IsXPUserDisabled()) then
+	local maxLevel = EffectiveMaxLevel()
+	if (maxLevel and UnitLevel("player") >= maxLevel) or (IsXPUserDisabled and IsXPUserDisabled()) then
 		return nil
 	end
 	local max = UnitXPMax("player")

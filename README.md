@@ -574,6 +574,8 @@ aliases (`/poly accounts`, `/poly remove-account`); debug messages stay in Frenc
 
 ## Version
 
+`2.12.1` : barre d'équipe (détails) : le % d'XP n'est plus affiché au niveau maximum de l'extension (le test du niveau maximum ne fonctionnait pas).
+
 `2.12.0` : double-clic sur la barre de titre d'une fenêtre : retour à sa taille par défaut (fenêtre principale, et fenêtres des modules par `P.EnableTitleDoubleClick`).
 `2.11.1` : langue choisie appliquée dès le chargement de Polypode (SavedVariables lues avant les fichiers : `LoadSavedVariablesFirst`), pour tous les textes de Polypode et de ses modules ; chemins des fichiers de langue compatibles macOS.
 `2.11.0` : Polypode en italien et en portugais du Brésil ; mots de souris italiens et portugais en bleu dans les infobulles. *Italian and Brazilian Portuguese translations.*
