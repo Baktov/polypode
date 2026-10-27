@@ -574,6 +574,8 @@ aliases (`/poly accounts`, `/poly remove-account`); debug messages stay in Frenc
 
 ## Version
 
+`2.13.0` : synchro entre fenêtres environ 8 fois plus rapide quand il y a beaucoup à échanger (première connexion de deux comptes) : envoi réparti sur 8 canaux de messages au lieu d'un, et annonces, équipes et actions du leader envoyées avant les données des compagnons. Toutes les fenêtres doivent avoir cette version.
+
 `2.12.1` : barre d'équipe (détails) : le % d'XP n'est plus affiché au niveau maximum de l'extension (le test du niveau maximum ne fonctionnait pas).
 
 `2.12.0` : double-clic sur la barre de titre d'une fenêtre : retour à sa taille par défaut (fenêtre principale, et fenêtres des modules par `P.EnableTitleDoubleClick`).

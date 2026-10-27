@@ -99,7 +99,7 @@ frame:SetScript("OnEvent", function(self, event, ...)
 		end
 	elseif event == "CHAT_MSG_ADDON" then
 		local prefix, message, channel, sender = ...
-		if prefix == P.SYNC_PREFIX then
+		if P.IsSyncPrefix(prefix) then
 			P.OnSyncMessage(message, channel, sender)
 		end
 	end

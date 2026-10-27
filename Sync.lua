@@ -6,9 +6,29 @@ local P = Polypode
 -- Battle.net n'est pas connecté).
 local teamToken
 
+-- Préfixes d'envoi : WoW accorde à chaque préfixe 10 messages, rechargés d'un par seconde. Les
+-- messages partent donc à tour de rôle sur plusieurs préfixes (POLYPODE, POLYPODE2...), tous
+-- écoutés : environ PREFIX_COUNT messages par seconde au lieu d'un, une fois la réserve épuisée.
+local PREFIX_COUNT = 8
+local SYNC_PREFIXES = { P.SYNC_PREFIX }
+for i = 2, PREFIX_COUNT do
+	SYNC_PREFIXES[i] = P.SYNC_PREFIX .. i
+end
+local isSyncPrefix = {}
+for _, prefix in ipairs(SYNC_PREFIXES) do
+	isSyncPrefix[prefix] = true
+end
+
+-- Vrai pour un préfixe de Polypode (réception, Events.lua).
+function P.IsSyncPrefix(prefix)
+	return isSyncPrefix[prefix] == true
+end
+
 function P.RegisterComm()
 	if C_ChatInfo and C_ChatInfo.RegisterAddonMessagePrefix then
-		C_ChatInfo.RegisterAddonMessagePrefix(P.SYNC_PREFIX)
+		for _, prefix in ipairs(SYNC_PREFIXES) do
+			C_ChatInfo.RegisterAddonMessagePrefix(prefix)
+		end
 	end
 end
 
@@ -104,17 +124,25 @@ local function GetBroadcastChannel()
 	return nil
 end
 
--- File d'envoi : le client WoW limite le débit des messages addon et rejette (sans les
--- mettre en attente) ceux qui dépassent. Les messages partent donc un par un ; un message
--- rejeté pour limite de débit reste en tête de file et est retenté plus tard.
+-- Files d'envoi : le client WoW limite le débit des messages addon et rejette (sans les
+-- mettre en attente) ceux qui dépassent. Les messages partent donc un par un, à tour de rôle
+-- sur les préfixes ; un préfixe épuisé est mis de côté THROTTLE_RETRY secondes et le message
+-- rejeté, resté en tête de file, part sur le suivant (l'ordre des fragments est gardé).
+-- Deux files : celle du cœur (annonces, équipes, état, actions du leader) passe avant celle
+-- des données volumineuses (types des compagnons, journal de quêtes QLOG), pour qu'une grosse
+-- synchro à la connexion ne retarde pas le reste.
 local SEND_INTERVAL = 0.1 -- secondes entre deux messages
-local THROTTLE_RETRY = 1 -- secondes avant de retenter un message rejeté
+local THROTTLE_RETRY = 1 -- secondes avant de réessayer un préfixe épuisé
 local THROTTLED = {
 	[Enum.SendAddonMessageResult and Enum.SendAddonMessageResult.AddonMessageThrottle or 3] = true,
 	[Enum.SendAddonMessageResult and Enum.SendAddonMessageResult.ChannelThrottle or 8] = true,
 }
-local sendQueue = {}
+local priorityQueue = {} -- messages du cœur
+local sendQueue = {} -- messages volumineux (compagnons, QLOG)
 local pumping = false
+local blockedUntil = {} -- [préfixe] = GetTime() jusqu'auquel il est épuisé
+local nextPrefix = 1
+local messageHandlers = {} -- [type] = handler(reste, expéditeur) des compagnons (P.RegisterMessageHandler)
 
 -- Personnages connectés, vus pendant la session via HELLO/HI : [Nom-Royaume] = true.
 -- Cibles de la synchro automatique (chuchoter un personnage hors ligne provoque une erreur).
@@ -151,18 +179,32 @@ if PLAYER_NOT_FOUND and ChatFrame_AddMessageEventFilter then
 end
 
 local function Pump()
-	local item = sendQueue[1]
+	local queue = priorityQueue[1] and priorityQueue or sendQueue
+	local item = queue[1]
 	if not item then
 		pumping = false
 		return
 	end
-	local result = C_ChatInfo.SendAddonMessage(P.SYNC_PREFIX, item.message, item.channel, item.target)
-	if THROTTLED[result] then
-		C_Timer.After(THROTTLE_RETRY, Pump)
-		return
+	local now = GetTime()
+	local wait = THROTTLE_RETRY
+	for _ = 1, #SYNC_PREFIXES do
+		local prefix = SYNC_PREFIXES[nextPrefix]
+		nextPrefix = nextPrefix % #SYNC_PREFIXES + 1
+		local blocked = blockedUntil[prefix] or 0
+		if blocked <= now then
+			local result = C_ChatInfo.SendAddonMessage(prefix, item.message, item.channel, item.target)
+			if not THROTTLED[result] then
+				table.remove(queue, 1)
+				C_Timer.After(SEND_INTERVAL, Pump)
+				return
+			end
+			blockedUntil[prefix] = now + THROTTLE_RETRY
+		else
+			wait = math.min(wait, blocked - now)
+		end
 	end
-	table.remove(sendQueue, 1)
-	C_Timer.After(SEND_INTERVAL, Pump)
+	-- Tous les préfixes épuisés : attendre le premier qui se recharge.
+	C_Timer.After(math.max(wait, SEND_INTERVAL), Pump)
 end
 
 -- Envoie un message addon (via la file). Sans canal : groupe/raid/guilde selon la situation.
@@ -180,7 +222,9 @@ function P.Broadcast(message, channel, target)
 	if not channel or not (C_ChatInfo and C_ChatInfo.SendAddonMessage) then
 		return
 	end
-	sendQueue[#sendQueue + 1] = { message = message, channel = channel, target = target }
+	local kind = message:match("^[^:]+")
+	local queue = (messageHandlers[kind] or kind == "QLOG") and sendQueue or priorityQueue
+	queue[#queue + 1] = { message = message, channel = channel, target = target }
 	if channel == "WHISPER" and target then
 		-- L'erreur « hors ligne » peut citer le nom complet ou le nom seul.
 		recentWhispers[target] = GetTime()
@@ -284,7 +328,6 @@ end
 -- messages sans que Polypode les connaisse. Le préfixe, le token et le filtrage des comptes
 -- restent ceux de Polypode (P.OnSyncMessage).
 P.MAX_MESSAGE_LENGTH = MAX_MESSAGE_LENGTH
-local messageHandlers = {} -- [type] = handler(reste, expéditeur)
 local peerCallbacks = {} -- fonctions(expéditeur) appelées à chaque HELLO/HI reçu
 
 -- Reçoit les messages « type:token:reste » d'un type propre au compagnon (token déjà vérifié).
