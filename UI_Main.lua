@@ -722,6 +722,18 @@ function P.IsTitleButtonShown(spec)
 	return not (spec.hideInSolo and P.IsSoloMode())
 end
 
+-- Boutons de compagnons masqués dans la barre d'équipe : [spec.moduleKey] = true (par personnage,
+-- cases du panneau d'options).
+function P.GetHiddenModuleButtons()
+	P.charDb.teamBar.hiddenModules = P.charDb.teamBar.hiddenModules or {}
+	return P.charDb.teamBar.hiddenModules
+end
+
+-- Vrai si le bouton du compagnon est affiché dans la colonne de la barre d'équipe.
+function P.IsModuleButtonShown(spec)
+	return P.IsTitleButtonShown(spec) and not P.GetHiddenModuleButtons()[spec.moduleKey]
+end
+
 -- Place les boutons affichés de droite à gauche depuis la croix (ceux de spec.left de gauche à
 -- droite après le libellé « Solo »), sans trou pour les masqués.
 local function LayoutTitleButtons()
@@ -781,7 +793,28 @@ end
 -- compagnons). spec = { text, width, onClick = fn(bouton, mouseButton), rightClick = clic droit
 -- aussi, tooltip = { titre, lignes... }, onCreate = fn(bouton), hideInSolo = masqué en mode solo,
 -- left = à gauche du titre, après la case « Solo » (2.5.0) }.
+-- Clé stable d'un bouton de compagnon (choix des boutons de la barre d'équipe, gardé par
+-- personnage) : spec.id, sinon le dossier de l'addon qui l'a demandé, lu dans la pile d'appel
+-- (« Polypode_Suivi », puis « Polypode_Suivi2 » pour son deuxième bouton...). Le libellé, traduit,
+-- ne convient pas.
+local moduleKeyCount = {}
+local function ModuleKey(spec)
+	if spec.id then
+		return spec.id
+	end
+	local addon = "?"
+	for name in (debugstack and debugstack(3, 8, 0) or ""):gmatch("AddOns[/\\]([^/\\]+)[/\\]") do
+		if name ~= "Polypode" then
+			addon = name
+			break
+		end
+	end
+	moduleKeyCount[addon] = (moduleKeyCount[addon] or 0) + 1
+	return moduleKeyCount[addon] == 1 and addon or (addon .. moduleKeyCount[addon])
+end
+
 function P.AddTitleButton(spec)
+	spec.moduleKey = ModuleKey(spec)
 	titleButtonSpecs[#titleButtonSpecs + 1] = spec
 	if ui.frame then
 		CreateTitleButton(spec)

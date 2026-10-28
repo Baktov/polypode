@@ -3,7 +3,7 @@
 ## Notes: Simple management of several multiboxed characters (roster, teams and leader, sync between clients). Slash command: /poly
 ## Notes-frFR: Gestion simple de plusieurs personnages multiboxés (roster, équipes et leader, sync entre clients). Commandes slash: /poly
 ## Author: Baktov
-## Version: 2.13.0
+## Version: 2.14.0
 ## SavedVariables: PolypodeDB
 ## LoadSavedVariablesFirst: 1
 ## SavedVariablesPerCharacter: PolypodeCharDB

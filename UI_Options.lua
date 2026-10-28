@@ -99,8 +99,9 @@ function P.BuildOptions()
 	local popupItems = {}
 	local function AddCheck(setting, tooltip)
 		tooltip = P.ColorClicks(tooltip) -- clics en bleu, dans le panneau comme dans la petite fenêtre
-		Settings.CreateCheckbox(category, setting, tooltip)
+		local initializer = Settings.CreateCheckbox(category, setting, tooltip)
 		popupItems[#popupItems + 1] = { kind = "check", setting = setting, tooltip = tooltip }
+		return initializer
 	end
 	-- Curseur en pourcentage, de min à max par step.
 	local function PercentText(value)
@@ -547,11 +548,58 @@ function P.BuildOptions()
 			P.RefreshTeamBar()
 		end
 	)
-	AddCheck(moduleButtonsSetting,
+	local moduleButtonsInit = AddCheck(moduleButtonsSetting,
 		L["Affiche contre la barre flottante d'équipe une colonne de petits boutons reprenant ceux des "
 		.. "modules (Data, Photo, Profils, Suivi... selon les addons installés) : trois premières "
-		.. "lettres, même clic et même infobulle que dans la fenêtre Polypode. Réglage propre à ce "
-		.. "personnage."])
+		.. "lettres, même clic et même infobulle que dans la fenêtre Polypode. Chaque bouton se choisit "
+		.. "dans la liste dessous. Réglage propre à ce personnage."])
+
+	-- Une case par bouton de compagnon installé (P.AddTitleButton, demandés au chargement des
+	-- addons, avant ce panneau), sous la case de la colonne ; puis « Tous » et « Aucun ».
+	local moduleSettings = {}
+	for _, spec in ipairs(P.GetTitleButtonSpecs()) do
+		local key = spec.moduleKey
+		local setting = Settings.RegisterProxySetting(
+			category,
+			"POLYPODE_TEAMBAR_MODULE_" .. (key:upper():gsub("[^%w]", "_")),
+			Settings.VarType.Boolean,
+			spec.text,
+			Settings.Default.True,
+			function()
+				return not P.GetHiddenModuleButtons()[key]
+			end,
+			function(value)
+				P.GetHiddenModuleButtons()[key] = not value or nil
+				P.RefreshTeamBar()
+			end
+		)
+		local initializer = AddCheck(setting,
+			L["Affiche le bouton « %s » dans la colonne des modules de la barre d'équipe. Réglage propre "
+			.. "à ce personnage."]:format(spec.text))
+		if initializer and initializer.SetParentInitializer then
+			initializer:SetParentInitializer(moduleButtonsInit, function()
+				return P.charDb.teamBar.moduleButtons
+			end)
+		end
+		moduleSettings[#moduleSettings + 1] = setting
+	end
+	local function SetAllModuleButtons(value)
+		for _, setting in ipairs(moduleSettings) do
+			setting:SetValue(value)
+		end
+	end
+	if #moduleSettings > 1 and layout and CreateSettingsButtonInitializer then
+		layout:AddInitializer(CreateSettingsButtonInitializer(L["Barre d'équipe : tous les boutons"], L["Tous"],
+			function()
+				SetAllModuleButtons(true)
+			end,
+			L["Coche tous les boutons des modules de la barre d'équipe."], true))
+		layout:AddInitializer(CreateSettingsButtonInitializer(L["Barre d'équipe : aucun bouton"], L["Aucun"],
+			function()
+				SetAllModuleButtons(false)
+			end,
+			L["Décoche tous les boutons des modules de la barre d'équipe."], true))
+	end
 
 	local moduleSideSetting = Settings.RegisterProxySetting(
 		category,

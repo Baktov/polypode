@@ -465,10 +465,11 @@ local function LayoutModuleButtons()
 	for index = #moduleButtons + 1, #specs do
 		moduleButtons[index] = CreateModuleButton(specs[index])
 	end
-	-- Boutons masqués dans le mode courant (spec.hideInSolo, P.IsTitleButtonShown) : retirés.
+	-- Boutons masqués dans le mode courant (spec.hideInSolo) ou décochés dans les options
+	-- (P.IsModuleButtonShown) : retirés.
 	local shown = {}
 	for index, button in ipairs(moduleButtons) do
-		local visible = P.IsTitleButtonShown(specs[index])
+		local visible = P.IsModuleButtonShown(specs[index])
 		button:SetShown(visible)
 		if visible then
 			shown[#shown + 1] = button
