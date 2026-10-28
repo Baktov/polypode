@@ -734,15 +734,28 @@ function P.IsModuleButtonShown(spec)
 	return P.IsTitleButtonShown(spec) and not P.GetHiddenModuleButtons()[spec.moduleKey]
 end
 
+-- Boutons de compagnons masqués dans la barre de titre de la fenêtre principale :
+-- [spec.moduleKey] = true (par personnage, cases du panneau d'options).
+function P.GetHiddenWindowButtons()
+	P.charDb.hiddenTitleButtons = P.charDb.hiddenTitleButtons or {}
+	return P.charDb.hiddenTitleButtons
+end
+
+-- Vrai si le bouton du compagnon est affiché dans la barre de titre de la fenêtre principale.
+function P.IsWindowButtonShown(spec)
+	return P.IsTitleButtonShown(spec) and not P.GetHiddenWindowButtons()[spec.moduleKey]
+end
+
 -- Place les boutons affichés de droite à gauche depuis la croix (ceux de spec.left de gauche à
--- droite après le libellé « Solo »), sans trou pour les masqués.
+-- droite après le libellé « Solo »), sans trou pour les masqués (mode solo, ou décochés dans
+-- les options : P.IsWindowButtonShown).
 local function LayoutTitleButtons()
 	local previous = ui.closeButton
 	local previousLeft = ui.soloCheck and (ui.soloCheck.Text or ui.soloCheck.text or ui.soloCheck)
 	local leftGap = 10 -- après le libellé « Solo », puis 4 entre deux boutons
 	for index, button in ipairs(titleButtons) do
 		local spec = titleButtonSpecs[index]
-		local shown = P.IsTitleButtonShown(spec)
+		local shown = P.IsWindowButtonShown(spec)
 		button:SetShown(shown)
 		if shown then
 			button:ClearAllPoints()
@@ -754,6 +767,13 @@ local function LayoutTitleButtons()
 				previous = button
 			end
 		end
+	end
+end
+
+-- Replace les boutons des compagnons (choix changé dans les options), si la fenêtre existe.
+function P.LayoutTitleButtons()
+	if ui.frame then
+		LayoutTitleButtons()
 	end
 end
 

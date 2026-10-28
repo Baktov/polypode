@@ -310,4 +310,11 @@ P.AddTranslations(P.L, "itIT", {
 	["Barre d'équipe : aucun bouton"] = "Barra della squadra: nessun pulsante",
 	["Aucun"] = "Nessuno",
 	["Décoche tous les boutons des modules de la barre d'équipe."] = "Deseleziona tutti i pulsanti dei moduli della barra della squadra.",
+	["Affiche le bouton « %s » dans la barre de titre de la fenêtre Polypode. Réglage propre à ce personnage."] = "Mostra il pulsante «%s» nella barra del titolo della finestra di Polypode. Impostazione per personaggio.",
+	["Fenêtre : tous les boutons"] = "Finestra: tutti i pulsanti",
+	["Coche tous les boutons des modules de la fenêtre Polypode."] = "Seleziona tutti i pulsanti dei moduli della finestra di Polypode.",
+	["Fenêtre : aucun bouton"] = "Finestra: nessun pulsante",
+	["Décoche tous les boutons des modules de la fenêtre Polypode."] = "Deseleziona tutti i pulsanti dei moduli della finestra di Polypode.",
+	["Fenêtre : bouton %s"] = "Finestra: pulsante %s",
+	["Barre d'équipe : bouton %s"] = "Barra della squadra: pulsante %s",
 })

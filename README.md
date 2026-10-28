@@ -498,7 +498,8 @@ fenêtre principale) :
 | Barre d'équipe : clignoter si la durabilité est faible | Oui | Fait clignoter en rouge, dans la liste de la barre flottante, un personnage dont la pièce la plus usée est sous le seuil ci-dessous. Réglage **par personnage** |
 | Barre d'équipe : seuil de durabilité | 25 % | Curseur de 5 à 95 % par pas de 5 : seuil de durabilité sous lequel un personnage clignote. Réglage **par personnage** |
 | Barre d'équipe : boutons des modules | Oui | Colonne de petits boutons (trois premières lettres) reprenant ceux des addons compagnons contre la barre flottante : même clic, même infobulle que dans la fenêtre. Réglage **par personnage** |
-| *(une case par bouton : Data, Suivi, Téléports...)* | Oui | Affiche ou non ce bouton dans la colonne ; liste selon les addons compagnons installés, avec « Tous » / « Aucun ». Réglage **par personnage** |
+| Fenêtre : bouton *(un par compagnon : Data, Suivi, Téléports...)* | Oui | Affiche ou non ce bouton dans la barre de titre de la fenêtre Polypode ; liste selon les addons compagnons installés, avec « Tous » / « Aucun ». Réglage **par personnage** |
+| Barre d'équipe : bouton *(un par compagnon)* | Oui | Affiche ou non ce bouton dans la colonne ; liste selon les addons compagnons installés, avec « Tous » / « Aucun ». Réglage **par personnage** |
 | Barre d'équipe : côté des boutons | À gauche | Liste : colonne à gauche ou à droite de la barre flottante, ou rangée horizontale au-dessus. Barre réduite : colonne sous l'icône (à gauche, à droite) ou rangée à sa droite (horizontal). Réglage **par personnage** |
 | Barre d'équipe : réduite à l'icône | Non | La barre flottante ne garde que l'icône Polypode, dans un cadre de la taille d'un bouton de module ; boutons des modules dessous (ou à droite en horizontal). Réglage **par personnage** |
 | Personnages disponibles : regrouper par compte | Oui (nouveaux personnages) | Range les personnages disponibles sous un en-tête repliable par compte WoW (renseigné par le champ ci-dessous ou Alt + clic sur un personnage), puis « Compte non renseigné ». Réglage **par personnage** |
@@ -577,7 +578,7 @@ aliases (`/poly accounts`, `/poly remove-account`); debug messages stay in Frenc
 
 ## Version
 
-`2.14.0` : options : choix bouton par bouton des boutons des modules de la barre d'équipe (une case par addon compagnon installé, boutons « Tous » / « Aucun »).
+`2.14.0` : options : choix bouton par bouton des boutons des modules, dans la fenêtre Polypode et dans la barre d'équipe (une case par addon compagnon installé, boutons « Tous » / « Aucun »).
 
 `2.13.0` : synchro entre fenêtres environ 8 fois plus rapide quand il y a beaucoup à échanger (première connexion de deux comptes) : envoi réparti sur 8 canaux de messages au lieu d'un, et annonces, équipes et actions du leader envoyées avant les données des compagnons. Toutes les fenêtres doivent avoir cette version.
 

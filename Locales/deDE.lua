@@ -310,4 +310,11 @@ P.AddTranslations(P.L, "deDE", {
 	["Barre d'équipe : aucun bouton"] = "Teamleiste: keine Schaltfläche",
 	["Aucun"] = "Keine",
 	["Décoche tous les boutons des modules de la barre d'équipe."] = "Deaktiviert alle Modulschaltflächen der Teamleiste.",
+	["Affiche le bouton « %s » dans la barre de titre de la fenêtre Polypode. Réglage propre à ce personnage."] = "Zeigt die Schaltfläche „%s“ in der Titelleiste des Polypode-Fensters. Einstellung pro Charakter.",
+	["Fenêtre : tous les boutons"] = "Fenster: alle Schaltflächen",
+	["Coche tous les boutons des modules de la fenêtre Polypode."] = "Aktiviert alle Modulschaltflächen des Polypode-Fensters.",
+	["Fenêtre : aucun bouton"] = "Fenster: keine Schaltfläche",
+	["Décoche tous les boutons des modules de la fenêtre Polypode."] = "Deaktiviert alle Modulschaltflächen des Polypode-Fensters.",
+	["Fenêtre : bouton %s"] = "Fenster: Schaltfläche %s",
+	["Barre d'équipe : bouton %s"] = "Teamleiste: Schaltfläche %s",
 })

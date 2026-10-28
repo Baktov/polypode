@@ -310,4 +310,11 @@ P.AddTranslations(P.L, "enUS", {
 	["Barre d'équipe : aucun bouton"] = "Team bar: no button",
 	["Aucun"] = "None",
 	["Décoche tous les boutons des modules de la barre d'équipe."] = "Unchecks all the module buttons of the team bar.",
+	["Affiche le bouton « %s » dans la barre de titre de la fenêtre Polypode. Réglage propre à ce personnage."] = "Shows the \"%s\" button in the title bar of the Polypode window. Per-character setting.",
+	["Fenêtre : tous les boutons"] = "Window: all buttons",
+	["Coche tous les boutons des modules de la fenêtre Polypode."] = "Checks all the module buttons of the Polypode window.",
+	["Fenêtre : aucun bouton"] = "Window: no button",
+	["Décoche tous les boutons des modules de la fenêtre Polypode."] = "Unchecks all the module buttons of the Polypode window.",
+	["Fenêtre : bouton %s"] = "Window: %s button",
+	["Barre d'équipe : bouton %s"] = "Team bar: %s button",
 })

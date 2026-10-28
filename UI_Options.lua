@@ -127,6 +127,49 @@ function P.BuildOptions()
 		end, tooltip)
 		popupItems[#popupItems + 1] = { kind = "dropdown", setting = setting, values = values, tooltip = tooltip }
 	end
+	-- Une case par bouton de compagnon installé (P.AddTitleButton, demandés au chargement des
+	-- addons, avant ce panneau), puis « Tous » et « Aucun ». choice = { variable (préfixe du nom
+	-- du réglage), hidden = fn() → [moduleKey] = true, refresh, label et tooltip (« %s » = bouton),
+	-- parent / parentShown (case dont elles dépendent, facultatif), allName, allTooltip,
+	-- noneName, noneTooltip }.
+	local function AddButtonChoices(choice)
+		local settings = {}
+		for _, spec in ipairs(P.GetTitleButtonSpecs()) do
+			local key = spec.moduleKey
+			local setting = Settings.RegisterProxySetting(
+				category,
+				choice.variable .. (key:upper():gsub("[^%w]", "_")),
+				Settings.VarType.Boolean,
+				choice.label:format(spec.text),
+				Settings.Default.True,
+				function()
+					return not choice.hidden()[key]
+				end,
+				function(value)
+					choice.hidden()[key] = not value or nil
+					choice.refresh()
+				end
+			)
+			local initializer = AddCheck(setting, choice.tooltip:format(spec.text))
+			if choice.parent and initializer and initializer.SetParentInitializer then
+				initializer:SetParentInitializer(choice.parent, choice.parentShown)
+			end
+			settings[#settings + 1] = setting
+		end
+		local function SetAll(value)
+			for _, setting in ipairs(settings) do
+				setting:SetValue(value)
+			end
+		end
+		if #settings > 1 and layout and CreateSettingsButtonInitializer then
+			layout:AddInitializer(CreateSettingsButtonInitializer(choice.allName, L["Tous"], function()
+				SetAll(true)
+			end, choice.allTooltip, true))
+			layout:AddInitializer(CreateSettingsButtonInitializer(choice.noneName, L["Aucun"], function()
+				SetAll(false)
+			end, choice.noneTooltip, true))
+		end
+	end
 
 	-- Langue de Polypode et de ses modules (tous les personnages) : libellé dans les deux langues,
 	-- pour être trouvé quelle que soit la langue affichée.
@@ -403,6 +446,20 @@ function P.BuildOptions()
 		.. "les autres vont dans « Compte non renseigné ». Réglage propre à ce personnage."])
 	-- Compte WoW du personnage connecté : champ de texte (élément personnalisé).
 	layout:AddInitializer(Settings.CreateElementInitializer("PolypodeAccountSettingTemplate", {}))
+
+	-- Boutons des compagnons dans la barre de titre de la fenêtre Polypode (par personnage).
+	AddButtonChoices({
+		variable = "POLYPODE_WINDOW_BUTTON_",
+		label = L["Fenêtre : bouton %s"],
+		hidden = P.GetHiddenWindowButtons,
+		refresh = P.LayoutTitleButtons,
+		tooltip = L["Affiche le bouton « %s » dans la barre de titre de la fenêtre Polypode. Réglage "
+			.. "propre à ce personnage."],
+		allName = L["Fenêtre : tous les boutons"],
+		allTooltip = L["Coche tous les boutons des modules de la fenêtre Polypode."],
+		noneName = L["Fenêtre : aucun bouton"],
+		noneTooltip = L["Décoche tous les boutons des modules de la fenêtre Polypode."],
+	})
 	-- Import d'une liste de personnages (fenêtre UI_Import.lua, aussi par /poly import).
 	if CreateSettingsButtonInitializer then
 		layout:AddInitializer(CreateSettingsButtonInitializer(L["Importer des personnages"], L["Importer"],
@@ -554,52 +611,22 @@ function P.BuildOptions()
 		.. "lettres, même clic et même infobulle que dans la fenêtre Polypode. Chaque bouton se choisit "
 		.. "dans la liste dessous. Réglage propre à ce personnage."])
 
-	-- Une case par bouton de compagnon installé (P.AddTitleButton, demandés au chargement des
-	-- addons, avant ce panneau), sous la case de la colonne ; puis « Tous » et « Aucun ».
-	local moduleSettings = {}
-	for _, spec in ipairs(P.GetTitleButtonSpecs()) do
-		local key = spec.moduleKey
-		local setting = Settings.RegisterProxySetting(
-			category,
-			"POLYPODE_TEAMBAR_MODULE_" .. (key:upper():gsub("[^%w]", "_")),
-			Settings.VarType.Boolean,
-			spec.text,
-			Settings.Default.True,
-			function()
-				return not P.GetHiddenModuleButtons()[key]
-			end,
-			function(value)
-				P.GetHiddenModuleButtons()[key] = not value or nil
-				P.RefreshTeamBar()
-			end
-		)
-		local initializer = AddCheck(setting,
-			L["Affiche le bouton « %s » dans la colonne des modules de la barre d'équipe. Réglage propre "
-			.. "à ce personnage."]:format(spec.text))
-		if initializer and initializer.SetParentInitializer then
-			initializer:SetParentInitializer(moduleButtonsInit, function()
-				return P.charDb.teamBar.moduleButtons
-			end)
-		end
-		moduleSettings[#moduleSettings + 1] = setting
-	end
-	local function SetAllModuleButtons(value)
-		for _, setting in ipairs(moduleSettings) do
-			setting:SetValue(value)
-		end
-	end
-	if #moduleSettings > 1 and layout and CreateSettingsButtonInitializer then
-		layout:AddInitializer(CreateSettingsButtonInitializer(L["Barre d'équipe : tous les boutons"], L["Tous"],
-			function()
-				SetAllModuleButtons(true)
-			end,
-			L["Coche tous les boutons des modules de la barre d'équipe."], true))
-		layout:AddInitializer(CreateSettingsButtonInitializer(L["Barre d'équipe : aucun bouton"], L["Aucun"],
-			function()
-				SetAllModuleButtons(false)
-			end,
-			L["Décoche tous les boutons des modules de la barre d'équipe."], true))
-	end
+	AddButtonChoices({
+		variable = "POLYPODE_TEAMBAR_MODULE_",
+		label = L["Barre d'équipe : bouton %s"],
+		hidden = P.GetHiddenModuleButtons,
+		refresh = P.RefreshTeamBar,
+		tooltip = L["Affiche le bouton « %s » dans la colonne des modules de la barre d'équipe. Réglage "
+			.. "propre à ce personnage."],
+		parent = moduleButtonsInit,
+		parentShown = function()
+			return P.charDb.teamBar.moduleButtons
+		end,
+		allName = L["Barre d'équipe : tous les boutons"],
+		allTooltip = L["Coche tous les boutons des modules de la barre d'équipe."],
+		noneName = L["Barre d'équipe : aucun bouton"],
+		noneTooltip = L["Décoche tous les boutons des modules de la barre d'équipe."],
+	})
 
 	local moduleSideSetting = Settings.RegisterProxySetting(
 		category,
