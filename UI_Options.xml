@@ -38,6 +38,29 @@
 		</Scripts>
 	</Frame>
 
+	<!-- Liste des boutons des compagnons (fenêtre ou barre d'équipe) : une ligne par bouton (case
+	     d'affichage, côté du titre pour la fenêtre, flèches pour l'ordre), puis « Tous » / « Aucun ».
+	     Hauteur variable (GetExtent de l'initialiseur) ; lignes créées dans
+	     Polypode.ButtonListSettingMixin (UI_Options.lua). -->
+	<Frame name="PolypodeButtonListSettingTemplate" virtual="true">
+		<Size y="60"/>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString parentKey="Text" inherits="GameFontNormal" justifyH="LEFT">
+					<Anchors>
+						<Anchor point="TOPLEFT" x="37" y="-6"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				Mixin(self, Polypode.ButtonListSettingMixin)
+				self:OnLoad()
+			</OnLoad>
+		</Scripts>
+	</Frame>
+
 	<!-- Compte WoW du personnage connecté (même rangement que Alt + clic dans la fenêtre).
 	     Méthodes dans Polypode.AccountSettingMixin (UI_Options.lua). -->
 	<Frame name="PolypodeAccountSettingTemplate" virtual="true">

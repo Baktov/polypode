@@ -746,27 +746,111 @@ function P.IsWindowButtonShown(spec)
 	return P.IsTitleButtonShown(spec) and not P.GetHiddenWindowButtons()[spec.moduleKey]
 end
 
+-- ORDRE DES BOUTONS (options, par personnage) : listes de clés (spec.moduleKey), une pour la
+-- fenêtre, une pour la barre d'équipe. Ordre affiché = de gauche à droite (de haut en bas pour
+-- une colonne) ; un bouton absent de la liste (compagnon installé depuis) vient à la suite, dans
+-- l'ordre des demandes.
+function P.GetWindowButtonOrder()
+	P.charDb.windowButtonOrder = P.charDb.windowButtonOrder or {}
+	return P.charDb.windowButtonOrder
+end
+
+function P.GetModuleButtonOrder()
+	P.charDb.teamBar.moduleOrder = P.charDb.teamBar.moduleOrder or {}
+	return P.charDb.teamBar.moduleOrder
+end
+
+-- Specs des boutons dans l'ordre de la liste order.
+function P.OrderedButtonSpecs(order)
+	local rank = {}
+	for index, key in ipairs(order) do
+		rank[key] = index
+	end
+	local items = {}
+	for index, spec in ipairs(titleButtonSpecs) do
+		items[#items + 1] = { spec = spec, index = index, rank = rank[spec.moduleKey] }
+	end
+	table.sort(items, function(a, b)
+		if a.rank and b.rank then
+			return a.rank < b.rank
+		elseif a.rank or b.rank then
+			return a.rank ~= nil
+		end
+		return a.index < b.index
+	end)
+	local specs = {}
+	for _, item in ipairs(items) do
+		specs[#specs + 1] = item.spec
+	end
+	return specs
+end
+
+-- Déplace le bouton key d'un rang (delta = -1 : avant, 1 : après) dans la liste order, réécrite
+-- en entier (tous les boutons connus) pour rester complète.
+function P.MoveButtonInOrder(order, key, delta)
+	local specs = P.OrderedButtonSpecs(order)
+	wipe(order)
+	for index, spec in ipairs(specs) do
+		order[index] = spec.moduleKey
+	end
+	for index, current in ipairs(order) do
+		if current == key then
+			local target = index + delta
+			if order[target] then
+				order[index], order[target] = order[target], order[index]
+			end
+			return
+		end
+	end
+end
+
+-- Côté du bouton dans la barre de titre : à gauche du titre (après « Solo ») ou à droite
+-- (vers la croix). Choix des options (P.charDb.windowButtonSides[clé] = "left" / "right"),
+-- sinon celui du compagnon (spec.left).
+function P.IsWindowButtonLeft(spec)
+	local side = P.charDb.windowButtonSides and P.charDb.windowButtonSides[spec.moduleKey]
+	if side then
+		return side == "left"
+	end
+	return spec.left == true
+end
+
+function P.SetWindowButtonSide(key, left)
+	P.charDb.windowButtonSides = P.charDb.windowButtonSides or {}
+	P.charDb.windowButtonSides[key] = left and "left" or "right"
+end
+
 -- Place les boutons affichés de droite à gauche depuis la croix (ceux de spec.left de gauche à
 -- droite après le libellé « Solo »), sans trou pour les masqués (mode solo, ou décochés dans
 -- les options : P.IsWindowButtonShown).
 local function LayoutTitleButtons()
-	local previous = ui.closeButton
 	local previousLeft = ui.soloCheck and (ui.soloCheck.Text or ui.soloCheck.text or ui.soloCheck)
 	local leftGap = 10 -- après le libellé « Solo », puis 4 entre deux boutons
+	local buttonBySpec = {}
 	for index, button in ipairs(titleButtons) do
-		local spec = titleButtonSpecs[index]
-		local shown = P.IsWindowButtonShown(spec)
-		button:SetShown(shown)
-		if shown then
+		buttonBySpec[titleButtonSpecs[index]] = button
+		button:Hide()
+	end
+	-- Ordre choisi (P.GetWindowButtonOrder), de gauche à droite : ceux de gauche après « Solo »,
+	-- ceux de droite finissant contre la croix (placés en partant de la fin).
+	local rightSide = {}
+	for _, spec in ipairs(P.OrderedButtonSpecs(P.GetWindowButtonOrder())) do
+		local button = buttonBySpec[spec]
+		if button and P.IsWindowButtonShown(spec) then
+			button:Show()
 			button:ClearAllPoints()
-			if spec.left and previousLeft then
+			if P.IsWindowButtonLeft(spec) and previousLeft then
 				button:SetPoint("LEFT", previousLeft, "RIGHT", leftGap, 0)
 				previousLeft, leftGap = button, 4
 			else
-				button:SetPoint("RIGHT", previous, "LEFT", -4, 0)
-				previous = button
+				rightSide[#rightSide + 1] = button
 			end
 		end
+	end
+	local previous = ui.closeButton
+	for index = #rightSide, 1, -1 do
+		rightSide[index]:SetPoint("RIGHT", previous, "LEFT", -4, 0)
+		previous = rightSide[index]
 	end
 end
 

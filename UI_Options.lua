@@ -85,6 +85,156 @@ function P.AccountSettingMixin:Init()
 	end
 end
 
+-- Élément « liste des boutons des compagnons » (modèle PolypodeButtonListSettingTemplate) : une
+-- ligne par bouton dans l'ordre choisi, avec sa case d'affichage, le côté du titre (fenêtre
+-- seulement) et ▲ / ▼ pour le déplacer, puis « Tous » / « Aucun ». Données de l'initialiseur
+-- (AddButtonChoices) : { title, settings = { [clé] = réglage d'affichage }, order = fn() → liste,
+-- sides = vrai pour la fenêtre, refresh, tooltip (« %s » = bouton) }. Les cases passent par les
+-- réglages (setting:SetValue), comme celles de la petite fenêtre du clic droit.
+P.ButtonListSettingMixin = {}
+
+local LIST_TITLE_HEIGHT, LIST_ROW_HEIGHT, LIST_FOOTER_HEIGHT = 26, 24, 32
+
+-- Hauteur de l'élément pour count boutons.
+local function ButtonListExtent(count)
+	return LIST_TITLE_HEIGHT + count * LIST_ROW_HEIGHT + LIST_FOOTER_HEIGHT
+end
+
+local function ArrowButton(parent, direction)
+	local button = CreateFrame("Button", nil, parent)
+	button:SetSize(22, 22)
+	local base = "Interface\\ChatFrame\\UI-ChatIcon-Scroll" .. direction
+	button:SetNormalTexture(base .. "-Up")
+	button:SetPushedTexture(base .. "-Down")
+	button:SetDisabledTexture(base .. "-Disabled")
+	button:SetHighlightTexture("Interface\\Buttons\\UI-Common-MouseHilight", "ADD")
+	return button
+end
+
+local function ShowListTooltip(owner, title, text)
+	GameTooltip:SetOwner(owner, "ANCHOR_RIGHT")
+	GameTooltip:AddLine(title)
+	GameTooltip:AddLine(text, 1, 1, 1, true)
+	P.ShowTooltip()
+end
+
+function P.ButtonListSettingMixin:OnLoad()
+	self.rows = {}
+	local all = CreateFrame("Button", nil, self, "UIPanelButtonTemplate")
+	all:SetSize(90, 22)
+	all:SetText(L["Tous"])
+	local none = CreateFrame("Button", nil, self, "UIPanelButtonTemplate")
+	none:SetSize(90, 22)
+	none:SetText(L["Aucun"])
+	none:SetPoint("LEFT", all, "RIGHT", 8, 0)
+	all:SetScript("OnClick", function()
+		self:SetAll(true)
+	end)
+	none:SetScript("OnClick", function()
+		self:SetAll(false)
+	end)
+	self.AllButton, self.NoneButton = all, none
+end
+
+function P.ButtonListSettingMixin:SetAll(value)
+	for _, setting in pairs(self.data.settings) do
+		setting:SetValue(value)
+	end
+	self:Fill()
+end
+
+function P.ButtonListSettingMixin:Move(key, delta)
+	P.MoveButtonInOrder(self.data.order(), key, delta)
+	self.data.refresh()
+	self:Fill()
+end
+
+local function CreateListRow(element)
+	local row = CreateFrame("Frame", nil, element)
+	row:SetHeight(LIST_ROW_HEIGHT)
+	row.Label = row:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
+	row.Label:SetPoint("LEFT", 52, 0)
+	row.Label:SetJustifyH("LEFT")
+	row.Check = CreateFrame("CheckButton", nil, row, "UICheckButtonTemplate")
+	row.Check:SetSize(24, 24)
+	row.Check:SetPoint("LEFT", row, "CENTER", -80, 0)
+	row.Check:SetScript("OnClick", function(check)
+		local setting = element.data.settings[row.key]
+		setting:SetValue(check:GetChecked() and true or false)
+	end)
+	row.Check:SetScript("OnEnter", function(check)
+		ShowListTooltip(check, row.text, element.data.tooltip:format(row.text))
+	end)
+	row.Check:SetScript("OnLeave", GameTooltip_Hide)
+	row.Side = CreateFrame("Button", nil, row, "UIPanelButtonTemplate")
+	row.Side:SetSize(84, 20)
+	row.Side:SetPoint("LEFT", row.Check, "RIGHT", 8, 0)
+	row.Side:SetScript("OnClick", function()
+		P.SetWindowButtonSide(row.key, not row.left)
+		element.data.refresh()
+		element:Fill()
+	end)
+	row.Side:SetScript("OnEnter", function(button)
+		ShowListTooltip(button, L["Côté du titre"], L["Place le bouton à gauche du titre de la fenêtre "
+			.. "(après « Solo ») ou à droite (vers la croix). Clic pour changer."])
+	end)
+	row.Side:SetScript("OnLeave", GameTooltip_Hide)
+	row.Up = ArrowButton(row, "Up")
+	row.Down = ArrowButton(row, "Down")
+	row.Up:SetScript("OnClick", function()
+		element:Move(row.key, -1)
+	end)
+	row.Down:SetScript("OnClick", function()
+		element:Move(row.key, 1)
+	end)
+	if P.SkinCheckBox then
+		P.SkinCheckBox(row.Check)
+	end
+	return row
+end
+
+-- Remplit les lignes selon l'ordre et les réglages courants.
+function P.ButtonListSettingMixin:Fill()
+	local data = self.data
+	local specs = P.OrderedButtonSpecs(data.order())
+	for index, spec in ipairs(specs) do
+		local row = self.rows[index] or CreateListRow(self)
+		self.rows[index] = row
+		row.key, row.text = spec.moduleKey, spec.text
+		row:ClearAllPoints()
+		row:SetPoint("TOPLEFT", 0, -(LIST_TITLE_HEIGHT + (index - 1) * LIST_ROW_HEIGHT))
+		row:SetPoint("RIGHT")
+		row.Label:SetText(spec.text)
+		local setting = data.settings[spec.moduleKey]
+		row.Check:SetChecked(setting and setting:GetValue() and true or false)
+		row.Side:SetShown(data.sides == true)
+		if data.sides then
+			row.left = P.IsWindowButtonLeft(spec)
+			row.Side:SetText(row.left and L["À gauche"] or L["À droite"])
+		end
+		local arrowAnchor = data.sides and row.Side or row.Check
+		row.Up:ClearAllPoints()
+		row.Up:SetPoint("LEFT", arrowAnchor, "RIGHT", 8, 0)
+		row.Down:ClearAllPoints()
+		row.Down:SetPoint("LEFT", row.Up, "RIGHT", 2, 0)
+		row.Up:SetEnabled(index > 1)
+		row.Down:SetEnabled(index < #specs)
+		row:Show()
+	end
+	for index = #specs + 1, #self.rows do
+		self.rows[index]:Hide()
+	end
+	self.AllButton:ClearAllPoints()
+	self.AllButton:SetPoint("TOPLEFT", 52, -(LIST_TITLE_HEIGHT + #specs * LIST_ROW_HEIGHT + 4))
+	self:SetHeight(ButtonListExtent(#specs))
+end
+
+function P.ButtonListSettingMixin:Init(initializer)
+	self.data = initializer.GetData and initializer:GetData() or initializer.data
+	self.Text:SetText(self.data.title)
+	self:Fill()
+end
+
 -- Enregistre la catégorie "Polypode" dans Options > AddOns. Appelé à PLAYER_LOGIN,
 -- une fois P.db disponible.
 function P.BuildOptions()
@@ -127,14 +277,16 @@ function P.BuildOptions()
 		end, tooltip)
 		popupItems[#popupItems + 1] = { kind = "dropdown", setting = setting, values = values, tooltip = tooltip }
 	end
-	-- Une case par bouton de compagnon installé (P.AddTitleButton, demandés au chargement des
-	-- addons, avant ce panneau), puis « Tous » et « Aucun ». choice = { variable (préfixe du nom
-	-- du réglage), hidden = fn() → [moduleKey] = true, refresh, label et tooltip (« %s » = bouton),
-	-- parent / parentShown (case dont elles dépendent, facultatif), allName, allTooltip,
-	-- noneName, noneTooltip }.
+	-- Boutons des compagnons installés (P.AddTitleButton, demandés au chargement des addons, avant
+	-- ce panneau) : un réglage d'affichage par bouton (aussi en case dans la petite fenêtre du clic
+	-- droit), et dans le panneau un seul élément PolypodeButtonListSettingTemplate (cases, côté,
+	-- ordre, « Tous » / « Aucun »). choice = { variable (préfixe du nom des réglages), title,
+	-- hidden = fn() → [moduleKey] = true, order = fn() → liste des clés, sides, refresh,
+	-- label et tooltip (« %s » = bouton) }.
 	local function AddButtonChoices(choice)
 		local settings = {}
-		for _, spec in ipairs(P.GetTitleButtonSpecs()) do
+		local specs = P.GetTitleButtonSpecs()
+		for _, spec in ipairs(specs) do
 			local key = spec.moduleKey
 			local setting = Settings.RegisterProxySetting(
 				category,
@@ -150,25 +302,25 @@ function P.BuildOptions()
 					choice.refresh()
 				end
 			)
-			local initializer = AddCheck(setting, choice.tooltip:format(spec.text))
-			if choice.parent and initializer and initializer.SetParentInitializer then
-				initializer:SetParentInitializer(choice.parent, choice.parentShown)
-			end
-			settings[#settings + 1] = setting
+			popupItems[#popupItems + 1] = { kind = "check", setting = setting,
+				tooltip = choice.tooltip:format(spec.text) }
+			settings[key] = setting
 		end
-		local function SetAll(value)
-			for _, setting in ipairs(settings) do
-				setting:SetValue(value)
-			end
+		if #specs == 0 or not layout then
+			return
 		end
-		if #settings > 1 and layout and CreateSettingsButtonInitializer then
-			layout:AddInitializer(CreateSettingsButtonInitializer(choice.allName, L["Tous"], function()
-				SetAll(true)
-			end, choice.allTooltip, true))
-			layout:AddInitializer(CreateSettingsButtonInitializer(choice.noneName, L["Aucun"], function()
-				SetAll(false)
-			end, choice.noneTooltip, true))
+		local initializer = Settings.CreateElementInitializer("PolypodeButtonListSettingTemplate", {
+			title = choice.title,
+			settings = settings,
+			order = choice.order,
+			sides = choice.sides,
+			refresh = choice.refresh,
+			tooltip = choice.tooltip,
+		})
+		initializer.GetExtent = function()
+			return ButtonListExtent(#P.GetTitleButtonSpecs())
 		end
+		layout:AddInitializer(initializer)
 	end
 
 	-- Langue de Polypode et de ses modules (tous les personnages) : libellé dans les deux langues,
@@ -450,15 +602,14 @@ function P.BuildOptions()
 	-- Boutons des compagnons dans la barre de titre de la fenêtre Polypode (par personnage).
 	AddButtonChoices({
 		variable = "POLYPODE_WINDOW_BUTTON_",
+		title = L["Fenêtre : boutons des modules (affichage, côté, ordre)"],
 		label = L["Fenêtre : bouton %s"],
 		hidden = P.GetHiddenWindowButtons,
+		order = P.GetWindowButtonOrder,
+		sides = true,
 		refresh = P.LayoutTitleButtons,
 		tooltip = L["Affiche le bouton « %s » dans la barre de titre de la fenêtre Polypode. Réglage "
 			.. "propre à ce personnage."],
-		allName = L["Fenêtre : tous les boutons"],
-		allTooltip = L["Coche tous les boutons des modules de la fenêtre Polypode."],
-		noneName = L["Fenêtre : aucun bouton"],
-		noneTooltip = L["Décoche tous les boutons des modules de la fenêtre Polypode."],
 	})
 	-- Import d'une liste de personnages (fenêtre UI_Import.lua, aussi par /poly import).
 	if CreateSettingsButtonInitializer then
@@ -605,7 +756,7 @@ function P.BuildOptions()
 			P.RefreshTeamBar()
 		end
 	)
-	local moduleButtonsInit = AddCheck(moduleButtonsSetting,
+	AddCheck(moduleButtonsSetting,
 		L["Affiche contre la barre flottante d'équipe une colonne de petits boutons reprenant ceux des "
 		.. "modules (Data, Photo, Profils, Suivi... selon les addons installés) : trois premières "
 		.. "lettres, même clic et même infobulle que dans la fenêtre Polypode. Chaque bouton se choisit "
@@ -613,19 +764,13 @@ function P.BuildOptions()
 
 	AddButtonChoices({
 		variable = "POLYPODE_TEAMBAR_MODULE_",
+		title = L["Barre d'équipe : boutons des modules (affichage, ordre)"],
 		label = L["Barre d'équipe : bouton %s"],
 		hidden = P.GetHiddenModuleButtons,
+		order = P.GetModuleButtonOrder,
 		refresh = P.RefreshTeamBar,
 		tooltip = L["Affiche le bouton « %s » dans la colonne des modules de la barre d'équipe. Réglage "
 			.. "propre à ce personnage."],
-		parent = moduleButtonsInit,
-		parentShown = function()
-			return P.charDb.teamBar.moduleButtons
-		end,
-		allName = L["Barre d'équipe : tous les boutons"],
-		allTooltip = L["Coche tous les boutons des modules de la barre d'équipe."],
-		noneName = L["Barre d'équipe : aucun bouton"],
-		noneTooltip = L["Décoche tous les boutons des modules de la barre d'équipe."],
 	})
 
 	local moduleSideSetting = Settings.RegisterProxySetting(
