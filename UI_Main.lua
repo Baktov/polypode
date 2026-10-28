@@ -748,8 +748,8 @@ end
 
 -- ORDRE DES BOUTONS (options, par personnage) : listes de clés (spec.moduleKey), une pour la
 -- fenêtre, une pour la barre d'équipe. Ordre affiché = de gauche à droite (de haut en bas pour
--- une colonne) ; un bouton absent de la liste (compagnon installé depuis) vient à la suite, dans
--- l'ordre des demandes.
+-- une colonne) ; liste vide (rien changé) : ordre par défaut (DEFAULT_BUTTON_ORDER) ; un bouton
+-- absent de la liste (compagnon installé depuis) vient à la suite.
 function P.GetWindowButtonOrder()
 	P.charDb.windowButtonOrder = P.charDb.windowButtonOrder or {}
 	return P.charDb.windowButtonOrder
@@ -760,7 +760,19 @@ function P.GetModuleButtonOrder()
 	return P.charDb.teamBar.moduleOrder
 end
 
--- Specs des boutons dans l'ordre de la liste order.
+-- Ordre par défaut, celui du schéma « vue générale » (Publication) : gestion (Data, Histoire,
+-- Suivi et sa Grille), outils (Profil, Téléports), divers (Photo, Map).
+local DEFAULT_BUTTON_ORDER = {
+	"Polypode_Data", "Polypode_Histoire", "Polypode_Suivi", "Polypode_Suivi2",
+	"Polypode_Profil", "Polypode_Teleport", "Polypode_Photo", "Polypode_Map",
+}
+local defaultRank = {}
+for index, key in ipairs(DEFAULT_BUTTON_ORDER) do
+	defaultRank[key] = index
+end
+
+-- Specs des boutons dans l'ordre de la liste order ; ceux qui n'y sont pas ensuite, dans l'ordre
+-- par défaut, puis dans l'ordre des demandes (compagnon inconnu de DEFAULT_BUTTON_ORDER).
 function P.OrderedButtonSpecs(order)
 	local rank = {}
 	for index, key in ipairs(order) do
@@ -768,13 +780,18 @@ function P.OrderedButtonSpecs(order)
 	end
 	local items = {}
 	for index, spec in ipairs(titleButtonSpecs) do
-		items[#items + 1] = { spec = spec, index = index, rank = rank[spec.moduleKey] }
+		items[#items + 1] = { spec = spec, index = index, rank = rank[spec.moduleKey],
+			default = defaultRank[spec.moduleKey] }
 	end
 	table.sort(items, function(a, b)
 		if a.rank and b.rank then
 			return a.rank < b.rank
 		elseif a.rank or b.rank then
 			return a.rank ~= nil
+		elseif a.default and b.default then
+			return a.default < b.default
+		elseif a.default or b.default then
+			return a.default ~= nil
 		end
 		return a.index < b.index
 	end)
