@@ -593,6 +593,7 @@ aliases (`/poly accounts`, `/poly remove-account`); debug messages stay in Frenc
 
 ## Version
 
+`2.15.4` : plus d'avertissements « Bindings.xml : Unrecognized XML: Binding » (fichier des raccourcis retiré de la liste du `.toc` : le jeu le charge tout seul ; raccourcis inchangés).
 `2.15.3` : WoW Forever : la synchro entre vos clients passe de nouveau. Le jeu nomme maintenant l'expéditeur « Prénom Nom » ; Polypode y ajoutait un royaume (« Naomi Nagatà-CAMWOWEU4Realm7PvE ») : chuchotements perdus, voyant « Seul » alors que l'autre client répondait, équipes et profils non reçus. Noms comparés et chuchotés en « Prénom Nom ».
 `2.15.2` : « Inviter l'équipe » quand tous les autres membres sont déjà groupés : le message le dit et les nomme (au lieu de « Aucun membre de l'équipe à inviter »).
 `2.15.1` : interface manette de WoW Forever (bêta) : plus de « Polypode a été bloqué à cause d'une action qui n'est utilisable que par l'IU de Blizzard » ; dans ce mode, Polypode ne ferme plus lui-même les fenêtres du jeu (dialogue de PNJ fermé par le leader, invitation de groupe acceptée, confirmation de cinématique) et laisse les films au joueur ; une action bloquée par le jeu est désormais nommée dans le chat.
