@@ -157,7 +157,8 @@ the other clients right away. Three frames side by side:
   character. Outside solo mode, the **?** button (left of **In Game**) recalls on hover how the list
   fills up: discovery of characters (announcements, dedicated channel, group, guild, whispers,
   allowed accounts, target, import), automatic matching (same character, duplicates, dated
-  versions), who counts as "connected", and how saves work with several accounts (with or without
+  versions), who counts as "connected", accounts (Battle.net recognized on its own, WoW account name
+  to set yourself) and how saves work with several accounts (with or without
   `mklink /J` junctions, sending priority). WoW does not give addons the WoW account name: it is set on each character, in the
   options (**WoW account of this character** field, once per character) or with **Alt + click** on
   a character in the window (menu: existing accounts, "New account...", "No account"). **Alt + click

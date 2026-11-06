@@ -164,7 +164,8 @@ côte à côte :
   pour chaque mode et chaque personnage. Hors mode solo, le bouton **?** (à gauche de **En Jeu**)
   rappelle au survol comment la liste se remplit : découverte des personnages (annonces, canal
   dédié, groupe, guilde, chuchotements, comptes autorisés, cible, import), rapprochements
-  automatiques (même personnage, doublons, versions datées), qui est « connecté », et la gestion
+  automatiques (même personnage, doublons, versions datées), qui est « connecté », les comptes
+  (Battle.net reconnu tout seul, nom du compte WoW à donner soi-même) et la gestion
   des sauvegardes à plusieurs comptes (avec ou sans jonctions `mklink /J`, priorité d'envoi). WoW ne donne pas le nom du
   compte WoW aux addons : il se renseigne sur chaque personnage, dans les options (champ **Compte
   WoW de ce personnage**, une fois par personnage) ou par **Alt + clic** sur un personnage dans la

@@ -1327,6 +1327,15 @@ function P.BuildUI()
 			L["Connecté : vous, un Polypode qui s'est annoncé pendant la session, ou un membre connecté de "
 				.. "votre groupe (même sans Polypode). Les connectés viennent en tête, les autres sont grisés."],
 		})
+		Section(L["Comptes"], {
+			L["Compte Battle.net : reconnu automatiquement. Chaque annonce porte un identifiant tiré de votre "
+				.. "BattleTag (haché, jamais envoyé en clair) : seuls vos personnages et ceux des comptes "
+				.. "autorisés sont acceptés."],
+			L["Compte WoW (WoW1, WoW2... d'un même Battle.net) : le jeu ne donne pas son nom aux addons, et tous "
+				.. "ont le même identifiant. Vous le nommez vous-même, une fois par personnage (Alt + clic sur le "
+				.. "personnage, ou dans les options) ; ce nom est partagé avec vos autres Polypode et sert à "
+				.. "regrouper la liste par compte."],
+		})
 		Section(L["Sauvegardes et plusieurs comptes"], {
 			L["Chaque compte WoW a son fichier de sauvegarde (WTF\\Account\\compte\\SavedVariables), réécrit en "
 				.. "entier à chaque déconnexion ou /reload."],
