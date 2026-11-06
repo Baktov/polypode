@@ -1286,6 +1286,62 @@ function P.BuildUI()
 	end)
 	inGameBtn:SetScript("OnLeave", GameTooltip_Hide)
 
+	-- « ? » (à gauche de « En Jeu », hors mode solo, placé par RefreshUI) : au survol, règles de
+	-- remplissage de la liste (découvertes, rapprochements, connectés) et des sauvegardes à
+	-- plusieurs comptes (avec ou sans jonctions).
+	local helpBtn = CreateFrame("Button", nil, charPanel, "UIPanelButtonTemplate")
+	helpBtn:SetSize(20, 18)
+	helpBtn:SetText("?")
+	helpBtn:SetScript("OnEnter", function(self)
+		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+		GameTooltip:AddLine(L["Personnages disponibles : comment la liste se remplit"])
+		local function Section(heading, lines)
+			GameTooltip:AddLine(" ")
+			GameTooltip:AddLine(heading, 1, 0.82, 0)
+			for _, line in ipairs(lines) do
+				GameTooltip:AddLine(line, 1, 1, 1, true)
+			end
+		end
+		Section(L["Découverte"], {
+			L["Votre personnage, à chaque connexion."],
+			L["Vos autres personnages qui ont Polypode, dès qu'ils s'annoncent : sur le canal dédié s'il existe, "
+				.. "sinon au raid, au groupe ou à la guilde, et chaque fois que le groupe s'agrandit. Sans aucun "
+				.. "de ces canaux, l'annonce est chuchotée aux personnages connus de vos comptes (à la connexion "
+				.. "et à l'ouverture de cette fenêtre)."],
+			L["Les autres comptes Battle.net que vous avez autorisés (demande au premier message sur le canal "
+				.. "dédié)."],
+			L["« Ajouter la cible » : le joueur ciblé, même sans Polypode."],
+			L["« Importer des personnages » (options) : la liste de vos comptes Battle.net, préparée hors du jeu."],
+			L["Ce que vos autres Polypode connectés ont ajouté, retiré ou modifié (personnages, équipes, "
+				.. "comptes WoW)."],
+		})
+		Section(L["Rapprochements automatiques"], {
+			L["Un même personnage est reconnu par son prénom et son royaume (espaces ignorés), ou sur WoW "
+				.. "Forever par son prénom et son nom de famille."],
+			L["Un personnage ajouté à la main est remplacé par sa vraie fiche dès qu'il s'annonce : ses places "
+				.. "dans les équipes sont reprises, sans doublon."],
+			L["Toute modification est datée : la plus récente l'emporte, une copie ancienne n'écrase jamais une "
+				.. "récente. Un personnage retiré ne revient que s'il se reconnecte lui-même avec Polypode."],
+		})
+		Section(L["Connectés"], {
+			L["Connecté : vous, un Polypode qui s'est annoncé pendant la session, ou un membre connecté de "
+				.. "votre groupe (même sans Polypode). Les connectés viennent en tête, les autres sont grisés."],
+		})
+		Section(L["Sauvegardes et plusieurs comptes"], {
+			L["Chaque compte WoW a son fichier de sauvegarde (WTF\\Account\\compte\\SavedVariables), réécrit en "
+				.. "entier à chaque déconnexion ou /reload."],
+			L["Avec des jonctions (mklink /J) vers un seul dossier : tous vos comptes lisent le même fichier et "
+				.. "le dernier client qui écrit l'emporte. Polypode tient donc tous ses clients connectés à jour "
+				.. "en mémoire, pour qu'ils écrivent tous la même chose."],
+			L["Sans jonction : chaque compte garde sa propre liste, qui ne se recale que quand les clients se "
+				.. "voient (connectés en même temps). Un personnage jamais vu par un compte n'y apparaît pas."],
+			L["Priorité d'envoi : annonces, personnages et équipes d'abord, données des modules ensuite. Le "
+				.. "voyant de la barre de titre montre où en est la synchro."],
+		})
+		P.ShowTooltip()
+	end)
+	helpBtn:SetScript("OnLeave", GameTooltip_Hide)
+
 	-- Bouton d'ajout du joueur ciblé (personnage sans Polypode, ex. un ami) au roster.
 	local addTargetBtn = CreateFrame("Button", nil, charPanel, "UIPanelButtonTemplate")
 	addTargetBtn:SetHeight(22)
@@ -1582,6 +1638,7 @@ function P.BuildUI()
 	ui.charPanel = charPanel
 	ui.collapseAccountsButton = collapseAllBtn
 	ui.inGameButton = inGameBtn
+	ui.charHelpButton = helpBtn
 	ui.teamPanel = teamPanel
 	ui.teamInput = teamInput
 	ui.teamCreateButton = createBtn
@@ -1600,6 +1657,7 @@ function P.BuildUI()
 		P.SkinButton(addTargetBtn)
 		P.SkinButton(collapseAllBtn)
 		P.SkinButton(inGameBtn)
+		P.SkinButton(helpBtn)
 		P.SkinButton(optionsBtn)
 		P.SkinEditBox(channelInput)
 		P.SkinCheckBox(soloCheck)
@@ -1728,7 +1786,12 @@ function P.RefreshUI()
 		ui.inGameButton:SetPoint("TOPRIGHT", -6, -4)
 	end
 	ui.inGameButton.activeTint:SetShown(inGameOnly)
-	ui.charPanel.header:SetPoint("RIGHT", ui.inGameButton, "LEFT", -6, 0)
+	-- « ? » à gauche de « En Jeu », hors mode solo ; le titre s'arrête avant le premier des deux.
+	local showHelp = not P.IsSoloMode()
+	ui.charHelpButton:SetShown(showHelp)
+	ui.charHelpButton:ClearAllPoints()
+	ui.charHelpButton:SetPoint("RIGHT", ui.inGameButton, "LEFT", -4, 0)
+	ui.charPanel.header:SetPoint("RIGHT", showHelp and ui.charHelpButton or ui.inGameButton, "LEFT", -6, 0)
 
 	local teams = {}
 	for name in pairs(P.GetTeams()) do

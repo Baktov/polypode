@@ -154,7 +154,11 @@ the other clients right away. Three frames side by side:
   the title without grouping) only shows **logged-in** characters (a simple display filter; accounts
   with nobody logged in are hidden); when active, it turns blue. It is active by default in solo
   mode (Monopode) and inactive by default otherwise; the choice is remembered for each mode and each
-  character. WoW does not give addons the WoW account name: it is set on each character, in the
+  character. Outside solo mode, the **?** button (left of **In Game**) recalls on hover how the list
+  fills up: discovery of characters (announcements, dedicated channel, group, guild, whispers,
+  allowed accounts, target, import), automatic matching (same character, duplicates, dated
+  versions), who counts as "connected", and how saves work with several accounts (with or without
+  `mklink /J` junctions, sending priority). WoW does not give addons the WoW account name: it is set on each character, in the
   options (**WoW account of this character** field, once per character) or with **Alt + click** on
   a character in the window (menu: existing accounts, "New account...", "No account"). **Alt + click
   on an account header** **renames** it for all its characters (an existing name merges the two

@@ -161,7 +161,11 @@ côte à côte :
   droite du titre sans regroupement) n'affiche que les personnages **connectés** (simple filtre
   d'affichage, les comptes sans connecté sont masqués) ; actif, il passe sur fond bleu. Il est
   actif par défaut en mode solo (Monopode) et inactif par défaut sinon ; le choix est mémorisé
-  pour chaque mode et chaque personnage. WoW ne donne pas le nom du
+  pour chaque mode et chaque personnage. Hors mode solo, le bouton **?** (à gauche de **En Jeu**)
+  rappelle au survol comment la liste se remplit : découverte des personnages (annonces, canal
+  dédié, groupe, guilde, chuchotements, comptes autorisés, cible, import), rapprochements
+  automatiques (même personnage, doublons, versions datées), qui est « connecté », et la gestion
+  des sauvegardes à plusieurs comptes (avec ou sans jonctions `mklink /J`, priorité d'envoi). WoW ne donne pas le nom du
   compte WoW aux addons : il se renseigne sur chaque personnage, dans les options (champ **Compte
   WoW de ce personnage**, une fois par personnage) ou par **Alt + clic** sur un personnage dans la
   fenêtre (menu : comptes existants, « Nouveau compte... », « Aucun compte »). **Alt + clic sur
@@ -588,7 +592,7 @@ aliases (`/poly accounts`, `/poly remove-account`); debug messages stay in Frenc
 
 ## Version
 
-`2.15.0` : synchro : « Ajouter la cible » relève le bon royaume (WoW Forever, autre royaume) et un ajout à la main est fusionné avec la vraie entrée du personnage dès qu'il s'annonce (plus de doublon) ; sans groupe, canal dédié ni guilde commune, annonce chuchotée aux personnages de vos comptes (connexion, ouverture de la fenêtre) ; une équipe créée ou modifiée part aussitôt aux membres groupés ; voyant de synchro dans la barre de titre (À jour / Synchro / Seul).
+`2.15.0` : synchro : « Ajouter la cible » relève le bon royaume (WoW Forever, autre royaume) et un ajout à la main est fusionné avec la vraie entrée du personnage dès qu'il s'annonce (plus de doublon) ; sans groupe, canal dédié ni guilde commune, annonce chuchotée aux personnages de vos comptes (connexion, ouverture de la fenêtre) ; une équipe créée ou modifiée part aussitôt aux membres groupés ; voyant de synchro dans la barre de titre (À jour / Synchro / Seul) ; bouton « ? » à gauche de « En Jeu » (hors mode solo) : règles de la liste des personnages et des sauvegardes à plusieurs comptes.
 `2.14.0` : options : boutons des modules réglables un par un, séparément pour la fenêtre Polypode et pour la barre d'équipe : affichage, ordre (flèches ▲ ▼), côté du titre pour la fenêtre (à gauche ou à droite), boutons « Tous » / « Aucun ».
 
 `2.13.0` : synchro entre fenêtres environ 8 fois plus rapide quand il y a beaucoup à échanger (première connexion de deux comptes) : envoi réparti sur 8 canaux de messages au lieu d'un, et annonces, équipes et actions du leader envoyées avant les données des compagnons. Toutes les fenêtres doivent avoir cette version.
