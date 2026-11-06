@@ -113,6 +113,9 @@ function P.OnGroupEvent(event, inviterName)
 		end
 	elseif event == "GROUP_ROSTER_UPDATE" and hideInvitePopup then
 		hideInvitePopup = false
+		if P.IsGamepadUI() then
+			return -- interface manette : fenêtre laissée au joueur (P.IsGamepadUI)
+		end
 		StaticPopup_Hide("PARTY_INVITE")
 		if LFGInvitePopup then
 			StaticPopupSpecial_Hide(LFGInvitePopup)

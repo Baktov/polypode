@@ -101,6 +101,18 @@ function P.IsSoloMode()
 	return P.charDb ~= nil and P.charDb.soloMode == true
 end
 
+-- Interface manette de Blizzard (WoW Forever, bêta) : quand un addon ferme ou ouvre lui-même une
+-- fenêtre de Blizzard (HideUIPanel, StaticPopup_Hide...), le gestionnaire de la manette appelle
+-- SetPreferredGamepadInteractTarget dans la chaîne de l'addon, et le jeu le bloque (« Polypode a
+-- été bloqué... »). Ces fermetures automatiques sont donc sautées dans ce mode.
+function P.IsGamepadUI()
+	if not (InputUtil and InputUtil.IsGamepadUIEnabled) then
+		return false
+	end
+	local ok, enabled = pcall(InputUtil.IsGamepadUIEnabled)
+	return ok and enabled == true
+end
+
 function P.Debug(msg)
 	if P.debugEnabled then
 		print("|cff33ff99Polypode|r: " .. tostring(msg))

@@ -563,11 +563,15 @@ function P.OnDialogCloseMessage(sender)
 	if CloseQuest then
 		pcall(CloseQuest)
 	end
-	if GossipFrame and GossipFrame:IsShown() then
-		HideUIPanel(GossipFrame)
-	end
-	if QuestFrame and QuestFrame:IsShown() then
-		HideUIPanel(QuestFrame)
+	-- Interface manette : pas de HideUIPanel depuis l'addon (action bloquée, P.IsGamepadUI) ;
+	-- CloseGossip et CloseQuest ci-dessus font fermer les fenêtres par le jeu.
+	if not P.IsGamepadUI() then
+		if GossipFrame and GossipFrame:IsShown() then
+			HideUIPanel(GossipFrame)
+		end
+		if QuestFrame and QuestFrame:IsShown() then
+			HideUIPanel(QuestFrame)
+		end
 	end
 	P.Debug("Dialogue fermé (fermeture du leader " .. tostring(sender) .. ")")
 end

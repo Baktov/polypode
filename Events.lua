@@ -52,8 +52,24 @@ frame:RegisterEvent("AUTOFOLLOW_END")
 -- Groupage automatique de l'équipe (AutoGroup.lua)
 frame:RegisterEvent("PARTY_INVITE_REQUEST")
 frame:RegisterEvent("GROUP_ROSTER_UPDATE")
+-- Action bloquée par le jeu : nom de la fonction dans le chat (la fenêtre de Blizzard ne le donne pas)
+frame:RegisterEvent("ADDON_ACTION_BLOCKED")
+frame:RegisterEvent("ADDON_ACTION_FORBIDDEN")
+local reportedActions = {}
 
 frame:SetScript("OnEvent", function(self, event, ...)
+	if event == "ADDON_ACTION_BLOCKED" or event == "ADDON_ACTION_FORBIDDEN" then
+		local addonName, func = ...
+		if type(addonName) == "string" and addonName:find("^Polypode") then
+			local id = addonName .. "|" .. tostring(func)
+			if not reportedActions[id] then
+				reportedActions[id] = true -- une fois par session et par fonction
+				print("|cff33ff99Polypode|r: " .. P.L["Action bloquée par le jeu : %s (%s). Merci de la signaler."]
+					:format(tostring(func), addonName))
+			end
+		end
+		return
+	end
 	if event == "ADDON_LOADED" then
 		local addonName = ...
 		if addonName == "Polypode" then

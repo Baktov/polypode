@@ -37,6 +37,9 @@ end
 
 -- Ferme la fenêtre de confirmation « Passer la cinématique ? » si elle traîne.
 local function DismissConfirm()
+	if P.IsGamepadUI() then
+		return -- interface manette : fermer une fenêtre de Blizzard depuis l'addon est bloqué
+	end
 	if StaticPopup_Hide then
 		StaticPopup_Hide("CONFIRM_STOP_CINEMATIC")
 	end
@@ -53,6 +56,10 @@ end
 local function ApplySkip(kind, allowPending)
 	local done = false
 	if kind == "movie" then
+		-- Interface manette : FinishMovie cache MovieFrame depuis l'addon (bloqué) ; film laissé au joueur.
+		if P.IsGamepadUI() then
+			return false
+		end
 		if MovieFrame and MovieFrame:IsShown() and MovieFrame.FinishMovie then
 			DismissConfirm()
 			MovieFrame:FinishMovie()
