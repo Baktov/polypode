@@ -57,6 +57,10 @@ itself.
   roster knows every character, whatever the login order. Polypode also announces itself to the
   group whenever it grows: grouping a character already logged in is enough for it to receive the
   teams.
+- **Without a group, dedicated channel or shared guild**, Polypode **whispers** its announcement to
+  the known characters of your accounts (the 12 most recently seen, not yet seen online), at login
+  and when the window opens (at most once per minute): your clients find each other without
+  waiting to be grouped.
 - **Dedicated channel** (optional): the simplest is still to group your characters at first login
   (or to share a guild), with nothing to set. The dedicated channel is for the other cases: several
   WoW or Battle.net accounts, characters with no shared guild, not grouped yet. It is a channel name
@@ -156,7 +160,9 @@ box (in red, see "Solo mode" below). Three frames side by side:
   character.
   **Add target** button (top of the frame): adds the targeted player to the list, even without
   Polypode (e.g. a friend); they can then join a team and be invited with it. The addition is shared
-  with your other logged-in Polypodes.
+  with your other logged-in Polypodes. The target's realm is read correctly, also on WoW Forever and
+  for another realm; if the added character has Polypode, its own announcement replaces the
+  addition (team places kept, no duplicate).
   When a team is selected: **right-click** on a character adds it to the team, **left-click**
   removes it, after confirmation; team members are highlighted in gold. A tooltip on hover gives the
   character's name, recalls these actions, then lists the teams it already belongs to (the selected

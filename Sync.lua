@@ -106,6 +106,10 @@ end
 function P.JoinSyncChannelLater()
 	C_Timer.After(CHANNEL_JOIN_DELAY, function()
 		P.ApplySyncChannel()
+		-- Ni canal dédié, ni groupe, ni guilde : découverte par chuchotement (Sync.lua).
+		C_Timer.After(CHANNEL_HELLO_DELAY + 1, function()
+			P.DiscoverPeers()
+		end)
 	end)
 end
 
@@ -140,6 +144,7 @@ local THROTTLED = {
 local priorityQueue = {} -- messages du cœur
 local sendQueue = {} -- messages volumineux (compagnons, QLOG)
 local pumping = false
+local lastSent, lastReceived = 0, 0 -- GetTime() du dernier message envoyé / reçu (voyant de synchro)
 local blockedUntil = {} -- [préfixe] = GetTime() jusqu'auquel il est épuisé
 local nextPrefix = 1
 local messageHandlers = {} -- [type] = handler(reste, expéditeur) des compagnons (P.RegisterMessageHandler)
@@ -195,6 +200,7 @@ local function Pump()
 			local result = C_ChatInfo.SendAddonMessage(prefix, item.message, item.channel, item.target)
 			if not THROTTLED[result] then
 				table.remove(queue, 1)
+				lastSent = GetTime()
 				C_Timer.After(SEND_INTERVAL, Pump)
 				return
 			end
@@ -240,7 +246,8 @@ end
 -- kind : "HELLO" (annonce spontanée, appelle une réponse) ou "HI" (réponse, sans suite).
 -- Format : TYPE:token:nom:royaume:classe:niveau:nomDeFamille (nom de famille vide sur
 -- Retail ; champ ajouté en dernier, ignoré par les versions qui ne le lisent pas).
-function P.SayHello(kind, channel)
+-- channel = "WHISPER" : target est le destinataire (découverte, réponse à un HELLO chuchoté).
+function P.SayHello(kind, channel, target)
 	local token = P.GetTeamToken()
 	if not token then
 		P.Debug("BattleTag indisponible, annonce non envoyée.")
@@ -250,7 +257,67 @@ function P.SayHello(kind, channel)
 	local level = UnitLevel("player")
 	local _, _, surname = P.UnitNameParts("player")
 	P.Broadcast(string.format("%s:%s:%s:%s:%s:%d:%s", kind or "HELLO", token,
-		UnitName("player"), GetRealmName(), class, level, surname or ""), channel)
+		UnitName("player"), GetRealmName(), class, level, surname or ""), channel, target)
+end
+
+-- DÉCOUVERTE PAR CHUCHOTEMENT : sans canal dédié, groupe ni guilde (GetBroadcastChannel nil),
+-- l'annonce de connexion ne part nulle part et les clients ne se trouvent qu'une fois groupés.
+-- HELLO est alors chuchoté aux personnages de nos comptes (token autorisé) pas encore vus
+-- connectés, les plus récemment vus d'abord (DISCOVERY_MAX au plus) ; l'erreur « hors ligne »
+-- est masquée (recentWhispers). À la connexion, à l'ouverture de la fenêtre (une fois par
+-- DISCOVERY_INTERVAL) et au clic sur le voyant de synchro (force).
+local DISCOVERY_MAX = 12
+local DISCOVERY_INTERVAL = 60 -- secondes
+local lastDiscovery
+
+function P.DiscoverPeers(force)
+	if GetBroadcastChannel() or not P.GetTeamToken() then
+		return false
+	end
+	local now = GetTime()
+	if not force and lastDiscovery and now - lastDiscovery < DISCOVERY_INTERVAL then
+		return false
+	end
+	lastDiscovery = now
+	local me = P.GetCharKey()
+	local candidates = {}
+	for key, entry in pairs(P.GetRoster()) do
+		if key ~= me and entry.token and P.IsTokenTrusted(entry.token)
+			and not onlineChars[FullName(P.GetTargetName(entry))] then
+			candidates[#candidates + 1] = entry
+		end
+	end
+	table.sort(candidates, function(a, b)
+		return (a.lastSeen or 0) > (b.lastSeen or 0)
+	end)
+	for i = 1, math.min(DISCOVERY_MAX, #candidates) do
+		P.SayHello("HELLO", "WHISPER", P.GetTargetName(candidates[i]))
+	end
+	P.Debug("Découverte : HELLO chuchoté à " .. math.min(DISCOVERY_MAX, #candidates) .. " personnage(s)")
+	return true
+end
+
+-- Cherche les autres clients maintenant (clic sur le voyant) : annonce habituelle s'il y a un
+-- canal d'annonce, sinon découverte par chuchotement.
+function P.FindPeers()
+	if GetBroadcastChannel() then
+		P.SayHello("HELLO")
+	else
+		P.DiscoverPeers(true)
+	end
+end
+
+-- État de la synchro (voyant de la fenêtre) : files d'envoi (core = cœur : annonces, roster,
+-- équipes ; bulk = compagnons, journal de quêtes), dernier envoi / dernière réception
+-- (GetTime(), 0 = jamais), clients connectés vus pendant la session (noms triés).
+function P.GetSyncStatus()
+	local peers = {}
+	for name in pairs(onlineChars) do
+		peers[#peers + 1] = name
+	end
+	table.sort(peers)
+	return { core = #priorityQueue, bulk = #sendQueue, lastSent = lastSent, lastReceived = lastReceived,
+		peers = peers }
 end
 
 -- Groupe qui s'agrandit : s'y annonce (HELLO), car un client rejoint sans canal dédié ni
@@ -869,7 +936,20 @@ function P.SyncTeam(teamName, target, select)
 		messages[#messages + 1] = string.format("TEAMINFO:%s:%d:%s", token, created, teamName)
 	end
 
-	for to in pairs(ResolveTargets(target, select and keys or nil)) do
+	-- Destinataires en plus des clients vus connectés : tous les membres si select (« Inviter
+	-- l'équipe »), sinon les membres déjà groupés avec nous (invités qui ne se sont pas encore
+	-- annoncés : l'équipe leur arrive dès sa création ou sa modification).
+	local extra = select and keys or nil
+	if not select and not target and P.FindGroupUnit then
+		extra = {}
+		local me = P.GetCharKey()
+		for _, key in ipairs(keys) do
+			if key ~= me and P.FindGroupUnit(key) then
+				extra[#extra + 1] = key
+			end
+		end
+	end
+	for to in pairs(ResolveTargets(target, extra)) do
 		for _, message in ipairs(messages) do
 			P.Broadcast(message, "WHISPER", to)
 		end
@@ -956,6 +1036,7 @@ function P.OnSyncMessage(message, channel, sender)
 		end
 		return
 	end
+	lastReceived = GetTime() -- voyant de synchro : seulement nos comptes
 
 	-- Réglages propres à ce compte : seulement de nos propres clients, jamais d'un compte
 	-- autorisé (pas de changement de canal ni d'autorisation en cascade).
@@ -1117,7 +1198,7 @@ function P.OnSyncMessage(message, channel, sender)
 
 	-- Répond à une annonce spontanée pour que le nouvel arrivant nous connaisse aussi.
 	if kind == "HELLO" then
-		P.SayHello("HI", channel)
+		P.SayHello("HI", channel, channel == "WHISPER" and sender or nil)
 	end
 
 	-- L'expéditeur est connecté : il recevra les synchros automatiques d'équipes.

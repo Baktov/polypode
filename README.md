@@ -55,6 +55,10 @@ annoncé.
   répondent en s'annonçant à leur tour : chaque roster connaît tous les personnages,
   quel que soit l'ordre de connexion. Polypode s'annonce aussi au groupe chaque fois qu'il
   s'agrandit : grouper un personnage déjà connecté suffit pour qu'il reçoive les équipes.
+- **Sans groupe, canal dédié ni guilde commune**, Polypode **chuchote** son annonce aux
+  personnages connus de vos comptes (les 12 plus récemment vus, pas encore vus connectés), à la
+  connexion et à l'ouverture de la fenêtre (une fois par minute au plus) : vos clients se trouvent
+  sans attendre d'être groupés.
 - **Canal dédié** (optionnel) : le plus simple reste de grouper vos personnages à la première
   connexion (ou d'avoir une guilde commune), sans rien régler. Le canal dédié sert dans les autres
   cas : plusieurs comptes WoW ou Battle.net, personnages sans guilde commune, pas encore groupés.
@@ -137,7 +141,11 @@ annoncé.
 Ouverte par `/poly ui`, le raccourci clavier ou le bouton de minimap. Le bouton **Options** (en haut
 à gauche de la barre de titre) ouvre directement le panneau d'options de Polypode ; **clic droit** :
 les raccourcis clavier de WoW, ouverts sur la section **Polypode** dépliée. À sa droite, le
-champ **Canal** puis la case **Solo** (en rouge, voir « Mode solo » ci-dessous). Trois cadres
+champ **Canal**, la case **Solo** (en rouge, voir « Mode solo » ci-dessous) puis le **voyant de
+synchro** : vert **À jour** (plus rien n'est envoyé ni reçu), orange **Synchro** (messages en
+attente d'envoi ou reçus depuis moins de 3 secondes), gris **Seul** (aucun autre client Polypode
+vu). Au survol : messages à envoyer (équipes et personnages d'abord, puis modules), dernier
+message reçu, clients connectés vus ; **clic** : chercher les autres clients tout de suite. Trois cadres
 côte à côte :
 
 - **Personnages disponibles** : tous les personnages de votre équipe détectés via les canaux
@@ -164,7 +172,9 @@ côte à côte :
   `(vous)` marque le personnage courant.
   Bouton **Ajouter la cible** (en haut du cadre) : ajoute le joueur ciblé à la liste, même
   s'il n'a pas Polypode (ex. un ami) ; il peut alors rejoindre une équipe et être invité
-  avec elle. L'ajout est partagé avec vos autres Polypode connectés.
+  avec elle. L'ajout est partagé avec vos autres Polypode connectés. Le royaume de la cible est
+  bien relevé, aussi sur WoW Forever et pour un autre royaume ; si le personnage ajouté a Polypode,
+  sa propre annonce remplace l'ajout (places dans les équipes reprises, sans doublon).
   Quand une équipe est sélectionnée : **clic droit** sur un personnage l'ajoute à l'équipe,
   **clic gauche** l'en retire, après confirmation ; les membres de l'équipe sont surlignés en doré. Une infobulle au survol donne le nom du personnage, rappelle ces actions, puis liste les équipes dont il fait déjà partie (l'équipe sélectionnée en vert).
   **Maj + clic** sur un personnage le **supprime** de Polypode, après une confirmation qui liste
@@ -578,6 +588,7 @@ aliases (`/poly accounts`, `/poly remove-account`); debug messages stay in Frenc
 
 ## Version
 
+`2.15.0` : synchro : « Ajouter la cible » relève le bon royaume (WoW Forever, autre royaume) et un ajout à la main est fusionné avec la vraie entrée du personnage dès qu'il s'annonce (plus de doublon) ; sans groupe, canal dédié ni guilde commune, annonce chuchotée aux personnages de vos comptes (connexion, ouverture de la fenêtre) ; une équipe créée ou modifiée part aussitôt aux membres groupés ; voyant de synchro dans la barre de titre (À jour / Synchro / Seul).
 `2.14.0` : options : boutons des modules réglables un par un, séparément pour la fenêtre Polypode et pour la barre d'équipe : affichage, ordre (flèches ▲ ▼), côté du titre pour la fenêtre (à gauche ou à droite), boutons « Tous » / « Aucun ».
 
 `2.13.0` : synchro entre fenêtres environ 8 fois plus rapide quand il y a beaucoup à échanger (première connexion de deux comptes) : envoi réparti sur 8 canaux de messages au lieu d'un, et annonces, équipes et actions du leader envoyées avant les données des compagnons. Toutes les fenêtres doivent avoir cette version.

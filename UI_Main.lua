@@ -821,6 +821,123 @@ function P.MoveButtonInOrder(order, key, delta)
 	end
 end
 
+-- VOYANT DE SYNCHRO (barre de titre, après « Solo », avant les boutons de gauche des modules) :
+-- vert « À jour », orange « Synchro » (messages en file ou reçus depuis moins de
+-- SYNC_QUIET secondes), gris « Seul » (aucun autre client vu). Le client qui reçoit ne sait pas
+-- combien de messages restent à venir : « À jour » veut dire « rien ne bouge ». Rafraîchi par
+-- un ticker tant que la fenêtre est ouverte ; clic : P.FindPeers.
+local SYNC_QUIET = 3 -- secondes sans message reçu ni envoyé
+local SYNC_TICK = 0.5
+local SYNC_ICONS = {
+	busy = "Interface\\COMMON\\Indicator-Yellow",
+	ok = "Interface\\COMMON\\Indicator-Green",
+	alone = "Interface\\COMMON\\Indicator-Gray",
+}
+
+local function SyncState(status)
+	local now = GetTime()
+	if status.core + status.bulk > 0 or (status.lastReceived > 0 and now - status.lastReceived < SYNC_QUIET)
+		or (status.lastSent > 0 and now - status.lastSent < SYNC_QUIET) then
+		return "busy"
+	end
+	return #status.peers > 0 and "ok" or "alone"
+end
+
+local SYNC_LABELS = { busy = L["Synchro"], ok = L["À jour"], alone = L["Seul"] }
+
+local function Ago(seconds)
+	seconds = math.floor(seconds)
+	if seconds < 60 then
+		return L["il y a %d s"]:format(seconds)
+	end
+	return L["il y a %d min"]:format(math.floor(seconds / 60))
+end
+
+local function RefreshSyncStatus()
+	local indicator = ui.syncStatus
+	if not indicator or not P.GetSyncStatus then
+		return
+	end
+	local state = SyncState(P.GetSyncStatus())
+	indicator.icon:SetTexture(SYNC_ICONS[state])
+	indicator.text:SetText(SYNC_LABELS[state])
+	indicator:SetWidth(16 + indicator.text:GetStringWidth())
+	if GameTooltip:IsOwned(indicator) and indicator:GetScript("OnEnter") then
+		indicator:GetScript("OnEnter")(indicator)
+	end
+end
+
+local function SyncTooltip(self)
+	local status = P.GetSyncStatus()
+	local state = SyncState(status)
+	local now = GetTime()
+	GameTooltip:SetOwner(self, "ANCHOR_BOTTOM")
+	GameTooltip:AddLine(L["Synchronisation"])
+	if state == "busy" then
+		GameTooltip:AddLine(L["Échanges en cours avec les autres clients Polypode."], 1, 0.82, 0, true)
+	elseif state == "ok" then
+		GameTooltip:AddLine(L["À jour : plus rien n'est envoyé ni reçu."], 0.3, 1, 0.3, true)
+	else
+		GameTooltip:AddLine(L["Aucun autre client Polypode trouvé pour l'instant."], 0.7, 0.7, 0.7, true)
+	end
+	GameTooltip:AddDoubleLine(L["À envoyer (équipes, personnages)"], tostring(status.core), 0.8, 0.8, 0.8, 1, 1, 1)
+	GameTooltip:AddDoubleLine(L["À envoyer (modules)"], tostring(status.bulk), 0.8, 0.8, 0.8, 1, 1, 1)
+	GameTooltip:AddDoubleLine(L["Dernier message reçu"],
+		status.lastReceived > 0 and Ago(now - status.lastReceived) or L["aucun"], 0.8, 0.8, 0.8, 1, 1, 1)
+	GameTooltip:AddLine(L["Clients connectés vus : %d"]:format(#status.peers), 0.8, 0.8, 0.8)
+	for i, name in ipairs(status.peers) do
+		if i > 8 then
+			GameTooltip:AddLine(L["et %d autre(s)"]:format(#status.peers - 8), 1, 1, 1)
+			break
+		end
+		GameTooltip:AddLine("  " .. name, 1, 1, 1)
+	end
+	if state == "alone" then
+		GameTooltip:AddLine(L["Sans canal dédié, groupe ni guilde commune, Polypode chuchote aux personnages "
+			.. "connus de vos comptes à la connexion et à l'ouverture de cette fenêtre (une fois par minute). "
+			.. "Un canal dédié commun les trouve toujours."], 0.7, 0.7, 0.7, true)
+	end
+	GameTooltip:AddLine(L["Clic : chercher les autres clients maintenant."], 1, 1, 1, true)
+	P.ShowTooltip()
+end
+
+local function BuildSyncStatus(f, anchor)
+	local indicator = CreateFrame("Button", nil, f)
+	indicator:SetSize(60, 20)
+	indicator:SetPoint("LEFT", anchor, "RIGHT", 10, 0)
+	indicator.icon = indicator:CreateTexture(nil, "ARTWORK")
+	indicator.icon:SetSize(12, 12)
+	indicator.icon:SetPoint("LEFT")
+	indicator.text = indicator:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+	indicator.text:SetPoint("LEFT", indicator.icon, "RIGHT", 3, 0)
+	indicator:SetScript("OnEnter", SyncTooltip)
+	indicator:SetScript("OnLeave", GameTooltip_Hide)
+	indicator:SetScript("OnClick", function()
+		if P.FindPeers then
+			P.FindPeers()
+		end
+		RefreshSyncStatus()
+	end)
+	ui.syncStatus = indicator
+	-- Ticker tant que la fenêtre est ouverte ; découverte à l'ouverture (Sync.lua, limitée).
+	f:HookScript("OnShow", function()
+		if P.DiscoverPeers then
+			P.DiscoverPeers()
+		end
+		RefreshSyncStatus()
+		if not indicator.ticker then
+			indicator.ticker = C_Timer.NewTicker(SYNC_TICK, RefreshSyncStatus)
+		end
+	end)
+	f:HookScript("OnHide", function()
+		if indicator.ticker then
+			indicator.ticker:Cancel()
+			indicator.ticker = nil
+		end
+	end)
+	RefreshSyncStatus()
+end
+
 -- Côté du bouton dans la barre de titre : à gauche du titre (après « Solo ») ou à droite
 -- (vers la croix). Choix des options (P.charDb.windowButtonSides[clé] = "left" / "right"),
 -- sinon celui du compagnon (spec.left).
@@ -841,7 +958,8 @@ end
 -- droite après le libellé « Solo »), sans trou pour les masqués (mode solo, ou décochés dans
 -- les options : P.IsWindowButtonShown).
 local function LayoutTitleButtons()
-	local previousLeft = ui.soloCheck and (ui.soloCheck.Text or ui.soloCheck.text or ui.soloCheck)
+	local previousLeft = ui.syncStatus
+		or ui.soloCheck and (ui.soloCheck.Text or ui.soloCheck.text or ui.soloCheck)
 	local leftGap = 10 -- après le libellé « Solo », puis 4 entre deux boutons
 	local buttonBySpec = {}
 	for index, button in ipairs(titleButtons) do
@@ -1500,6 +1618,7 @@ function P.BuildUI()
 		soloLabel:ClearAllPoints()
 		soloLabel:SetPoint("LEFT", soloCheck, "RIGHT", 5, 0)
 	end
+	BuildSyncStatus(f, soloLabel or soloCheck)
 
 	-- Boutons des addons compagnons demandés avant la construction de la fenêtre.
 	for _, spec in ipairs(titleButtonSpecs) do

@@ -448,6 +448,7 @@ function P.AddCharacter(name, realm, class, level, token, surname)
 		entry.surname = surname
 	end
 	entry.lastSeen = time()
+	P.MergeManualDuplicates(key)
 	return key, entry
 end
 
@@ -463,14 +464,58 @@ function P.GetTokenCharacters(token)
 	return keys
 end
 
+-- Royaume d'une unité joueur, écrit comme GetRealmName (avec espaces) quand il est connu. Lu par
+-- GetPlayerInfoByGUID (vide pour notre royaume), sinon par UnitName hors WoW Forever (qui y
+-- renvoie le nom de famille) ; un royaume reçu sans espaces est rapproché du nôtre ou de ceux
+-- déjà vus dans le roster (les clés viennent des annonces, qui portent GetRealmName).
+local function UnitRealm(unit)
+	local realm
+	local guid = UnitGUID(unit)
+	if guid and GetPlayerInfoByGUID then
+		local ok, guidRealm = pcall(function()
+			return select(7, GetPlayerInfoByGUID(guid))
+		end)
+		if ok and type(guidRealm) == "string" and guidRealm ~= ""
+			and not (issecretvalue and issecretvalue(guidRealm)) then
+			realm = guidRealm
+		end
+	end
+	if not realm and not P.HasSurnames() then
+		local _, unitRealm = UnitName(unit)
+		if unitRealm and unitRealm ~= "" then
+			realm = unitRealm
+		end
+	end
+	local own = GetRealmName()
+	if not realm then
+		return own
+	end
+	local compact = realm:gsub("[%s%-]", "")
+	if (own:gsub("[%s%-]", "")) == compact then
+		return own
+	end
+	for _, entry in pairs(P.db.roster) do
+		if entry.realm and (entry.realm:gsub("[%s%-]", "")) == compact then
+			return entry.realm
+		end
+	end
+	return realm
+end
+
 -- Ajoute le joueur ciblé au roster (ex. personnage d'un ami, sans Polypode) et le partage
 -- avec les autres Polypode. Renvoie true et la clé, ou false et un message d'erreur.
+-- Personnage déjà connu (P.KeyForUnit : prénom et nom de famille sur WoW Forever, royaume
+-- ailleurs) : refusé s'il est actif ; un personnage retiré sous la même clé est repris.
 function P.AddTargetCharacter()
 	if not UnitExists("target") or not UnitIsPlayer("target") then
 		return false, L["Ciblez d'abord un joueur."]
 	end
-	local name, realm, surname = P.UnitNameParts("target")
-	realm = realm or GetRealmName()
+	local name, _, surname = P.UnitNameParts("target")
+	local knownKey = P.KeyForUnit("target")
+	if knownKey and P.GetCharacter(knownKey) then
+		return false, L["%s est déjà dans la liste."]:format(knownKey)
+	end
+	local realm = UnitRealm("target")
 	local key = P.GetCharKey(name, realm)
 	if P.GetCharacter(key) then
 		return false, L["%s est déjà dans la liste."]:format(key)
@@ -620,6 +665,45 @@ local function TeamChanged(teamName)
 	team.updated = NextVersion(team.updated)
 	if P.SyncTeam then
 		P.SyncTeam(teamName)
+	end
+end
+
+-- DOUBLONS : un personnage ajouté à la main (« Ajouter la cible », sans token) sous un mauvais
+-- royaume — avant 2.15.0 sur WoW Forever, celui du personnage qui l'ajoutait, UnitName y
+-- renvoyant le nom de famille à la place du royaume — est remplacé par sa vraie entrée dès
+-- qu'il s'annonce (entrée avec token) : ses places dans les équipes (et le rôle de leader) sont
+-- reprises, puis le doublon est retiré (pierre tombale synchronisée). Même personnage : même
+-- prénom et même nom de famille (WoW Forever), sinon même prénom et même royaume sans espaces.
+local function SamePerson(a, b)
+	if a.name ~= b.name then
+		return false
+	end
+	if P.HasSurnames() and a.surname and b.surname then
+		return a.surname == b.surname
+	end
+	return ((a.realm or ""):gsub("%s", "")) == ((b.realm or ""):gsub("%s", ""))
+end
+
+function P.MergeManualDuplicates(key)
+	local entry = P.GetCharacter(key)
+	if not entry or not entry.token then
+		return
+	end
+	for otherKey, other in pairs(P.db.roster) do
+		if otherKey ~= key and not other.removed and not other.token and SamePerson(entry, other) then
+			for teamName, team in pairs(P.GetTeams()) do
+				if team.members and team.members[otherKey] then
+					team.members[otherKey] = nil
+					team.members[key] = true
+					if team.leader == otherKey then
+						team.leader = key
+					end
+					TeamChanged(teamName)
+				end
+			end
+			P.RemoveCharacter(otherKey)
+			P.Debug("Doublon " .. otherKey .. " remplacé par " .. key)
+		end
 	end
 end
 

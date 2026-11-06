@@ -230,7 +230,23 @@ Messages existants :
   famille vide sur Retail, ajouté en dernier pour rester lisible par les versions précédentes). `HELLO` part à
   `PLAYER_LOGIN`, à l'adhésion au canal dédié et au groupe/raid quand il s'agrandit (`P.OnGroupRosterHello`,
   sur `GROUP_ROSTER_UPDATE`, différé 2 s) : sans canal dédié ni guilde, un personnage groupé après sa
-  connexion n'aurait jamais reçu d'annonce, donc ni roster ni équipes.
+  connexion n'aurait jamais reçu d'annonce, donc ni roster ni équipes. **Découverte par chuchotement**
+  (2.15.0, `P.DiscoverPeers(force)`) : sans canal d'annonce (`GetBroadcastChannel` nil : ni canal dédié,
+  ni groupe, ni guilde), `HELLO` est chuchoté (`P.SayHello(kind, "WHISPER", cible)`) aux personnages du
+  roster à token autorisé pas encore dans `onlineChars` (les `DISCOVERY_MAX` = 12 plus récents par
+  `lastSeen`), 2 s après l'adhésion au canal à la connexion (`P.JoinSyncChannelLater`), à l'ouverture de
+  la fenêtre (une fois par `DISCOVERY_INTERVAL` = 60 s) et au clic sur le voyant (`P.FindPeers` : HELLO
+  habituel s'il y a un canal d'annonce). Un HELLO chuchoté reçoit un HI chuchoté à l'expéditeur.
+  **Voyant de synchro** (UI_Main.lua, `ui.syncStatus` après « Solo », premier ancrage des boutons de
+  gauche) : `P.GetSyncStatus()` = { `core`, `bulk` (tailles des files), `lastSent`, `lastReceived`
+  (`GetTime()`, messages de nos comptes seulement), `peers` (`onlineChars` triés) } ; état `busy` (file
+  non vide ou message de moins de `SYNC_QUIET` = 3 s), `ok`, `alone` (aucun pair) ; ticker 0,5 s tant que
+  la fenêtre est ouverte. **Doublons** (Core.lua, `P.MergeManualDuplicates(clé)`, appelé par
+  `P.AddCharacter`) : une entrée à token remplace une entrée manuelle sans token du même personnage
+  (prénom + nom de famille sur Forever, sinon prénom + royaume sans espaces) : places d'équipe et
+  leader repris (`TeamChanged`), doublon retiré (`P.RemoveCharacter`). `P.AddTargetCharacter` : refus si
+  `P.KeyForUnit("target")` est actif, royaume par `UnitRealm` (`GetPlayerInfoByGUID`, sinon `UnitName`
+  hors Forever, rapproché sans espaces de `GetRealmName` ou des royaumes du roster).
 - `TEAM` : `TEAM:token:flag:version:leader:membre1,membre2,...:nomÉquipe`, envoyé par
   `P.SyncTeam(teamName, target, select)` en **WHISPER**. `flag` = `N` (premier fragment), `S`
   (premier fragment + sélection chez le destinataire), `+` (suite) ou `D` (équipe supprimée : un seul
@@ -239,7 +255,8 @@ Messages existants :
   nom d'équipe en dernier (peut contenir `:`). Réception : `P.ApplyTeamSync` n'applique un premier
   fragment que si sa version est **plus récente** que la locale, et un `+` que si la version locale
   est celle du premier fragment. Destinataires : `target`, sinon les clients connectés vus via
-  HELLO/HI pendant la session (`onlineChars`), plus les membres si `select`.
+  HELLO/HI pendant la session (`onlineChars`), plus tous les membres si `select`, sinon les membres
+  déjà groupés (`P.FindGroupUnit` : invités pas encore annoncés).
 - `TEAMINFO` : `TEAMINFO:token:date:nomÉquipe` (nom en dernier), date de création d'une équipe, envoyée par
   `P.SyncTeam` après les fragments `TEAM` (message à part : un champ de plus dans `TEAM` serait mal lu par
   les versions précédentes) ; reçue par `P.ApplyTeamCreated`.
