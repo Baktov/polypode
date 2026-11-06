@@ -1213,10 +1213,10 @@ end
 -- Nom à passer aux API qui ciblent un joueur (invitation, chuchotement addon) : "Nom" sur
 -- notre royaume, sinon "Nom-Royaume" avec le royaume sous sa forme courte (sans espaces ni
 -- tirets, ex. "ArgentDawn"). entry : entrée du roster.
--- WoW Forever (noms uniques par région) : ce qui suit le tiret est le nom de famille, pas le
--- royaume (chuchotement « Prénom-Nom », expéditeur des messages addon, /follow) : "Prénom-Nom"
--- si le nom de famille est connu (celui de l'entrée, sinon celui du roster pour une entrée
--- reconstruite depuis une clé).
+-- WoW Forever (noms uniques par région, pas de royaume dans les noms) : « Prénom Nom », la forme
+-- que le jeu donne à l'expéditeur des messages addon (bêta 1.60.1 ; « Prénom-Nom » avant) et
+-- qu'attendent les invitations, si le nom de famille est connu (celui de l'entrée, sinon celui
+-- du roster pour une entrée reconstruite depuis une clé).
 function P.GetTargetName(entry)
 	if P.HasSurnames() then
 		local surname = entry.surname
@@ -1225,13 +1225,28 @@ function P.GetTargetName(entry)
 			surname = known and known.surname
 		end
 		if surname and surname ~= "" then
-			return entry.name .. "-" .. surname
+			return P.JoinSurname(entry.name, surname)
 		end
 	end
 	if entry.realm == GetRealmName() then
 		return entry.name
 	end
 	return entry.name .. "-" .. (entry.realm:gsub("[%s%-]", ""))
+end
+
+-- Nom complet d'un joueur pour comparer deux noms (expéditeur, destinataire, clients connectés).
+-- Retail : "Nom-Royaume" (royaume court ajouté s'il manque). WoW Forever : « Prénom Nom », sans
+-- royaume ; l'ancienne forme « Prénom-Nom » y est ramenée. Avant 2.15.3, le royaume était ajouté
+-- à « Prénom Nom » (« Naomi Nagatà-CAMWOWEU4Realm7PvE ») : chuchotements perdus, client jamais vu.
+function P.FullName(name)
+	if P.HasSurnames() then
+		local first, surname = name:match("^([^%s%-]+)[%s%-](.+)$")
+		return first and P.JoinSurname(first, surname) or name
+	end
+	if not name:find("-", 1, true) then
+		return name .. "-" .. (GetNormalizedRealmName() or "")
+	end
+	return name
 end
 
 -- Nom à passer à C_PartyInfo.InviteUnit et aux macros /follow, /assist : sur WoW Forever (noms

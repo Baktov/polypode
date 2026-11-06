@@ -159,10 +159,7 @@ local WHISPER_ERROR_WINDOW = 10 -- secondes pendant lesquelles l'erreur « hors 
 
 -- Nom complet "Nom-Royaume" (royaume sous forme courte), forme unique pour comparer et cibler.
 local function FullName(name)
-	if not name:find("-", 1, true) then
-		return name .. "-" .. (GetNormalizedRealmName() or "")
-	end
-	return name
+	return P.FullName(name) -- Core.lua (forme « Prénom Nom » sur WoW Forever)
 end
 
 -- Masque « Aucun joueur nommé X n'est connecté » provoqué par nos chuchotements addon à un

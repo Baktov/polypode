@@ -9,9 +9,11 @@ reste testée avant usage (`if C_X and C_X.Fn then`) pour se désactiver sur For
 `WOW_PROJECT_ID` (Forever est classé mainline). Pas de `ReloadUI()` depuis l'addon (bloqué sur Forever).
 Sur Forever, `UnitName(unit)` renvoie **prénom, nom de famille** (Retail : nom, royaume) : ne jamais lire
 son second résultat directement, passer par `P.UnitNameParts(unit)` (prénom, royaume, nom de famille).
-De même, dans un nom de joueur (chuchotement, expéditeur d'un message addon, `/follow`), ce qui suit le tiret
-est le **nom de famille** : `P.GetTargetName` renvoie « Prénom-Nom » sur Forever (nom de famille de l'entrée ou
-du roster), et `P.GetInviteName` « Prénom Nom » pour `C_PartyInfo.InviteUnit` et les macros `/follow` / `/assist` (UI_Keybinds.lua :
+De même, un nom de joueur (chuchotement, expéditeur d'un message addon, `/follow`) n'y porte pas de royaume :
+le jeu donne l'expéditeur en « Prénom Nom » (bêta 1.60.1 ; « Prénom-Nom » avant). `P.GetTargetName` renvoie
+« Prénom Nom » sur Forever (nom de famille de l'entrée ou du roster) ; `P.FullName(nom)` (Core.lua, utilisé par
+Sync.lua et AutoGroup.lua) compare les noms : « Nom-Royaume » sur Retail, « Prénom Nom » sur Forever (l'ancien
+« Prénom-Nom » y est ramené, jamais de royaume ajouté) ; `P.GetInviteName` « Prénom Nom » pour `C_PartyInfo.InviteUnit` et les macros `/follow` / `/assist` (UI_Keybinds.lua :
 « Prénom-Nom » y donne « Unité inconnue »).
 Unité du groupe ↔ personnage du roster : toujours par `P.KeyForUnit(unit)` / `P.FindGroupUnit(key)` / `P.IsEntryInGroup(entry)`
 (Core.lua : prénom + royaume, ou prénom + nom de famille sur Forever), jamais par `UnitInParty(nom)` ni en recollant

@@ -25,10 +25,7 @@ end
 
 -- Nom complet "Nom-Royaume" (royaume sous forme courte), pour comparer deux noms.
 local function FullName(name)
-	if not name:find("-", 1, true) then
-		return name .. "-" .. (GetNormalizedRealmName() or "")
-	end
-	return name
+	return P.FullName(name) -- Core.lua (forme « Prénom Nom » sur WoW Forever)
 end
 
 -- Nom complet d'une clé de roster "Nom-Royaume".
