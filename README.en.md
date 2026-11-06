@@ -135,7 +135,11 @@ itself.
 Opened with `/poly ui`, the key binding or the minimap button. The **Options** button (top left of
 the title bar) opens the Polypode options panel directly; **right-click**: the WoW key bindings,
 opened on the expanded **Polypode** section. To its right, the **Channel** field then the **Solo**
-box (in red, see "Solo mode" below). Three frames side by side:
+box (in red, see "Solo mode" below), then the **sync indicator**: green **Up to date** (nothing is
+being sent or received), orange **Syncing** (messages waiting to be sent or received less than 3
+seconds ago), grey **Alone** (no other Polypode client seen). On hover: messages to send (teams and
+characters first, then modules), last message received, connected clients seen; **click**: look for
+the other clients right away. Three frames side by side:
 
 - **Available characters**: all the characters of your team detected through the channels (group,
   raid, guild). **Logged-in** characters come first, then the logged-out ones, **slightly greyed**;
