@@ -1352,6 +1352,18 @@ function P.InviteTeam(teamName)
 
 	local invitees = P.GetTeamInvitees(teamName)
 	if #invitees == 0 then
+		-- Personne à inviter : dire si c'est parce que tous les autres membres sont déjà groupés.
+		local grouped = {}
+		for key in pairs(P.GetTeamMembers(teamName) or {}) do
+			local entry = P.GetCharacter(key)
+			if entry and entry.name and key ~= P.GetCharKey() and P.IsEntryInGroup(entry) then
+				grouped[#grouped + 1] = P.GetInviteName(entry)
+			end
+		end
+		if #grouped > 0 then
+			table.sort(grouped)
+			return false, L["Toute l'équipe est déjà dans le groupe (%s)."]:format(table.concat(grouped, ", "))
+		end
 		return false, L["Aucun membre de l'équipe à inviter."]
 	end
 

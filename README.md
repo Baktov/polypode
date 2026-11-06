@@ -593,6 +593,7 @@ aliases (`/poly accounts`, `/poly remove-account`); debug messages stay in Frenc
 
 ## Version
 
+`2.15.2` : « Inviter l'équipe » quand tous les autres membres sont déjà groupés : le message le dit et les nomme (au lieu de « Aucun membre de l'équipe à inviter »).
 `2.15.1` : interface manette de WoW Forever (bêta) : plus de « Polypode a été bloqué à cause d'une action qui n'est utilisable que par l'IU de Blizzard » ; dans ce mode, Polypode ne ferme plus lui-même les fenêtres du jeu (dialogue de PNJ fermé par le leader, invitation de groupe acceptée, confirmation de cinématique) et laisse les films au joueur ; une action bloquée par le jeu est désormais nommée dans le chat.
 `2.15.0` : synchro : « Ajouter la cible » relève le bon royaume (WoW Forever, autre royaume) et un ajout à la main est fusionné avec la vraie entrée du personnage dès qu'il s'annonce (plus de doublon) ; sans groupe, canal dédié ni guilde commune, annonce chuchotée aux personnages de vos comptes (connexion, ouverture de la fenêtre) ; une équipe créée ou modifiée part aussitôt aux membres groupés ; voyant de synchro dans la barre de titre (À jour / Synchro / Seul) ; bouton « ? » à gauche de « En Jeu » (hors mode solo) : règles de la liste des personnages et des sauvegardes à plusieurs comptes.
 `2.14.0` : options : boutons des modules réglables un par un, séparément pour la fenêtre Polypode et pour la barre d'équipe : affichage, ordre (flèches ▲ ▼), côté du titre pour la fenêtre (à gauche ou à droite), boutons « Tous » / « Aucun ».

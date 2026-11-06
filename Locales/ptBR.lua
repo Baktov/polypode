@@ -34,6 +34,7 @@ P.AddTranslations(P.L, "ptBR", {
 	["L'équipe ne compte aucun autre membre que vous."] = "A equipe não tem nenhum outro membro além de você.",
 	["Seul le chef du groupe peut inviter."] = "Somente o líder do grupo pode convidar.",
 	["Aucun membre de l'équipe à inviter."] = "Nenhum membro da equipe para convidar.",
+	["Toute l'équipe est déjà dans le groupe (%s)."] = "A equipe inteira já está no grupo (%s).",
 	["%d invitation(s) envoyée(s)."] = "%d convite(s) enviado(s).",
 	["Groupe complet : convertissez-le en raid puis réinvitez les %d restant(s)."] = "Grupo cheio: converta-o em raide e convide de novo os %d restantes.",
 	-- Commands.lua

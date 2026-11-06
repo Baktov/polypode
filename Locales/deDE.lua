@@ -34,6 +34,7 @@ P.AddTranslations(P.L, "deDE", {
 	["L'équipe ne compte aucun autre membre que vous."] = "Das Team hat außer Ihnen kein Mitglied.",
 	["Seul le chef du groupe peut inviter."] = "Nur der Gruppenanführer kann einladen.",
 	["Aucun membre de l'équipe à inviter."] = "Kein Teammitglied einzuladen.",
+	["Toute l'équipe est déjà dans le groupe (%s)."] = "Das ganze Team ist bereits in der Gruppe (%s).",
 	["%d invitation(s) envoyée(s)."] = "%d Einladung(en) gesendet.",
 	["Groupe complet : convertissez-le en raid puis réinvitez les %d restant(s)."] = "Gruppe voll: in einen Schlachtzug umwandeln und dann die %d übrigen erneut einladen.",
 	-- Commands.lua
