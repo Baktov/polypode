@@ -166,15 +166,25 @@ function POLYPODE_TOGGLEUI()
 	P.ToggleUI()
 end
 
--- Se nommer leader de l'équipe sélectionnée (en y entrant si besoin).
+-- Se nommer leader de l'équipe sélectionnée. Sans effet en mode solo, et refusé si le personnage
+-- n'est pas déjà membre de l'équipe (2.15.5 : un appui involontaire ajoutait le personnage à
+-- l'équipe et la lui donnait ; on entre dans une équipe par la fenêtre principale).
 function POLYPODE_SETLEADER()
+	if P.IsSoloMode() then
+		ShowError(L["Polypode : mode solo, pas de leader à nommer."])
+		return
+	end
 	local team = P.GetSelectedTeam()
 	if not team then
 		ShowError(L["Polypode : aucune équipe sélectionnée."])
 		return
 	end
 	local key = P.GetCharKey()
-	P.AddTeamMember(team, key)
+	local members = P.GetTeamMembers(team)
+	if not (members and members[key]) then
+		ShowError(L["Polypode : ce personnage n'est pas membre de l'équipe « %s »."]:format(team))
+		return
+	end
 	P.SetTeamLeader(team, key)
 	P.RefreshUI()
 	ShowInfo(L["Vous êtes le leader de l'équipe « %s »."]:format(team))

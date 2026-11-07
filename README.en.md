@@ -423,7 +423,7 @@ Set in the WoW key bindings menu, **Polypode** category (direct access: **right-
 | Binding | Action |
 |---|---|
 | Open/Close the window | Toggle the main window |
-| Become team leader | The current character becomes leader of the selected team (joining it if it is not a member); synchronized with your other Polypodes |
+| Become team leader | The current character becomes leader of the selected team, if already a member (otherwise: error message; no effect in solo mode); synchronized with your other Polypodes |
 | Follow the leader | Follows (`/follow`) the leader of the selected team |
 | Assist the leader | Assists (`/assist`) the leader of the selected team: takes their target, then attacks (`/startattack`) if the option "Attack after assisting" is checked |
 | Barbarian: follow a random group player | Follows (`/follow`) another logged-in player of the group picked at random (other than the one already followed if there is a choice); a new player is picked after each press |

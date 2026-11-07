@@ -63,6 +63,8 @@ P.AddTranslations(P.L, "ptBR", {
 	["Usage : /poly retirer-compte <n°> (numéro donné par /poly comptes)"] = "Uso: /poly remove-account <nº> (número dado por /poly accounts)",
 	["Polypode : mode debug activé."] = "Polypode: modo de depuração ativado.",
 	["Polypode : mode debug désactivé."] = "Polypode: modo de depuração desativado.",
+	["Polypode : mode solo, pas de leader à nommer."] = "Polypode: modo solo, nenhum líder a nomear.",
+	["Polypode : ce personnage n'est pas membre de l'équipe « %s »."] = "Polypode: este personagem não é membro da equipe \"%s\".",
 	["Polypode : aucune équipe sélectionnée."] = "Polypode: nenhuma equipe selecionada.",
 	["Vous êtes le leader de l'équipe « %s »."] = "Você é o líder da equipe \"%s\".",
 	["Polypode : raccourci en cours d'activation, appuyez de nouveau (hors combat)."] = "Polypode: atalho em ativação, pressione de novo (fora de combate).",

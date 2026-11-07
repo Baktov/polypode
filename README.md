@@ -445,7 +445,7 @@ sur le bouton **Options** de la fenêtre principale) :
 | Raccourci | Action |
 |---|---|
 | Ouvrir/Fermer l'interface | Basculer la fenêtre principale |
-| Se nommer leader de l'équipe | Le personnage courant devient leader de l'équipe sélectionnée (il y entre s'il n'en est pas membre) ; synchronisé avec vos autres Polypode |
+| Se nommer leader de l'équipe | Le personnage courant devient leader de l'équipe sélectionnée, s'il en est déjà membre (sinon : message d'erreur ; sans effet en mode solo) ; synchronisé avec vos autres Polypode |
 | Suivre le leader | Suit (`/follow`) le leader de l'équipe sélectionnée |
 | Assister le leader | Assiste (`/assist`) le leader de l'équipe sélectionnée : prend sa cible, puis attaque (`/startattack`) si l'option « Attaquer après l'assistance » est cochée |
 | Barbare : suivre un joueur du groupe au hasard | Suit (`/follow`) un autre joueur connecté du groupe tiré au hasard (autre que celui déjà suivi s'il y a le choix) ; un nouveau joueur est tiré après chaque appui |
@@ -593,6 +593,7 @@ aliases (`/poly accounts`, `/poly remove-account`); debug messages stay in Frenc
 
 ## Version
 
+`2.15.5` : raccourci « Se nommer leader de l'équipe » : sans effet en mode solo, et refusé si le personnage n'est pas déjà membre de l'équipe sélectionnée (un appui involontaire l'y ajoutait et lui donnait l'équipe).
 `2.15.4` : plus d'avertissements « Bindings.xml : Unrecognized XML: Binding » (fichier des raccourcis retiré de la liste du `.toc` : le jeu le charge tout seul ; raccourcis inchangés).
 `2.15.3` : WoW Forever : la synchro entre vos clients passe de nouveau. Le jeu nomme maintenant l'expéditeur « Prénom Nom » ; Polypode y ajoutait un royaume (« Naomi Nagatà-CAMWOWEU4Realm7PvE ») : chuchotements perdus, voyant « Seul » alors que l'autre client répondait, équipes et profils non reçus. Noms comparés et chuchotés en « Prénom Nom ».
 `2.15.2` : « Inviter l'équipe » quand tous les autres membres sont déjà groupés : le message le dit et les nomme (au lieu de « Aucun membre de l'équipe à inviter »).
