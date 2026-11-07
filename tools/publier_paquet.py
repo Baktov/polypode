@@ -29,6 +29,14 @@ ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 MODULES = ['Polypode', 'Polypode_Data', 'Polypode_Histoire', 'Polypode_Map', 'Polypode_Photo',
            'Polypode_Profil', 'Polypode_Suivi', 'Polypode_Teleport']
 MANIFEST = os.path.join(ROOT, 'Publication', 'Curse', 'paquet.json')
+# Seuls fichiers livrés sur CurseForge : ceux que le jeu lit (code, images, sons, polices) et la
+# documentation. Tout le reste (programmes comme tools/import_bnet.py, données de travail...) est
+# écarté et listé : il reste disponible dans les publications GitHub de chaque module.
+ALLOWED_EXT = {'.lua', '.toc', '.xml', '.blp', '.tga', '.png', '.jpg', '.ogg', '.mp3', '.ttf', '.otf',
+               '.md', '.txt'}
+# Dossiers écartés du paquet seulement (gardés dans la publication GitHub) : tools/ de Polypode,
+# programme import_bnet.py (hors jeu) et sa notice ; la page CurseForge renvoie à GitHub.
+PACK_EXCLUDE_DIRS = {'Polypode': {'tools/'}}
 
 
 def read_manifest():
@@ -78,13 +86,17 @@ def main():
     zip_name = f'Polypode-{version}.zip'
     dest = os.path.join(args.dossier, zip_name)
     folders = []
+    skipped = []
     count = 0
     with zipfile.ZipFile(dest, 'w', zipfile.ZIP_DEFLATED) as z:
         for name, (repo, tag) in modules.items():
-            kept, nested = add_module(z, repo, name, tag)
+            kept, nested = add_module(z, repo, name, tag, ALLOWED_EXT, skipped,
+                                       PACK_EXCLUDE_DIRS.get(name, ()))
             folders += [name, *nested]
             count += len(kept)
     print(f'{zip_name} : {count} fichiers, dossiers {", ".join(folders)}')
+    if skipped:
+        print(f'Écartés (hors liste des extensions livrées) : {", ".join(skipped)}')
 
     # Notes de version (champ « Changelog » du fichier sur CurseForge, éditeur Markdown).
     lines = [f'**Polypode {version}**', '', '| Module | Version |', '| --- | --- |']

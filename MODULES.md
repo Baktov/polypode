@@ -185,7 +185,9 @@ python Polypode\tools\publier_paquet.py --noter   # après l'envoi sur CurseForg
 
 Prend la **dernière version publiée sur GitHub** (étiquette) de chaque module de la liste `MODULES`
 en tête du programme, avec les mêmes exclusions que `publier_version.py` : publier d'abord les
-modules modifiés. `--noter` écrit `Publication/Curse/paquet.json` (versions envoyées), base des
+modules modifiés. En plus, seules les extensions de `ALLOWED_EXT` sont livrées (code, images, sons,
+polices, `.md`, `.txt` : les autres sont écartées et listées) et `tools/` de Polypode est écarté
+(`PACK_EXCLUDE_DIRS` : `import_bnet.py` reste dans la publication GitHub). `--noter` écrit `Publication/Curse/paquet.json` (versions envoyées), base des
 nouveautés du paquet suivant. Marche à suivre complète : `Publication/Curse/LISEZMOI.md`. Un
 nouveau module s'ajoute à `MODULES` dans ce programme.
 

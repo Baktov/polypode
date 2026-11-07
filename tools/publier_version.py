@@ -25,7 +25,7 @@ import zipfile
 
 # Fichiers de développement jamais livrés (nom de fichier, ou dossier de premier niveau avec /).
 EXCLUDE_NAMES = {'CLAUDE.md', 'MODULES.md', '.gitignore', '.gitattributes', 'publier_version.py', 'publier_paquet.py',
-                 'check_locale.py'}
+                 'check_locale.py', 'luac.out'}
 EXCLUDE_DIRS = {'Modele/', '.vscode/', '.kilo/'}
 # Dossiers propres à un module : outils de développement (Polypode garde tools/ : import_bnet.py
 # est présenté aux joueurs dans son README).
@@ -70,16 +70,22 @@ def changes(repo, since, ref='HEAD'):
     return lines
 
 
-def add_module(z, repo, name, ref='HEAD'):
+def add_module(z, repo, name, ref='HEAD', allowed_ext=None, skipped=None, extra_dirs=()):
     """Ajoute le module (fichiers suivis à ref) au ZIP ouvert z : <name>/... et addons imbriqués
-    (<sous-dossier>/<sous-dossier>.toc) au premier niveau. Rend (fichiers ajoutés, addons imbriqués)."""
+    (<sous-dossier>/<sous-dossier>.toc) au premier niveau. Rend (fichiers ajoutés, addons imbriqués).
+    allowed_ext : extensions seules admises (paquet CurseForge) ; les autres vont dans skipped.
+    extra_dirs : dossiers de premier niveau écartés en plus (paquet CurseForge)."""
     files = git(repo, 'ls-tree', '-r', '--name-only', '-z', ref).split('\0')
     files = [f for f in files if f]
     nested = {f.split('/')[0] for f in files if re.fullmatch(r'([^/]+)/\1\.toc', f)}
-    excluded_dirs = EXCLUDE_DIRS | EXTRA_EXCLUDE_DIRS.get(name, set())
+    excluded_dirs = EXCLUDE_DIRS | EXTRA_EXCLUDE_DIRS.get(name, set()) | set(extra_dirs)
     kept = []
     for f in sorted(files):
         if os.path.basename(f) in EXCLUDE_NAMES or any(f.startswith(d) for d in excluded_dirs):
+            continue
+        if allowed_ext is not None and os.path.splitext(f)[1].lower() not in allowed_ext:
+            if skipped is not None:
+                skipped.append(f'{name}/{f}')
             continue
         top = f.split('/')[0]
         target = f if top in nested else f'{name}/{f}'
