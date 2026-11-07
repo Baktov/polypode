@@ -174,6 +174,21 @@ lignes de la section « Version » du README depuis la version publiée précéd
 arbre propre, HEAD poussé, version pas encore publiée. Un nouveau fichier de développement à ne
 pas livrer s'ajoute aux exclusions en tête du programme.
 
+## Paquet CurseForge (tous les modules)
+
+Sur CurseForge, Polypode a **une seule page** : le fichier envoyé contient tous les modules.
+
+```
+python Polypode\tools\publier_paquet.py           # Polypode-<date>.zip et .notes.md (dossier temporaire)
+python Polypode\tools\publier_paquet.py --noter   # après l'envoi sur CurseForge
+```
+
+Prend la **dernière version publiée sur GitHub** (étiquette) de chaque module de la liste `MODULES`
+en tête du programme, avec les mêmes exclusions que `publier_version.py` : publier d'abord les
+modules modifiés. `--noter` écrit `Publication/Curse/paquet.json` (versions envoyées), base des
+nouveautés du paquet suivant. Marche à suivre complète : `Publication/Curse/LISEZMOI.md`. Un
+nouveau module s'ajoute à `MODULES` dans ce programme.
+
 ## Créer un nouveau module
 
 Squelette prêt à copier : `Polypode/Modele/` (voir son `LISEZMOI.txt`). Démarche, pour un module
@@ -202,8 +217,9 @@ Squelette prêt à copier : `Polypode/Modele/` (voir son `LISEZMOI.txt`). Démar
    traduits dans `Locales/` (section « Langues »).
 6. **Déclarer le module dans Polypode** (commit dans ce dépôt) : ligne du tableau « Les modules »
    ci-dessus, section « Addons compagnons » du `README.md` de Polypode (et son nombre), liste des
-   compagnons / API publique de son `CLAUDE.md` ; ajouter aussi le dossier dans le `CLAUDE.md`
-   local de `ADDONS_POLYPODE`.
+   compagnons / API publique de son `CLAUDE.md`, liste `MODULES` de `tools/publier_paquet.py`
+   (paquet CurseForge) ; ajouter aussi le dossier dans le `CLAUDE.md` local de `ADDONS_POLYPODE`
+   et le module dans la description de la page CurseForge (`Publication/Curse/01_polypode.md`).
 7. **Vérifier et publier** : `luac -p`, linter WoW (`wow_lua_lint`), test en jeu (`/reload`, et
    WoW Forever si pertinent) ; commit « Polypode X 1.0.0 : … » puis push ; le relier au jeu
    (`mklink /J "<jeu>\Interface\AddOns\Polypode_X" "C:\PROJETS\CLAUDE\ADDONS_POLYPODE\Polypode_X"`, Retail

@@ -24,7 +24,8 @@ import tempfile
 import zipfile
 
 # Fichiers de développement jamais livrés (nom de fichier, ou dossier de premier niveau avec /).
-EXCLUDE_NAMES = {'CLAUDE.md', 'MODULES.md', '.gitignore', '.gitattributes', 'publier_version.py', 'check_locale.py'}
+EXCLUDE_NAMES = {'CLAUDE.md', 'MODULES.md', '.gitignore', '.gitattributes', 'publier_version.py', 'publier_paquet.py',
+                 'check_locale.py'}
 EXCLUDE_DIRS = {'Modele/', '.vscode/', '.kilo/'}
 # Dossiers propres à un module : outils de développement (Polypode garde tools/ : import_bnet.py
 # est présenté aux joueurs dans son README).
@@ -40,8 +41,8 @@ def version_tuple(text):
     return tuple(int(x) for x in text.split('.'))
 
 
-def toc_fields(repo, name):
-    text = git(repo, 'show', f'HEAD:{name}.toc')
+def toc_fields(repo, name, ref='HEAD'):
+    text = git(repo, 'show', f'{ref}:{name}.toc')
     fields = {}
     for line in text.splitlines():
         m = re.match(r'##\s*([\w-]+)\s*:\s*(.*)', line)
@@ -55,9 +56,9 @@ def last_release(repo):
     return max(tags, key=lambda t: version_tuple(t[1:]), default=None)
 
 
-def changes(repo, since):
-    """Lignes « `x.y.z` : ... » de la section Version du README, plus récentes que since."""
-    readme = git(repo, 'show', 'HEAD:README.md')
+def changes(repo, since, ref='HEAD'):
+    """Lignes « `x.y.z` : ... » de la section Version du README (à ref), plus récentes que since."""
+    readme = git(repo, 'show', f'{ref}:README.md')
     section = readme.split('\n## Version', 1)[1] if '\n## Version' in readme else ''
     lines = []
     for line in section.splitlines():
@@ -69,22 +70,28 @@ def changes(repo, since):
     return lines
 
 
-def build_zip(repo, name, dest):
-    """ZIP depuis HEAD : <name>/... et addons imbriqués (<sous-dossier>/<sous-dossier>.toc) au premier niveau."""
-    files = git(repo, 'ls-files', '-z').split('\0')
+def add_module(z, repo, name, ref='HEAD'):
+    """Ajoute le module (fichiers suivis à ref) au ZIP ouvert z : <name>/... et addons imbriqués
+    (<sous-dossier>/<sous-dossier>.toc) au premier niveau. Rend (fichiers ajoutés, addons imbriqués)."""
+    files = git(repo, 'ls-tree', '-r', '--name-only', '-z', ref).split('\0')
     files = [f for f in files if f]
     nested = {f.split('/')[0] for f in files if re.fullmatch(r'([^/]+)/\1\.toc', f)}
     excluded_dirs = EXCLUDE_DIRS | EXTRA_EXCLUDE_DIRS.get(name, set())
     kept = []
-    with zipfile.ZipFile(dest, 'w', zipfile.ZIP_DEFLATED) as z:
-        for f in sorted(files):
-            if os.path.basename(f) in EXCLUDE_NAMES or any(f.startswith(d) for d in excluded_dirs):
-                continue
-            top = f.split('/')[0]
-            target = f if top in nested else f'{name}/{f}'
-            z.writestr(target, git(repo, 'show', f'HEAD:{f}', binary=True))
-            kept.append(target)
+    for f in sorted(files):
+        if os.path.basename(f) in EXCLUDE_NAMES or any(f.startswith(d) for d in excluded_dirs):
+            continue
+        top = f.split('/')[0]
+        target = f if top in nested else f'{name}/{f}'
+        z.writestr(target, git(repo, 'show', f'{ref}:{f}', binary=True))
+        kept.append(target)
     return kept, sorted(nested)
+
+
+def build_zip(repo, name, dest, ref='HEAD'):
+    """ZIP d'un seul module, depuis ref."""
+    with zipfile.ZipFile(dest, 'w', zipfile.ZIP_DEFLATED) as z:
+        return add_module(z, repo, name, ref)
 
 
 def main():
