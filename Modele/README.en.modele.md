@@ -61,4 +61,5 @@ file): you may take it, modify it and redistribute it, as long as you keep this 
 credit the author. Copyright (C) 2026 Baktov.
 
 ## Versions
+
 The full version history is in the [French README](README.md#version).
