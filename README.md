@@ -572,6 +572,12 @@ commandes, raccourcis clavier (interface, se nommer leader, suivre, assister, ba
 
 ---
 
+## Licence
+
+Polypode est un logiciel libre, sous licence **GNU GPL version 3** (fichier
+[`LICENSE`](LICENSE)) : vous pouvez le reprendre, le modifier et le redistribuer, à condition de
+garder cette licence et de citer l'auteur. Copyright (C) 2026 Baktov.
+
 ## Langues (Languages)
 
 Polypode s'affiche dans la langue du jeu : **français**, **anglais**, **allemand**, **espagnol**,
@@ -593,6 +599,7 @@ aliases (`/poly accounts`, `/poly remove-account`); debug messages stay in Frenc
 
 ## Version
 
+`2.15.6` : licence libre **GNU GPL version 3** (fichier `LICENSE`).
 `2.15.5` : raccourci « Se nommer leader de l'équipe » : sans effet en mode solo, et refusé si le personnage n'est pas déjà membre de l'équipe sélectionnée (un appui involontaire l'y ajoutait et lui donnait l'équipe).
 `2.15.4` : plus d'avertissements « Bindings.xml : Unrecognized XML: Binding » (fichier des raccourcis retiré de la liste du `.toc` : le jeu le charge tout seul ; raccourcis inchangés).
 `2.15.3` : WoW Forever : la synchro entre vos clients passe de nouveau. Le jeu nomme maintenant l'expéditeur « Prénom Nom » ; Polypode y ajoutait un royaume (« Naomi Nagatà-CAMWOWEU4Realm7PvE ») : chuchotements perdus, voyant « Seul » alors que l'autre client répondait, équipes et profils non reçus. Noms comparés et chuchotés en « Prénom Nom ».

@@ -11,6 +11,7 @@
 ## Notes-frFR: Modèle d'addon compagnon de Polypode : zone actuelle de chaque personnage (exemple à remplacer).
 ## Author: Baktov
 ## Version: 1.0.0
+## X-License: GPL-3.0
 ## Dependencies: Polypode
 ## SavedVariables: PolypodeModeleData
 ## SavedVariablesPerCharacter: PolypodeModeleDB

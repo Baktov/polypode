@@ -27,6 +27,8 @@ import zipfile
 EXCLUDE_NAMES = {'CLAUDE.md', 'MODULES.md', '.gitignore', '.gitattributes', 'publier_version.py', 'publier_paquet.py',
                  'check_locale.py', 'luac.out'}
 EXCLUDE_DIRS = {'Modele/', '.vscode/', '.kilo/'}
+# Fichiers de licence (sans extension), toujours livrés, même avec une liste d'extensions.
+LICENSE_NAMES = {'LICENSE'}
 # Dossiers propres à un module : outils de développement (Polypode garde tools/ : import_bnet.py
 # est présenté aux joueurs dans son README).
 EXTRA_EXCLUDE_DIRS = {'Polypode_Photo': {'tools/'}}
@@ -83,7 +85,8 @@ def add_module(z, repo, name, ref='HEAD', allowed_ext=None, skipped=None, extra_
     for f in sorted(files):
         if os.path.basename(f) in EXCLUDE_NAMES or any(f.startswith(d) for d in excluded_dirs):
             continue
-        if allowed_ext is not None and os.path.splitext(f)[1].lower() not in allowed_ext:
+        if (allowed_ext is not None and os.path.splitext(f)[1].lower() not in allowed_ext
+                and os.path.basename(f) not in LICENSE_NAMES):
             if skipped is not None:
                 skipped.append(f'{name}/{f}')
             continue

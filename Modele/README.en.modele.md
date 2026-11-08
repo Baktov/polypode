@@ -54,6 +54,11 @@ In **Options > AddOns > Polypode > Template** (setting specific to each characte
 
 ---
 
-## Versions
+## License
 
+Polypode Modele is free software, under the **GNU GPL version 3** ([`LICENSE`](LICENSE)
+file): you may take it, modify it and redistribute it, as long as you keep this license and
+credit the author. Copyright (C) 2026 Baktov.
+
+## Versions
 The full version history is in the [French README](README.md#version).

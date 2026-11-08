@@ -54,6 +54,11 @@ Dans **Options → AddOns → Polypode → Modele** (réglage propre à chaque p
 
 ---
 
-## Version
+## Licence
 
+Polypode Modele est un logiciel libre, sous licence **GNU GPL version 3** (fichier
+[`LICENSE`](LICENSE)) : vous pouvez le reprendre, le modifier et le redistribuer, à condition de
+garder cette licence et de citer l'auteur. Copyright (C) 2026 Baktov.
+
+## Version
 `1.0.0` : première version (zone actuelle de chaque personnage du roster).

@@ -200,7 +200,8 @@ Squelette prêt à copier : `Polypode/Modele/` (voir son `LISEZMOI.txt`). Démar
    personnages) ; noms : dossier `Polypode_X`, titre « Polypode X », dépôt `Baktov/polypode-x`,
    commande `/poly x`, type de message de synchro propre s'il en faut un (comme `SUIVI`, `DATA`).
 2. **Dépôt** : créer le dépôt GitHub ; dans `AddOns/Polypode_X` : `git init`, `git remote add origin`.
-3. **Fichiers** : copier `Polypode/Modele/` vers `AddOns/Polypode_X`, renommer (`Polypode_Modele.toc`
+3. **Fichiers** : copier `Polypode/Modele/` vers `AddOns/Polypode_X` (avec `LICENSE`, GPL-3.0 comme
+   tous les modules ; `## X-License: GPL-3.0` dans le `.toc`, section « Licence » des README), renommer (`Polypode_Modele.toc`
    → `Polypode_X.toc`, `Modele.lua` → `X.lua`, `CLAUDE.modele.md` → `CLAUDE.md`,
    `README.modele.md` → `README.md`, `README.en.modele.md` → `README.en.md`, supprimer
    `LISEZMOI.txt`) et remplacer partout `Modele` /
