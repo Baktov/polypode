@@ -397,6 +397,12 @@ La barre flottante s'affiche aussi sans glisser, par un clic sur la **poignée**
 de votre personnage en mode solo). Une manette utilisée **sans** l'interface manette de Blizzard
 (addon de manette, par exemple) garde les clics de la souris : Polypode ne peut pas la reconnaître.
 
+Modules adaptés de la même façon : **Map** (clic droit sur la carte : point TomTom ; clic droit
+sur son bouton : options et recentrage), **Suivi** (boutons de défilement horizontal sous la
+Grille quand elle déborde), **Data** (clic droit sur son bouton : options et rangement). Les
+autres modules n'utilisent pas de touche de modification ; **Photo** (placer les personnages en
+les glissant) reste à revoir.
+
 ---
 
 ## Addons compagnons (séparés)
@@ -636,6 +642,7 @@ aliases (`/poly accounts`, `/poly remove-account`); debug messages stay in Frenc
 
 ## Version
 
+`2.19.0` : pour les modules : infobulle d'un bouton de module qui peut suivre le mode (interface manette ou souris), et texte commun « Clic droit : menu des actions ». Map, Suivi et Data adaptés à l'interface manette.
 `2.18.0` : interface manette de Blizzard : le clic droit sur un personnage, un en-tête de compte, une équipe ou la barre flottante ouvre un menu de toutes ses actions (remplace Maj / Alt + clic et le double-clic), infobulles adaptées ; suppression d'une équipe depuis ce menu confirmée. Sans l'interface manette, rien ne change.
 `2.17.0` : barre flottante plus facile à trouver : poignée visible à droite des équipes (et de votre personnage en mode solo), à tirer hors de la fenêtre ou à cliquer pour afficher / masquer la barre sans glisser (manette) ; bulle d'aide sur la poignée tant que la barre n'a jamais servi sur ce personnage.
 `2.16.0` : premier lancement sur un personnage : halo et bulle d'aide sur la case « Solo » jusqu'au choix solo / multi ; fenêtre principale élargie à l'ouverture pour que toute sa barre de titre soit lisible (en solo comme en multi), tant que sa largeur n'a pas été choisie à la poignée.

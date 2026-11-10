@@ -45,6 +45,12 @@ publique `P.*`, listée dans la section « Dépendances vers Polypode » de leur
 - Retail (Interface 120000) et **WoW Forever** (16001) : tester l'existence de toute API récente
   (`if C_X and C_X.Fn then`), lectures fragiles sous `pcall` ; ne pas se fier à `WOW_PROJECT_ID`.
 - Tout contenu de taille variable **défile** (`P.CreateScrollList` / `P.SetListData`).
+- **Interface manette** de Blizzard (`P.IsGamepadUI()`, Polypode 2.15.1, testée avant usage) : Maj / Alt +
+  clic, double-clic et molette y sont malaisés. Toute action qui n'a que ces gestes reçoit, **dans ce mode
+  seulement**, un accès par simple clic : en général un menu au clic droit (`MenuUtil.CreateContextMenu`),
+  infobulle avec `P.GamepadMenuHint()` (« Clic droit : menu des actions ») à la place des touches. À la
+  souris, rien ne change. Infobulle d'un bouton `P.AddTitleButton` qui suit le mode : `spec.tooltip` en
+  fonction si `P.TITLE_TOOLTIP_FUNCTION` (Polypode 2.19), sinon liste fixe.
 - Toute fenêtre **redimensionnable** revient à sa taille par défaut par un **double-clic sur sa barre de
   titre** : `P.EnableTitleDoubleClick(fenêtre, remise)` (Polypode 2.12, testée avant usage), `remise` remet la
   taille par défaut et l'enregistre.

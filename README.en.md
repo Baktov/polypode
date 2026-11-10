@@ -374,6 +374,11 @@ The floating bar can also be shown without dragging, by clicking the **handle** 
 your character in solo mode). A gamepad used **without** Blizzard's gamepad interface (through a
 gamepad addon, for example) keeps the mouse clicks: Polypode cannot recognize it.
 
+Modules adapted the same way: **Map** (right-click on the map: TomTom waypoint; right-click on its
+button: options and recentering), **Tracker** (horizontal scroll buttons under the Grid when it
+overflows), **Data** (right-click on its button: options and deposit). The other modules use no
+modifier key; **Photo** (placing characters by dragging them) is still to be reviewed.
+
 ---
 
 ## Companion addons (separate)

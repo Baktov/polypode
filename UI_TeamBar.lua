@@ -491,7 +491,7 @@ local function CreateModuleButton(spec)
 		button:SetScript("OnEnter", function(self)
 			-- Infobulle du côté opposé à la barre.
 			GameTooltip:SetOwner(self, moduleTooltipAnchor)
-			for i, line in ipairs(spec.tooltip) do
+			for i, line in ipairs(P.TitleButtonTooltip(spec)) do
 				if i == 1 then
 					GameTooltip:AddLine(line)
 				else

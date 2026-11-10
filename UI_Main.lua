@@ -285,7 +285,20 @@ end)
 local function GamepadMenuHint()
 	return L["Clic droit : menu des actions"]
 end
-P.GamepadMenuHint = GamepadMenuHint -- repris par l'infobulle de la barre flottante (UI_TeamBar.lua)
+-- API publique (2.19.0) : reprise par la barre flottante (UI_TeamBar.lua) et par les compagnons.
+P.GamepadMenuHint = GamepadMenuHint
+
+-- Lignes de l'infobulle d'un bouton de compagnon (P.AddTitleButton) : spec.tooltip est une liste,
+-- ou (2.19.0, signalé par P.TITLE_TOOLTIP_FUNCTION) une fonction qui la renvoie à chaque survol,
+-- pour une infobulle qui suit l'état (ex. interface manette).
+P.TITLE_TOOLTIP_FUNCTION = true
+
+function P.TitleButtonTooltip(spec)
+	if type(spec.tooltip) == "function" then
+		return spec.tooltip() or {}
+	end
+	return spec.tooltip or {}
+end
 
 -- Nouvelle équipe au nom de key, avec lui pour leader, puis sélectionnée (clic droit sans équipe
 -- sélectionnée dans « Personnages disponibles », ou menu manette).
@@ -1213,7 +1226,7 @@ local function CreateTitleButton(spec)
 	if spec.tooltip then
 		button:SetScript("OnEnter", function(self)
 			GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-			for i, line in ipairs(spec.tooltip) do
+			for i, line in ipairs(P.TitleButtonTooltip(spec)) do
 				if i == 1 then
 					GameTooltip:AddLine(line)
 				else
