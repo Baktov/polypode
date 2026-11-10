@@ -31,6 +31,9 @@ P.defaults = {
 		width = 720, -- taille de la fenêtre principale, mémorisée au redimensionnement
 		height = 320,
 		soloWidth = 620, -- largeur en mode solo (un seul cadre, cf. UI_Main.lua), mémorisée à part
+		-- [« width » | « soloWidth »] = true : largeur choisie à la poignée ; sinon la fenêtre
+		-- s'élargit à l'ouverture pour que toute sa barre de titre soit lisible (UI_Main.lua).
+		manualWidth = {},
 	},
 	-- [nom] = { name, members = { [nom-royaume] = true }, leader = nom-royaume|nil,
 	--          updated = heure serveur de la dernière modification (synchro) }
@@ -140,10 +143,17 @@ end
 
 function P.InitDB()
 	PolypodeDB = CopyDefaults(P.defaults, PolypodeDB or {})
+	local newCharacter = PolypodeCharDB == nil -- premier lancement de Polypode sur ce personnage
 	PolypodeCharDB = CopyDefaults(P.charDefaults, PolypodeCharDB or {})
 	P.ApplyLanguage(PolypodeDB.language)
 	P.db = PolypodeDB
 	P.charDb = PolypodeCharDB
+
+	-- Choix solo / multi (bulle d'aide sur la case « Solo », UI_Main.lua) : à faire sur un
+	-- personnage qui lance Polypode pour la première fois ; ceux qui l'utilisaient déjà l'ont fait.
+	if P.charDb.soloChosen == nil then
+		P.charDb.soloChosen = not newCharacter
+	end
 
 	-- Nettoyage : l'ancien leader global (remplacé par un leader par équipe) et le rôle
 	-- par personnage associé ne sont plus utilisés.

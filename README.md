@@ -239,6 +239,10 @@ de défilement n'apparaît que si la liste déborde du cadre.
 La fenêtre se **redimensionne** par la poignée du coin bas-droit ; les trois cadres se
 partagent la largeur à parts égales et la taille est mémorisée pour le compte (720 × 320
 par défaut ; **double-clic** sur sa barre de titre : retour à la taille par défaut, largeur du mode solo comprise). Si la fenêtre est très réduite, le contenu est simplement tronqué.
+Tant que vous n'avez pas choisi sa largeur à la poignée, la fenêtre **s'élargit à l'ouverture**
+pour que toute sa barre de titre soit lisible (Options, Canal, Solo, voyant, boutons des modules,
+titre et croix), en mode solo comme hors mode solo, sans dépasser l'écran ; le double-clic sur la
+barre de titre rétablit ce réglage automatique.
 
 ---
 
@@ -268,6 +272,11 @@ connexion complète le reste.
 Pour jouer **un seul personnage** : case **Solo** (en rouge, à droite du champ Canal de la fenêtre
 principale) ou première option du panneau, **Mode solo** (en rouge). Réglage propre à chaque
 personnage.
+
+Au **premier lancement de Polypode sur un personnage**, la case **Solo** est signalée par un halo
+doré qui pulse et une bulle d'aide, à chaque ouverture de la fenêtre, jusqu'à ce que vous fassiez
+le choix : cocher la case (un seul personnage), la décocher, ou fermer la bulle par sa croix
+(plusieurs personnages).
 
 - La fenêtre ne garde que **Personnages disponibles**, sur toute sa largeur ; les cadres
   « Équipes » et « Personnages de l'équipe » sont masqués, et la fenêtre est un peu plus étroite
@@ -599,6 +608,7 @@ aliases (`/poly accounts`, `/poly remove-account`); debug messages stay in Frenc
 
 ## Version
 
+`2.16.0` : premier lancement sur un personnage : halo et bulle d'aide sur la case « Solo » jusqu'au choix solo / multi ; fenêtre principale élargie à l'ouverture pour que toute sa barre de titre soit lisible (en solo comme en multi), tant que sa largeur n'a pas été choisie à la poignée.
 `2.15.6` : licence libre **GNU GPL version 3** (fichier `LICENSE`).
 `2.15.5` : raccourci « Se nommer leader de l'équipe » : sans effet en mode solo, et refusé si le personnage n'est pas déjà membre de l'équipe sélectionnée (un appui involontaire l'y ajoutait et lui donnait l'équipe).
 `2.15.4` : plus d'avertissements « Bindings.xml : Unrecognized XML: Binding » (fichier des raccourcis retiré de la liste du `.toc` : le jeu le charge tout seul ; raccourcis inchangés).

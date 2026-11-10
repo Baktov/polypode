@@ -954,6 +954,8 @@ function P.SetWindowButtonSide(key, left)
 	P.charDb.windowButtonSides[key] = left and "left" or "right"
 end
 
+local FitTitleBar -- largeur ajustée à la barre de titre (défini plus bas, après WidthKey)
+
 -- Place les boutons affichés de droite à gauche depuis la croix (ceux de spec.left de gauche à
 -- droite après le libellé « Solo »), sans trou pour les masqués (mode solo, ou décochés dans
 -- les options : P.IsWindowButtonShown).
@@ -987,6 +989,7 @@ local function LayoutTitleButtons()
 		rightSide[index]:SetPoint("RIGHT", previous, "LEFT", -4, 0)
 		previous = rightSide[index]
 	end
+	FitTitleBar() -- boutons ajoutés, masqués ou changés de côté : la fenêtre suit si besoin
 end
 
 -- Replace les boutons des compagnons (choix changé dans les options), si la fenêtre existe.
@@ -1080,6 +1083,131 @@ local function WidthKey()
 	return P.IsSoloMode() and "soloWidth" or "width"
 end
 
+-- LARGEUR AJUSTÉE À LA BARRE DE TITRE : Options, Canal, Solo, voyant et boutons de gauche,
+-- titre centré, boutons de droite et croix doivent tenir sans se chevaucher. Tant que la largeur
+-- du mode courant n'a pas été choisie à la poignée (P.db.mainFrame.manualWidth[clé]), la fenêtre
+-- ouverte s'élargit à ce qu'il faut (jamais rétrécie, bornée à l'écran) et garde cette largeur.
+local TITLE_GAP = 12 -- écart minimal entre le titre centré et les boutons de chaque côté
+
+-- Largeur nécessaire, mesurée sur les éléments placés (nil si la fenêtre n'est pas encore placée).
+local function TitleBarWidth()
+	local f = ui.frame
+	local frameLeft, frameRight = f:GetLeft(), f:GetRight()
+	if not (frameLeft and frameRight) then
+		return nil
+	end
+	local leftEnd, rightStart = frameLeft, ui.closeButton:GetLeft() or frameRight
+	local soloLabel = ui.soloCheck.Text or ui.soloCheck.text
+	local leftRegions = { ui.optionsButton, ui.channelInput, ui.soloCheck, soloLabel, ui.syncStatus,
+		ui.syncStatus and ui.syncStatus.text }
+	for index, button in ipairs(titleButtons) do
+		if button:IsShown() then
+			if P.IsWindowButtonLeft(titleButtonSpecs[index]) then
+				leftRegions[#leftRegions + 1] = button
+			else
+				rightStart = math.min(rightStart, button:GetLeft() or rightStart)
+			end
+		end
+	end
+	for _, region in ipairs(leftRegions) do
+		if region and region:IsShown() then
+			leftEnd = math.max(leftEnd, region:GetRight() or leftEnd)
+		end
+	end
+	local side = math.max(leftEnd - frameLeft, frameRight - rightStart)
+	return 2 * (side + TITLE_GAP) + f.TitleText:GetStringWidth()
+end
+
+FitTitleBar = function()
+	local f = ui.frame
+	if not (f and f:IsShown()) then
+		return
+	end
+	local key = WidthKey()
+	if P.db.mainFrame.manualWidth[key] then
+		return
+	end
+	local needed = TitleBarWidth()
+	if not needed then
+		return
+	end
+	needed = math.min(math.ceil(needed), UIParent:GetWidth() - 20)
+	if needed <= f:GetWidth() + 0.5 then
+		return
+	end
+	f:SetWidth(needed)
+	P.db.mainFrame[key] = needed
+	-- Élargie au-delà du bord droit de l'écran : ramenée dedans.
+	local overflow = (f:GetRight() or 0) - UIParent:GetRight()
+	if overflow > 0 then
+		local left, top = f:GetLeft() - overflow, f:GetTop()
+		f:ClearAllPoints()
+		f:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", math.max(left, 0), top)
+	end
+end
+
+-- CHOIX SOLO / MULTI au premier lancement sur un personnage (P.charDb.soloChosen faux, Core.lua) :
+-- bulle d'aide de Blizzard (HelpTip, testée avant usage) pointée sur la case « Solo » et halo qui
+-- pulse autour d'elle, à chaque ouverture de la fenêtre tant que le choix n'est pas fait. Cocher ou
+-- décocher la case (ou l'option du panneau) ou fermer la bulle par sa croix fait le choix.
+local function SoloTipText()
+	return L["Un seul personnage ? Cochez « Solo » (Monopode). Plusieurs personnages en multibox : "
+		.. "laissez la case vide et fermez cette bulle. Réglage propre à ce personnage."]
+end
+
+local function MarkSoloChosen()
+	P.charDb.soloChosen = true
+	local glow = ui.soloCheck and ui.soloCheck.choiceGlow
+	if glow then
+		glow.pulse:Stop()
+		glow:Hide()
+	end
+	if ui.frame and HelpTip and HelpTip.Hide then
+		HelpTip:Hide(ui.frame, SoloTipText())
+	end
+end
+
+local function ShowSoloChoice()
+	if P.charDb.soloChosen ~= false or not (ui.frame and ui.frame:IsShown()) then
+		return
+	end
+	local glow = ui.soloCheck.choiceGlow
+	glow:Show()
+	glow.pulse:Play()
+	if not (HelpTip and HelpTip.Show and HelpTip.Point and HelpTip.ButtonStyle) then
+		return -- pas de bulle de Blizzard : le halo seul signale la case
+	end
+	local text = SoloTipText()
+	if HelpTip.IsShowing and HelpTip:IsShowing(ui.frame, text) then
+		return
+	end
+	pcall(HelpTip.Show, HelpTip, ui.frame, {
+		text = text,
+		buttonStyle = HelpTip.ButtonStyle.Close,
+		targetPoint = HelpTip.Point.BottomEdgeCenter,
+		onAcknowledgeCallback = MarkSoloChosen, -- croix de la bulle (pas sa disparition avec la fenêtre)
+	}, ui.soloCheck)
+end
+
+-- Halo de la case « Solo » (posé après le skin), affiché par ShowSoloChoice.
+local function BuildSoloGlow(soloCheck)
+	local glow = soloCheck:CreateTexture(nil, "OVERLAY")
+	glow:SetTexture("Interface\\Buttons\\UI-ActionButton-Border")
+	glow:SetBlendMode("ADD")
+	glow:SetVertexColor(1, 0.82, 0)
+	glow:SetSize(44, 44)
+	glow:SetPoint("CENTER")
+	glow:Hide()
+	local pulse = glow:CreateAnimationGroup()
+	pulse:SetLooping("BOUNCE")
+	local fade = pulse:CreateAnimation("Alpha")
+	fade:SetFromAlpha(0.2)
+	fade:SetToAlpha(1)
+	fade:SetDuration(0.7)
+	glow.pulse = pulse
+	soloCheck.choiceGlow = glow
+end
+
 -- Largeur des cadres : un tiers chacun, ou toute la largeur pour le seul cadre du mode solo.
 local function LayoutPanels()
 	local f = ui.frame
@@ -1110,6 +1238,7 @@ end
 -- Active / désactive le mode solo pour ce personnage (case de la fenêtre et panneau d'options).
 function P.SetSoloMode(enabled)
 	P.charDb.soloMode = enabled and true or false
+	MarkSoloChosen() -- choix du premier lancement fait (bulle et halo retirés)
 	if ui.frame then
 		ApplySoloLayout()
 	end
@@ -1222,14 +1351,18 @@ function P.BuildUI()
 	grip:SetScript("OnMouseUp", function()
 		f:StopMovingOrSizing()
 		P.db.mainFrame[WidthKey()], P.db.mainFrame.height = f:GetSize()
+		P.db.mainFrame.manualWidth[WidthKey()] = true -- largeur choisie : plus ajustée au titre
 	end)
 
-	-- Double-clic sur la barre de titre : taille par défaut (largeur du mode courant, solo ou non).
+	-- Double-clic sur la barre de titre : taille par défaut (largeur du mode courant, solo ou non),
+	-- élargie si besoin pour toute la barre de titre.
 	P.EnableTitleDoubleClick(f, function()
 		local key = WidthKey()
 		P.db.mainFrame[key] = P.defaults.mainFrame[key]
 		P.db.mainFrame.height = P.defaults.mainFrame.height
+		P.db.mainFrame.manualWidth[key] = nil
 		f:SetSize(P.db.mainFrame[key], P.db.mainFrame.height)
+		FitTitleBar()
 	end)
 
 	-- Trois cadres côte à côte, chacun sur un tiers de la largeur : les deux premiers
@@ -1686,6 +1819,16 @@ function P.BuildUI()
 		soloLabel:SetPoint("LEFT", soloCheck, "RIGHT", 5, 0)
 	end
 	BuildSyncStatus(f, soloLabel or soloCheck)
+	BuildSoloGlow(soloCheck)
+	-- À l'ouverture : largeur ajustée à la barre de titre, puis choix solo / multi si à faire
+	-- (encore une fois à l'image suivante, les positions étant alors toutes calculées).
+	f:HookScript("OnShow", function()
+		FitTitleBar()
+		C_Timer.After(0, function()
+			FitTitleBar()
+			ShowSoloChoice()
+		end)
+	end)
 
 	-- Boutons des addons compagnons demandés avant la construction de la fenêtre.
 	for _, spec in ipairs(titleButtonSpecs) do

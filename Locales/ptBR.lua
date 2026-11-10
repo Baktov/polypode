@@ -260,6 +260,7 @@ P.AddTranslations(P.L, "ptBR", {
 	["Solo"] = "Solo",
 	["Pour jouer un seul personnage : la fenêtre ne garde que « Personnages disponibles », sans les équipes. Glissez votre personnage hors de la liste pour en faire une barre flottante, avec les boutons des modules."] = "Para jogar com um só personagem: a janela mantém só \"Personagens disponíveis\", sem as equipes. Arraste o seu personagem para fora da lista para transformá-lo em uma barra flutuante, com os botões dos módulos.",
 	["Réglage propre à ce personnage (aussi dans les options)."] = "Configuração própria deste personagem (também nas opções).",
+	["Un seul personnage ? Cochez « Solo » (Monopode). Plusieurs personnages en multibox : laissez la case vide et fermez cette bulle. Réglage propre à ce personnage."] = "Joga com um só personagem? Marque \"Solo\" (Monopode). Vários personagens (multiboxing): deixe a caixa vazia e feche esta dica. Configuração própria deste personagem.",
 	["Personnages disponibles"] = "Personagens disponíveis",
 	["Tout replier"] = "Recolher tudo",
 	["Tout déplier"] = "Expandir tudo",

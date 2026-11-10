@@ -228,6 +228,10 @@ only shows when the list overflows the frame.
 The window is **resized** with the bottom-right corner grip; the three frames share the width
 equally and the size is remembered for the account (720 × 320 by default; **double-click** its title bar: back to the default size, solo mode width included). If the window is
 made very small, the content is simply cut off.
+As long as you have not chosen its width with the grip, the window **widens when opened** so that
+its whole title bar is readable (Options, Channel, Solo, indicator, module buttons, title and close
+button), in solo mode or not, without going past the screen; double-clicking the title bar brings
+this automatic setting back.
 
 ---
 
@@ -256,6 +260,10 @@ An imported character appears without being logged in; its first login fills in 
 
 To play **a single character**: **Solo** box (in red, right of the Channel field of the main window)
 or first option of the panel, **Solo mode** (in red). Per-character setting.
+
+The **first time Polypode runs on a character**, the **Solo** box is pointed out by a pulsing gold
+glow and a help tip, each time the window opens, until you make the choice: check the box (a
+single character), uncheck it, or close the tip with its cross (several characters).
 
 - The window only keeps **Available characters**, over its whole width; the "Teams" and "Team
   characters" frames are hidden, and the window is a bit narrower (620 pixels by default; its width
