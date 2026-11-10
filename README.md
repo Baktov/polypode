@@ -378,6 +378,27 @@ multibox a sa propre barre) et retrouvés à la connexion.
 
 ---
 
+## Interface manette
+
+Avec l'**interface manette de Blizzard** activée (WoW Forever), Maj + clic, Alt + clic et le
+double-clic sont malaisés au curseur de la manette. Dans ce mode **seulement**, le **clic droit**
+ouvre un **menu** qui regroupe toutes les actions ; le clic gauche ne change pas, et les
+infobulles indiquent « Clic droit : menu des actions » à la place des touches. À la souris, tout
+reste comme décrit ailleurs dans ce document.
+
+| Clic droit sur | Menu |
+|---|---|
+| Un personnage (Personnages disponibles) | ajouter à l'équipe sélectionnée, ou l'en retirer, ou créer une équipe à son nom ; ranger dans un compte WoW ; supprimer le personnage |
+| Un en-tête de compte | déplier / replier ; renommer le compte |
+| Une équipe | sélectionner / désélectionner ; afficher / masquer sa barre flottante ; renommer ; supprimer (avec confirmation) |
+| La barre flottante ou son icône | inviter l'équipe ; envoyer la position de la barre ; déplier / replier la liste ; figer / libérer ; réduire à l'icône / barre complète ; options ; masquer la barre |
+
+La barre flottante s'affiche aussi sans glisser, par un clic sur la **poignée** d'une équipe (ou
+de votre personnage en mode solo). Une manette utilisée **sans** l'interface manette de Blizzard
+(addon de manette, par exemple) garde les clics de la souris : Polypode ne peut pas la reconnaître.
+
+---
+
 ## Addons compagnons (séparés)
 
 Sept fonctions sont des addons séparés, qui dépendent de Polypode et se chargent ou non depuis
@@ -615,6 +636,7 @@ aliases (`/poly accounts`, `/poly remove-account`); debug messages stay in Frenc
 
 ## Version
 
+`2.18.0` : interface manette de Blizzard : le clic droit sur un personnage, un en-tête de compte, une équipe ou la barre flottante ouvre un menu de toutes ses actions (remplace Maj / Alt + clic et le double-clic), infobulles adaptées ; suppression d'une équipe depuis ce menu confirmée. Sans l'interface manette, rien ne change.
 `2.17.0` : barre flottante plus facile à trouver : poignée visible à droite des équipes (et de votre personnage en mode solo), à tirer hors de la fenêtre ou à cliquer pour afficher / masquer la barre sans glisser (manette) ; bulle d'aide sur la poignée tant que la barre n'a jamais servi sur ce personnage.
 `2.16.0` : premier lancement sur un personnage : halo et bulle d'aide sur la case « Solo » jusqu'au choix solo / multi ; fenêtre principale élargie à l'ouverture pour que toute sa barre de titre soit lisible (en solo comme en multi), tant que sa largeur n'a pas été choisie à la poignée.
 `2.15.6` : licence libre **GNU GPL version 3** (fichier `LICENSE`).

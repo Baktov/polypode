@@ -355,6 +355,27 @@ window has its own bar) and restored at login.
 
 ---
 
+## Gamepad interface
+
+With Blizzard's **gamepad interface** turned on (WoW Forever), Shift + click, Alt + click and
+double-click are awkward with the gamepad cursor. In this mode **only**, **right-click** opens a
+**menu** gathering all the actions; left-click does not change, and tooltips show "Right-click:
+actions menu" instead of the modifier keys. With a mouse, everything stays as described
+elsewhere in this document.
+
+| Right-click on | Menu |
+|---|---|
+| A character (Available characters) | add to the selected team, or remove from it, or create a team named after them; put in a WoW account; delete the character |
+| An account header | expand / collapse; rename the account |
+| A team | select / deselect; show / hide its floating bar; rename; delete (with confirmation) |
+| The floating bar or its icon | invite the team; send the bar position; expand / collapse the list; lock / unlock; shrink to the icon / full bar; options; hide the bar |
+
+The floating bar can also be shown without dragging, by clicking the **handle** of a team (or of
+your character in solo mode). A gamepad used **without** Blizzard's gamepad interface (through a
+gamepad addon, for example) keeps the mouse clicks: Polypode cannot recognize it.
+
+---
+
 ## Companion addons (separate)
 
 Seven features are separate addons, which depend on Polypode and are enabled or not in the AddOns

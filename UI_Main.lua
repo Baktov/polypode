@@ -221,7 +221,8 @@ local function ConfirmRemoveMember(teamName, key)
 		{ team = teamName, key = key })
 end
 
-local function ShowAccountMenu(owner, key)
+-- Choix du compte WoW de key, ajoutés à un menu (racine, ou sous-menu du menu manette).
+local function AddAccountEntries(menu, key)
 	local function IsCurrent(label)
 		return (P.GetCharacterAccount(key) or "") == label
 	end
@@ -229,17 +230,106 @@ local function ShowAccountMenu(owner, key)
 		P.SetCharacterAccount(key, label)
 		P.RefreshUI()
 	end
-	MenuUtil.CreateContextMenu(owner, function(_, root)
-		root:CreateTitle(L["Compte WoW de %s"]:format(P.GetDisplayName(key)))
-		root:CreateRadio(L["Aucun compte"], IsCurrent, Assign, "")
-		for _, label in ipairs(P.GetAccountLabels()) do
-			root:CreateRadio(label, IsCurrent, Assign, label)
-		end
-		root:CreateButton(L["Nouveau compte..."], function()
-			StaticPopup_Show(NEW_ACCOUNT_POPUP, P.GetDisplayName(key), nil, key)
-		end)
+	menu:CreateRadio(L["Aucun compte"], IsCurrent, Assign, "")
+	for _, label in ipairs(P.GetAccountLabels()) do
+		menu:CreateRadio(label, IsCurrent, Assign, label)
+	end
+	menu:CreateButton(L["Nouveau compte..."], function()
+		StaticPopup_Show(NEW_ACCOUNT_POPUP, P.GetDisplayName(key), nil, key)
 	end)
 end
+
+local function ShowAccountMenu(owner, key)
+	MenuUtil.CreateContextMenu(owner, function(_, root)
+		root:CreateTitle(L["Compte WoW de %s"]:format(P.GetDisplayName(key)))
+		AddAccountEntries(root, key)
+	end)
+end
+
+-- Supprime une équipe (Maj + clic gauche dans « Équipes », ou menu manette après confirmation).
+local function DeleteTeam(teamName)
+	if P.DeleteTeam(teamName) then
+		UIErrorsFrame:AddMessage(L["Équipe « %s » supprimée."]:format(teamName), 1, 0.82, 0)
+		if P.charDb.selectedTeam == teamName then
+			ChooseTeam(nil)
+		else
+			P.RefreshUI()
+		end
+	end
+end
+
+-- Confirmation de la suppression depuis le menu manette (un choix de menu se fait plus vite par
+-- erreur qu'un Maj + clic). data = nom de l'équipe.
+local DELETE_TEAM_POPUP = "POLYPODE_DELETE_TEAM"
+
+P.OnLanguageApplied(function()
+	StaticPopupDialogs[DELETE_TEAM_POPUP] = {
+		text = L["Supprimer l'équipe « %s » ?"],
+		button1 = DELETE or L["Supprimer"],
+		button2 = CANCEL,
+		OnAccept = function(_, teamName)
+			DeleteTeam(teamName)
+		end,
+		timeout = 0,
+		whileDead = true,
+		hideOnEscape = true,
+		preferredIndex = 3,
+	}
+end)
+
+-- INTERFACE MANETTE (P.IsGamepadUI, Core.lua) : Maj / Alt + clic et double-clic sont malaisés au
+-- curseur de la manette. Dans ce mode seulement, le clic droit sur un personnage, un en-tête de
+-- compte, une équipe ou la barre flottante (UI_TeamBar.lua) ouvre le menu de toutes ses actions ;
+-- à la souris, les clics restent ceux d'avant. Infobulles : cette ligne remplace celles des
+-- touches Maj / Alt et du double-clic.
+local function GamepadMenuHint()
+	return L["Clic droit : menu des actions"]
+end
+P.GamepadMenuHint = GamepadMenuHint -- repris par l'infobulle de la barre flottante (UI_TeamBar.lua)
+
+-- Nouvelle équipe au nom de key, avec lui pour leader, puis sélectionnée (clic droit sans équipe
+-- sélectionnée dans « Personnages disponibles », ou menu manette).
+local function CreateTeamWithLeader(key)
+	local teamName, err = P.CreateTeamWithLeader(key)
+	if teamName then
+		UIErrorsFrame:AddMessage(L["Équipe « %s » créée, leader : %s."]:format(teamName, P.GetDisplayName(key)),
+			1, 0.82, 0)
+		ChooseTeam(teamName)
+	else
+		UIErrorsFrame:AddMessage(err, 1, 0.1, 0.1)
+	end
+end
+
+-- Personnage, en interface manette : actions d'équipe, compte WoW, suppression.
+local function ShowCharacterMenu(owner, key)
+	MenuUtil.CreateContextMenu(owner, function(_, root)
+		root:CreateTitle(P.GetDisplayName(key, true))
+		if not P.IsSoloMode() then
+			local members = selectedTeam and P.GetTeamMembers(selectedTeam)
+			if not selectedTeam then
+				root:CreateButton(L["Créer une équipe à son nom, avec lui pour leader"], function()
+					CreateTeamWithLeader(key)
+				end)
+			elseif members and members[key] then
+				root:CreateButton(L["Retirer de l'équipe « %s »"]:format(selectedTeam), function()
+					ConfirmRemoveMember(selectedTeam, key)
+				end)
+			else
+				root:CreateButton(L["Ajouter à l'équipe « %s »"]:format(selectedTeam), function()
+					P.AddTeamMember(selectedTeam, key)
+					P.RefreshUI()
+				end)
+			end
+		end
+		AddAccountEntries(root:CreateButton(L["Ranger dans un compte WoW"]), key)
+		if key ~= P.GetCharKey() then
+			root:CreateButton(L["Supprimer ce personnage et ses données..."], function()
+				ConfirmRemoveCharacter(key)
+			end)
+		end
+	end)
+end
+
 
 -- Taille minimale volontairement petite : en dessous du confortable, le contenu est
 -- simplement tronqué (textes coupés sur une ligne, listes réduites), pas réorganisé.
@@ -640,6 +730,22 @@ end
 -- P.SetCharacterAccount). Les personnages sans compte vont dans « Compte non renseigné ».
 -- Renvoie la clé de groupe et son libellé.
 local NO_ACCOUNT_GROUP = "~none"
+
+-- En-tête de compte, en interface manette : replier / déplier, renommer.
+local function ShowAccountHeaderMenu(owner, data)
+	MenuUtil.CreateContextMenu(owner, function(_, root)
+		root:CreateTitle(data.label)
+		root:CreateButton(data.collapsed and L["Déplier"] or L["Replier"], function()
+			P.charDb.collapsedAccounts[data.groupKey] = not data.collapsed or nil
+			P.RefreshUI()
+		end)
+		if data.groupKey ~= NO_ACCOUNT_GROUP then
+			root:CreateButton(L["Renommer le compte..."], function()
+				StaticPopup_Show(RENAME_ACCOUNT_POPUP, data.label, nil, data.label)
+			end)
+		end
+	end)
+end
 
 local function AccountGroup(key)
 	local label = P.GetCharacterAccount(key)
@@ -1307,6 +1413,45 @@ local function UpdateBarTipLater()
 	end
 end
 
+-- Barre flottante d'une équipe sans glisser (poignée, menu manette) : la sélectionne et affiche sa
+-- barre, ou masque la barre si c'est déjà la sienne qui est affichée.
+local function ToggleTeamBarFor(teamName)
+	MarkBarLearned()
+	if teamName == selectedTeam and P.IsTeamBarShown() then
+		P.SetTeamBarShown(false)
+	else
+		ChooseTeam(teamName)
+		P.SetTeamBarShown(true)
+	end
+end
+
+-- Équipe, en interface manette : sélection, barre flottante, renommage, suppression (confirmée).
+local function ShowTeamMenu(owner, teamName)
+	MenuUtil.CreateContextMenu(owner, function(_, root)
+		root:CreateTitle(teamName)
+		if teamName == selectedTeam then
+			root:CreateButton(L["Désélectionner"], function()
+				ChooseTeam(nil)
+			end)
+		else
+			root:CreateButton(L["Sélectionner l'équipe"], function()
+				ChooseTeam(teamName)
+			end)
+		end
+		local shownHere = teamName == selectedTeam and P.IsTeamBarShown()
+		root:CreateButton(shownHere and L["Masquer la barre flottante"] or L["Afficher la barre flottante"],
+			function()
+				ToggleTeamBarFor(teamName)
+			end)
+		root:CreateButton(L["Renommer l'équipe..."], function()
+			StaticPopup_Show(RENAME_POPUP, teamName, nil, teamName)
+		end)
+		root:CreateButton(L["Supprimer l'équipe..."], function()
+			StaticPopup_Show(DELETE_TEAM_POPUP, teamName, nil, teamName)
+		end)
+	end)
+end
+
 -- CHOIX SOLO / MULTI au premier lancement sur un personnage (P.charDb.soloChosen faux, Core.lua) :
 -- bulle d'aide de Blizzard (HelpTip, testée avant usage) pointée sur la case « Solo » et halo qui
 -- pulse autour d'elle, à chaque ouverture de la fenêtre tant que le choix n'est pas fait. Cocher ou
@@ -1683,6 +1828,15 @@ function P.BuildUI()
 		return FormatCharacter(data)
 	end, HEADER_HEIGHT + INPUT_HEIGHT, {
 		onClick = function(data, mouseButton)
+			if mouseButton == "RightButton" and P.IsGamepadUI() then
+				-- Interface manette : toutes les actions de la ligne dans un menu.
+				if data.header then
+					ShowAccountHeaderMenu(charPanel, data)
+				else
+					ShowCharacterMenu(charPanel, data.key)
+				end
+				return
+			end
 			if data.header then
 				if IsAltKeyDown() then
 					if data.groupKey ~= NO_ACCOUNT_GROUP then
@@ -1707,15 +1861,7 @@ function P.BuildUI()
 			end
 			if not selectedTeam then
 				if mouseButton == "RightButton" then
-					-- Sans équipe sélectionnée : nouvelle équipe à son nom, avec lui pour leader.
-					local teamName, err = P.CreateTeamWithLeader(data.key)
-					if teamName then
-						UIErrorsFrame:AddMessage(L["Équipe « %s » créée, leader : %s."]:format(teamName, P.GetDisplayName(data.key)),
-							1, 0.82, 0)
-						ChooseTeam(teamName)
-					else
-						UIErrorsFrame:AddMessage(err, 1, 0.1, 0.1)
-					end
+					CreateTeamWithLeader(data.key) -- sans équipe sélectionnée : équipe à son nom
 				else
 					UIErrorsFrame:AddMessage(L["Sélectionnez d'abord une équipe (ou clic droit pour en "
 						.. "créer une avec ce personnage pour leader)."], 1, 0.1, 0.1)
@@ -1738,10 +1884,14 @@ function P.BuildUI()
 			return members and members[data.key] or false
 		end,
 		tooltip = function(data)
+			-- Interface manette : le menu du clic droit remplace Maj / Alt + clic.
+			local gamepad = P.IsGamepadUI()
 			if data.header then
 				local lines = { data.label, L["%d connecté(s) sur %d"]:format(data.online, #data.items),
 					data.collapsed and L["Clic : déplier"] or L["Clic : replier"] }
-				if data.groupKey ~= NO_ACCOUNT_GROUP then
+				if gamepad then
+					lines[#lines + 1] = GamepadMenuHint()
+				elseif data.groupKey ~= NO_ACCOUNT_GROUP then
 					lines[#lines + 1] = L["Alt + clic : renommer le compte (tous ses personnages)"]
 				end
 				return lines
@@ -1749,7 +1899,16 @@ function P.BuildUI()
 			local presence = data.first and "|cff40ff40" .. L["Connecté"] .. "|r"
 				or "|cff999999" .. L["Déconnecté (ou pas vu cette session)"] .. "|r"
 			local account = L["Compte WoW : %s"]:format(P.GetCharacterAccount(data.key) or L["non renseigné"])
-			local hint = L["Alt + clic : ranger dans un compte WoW|nMaj + clic : supprimer ce personnage et ses données"]
+			local hint = gamepad and GamepadMenuHint()
+				or L["Alt + clic : ranger dans un compte WoW|nMaj + clic : supprimer ce personnage et ses données"]
+			if gamepad and not P.IsSoloMode() then
+				local lines = { presence, account }
+				if selectedTeam then
+					lines[#lines + 1] = L["Clic gauche : retirer de l'équipe « %s »"]:format(selectedTeam)
+				end
+				lines[#lines + 1] = hint
+				return CharacterTooltip(data.key, lines)
+			end
 			if P.IsSoloMode() then
 				local lines = { P.GetDisplayName(data.key, true), presence, account }
 				if data.key == P.GetCharKey() then
@@ -1842,15 +2001,10 @@ function P.BuildUI()
 		return data.name
 	end, HEADER_HEIGHT + INPUT_HEIGHT, {
 		onClick = function(data, mouseButton)
-			if mouseButton == "LeftButton" and IsShiftKeyDown() then
-				if P.DeleteTeam(data.name) then
-					UIErrorsFrame:AddMessage(L["Équipe « %s » supprimée."]:format(data.name), 1, 0.82, 0)
-					if P.charDb.selectedTeam == data.name then
-						ChooseTeam(nil)
-					else
-						P.RefreshUI()
-					end
-				end
+			if mouseButton == "RightButton" and P.IsGamepadUI() then
+				ShowTeamMenu(teamPanel, data.name) -- interface manette : toutes les actions
+			elseif mouseButton == "LeftButton" and IsShiftKeyDown() then
+				DeleteTeam(data.name)
 			elseif mouseButton == "RightButton" then
 				ChooseTeam(nil)
 			else
@@ -1862,10 +2016,15 @@ function P.BuildUI()
 		end,
 		tooltip = function(data)
 			local created = P.GetTeamCreated(data.name)
+			local createdLine = created
+				and ("|cff999999" .. L["Créée le %s"]:format(date(L["%d/%m/%Y à %H:%M"], created)) .. "|r")
+				or "|cff999999" .. L["Date de création inconnue (équipe plus ancienne)"] .. "|r"
+			if P.IsGamepadUI() then
+				return { data.name, createdLine, L["Clic gauche : sélectionner l'équipe"], GamepadMenuHint() }
+			end
 			return {
 				data.name,
-				created and ("|cff999999" .. L["Créée le %s"]:format(date(L["%d/%m/%Y à %H:%M"], created)) .. "|r")
-					or "|cff999999" .. L["Date de création inconnue (équipe plus ancienne)"] .. "|r",
+				createdLine,
 				L["Clic gauche : sélectionner l'équipe"],
 				L["Clic droit : désélectionner"],
 				L["Double-clic : renommer l'équipe"],
@@ -1874,10 +2033,12 @@ function P.BuildUI()
 			}
 		end,
 		-- Double-clic gauche : renommer (le premier clic a sélectionné l'équipe). Double-clic
-		-- droit : second clic droit ordinaire (désélection).
+		-- droit : second clic droit ordinaire (désélection ; menu en interface manette).
 		onDoubleClick = function(data, mouseButton)
 			if mouseButton == "LeftButton" then
 				StaticPopup_Show(RENAME_POPUP, data.name, nil, data.name)
+			elseif P.IsGamepadUI() then
+				ShowTeamMenu(teamPanel, data.name)
 			else
 				ChooseTeam(nil)
 			end
@@ -1894,13 +2055,7 @@ function P.BuildUI()
 				return true
 			end,
 			onClick = function(data)
-				MarkBarLearned()
-				if data.name == selectedTeam and P.IsTeamBarShown() then
-					P.SetTeamBarShown(false)
-				else
-					ChooseTeam(data.name)
-					P.SetTeamBarShown(true)
-				end
+				ToggleTeamBarFor(data.name)
 			end,
 			tooltip = function(data)
 				local shownHere = data.name == selectedTeam and P.IsTeamBarShown()

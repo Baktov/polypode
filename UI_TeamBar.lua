@@ -364,15 +364,57 @@ local function ShareLayout()
 	end
 end
 
+-- INTERFACE MANETTE (P.IsGamepadUI) : clic droit sur la barre ou sur son icône = menu de toutes
+-- ses actions (Alt / Maj + clic malaisés au curseur de la manette). À la souris, rien ne change.
+local function ShowBarMenu(owner)
+	local state = P.charDb.teamBar
+	local solo = P.IsSoloMode()
+	MenuUtil.CreateContextMenu(owner, function(_, root)
+		root:CreateTitle(solo and P.GetDisplayName(P.GetCharKey())
+			or P.GetSelectedTeam() or L["Aucune équipe sélectionnée"])
+		if not solo then
+			root:CreateButton(L["Inviter l'équipe"], function()
+				P.InviteSelectedTeam()
+			end)
+			root:CreateButton(L["Envoyer cette position aux personnages de l'équipe"], ShareLayout)
+		end
+		if not state.compact then
+			root:CreateButton(state.expanded and L["Replier la liste"] or L["Déplier la liste"], function()
+				state.expanded = not state.expanded
+				P.RefreshTeamBar()
+			end)
+		end
+		root:CreateButton(state.locked and L["Libérer la barre"] or L["Figer la barre"], ToggleLocked)
+		root:CreateButton(state.compact and L["Barre complète"] or L["Réduire à l'icône"], function()
+			state.compact = not state.compact
+			P.RefreshTeamBar()
+		end)
+		root:CreateButton(L["Options de Polypode..."], function()
+			if P.optionsPopup then
+				P.ToggleOptionsPopup(iconButton, P.optionsPopup)
+			else
+				P.OpenOptions()
+			end
+		end)
+		root:CreateButton(L["Masquer la barre"], function()
+			GameTooltip:Hide()
+			P.SetTeamBarShown(false)
+		end)
+	end)
+end
+
 local function ShowBarTooltip(self)
 	if bar and bar.dragging then
 		return -- pas d'infobulle pendant le déplacement de la barre
 	end
 	GameTooltip:SetOwner(self, "ANCHOR_TOP")
 	local solo = P.IsSoloMode()
+	local gamepad = P.IsGamepadUI()
 	if solo then
 		GameTooltip:AddLine(P.GetDisplayName(P.GetCharKey()) .. " |cffff4040" .. L["(mode solo)"] .. "|r")
-		GameTooltip:AddLine(L["Clic droit : déplier / replier la ligne du personnage"], 1, 1, 1)
+		if not gamepad then
+			GameTooltip:AddLine(L["Clic droit : déplier / replier la ligne du personnage"], 1, 1, 1)
+		end
 	else
 		GameTooltip:AddLine(P.GetSelectedTeam() or L["Aucune équipe sélectionnée"])
 		GameTooltip:AddLine(L["Clic gauche : inviter l'équipe (comme le bouton « Inviter l'équipe »)"], 1, 1, 1)
@@ -380,9 +422,17 @@ local function ShowBarTooltip(self)
 		if reason then
 			GameTooltip:AddLine(reason, 1, 0.1, 0.1, true)
 		end
-		GameTooltip:AddLine(L["Clic droit : déplier / replier la liste des personnages"], 1, 1, 1)
+		if not gamepad then
+			GameTooltip:AddLine(L["Clic droit : déplier / replier la liste des personnages"], 1, 1, 1)
+		end
 	end
-	if P.charDb.teamBar.locked then
+	if gamepad then
+		-- Interface manette : le menu du clic droit remplace Alt / Maj + clic.
+		if P.charDb.teamBar.locked then
+			GameTooltip:AddLine(L["Barre figée (position et taille)"], 1, 0.82, 0)
+		end
+		GameTooltip:AddLine(P.GamepadMenuHint(), 1, 1, 1)
+	elseif P.charDb.teamBar.locked then
 		GameTooltip:AddLine(L["Barre figée (position et taille)"], 1, 0.82, 0)
 		GameTooltip:AddLine(L["Alt + clic : libérer"], 1, 1, 1)
 	else
@@ -394,8 +444,10 @@ local function ShowBarTooltip(self)
 		GameTooltip:AddLine(L["Croix : masquer (glisser votre personnage hors de la fenêtre Polypode "
 			.. "pour la réafficher)"], 1, 1, 1, true)
 	else
-		GameTooltip:AddLine(L["Maj + clic : envoyer cette position et cette taille aux personnages de "
-			.. "l'équipe dont la barre est masquée"], 1, 1, 1, true)
+		if not gamepad then
+			GameTooltip:AddLine(L["Maj + clic : envoyer cette position et cette taille aux personnages de "
+				.. "l'équipe dont la barre est masquée"], 1, 1, 1, true)
+		end
 		GameTooltip:AddLine(L["Croix : masquer (glisser une équipe hors de la fenêtre Polypode pour "
 			.. "la réafficher)"], 1, 1, 1, true)
 	end
@@ -555,6 +607,10 @@ local function Build()
 		-- Le relâchement qui termine un déplacement n'est pas un clic.
 		local dragged = self.dragging
 		self.dragging = nil
+		if mouseButton == "RightButton" and not dragged and P.IsGamepadUI() then
+			ShowBarMenu(self) -- interface manette : toutes les actions de la barre
+			return
+		end
 		if P.charDb.teamBar.compact and not IsAltKeyDown() then
 			return -- barre réduite : l'icône porte les actions (pas d'invitation ni de liste)
 		end
@@ -597,7 +653,9 @@ local function Build()
 	-- comme les boutons des modules.
 	iconBtn:RegisterForClicks("LeftButtonUp", "RightButtonUp")
 	iconBtn:SetScript("OnClick", function(self, mouseButton)
-		if mouseButton == "LeftButton" and IsAltKeyDown() then
+		if mouseButton == "RightButton" and P.IsGamepadUI() then
+			ShowBarMenu(self) -- interface manette : menu de la barre (options comprises)
+		elseif mouseButton == "LeftButton" and IsAltKeyDown() then
 			ToggleLocked() -- comme sur la barre (seule l'icône reste en barre réduite)
 		elseif mouseButton == "RightButton" and IsShiftKeyDown() and P.charDb.teamBar.compact then
 			-- Barre réduite (croix masquée) : Maj + clic droit la masque, comme la croix.
@@ -621,8 +679,12 @@ local function Build()
 		GameTooltip:SetOwner(self, "ANCHOR_TOP")
 		GameTooltip:AddLine("Polypode")
 		GameTooltip:AddLine(L["Clic : ouvrir / fermer la fenêtre Polypode"], 1, 1, 1)
-		GameTooltip:AddLine(L["Clic droit : options de Polypode"], 1, 1, 1)
-		if P.charDb.teamBar.compact then
+		if P.IsGamepadUI() then
+			GameTooltip:AddLine(P.GamepadMenuHint(), 1, 1, 1) -- options comprises dans le menu
+		else
+			GameTooltip:AddLine(L["Clic droit : options de Polypode"], 1, 1, 1)
+		end
+		if P.charDb.teamBar.compact and not P.IsGamepadUI() then
 			GameTooltip:AddLine(P.charDb.teamBar.locked and L["Barre figée — Alt + clic : libérer"]
 				or L["Glisser : déplacer la barre — Alt + clic : figer"], 1, 1, 1)
 			GameTooltip:AddLine(L["Maj + clic droit : masquer la barre"], 1, 1, 1)
