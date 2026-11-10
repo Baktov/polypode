@@ -154,6 +154,12 @@ function P.InitDB()
 	if P.charDb.soloChosen == nil then
 		P.charDb.soloChosen = not newCharacter
 	end
+	-- Bulle d'aide de la poignée de la barre flottante (UI_Main.lua) : inutile si la barre a déjà
+	-- servi sur ce personnage (affichée ou placée).
+	if P.charDb.barTipDone == nil then
+		local bar = P.charDb.teamBar
+		P.charDb.barTipDone = bar.point ~= nil or bar.shown == true or bar.soloShown == true
+	end
 
 	-- Nettoyage : l'ancien leader global (remplacé par un leader par équipe) et le rôle
 	-- par personnage associé ne sont plus utilisés.

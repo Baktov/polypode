@@ -202,6 +202,11 @@ the other clients right away. Three frames side by side:
   later). An empty name, a name already taken or one containing ":" is refused.
   **Dragging** a team (left button held) out of the window selects it and drops it as a **floating
   bar** where you release it (see Floating team bar).
+  Each team has a **handle** on its right (six dots, gold on hover): dragging it does the same, and
+  a **click** on it selects the team and shows its bar without dragging (handy with a gamepad);
+  clicking the handle of the team already shown hides the bar. The first time, the bar is placed
+  to the right of the window. As long as the bar has never been used on this character, a help tip
+  points out the handle (after the solo / multi choice).
 - **Team characters**: members of the selected team, the **leader always first** then the others
   sorted by name, same layout as the available characters.
   - **Left-click** on a member: it becomes **team leader** (gold highlight and `[leader]`). Each team
@@ -271,8 +276,9 @@ single character), uncheck it, or close the tip with its cross (several characte
   **Add target** button is hidden (it is for building teams) and the list moves up in its place.
 - Team clicks on characters do nothing; Alt + click (WoW account) and Shift + click (deletion)
   remain.
-- **Dragging your character** (the "(you)" line) out of the list turns it into a **floating bar**,
-  like a team: your name in class color, right-click to expand its line (level, item level, health,
+- **Dragging your character** (the "(you)" line, or its **handle** on the right) out of the list
+  turns it into a **floating bar**; a click on the handle shows or hides it without dragging. Like
+  a team: your name in class color, right-click to expand its line (level, item level, health,
   durability), same grip, padlock, close button and **column of module buttons**. No invitation or
   position sharing. Its display is remembered separately: the team bar comes back when leaving solo
   mode.
@@ -341,7 +347,8 @@ the selection (click on another team, sync); "No team" if nothing is selected.
 - **Alt + click**: **locks** the bar (position and size: no more moving, grip hidden, padlock shown)
   or unlocks it. Invitation (left-click), expanding (right-click) and the close button stay active. A
   locked bar does not move when you drag a team out of the window again.
-- **Close button**: hides the bar; drag a team out of the window again to show it.
+- **Close button**: hides the bar; drag a team out of the window again, or click its handle, to
+  show it.
 
 Display, expansion, position, size and lock are remembered **for each character** (each multibox
 window has its own bar) and restored at login.

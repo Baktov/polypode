@@ -291,6 +291,87 @@ end
 -- opts.rowHeight : hauteur des lignes (défaut 20), ex. une rangée d'icônes posées par decorate.
 -- opts.inset : marge gauche et droite de la liste dans le cadre (défaut 10). La barre de
 -- défilement n'apparaît (et ne prend de place à droite) que si la liste déborde.
+-- opts.handle : poignée à droite des lignes où shown(data) est vrai (2.17.0, barre flottante) :
+-- { shown = fn(data), onClick = fn(data), tooltip = fn(data) → lignes } ; la tirer appelle
+-- opts.onDragStart(data) comme la ligne, un clic appelle onClick (souris et manette).
+local HANDLE_WIDTH = 16
+local HANDLE_DIM, HANDLE_LIT = { 0.8, 0.8, 0.8, 0.45 }, { 1, 0.82, 0, 1 }
+
+local function LightHandle(handle, lit)
+	local color = lit and HANDLE_LIT or HANDLE_DIM
+	for _, dot in ipairs(handle.dots) do
+		dot:SetColorTexture(color[1], color[2], color[3], color[4])
+	end
+end
+
+local function CreateRowHandle(row, opts)
+	local handle = CreateFrame("Button", nil, row)
+	handle:SetSize(HANDLE_WIDTH, (opts.rowHeight or ROW_HEIGHT) - 2)
+	if opts.button then
+		handle:SetPoint("RIGHT", row.button, "LEFT", -2, 0)
+	else
+		handle:SetPoint("RIGHT", -2, 0)
+	end
+	-- Six points en deux colonnes : le motif habituel d'un élément qu'on peut tirer.
+	handle.dots = {}
+	for column = 0, 1 do
+		for line = -1, 1 do
+			local dot = handle:CreateTexture(nil, "ARTWORK")
+			dot:SetSize(3, 3)
+			dot:SetPoint("CENTER", (column - 0.5) * 5, line * 5)
+			handle.dots[#handle.dots + 1] = dot
+		end
+	end
+	local highlight = handle:CreateTexture(nil, "HIGHLIGHT")
+	highlight:SetAllPoints()
+	highlight:SetColorTexture(1, 0.82, 0, 0.2)
+	LightHandle(handle, false)
+
+	handle:RegisterForClicks("LeftButtonUp")
+	handle:RegisterForDrag("LeftButton")
+	handle:SetScript("OnClick", function()
+		opts.handle.onClick(row.data)
+	end)
+	handle:SetScript("OnDragStart", function()
+		if opts.onDragStart then
+			opts.onDragStart(row.data)
+		end
+	end)
+	handle:SetScript("OnEnter", function(self)
+		LightHandle(self, true)
+		if SetCursor then
+			SetCursor("UI_MOVE_CURSOR")
+		end
+		local lines = opts.handle.tooltip and opts.handle.tooltip(row.data)
+		if lines and #lines > 0 then
+			GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+			for i, line in ipairs(lines) do
+				if i == 1 then
+					GameTooltip:AddLine(line)
+				else
+					GameTooltip:AddLine(line, 1, 1, 1, true)
+				end
+			end
+			P.ShowTooltip()
+		end
+	end)
+	handle:SetScript("OnLeave", function(self)
+		LightHandle(self, row:IsMouseOver())
+		if ResetCursor then
+			ResetCursor()
+		end
+		GameTooltip_Hide()
+	end)
+	-- Ligne survolée : la poignée s'éclaire aussi, pour se faire remarquer.
+	row:HookScript("OnEnter", function()
+		LightHandle(handle, true)
+	end)
+	row:HookScript("OnLeave", function()
+		LightHandle(handle, handle:IsMouseOver())
+	end)
+	row.handle = handle
+end
+
 local function CreateScrollList(panel, formatFn, top, opts)
 	top = top or HEADER_HEIGHT
 	opts = opts or {}
@@ -383,9 +464,25 @@ local function CreateScrollList(panel, formatFn, top, opts)
 					P.SkinButton(row.button)
 				end
 			end
+
+			if opts.handle then
+				CreateRowHandle(row, opts)
+			end
 		end
 		row.data = data
 		row.text:SetText(formatFn(data))
+		if opts.handle then
+			-- Poignée des seules lignes concernées ; le texte s'arrête avant elle.
+			local hasHandle = opts.handle.shown(data) and true or false
+			row.handle:SetShown(hasHandle)
+			if hasHandle then
+				row.text:SetPoint("RIGHT", row.handle, "LEFT", -4, 0)
+			elseif opts.button then
+				row.text:SetPoint("RIGHT", row.button, "LEFT", -6, 0)
+			else
+				row.text:SetPoint("RIGHT", -4, 0)
+			end
+		end
 		if opts.decorate then
 			opts.decorate(row, data)
 		end
@@ -1146,6 +1243,70 @@ FitTitleBar = function()
 	end
 end
 
+-- POIGNÉE DE LA BARRE FLOTTANTE (lignes d'équipe ; ligne « (vous) » en mode solo, opts.handle de
+-- CreateScrollList) : à tirer hors de la fenêtre, ou clic pour afficher / masquer la barre (souris
+-- et manette). Bulle d'aide (HelpTip) sur la plus haute poignée visible tant que
+-- P.charDb.barTipDone est faux (Core.lua), après le choix solo / multi ; le premier affichage de
+-- la barre (glisser ou clic) ou la croix de la bulle la retirent pour de bon.
+local barTipHandle -- poignée où pointe la bulle affichée
+
+local function BarTipText()
+	return L["Tirez cette poignée hors de la fenêtre pour en faire une barre flottante, ou cliquez dessus."]
+end
+
+local function HideBarTip()
+	if barTipHandle and ui.frame and HelpTip and HelpTip.Hide then
+		HelpTip:Hide(ui.frame, BarTipText())
+	end
+	barTipHandle = nil
+end
+
+local function MarkBarLearned()
+	P.charDb.barTipDone = true
+	HideBarTip()
+end
+
+local function UpdateBarTip()
+	if P.charDb.barTipDone ~= false or P.charDb.soloChosen == false
+		or not (ui.frame and ui.frame:IsShown())
+		or not (HelpTip and HelpTip.Show and HelpTip.Point and HelpTip.ButtonStyle) then
+		HideBarTip()
+		return
+	end
+	local panel = P.IsSoloMode() and ui.charPanel or ui.teamPanel
+	local best
+	if panel.scrollBox.ForEachFrame then
+		panel.scrollBox:ForEachFrame(function(row)
+			local handle = row.handle
+			if handle and handle:IsVisible() and (not best or (handle:GetTop() or 0) > (best:GetTop() or 0)) then
+				best = handle
+			end
+		end)
+	end
+	local text = BarTipText()
+	if best and best == barTipHandle and HelpTip.IsShowing and HelpTip:IsShowing(ui.frame, text) then
+		return -- déjà sur la bonne poignée
+	end
+	HideBarTip()
+	if not best then
+		return -- pas encore de poignée (aucune équipe)
+	end
+	barTipHandle = best
+	pcall(HelpTip.Show, HelpTip, ui.frame, {
+		text = text,
+		buttonStyle = HelpTip.ButtonStyle.Close,
+		targetPoint = HelpTip.Point.RightEdgeCenter,
+		onAcknowledgeCallback = MarkBarLearned,
+	}, best)
+end
+
+-- Après remplissage des listes : à l'image suivante, les lignes étant alors placées.
+local function UpdateBarTipLater()
+	if P.charDb.barTipDone == false then
+		C_Timer.After(0, UpdateBarTip)
+	end
+end
+
 -- CHOIX SOLO / MULTI au premier lancement sur un personnage (P.charDb.soloChosen faux, Core.lua) :
 -- bulle d'aide de Blizzard (HelpTip, testée avant usage) pointée sur la case « Solo » et halo qui
 -- pulse autour d'elle, à chaque ouverture de la fenêtre tant que le choix n'est pas fait. Cocher ou
@@ -1165,6 +1326,7 @@ local function MarkSoloChosen()
 	if ui.frame and HelpTip and HelpTip.Hide then
 		HelpTip:Hide(ui.frame, SoloTipText())
 	end
+	UpdateBarTipLater() -- étape suivante : la poignée de la barre flottante
 end
 
 local function ShowSoloChoice()
@@ -1616,9 +1778,26 @@ function P.BuildUI()
 		-- Mode solo : le personnage joué, glissé hors de la liste, devient la barre flottante.
 		onDragStart = function(data)
 			if P.IsSoloMode() and data.key == P.GetCharKey() then
+				MarkBarLearned()
 				P.StartTeamBarDrag()
 			end
 		end,
+		-- Poignée de la même ligne : la tirer, ou clic pour afficher / masquer la barre.
+		handle = {
+			shown = function(data)
+				return not data.header and P.IsSoloMode() and data.key == P.GetCharKey()
+			end,
+			onClick = function()
+				MarkBarLearned()
+				P.SetTeamBarShown(not P.IsTeamBarShown())
+			end,
+			tooltip = function()
+				return { L["Barre flottante"],
+					L["Glisser hors de la fenêtre : la barre flottante apparaît où vous lâchez."],
+					P.IsTeamBarShown() and L["Clic : masquer la barre flottante"]
+						or L["Clic : afficher la barre flottante"] }
+			end,
+		},
 	})
 	charPanel.emptyText:SetText(L["Aucun personnage disponible"])
 
@@ -1704,9 +1883,33 @@ function P.BuildUI()
 			end
 		end,
 		onDragStart = function(data)
+			MarkBarLearned()
 			ChooseTeam(data.name)
 			P.StartTeamBarDrag()
 		end,
+		-- Poignée de chaque équipe : la tirer comme la ligne, ou clic pour sélectionner l'équipe et
+		-- afficher sa barre (clic sur l'équipe déjà affichée : barre masquée).
+		handle = {
+			shown = function()
+				return true
+			end,
+			onClick = function(data)
+				MarkBarLearned()
+				if data.name == selectedTeam and P.IsTeamBarShown() then
+					P.SetTeamBarShown(false)
+				else
+					ChooseTeam(data.name)
+					P.SetTeamBarShown(true)
+				end
+			end,
+			tooltip = function(data)
+				local shownHere = data.name == selectedTeam and P.IsTeamBarShown()
+				return { L["Barre flottante"],
+					L["Glisser hors de la fenêtre : la barre flottante apparaît où vous lâchez."],
+					shownHere and L["Clic : masquer la barre flottante"]
+						or L["Clic : sélectionner l'équipe et afficher sa barre flottante"] }
+			end,
+		},
 	})
 	teamPanel.emptyText:SetText(L["Aucune équipe"])
 
@@ -1827,6 +2030,7 @@ function P.BuildUI()
 		C_Timer.After(0, function()
 			FitTitleBar()
 			ShowSoloChoice()
+			UpdateBarTip()
 		end)
 	end)
 
@@ -1968,6 +2172,7 @@ function P.RefreshUI()
 
 	-- L'état du groupe, qui change sans rafraîchir la fenêtre, est vérifié au clic par P.InviteTeam.
 	ui.inviteButton:SetEnabled(InviteBlockedReason() == nil)
+	UpdateBarTipLater() -- poignées peut-être changées (équipe créée, mode solo...)
 end
 
 -- Sélectionne une équipe (ex. reçue par synchro via « Inviter l'équipe ») : le choix est

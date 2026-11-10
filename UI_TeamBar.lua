@@ -826,6 +826,34 @@ function P.ApplyTeamBarLayout(teamName, layout)
 	P.RefreshTeamBar()
 end
 
+-- Barre affichée dans le mode courant (solo ou équipe).
+function P.IsTeamBarShown()
+	return P.charDb.teamBar[ShownKey()] == true
+end
+
+-- Affiche ou masque la barre sans la glisser (clic sur la poignée d'une ligne, UI_Main.lua :
+-- souris et manette). Sans position mémorisée, elle se pose à droite de la fenêtre principale
+-- ouverte (gardée dans l'écran par SetClampedToScreen) et cette place est retenue.
+function P.SetTeamBarShown(shown)
+	local state = P.charDb.teamBar
+	state[ShownKey()] = shown and true or false
+	P.RefreshTeamBar()
+	local frame = P.ui.frame
+	if not (shown and bar and not state.point and frame and frame:IsShown()) then
+		return
+	end
+	bar:ClearAllPoints()
+	bar:SetPoint("TOPLEFT", frame, "TOPRIGHT", 12, 0)
+	local left, top = bar:GetLeft(), bar:GetTop()
+	if left and top then
+		bar:ClearAllPoints()
+		bar:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", left, top)
+		SavePosition()
+	else
+		RestorePosition()
+	end
+end
+
 -- Début du glisser d'une équipe hors du cadre « Équipes » : la barre apparaît sous le curseur
 -- et le suit jusqu'au relâchement du bouton, où sa position est mémorisée. Le relâchement est
 -- guetté par OnUpdate plutôt que par l'OnDragStop de la ligne d'origine, qui peut être

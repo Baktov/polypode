@@ -209,6 +209,11 @@ côte à côte :
   vide, déjà pris ou contenant « : » est refusé.
   **Glisser** une équipe (clic gauche maintenu) hors de la fenêtre la sélectionne et la pose en
   **barre flottante** à l'endroit où vous la lâchez (voir Barre flottante d'équipe).
+  Chaque équipe porte à droite une **poignée** (six points, dorés au survol) : la tirer fait la même
+  chose, et un **clic** dessus sélectionne l'équipe et affiche sa barre sans glisser (pratique à la
+  manette) ; clic sur la poignée de l'équipe déjà affichée : la barre est masquée. La première fois,
+  la barre se pose à droite de la fenêtre. Tant que la barre n'a jamais servi sur ce personnage,
+  une bulle d'aide signale la poignée (après le choix solo / multi).
 - **Personnages de l'équipe** : membres de l'équipe sélectionnée, le **leader toujours en tête**
   puis les autres triés par nom, même
   présentation que les personnages disponibles.
@@ -286,8 +291,9 @@ le choix : cocher la case (un seul personnage), la décocher, ou fermer la bulle
   à sa place.
 - Les clics d'équipe sur les personnages sont sans effet ; Alt + clic (compte WoW) et Maj + clic
   (suppression) restent.
-- **Glisser votre personnage** (la ligne « (vous) ») hors de la liste en fait une **barre
-  flottante**, comme une équipe : votre nom en couleur de classe, clic droit pour déplier sa ligne
+- **Glisser votre personnage** (la ligne « (vous) », ou sa **poignée** à droite) hors de la liste
+  en fait une **barre flottante** ; un clic sur la poignée l'affiche ou la masque sans glisser.
+  Comme une équipe : votre nom en couleur de classe, clic droit pour déplier sa ligne
   (niveau, niveau d'objet, vie, durabilité), même poignée, cadenas, croix et **colonne des boutons
   des modules**. Pas d'invitation ni de partage de position. Son affichage est mémorisé à part :
   la barre d'équipe revient en quittant le mode solo.
@@ -364,7 +370,8 @@ rien n'est sélectionné.
 - **Alt + clic** : **fige** la barre (position et taille : plus de déplacement, poignée masquée,
   cadenas affiché) ou la libère. L'invitation (clic gauche), le pliage (clic droit) et la croix restent actifs. Une barre
   figée ne bouge pas quand on glisse à nouveau une équipe hors de la fenêtre.
-- **Croix** : masque la barre ; glisser à nouveau une équipe hors de la fenêtre pour la réafficher.
+- **Croix** : masque la barre ; glisser à nouveau une équipe hors de la fenêtre, ou cliquer sur sa
+  poignée, pour la réafficher.
 
 Affichage, pliage, position, taille et verrouillage sont mémorisés **pour chaque personnage** (chaque fenêtre de
 multibox a sa propre barre) et retrouvés à la connexion.
@@ -608,6 +615,7 @@ aliases (`/poly accounts`, `/poly remove-account`); debug messages stay in Frenc
 
 ## Version
 
+`2.17.0` : barre flottante plus facile à trouver : poignée visible à droite des équipes (et de votre personnage en mode solo), à tirer hors de la fenêtre ou à cliquer pour afficher / masquer la barre sans glisser (manette) ; bulle d'aide sur la poignée tant que la barre n'a jamais servi sur ce personnage.
 `2.16.0` : premier lancement sur un personnage : halo et bulle d'aide sur la case « Solo » jusqu'au choix solo / multi ; fenêtre principale élargie à l'ouverture pour que toute sa barre de titre soit lisible (en solo comme en multi), tant que sa largeur n'a pas été choisie à la poignée.
 `2.15.6` : licence libre **GNU GPL version 3** (fichier `LICENSE`).
 `2.15.5` : raccourci « Se nommer leader de l'équipe » : sans effet en mode solo, et refusé si le personnage n'est pas déjà membre de l'équipe sélectionnée (un appui involontaire l'y ajoutait et lui donnait l'équipe).
