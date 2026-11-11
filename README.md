@@ -24,7 +24,7 @@ Avec la prise en compte de ces addons est venue l'envie de faire un mode Solo (M
 1. Télécharger **`Polypode-<version>.zip`** de la [dernière version](https://github.com/Baktov/polypode/releases/latest)
    (pas « Source code », dont le dossier serait à renommer) et le décompresser dans
    `World of Warcraft/_retail_/Interface/AddOns/` : il contient directement le dossier `Polypode`.
-   Addons compagnons, même procédure (chacun nécessite Polypode) :
+   Addons compagnons, même procédure (chacun nécessite Polypode, sauf Map qui fonctionne aussi seul) :
    [Data](https://github.com/Baktov/polypode-data/releases/latest),
    [Histoire](https://github.com/Baktov/polypode-histoire/releases/latest),
    [Map](https://github.com/Baktov/polypode-map/releases/latest),
@@ -445,7 +445,9 @@ Polypode Suivi ; il peut être désactivé (il ne fait plus que le rappeler).
   petite carte de zone permanente (redimensionnable, zoomable, estompable) qui montre les
   personnages de l'équipe sélectionnée, même hors du groupe (positions échangées entre vos
   clients), avec les quêtes, les expéditions, les points TomTom, HandyNotes et un ping au clic ;
-  remplace EnhanceBattlefieldMinimap, sans librairie (à installer sur chaque personnage).
+  remplace EnhanceBattlefieldMinimap, sans librairie (à installer sur chaque personnage). Peut aussi
+  s'installer **sans Polypode** (1.12.0 : `/pmap`, bouton de la minicarte), sans les personnages de
+  l'équipe.
 - **Polypode Téléports** (https://github.com/Baktov/polypode-teleport) : bouton **Téléports** et
   `/poly teleport`, téléports de l'équipe sélectionnée (pierre de foyer et ses jouets, sorts de
   classe, téléportations de mage, trous de ver) : prêts ou en recharge pour chaque membre, lieu de

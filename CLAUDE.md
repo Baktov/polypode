@@ -41,7 +41,7 @@ n'ajoute une fonctionnalité que si elle sert directement cet objectif.
   messages `PROF` / `PROFV` / `PROFREQ` à lui) et **Polypode Histoire** (`../Polypode_Histoire`,
   https://github.com/Baktov/polypode-histoire : journal chronologique commun des personnages, message `HIST` à lui ;
   utilise aussi `P.GetTeams` et `P.FindGroupUnit`) et **Polypode Map** (`../Polypode_Map`,
-  https://github.com/Baktov/polypode-map : petite carte de zone permanente, messages `MAPPOS` / `MAPPING` à lui ;
+  https://github.com/Baktov/polypode-map : petite carte de zone permanente, messages `MAPPOS` / `MAPPING` à lui ; **Polypode facultatif** depuis 1.12.0 (`OptionalDeps`, appels gardés) : une évolution de l'API qu'il utilise ne doit pas le rendre obligatoire ;
   utilise aussi `P.FindGroupUnit`, `P.GetTargetName`, `P.IsCharacterOnline`, `P.GetTeamLeader`) et **Polypode Teleport**
   (`../Polypode_Teleport`, https://github.com/Baktov/polypode-teleport : téléports de l'équipe, boutons sécurisés
   `PolypodeTeleport_<id>`, message `TELE` à lui ; utilise aussi `P.GetSelectedTeam`, `P.GetTeamMembers`, `P.GetTeamLeader`). Polypode n'en sait

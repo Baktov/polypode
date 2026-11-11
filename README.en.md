@@ -27,7 +27,7 @@ the addons above (while keeping the Polypode philosophy): we have come full circ
 1. Download **`Polypode-<version>.zip`** from the [latest release](https://github.com/Baktov/polypode/releases/latest)
    (not "Source code", whose folder would have to be renamed) and unzip it into
    `World of Warcraft/_retail_/Interface/AddOns/`: it directly contains the `Polypode` folder.
-   Companion addons, same procedure (each one requires Polypode):
+   Companion addons, same procedure (each one requires Polypode, except Map, which also works on its own):
    [Data](https://github.com/Baktov/polypode-data/releases/latest),
    [History](https://github.com/Baktov/polypode-histoire/releases/latest),
    [Map](https://github.com/Baktov/polypode-map/releases/latest),
@@ -421,7 +421,8 @@ of that).
   permanent zone map (resizable, zoomable, fadable) showing the characters of the selected team,
   even outside the group (positions exchanged between your clients), with quests, world quests,
   TomTom waypoints, HandyNotes and a ping on click; replaces EnhanceBattlefieldMinimap, with no
-  library (to install on each character).
+  library (to install on each character). Can also be installed **without Polypode** (1.12.0:
+  `/pmap`, minimap button), without the team characters.
 - **Polypode Teleports** (Polypode Téléports, https://github.com/Baktov/polypode-teleport):
   **Teleports** button and `/poly teleport`, teleports of the selected team (hearthstone and its
   toys, class spells, mage teleports, wormholes): ready or on cooldown for each member, where each
