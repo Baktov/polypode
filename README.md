@@ -654,6 +654,7 @@ aliases (`/poly accounts`, `/poly remove-account`); debug messages stay in Frenc
 
 ## Version
 
+`2.24.0` : pour les modules : la petite fenêtre d'options peut porter des boutons d'action (utilisé par Map pour copier une disposition).
 `2.23.1` : fenêtre principale : elle peut de nouveau être rendue plus étroite que sa barre de titre à la poignée ; ce choix est gardé à part en mode solo et hors mode solo, jusqu'au double-clic sur la barre de titre.
 `2.23.0` : fenêtre principale : deux tailles mémorisées, une en mode solo et une hors mode solo (largeur et hauteur) ; au passage d'un mode à l'autre, la fenêtre reprend la taille de ce mode et s'élargit si besoin pour que toute la barre de titre soit lisible, même après un redimensionnement à la poignée, qui ne descend plus sous cette largeur.
 `2.22.0` : barre flottante : au survol, deux petits boutons pour réduire la barre à l'icône (ou la rétablir) et changer la disposition des boutons des modules (à gauche, à droite, horizontal) en un clic ; ces deux réglages passent en tête de la petite fenêtre d'options.

@@ -10,7 +10,9 @@ local L = P.L
 -- P.ToggleOptionsPopup(owner, popup), popup = { key, title, items, category } ; items = liste de
 --   { kind = "check", setting, tooltip } ;
 --   { kind = "slider", setting, min, max, step, format = fn(valeur) → texte, tooltip } ;
---   { kind = "dropdown", setting, values = { { valeur, libellé }, ... }, tooltip }.
+--   { kind = "dropdown", setting, values = { { valeur, libellé }, ... }, tooltip } ;
+--   { kind = "button", setting = { GetName = fn → libellé }, text, onClick = fn(bouton), tooltip }
+--   (2.24.0, signalé par P.OPTIONS_POPUP_BUTTONS : bouton à droite, pour une action).
 -- Bouton « Toutes les options » : le panneau complet (champs de texte...). Contenu défilant
 -- (P.CreateScrollList, lignes recyclées : tout se recalcule dans FillRow).
 
@@ -18,6 +20,7 @@ local WIDTH, MAX_HEIGHT, ROW_HEIGHT = 360, 440, 28
 local CONTROL_WIDTH = 140 -- liste déroulante, à droite de la ligne
 local SLIDER_WIDTH, SLIDER_LABEL = 110, 40 -- curseur, et place de sa valeur à droite
 local popups = {} -- [key] = fenêtre
+P.OPTIONS_POPUP_BUTTONS = true -- items { kind = "button" } acceptés (2.24.0)
 
 -- Infobulle d'une option : son nom, puis son explication.
 local function ShowItemTooltip(owner, item)
@@ -96,7 +99,29 @@ local function EnsureDropdown(row)
 	return row.dropdown
 end
 
--- Habille une ligne selon son option : case à gauche du libellé, curseur ou liste à droite.
+local function EnsureButton(row)
+	if not row.actionButton then
+		local button = CreateFrame("Button", nil, row, "UIPanelButtonTemplate")
+		button:SetSize(CONTROL_WIDTH, 22)
+		button:SetPoint("RIGHT", -4, 0)
+		button:SetScript("OnClick", function(self)
+			if row.data and row.data.kind == "button" and row.data.onClick then
+				row.data.onClick(self)
+			end
+		end)
+		button:SetScript("OnEnter", function(self)
+			ShowItemTooltip(self, row.data)
+		end)
+		button:SetScript("OnLeave", GameTooltip_Hide)
+		if P.SkinButton then
+			P.SkinButton(button)
+		end
+		row.actionButton = button
+	end
+	return row.actionButton
+end
+
+-- Habille une ligne selon son option : case à gauche du libellé, curseur, liste ou bouton à droite.
 local function FillRow(row, item)
 	row.filling = true
 	local kind = item.kind
@@ -108,6 +133,9 @@ local function FillRow(row, item)
 	end
 	if row.dropdown then
 		row.dropdown:SetShown(kind == "dropdown")
+	end
+	if row.actionButton then
+		row.actionButton:SetShown(kind == "button")
 	end
 	row.text:ClearAllPoints()
 	if kind == "check" then
@@ -126,6 +154,12 @@ local function FillRow(row, item)
 		slider:Show()
 		row.text:SetPoint("LEFT", 6, 0)
 		row.text:SetPoint("RIGHT", slider, "LEFT", -6, 0)
+	elseif kind == "button" then
+		local button = EnsureButton(row)
+		button:SetText(item.text or "")
+		button:Show()
+		row.text:SetPoint("LEFT", 6, 0)
+		row.text:SetPoint("RIGHT", button, "LEFT", -6, 0)
 	else
 		local dropdown = EnsureDropdown(row)
 		dropdown:GenerateMenu() -- texte du choix courant
