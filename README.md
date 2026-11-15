@@ -192,7 +192,8 @@ côte à côte :
   **leader**, et la sélectionne.
 - **Équipes** : saisir un nom dans le champ « Nom de l'équipe » puis valider avec
   **Entrée** ou le bouton **Créer** : l'équipe est créée et ajoutée à la liste (triée par
-  nom, mémorisée pour le compte). Un nom vide ou déjà utilisé est refusé avec un message
+  nom, mémorisée pour le compte). Hors mode solo, le personnage qui la crée en devient
+  **membre et leader** (il peut ensuite s'en retirer). Un nom vide ou déjà utilisé est refusé avec un message
   en rouge à l'écran. **Échap** quitte le champ. **Clic gauche** sur une équipe la sélectionne, **clic droit** la désélectionne (plus aucune équipe sélectionnée, rappelé par une infobulle au survol)
   (surbrillance dorée). L'infobulle d'une équipe donne sa **date de création** (inconnue pour les
   équipes créées avant la version 0.50.0). La sélection est **mémorisée pour chaque personnage** : après une
@@ -646,6 +647,7 @@ aliases (`/poly accounts`, `/poly remove-account`); debug messages stay in Frenc
 
 ## Version
 
+`2.21.0` : hors mode solo, le personnage qui crée une équipe (champ « Nom de l'équipe ») en devient automatiquement membre et leader ; il peut ensuite s'en retirer.
 `2.20.0` : barre flottante d'équipe réservée aux membres : hors mode solo, une équipe ne peut être sortie en barre ou affichée que si le personnage connecté en fait partie (sinon message pour l'y ajouter) ; infobulle de la poignée et position partagée (Maj + clic) suivent la même règle.
 `2.19.0` : pour les modules : infobulle d'un bouton de module qui peut suivre le mode (interface manette ou souris), et texte commun « Clic droit : menu des actions ». Map, Suivi et Data adaptés à l'interface manette.
 `2.18.0` : interface manette de Blizzard : le clic droit sur un personnage, un en-tête de compte, une équipe ou la barre flottante ouvre un menu de toutes ses actions (remplace Maj / Alt + clic et le double-clic), infobulles adaptées ; suppression d'une équipe depuis ce menu confirmée. Sans l'interface manette, rien ne change.

@@ -185,8 +185,9 @@ the other clients right away. Three frames side by side:
   ("Arthas", or "Arthas_1", "Arthas_2"... if that name is taken), with it as member and **leader**,
   and selects it.
 - **Teams**: type a name in the "Team name" field then confirm with **Enter** or the **Create**
-  button: the team is created and added to the list (sorted by name, remembered for the account). An
-  empty or already used name is refused with a red message on screen. **Escape** leaves the field.
+  button: the team is created and added to the list (sorted by name, remembered for the account).
+  Outside solo mode, the character creating it becomes its **member and leader** (it can remove itself
+  afterwards). An empty or already used name is refused with a red message on screen. **Escape** leaves the field.
   **Left-click** on a team selects it (gold highlight), **right-click** deselects it (no team
   selected any more, recalled by a tooltip on hover). A team's tooltip gives its **creation date**
   (unknown for teams created before version 0.50.0). The selection is **remembered for each

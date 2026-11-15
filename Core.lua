@@ -772,7 +772,7 @@ function P.CreateTeam(name)
 	local old = P.db.teams[name]
 	P.db.teams[name] = { name = name, members = {}, updated = old and old.updated, created = GetServerTime() }
 	TeamChanged(name)
-	return true
+	return true, name -- nom nettoyé (espaces retirés), pour la suite de la création
 end
 
 -- Supprime une équipe (pierre tombale synchronisée). Renvoie true si supprimée.

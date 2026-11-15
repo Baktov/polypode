@@ -1993,14 +1993,22 @@ function P.BuildUI()
 		teamInput.Instructions:SetText(L["Nom de l'équipe"])
 	end
 
-	-- Valide la saisie (Entrée ou bouton) : crée l'équipe, ou affiche l'erreur à l'écran.
+	-- Valide la saisie (Entrée ou bouton) : crée l'équipe, ou affiche l'erreur à l'écran. Hors mode
+	-- solo, le personnage qui la crée en devient membre et leader (confort : il peut s'en retirer).
 	local function SubmitTeam()
-		local ok, err = P.CreateTeam(teamInput:GetText())
+		local ok, result = P.CreateTeam(teamInput:GetText())
 		if ok then
 			teamInput:SetText("")
+			local key = P.GetCharKey()
+			if not P.IsSoloMode() and P.GetCharacter(key) then
+				P.AddTeamMember(result, key)
+				P.SetTeamLeader(result, key)
+				UIErrorsFrame:AddMessage(L["Équipe « %s » créée, leader : %s."]:format(result, P.GetDisplayName(key)),
+					1, 0.82, 0)
+			end
 			P.RefreshUI()
 		else
-			UIErrorsFrame:AddMessage(err, 1, 0.1, 0.1)
+			UIErrorsFrame:AddMessage(result, 1, 0.1, 0.1)
 		end
 	end
 	teamInput:SetScript("OnEnterPressed", SubmitTeam)
