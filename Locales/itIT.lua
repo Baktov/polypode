@@ -395,4 +395,15 @@ P.AddTranslations(P.L, "itIT", {
 	["Compte Battle.net : reconnu automatiquement. Chaque annonce porte un identifiant tiré de votre BattleTag (haché, jamais envoyé en clair) : seuls vos personnages et ceux des comptes autorisés sont acceptés."] = "Account Battle.net: riconosciuto automaticamente. Ogni annuncio porta un identificativo ricavato dal tuo BattleTag (cifrato, mai inviato in chiaro): sono accettati solo i tuoi personaggi e quelli degli account autorizzati.",
 	["Compte WoW (WoW1, WoW2... d'un même Battle.net) : le jeu ne donne pas son nom aux addons, et tous ont le même identifiant. Vous le nommez vous-même, une fois par personnage (Alt + clic sur le personnage, ou dans les options) ; ce nom est partagé avec vos autres Polypode et sert à regrouper la liste par compte."] = "Account WoW (WoW1, WoW2... di uno stesso Battle.net): il gioco non fornisce il suo nome agli addon, e hanno tutti lo stesso identificativo. Lo nomini tu, una volta per personaggio (Alt + clic sul personaggio, o nelle opzioni); il nome è condiviso con gli altri tuoi Polypode e serve a raggruppare l'elenco per account.",
 	["Action bloquée par le jeu : %s (%s). Merci de la signaler."] = "Azione bloccata dal gioco: %s (%s). Per favore, segnalala.",
+	-- UI_Broker.lua
+	["Équipe Polypode"] = "Squadra Polypode",
+	["Modules Polypode"] = "Moduli Polypode",
+	["Modules (%d)"] = "Moduli (%d)",
+	["Clic droit : ouvrir / fermer la fenêtre Polypode"] = "Clic destro: apri / chiudi la finestra di Polypode",
+	["Maj + clic : afficher / masquer la barre flottante"] = "Maiusc + clic: mostra / nascondi la barra mobile",
+	["Ouvrir un module"] = "Apri un modulo",
+	["Options d'un module"] = "Opzioni di un modulo",
+	["Aucun module installé"] = "Nessun modulo installato",
+	["Clic : choisir un module à ouvrir"] = "Clic: scegli un modulo da aprire",
+	["Clic droit : options d'un module"] = "Clic destro: opzioni di un modulo",
 })

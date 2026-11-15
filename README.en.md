@@ -500,6 +500,24 @@ all already followed), the key shows a message on screen.
 
 ---
 
+## Data bars (brokers)
+
+Polypode provides **LibDataBroker** sources to put in a data bar: "Broker Plugin" block of
+EllesmereUI DataBars, ElvUI datatexts, Titan Panel, ChocolateBar, Bazooka... Nothing is embedded:
+the sources only exist if one of these addons loads LibDataBroker (always the case for a bar that
+shows brokers).
+
+- **Polypode Team** ("Polypode team"): name of the selected team, connected characters / members,
+  then the **leader** (crown, class color). In **solo mode**, your character's name: same source in
+  both modes, so the bar does not need reconfiguring. Tooltip: members (leader first), level and
+  zone, or "offline". **Left-click**: invite the team (solo: Polypode window); **right-click**: open
+  / close the window; **Shift + click**: show / hide the floating bar.
+- **Polypode Modules** ("Polypode modules"): number of modules; **click**: menu to open one;
+  **right-click**: menu of their options.
+- **One shortcut per module** ("Polypode Data", "Polypode Suivi", "Polypode Map"...) with the
+  module's icon: same click and same tooltip as its button in the window. Only place the ones you
+  want.
+
 ## Minimap button
 
 A **hand**-shaped button is placed around the minimap:

@@ -525,6 +525,25 @@ possible (seul dans le groupe, ou tous déjà suivis), la touche affiche un mess
 
 ---
 
+## Barres de données (brokers)
+
+Polypode fournit des sources **LibDataBroker** à placer dans une barre de données : bloc « Broker
+Plugin » d'EllesmereUI DataBars, textes d'information d'ElvUI, Titan Panel, ChocolateBar,
+Bazooka... Rien n'est embarqué : les sources n'existent que si un de ces addons charge
+LibDataBroker (c'est toujours le cas d'une barre qui affiche des brokers).
+
+- **Polypode Team** (« Équipe Polypode ») : nom de l'équipe sélectionnée, personnages connectés /
+  membres, puis le **leader** (couronne, couleur de classe). En **mode solo**, le nom de votre
+  personnage : même source dans les deux modes, la barre n'est pas à reconfigurer. Infobulle :
+  membres (leader en tête), niveau et zone, ou « hors ligne ». **Clic gauche** : inviter l'équipe
+  (en solo : fenêtre Polypode) ; **clic droit** : ouvrir / fermer la fenêtre ; **Maj + clic** :
+  afficher / masquer la barre flottante.
+- **Polypode Modules** (« Modules Polypode ») : nombre de modules ; **clic** : menu pour en ouvrir
+  un ; **clic droit** : menu de leurs options.
+- **Un raccourci par module** (« Polypode Data », « Polypode Suivi », « Polypode Map »...) avec
+  l'icône du module : même clic et même infobulle que son bouton dans la fenêtre. Placez seulement
+  ceux que vous voulez.
+
 ## Bouton de minimap
 
 Un bouton en forme de **main** est placé autour de la minimap :
@@ -654,6 +673,7 @@ aliases (`/poly accounts`, `/poly remove-account`); debug messages stay in Frenc
 
 ## Version
 
+`2.25.0` : **barres de données** : sources LibDataBroker « Polypode Team » (équipe, connectés / membres, leader ; personnage joué en mode solo ; clics : inviter, fenêtre, barre flottante), « Polypode Modules » (menu pour ouvrir un module ou ses options) et un raccourci par module, pour EllesmereUI DataBars, ElvUI, Titan Panel...
 `2.24.0` : pour les modules : la petite fenêtre d'options peut porter des boutons d'action (utilisé par Map pour copier une disposition).
 `2.23.1` : fenêtre principale : elle peut de nouveau être rendue plus étroite que sa barre de titre à la poignée ; ce choix est gardé à part en mode solo et hors mode solo, jusqu'au double-clic sur la barre de titre.
 `2.23.0` : fenêtre principale : deux tailles mémorisées, une en mode solo et une hors mode solo (largeur et hauteur) ; au passage d'un mode à l'autre, la fenêtre reprend la taille de ce mode et s'élargit si besoin pour que toute la barre de titre soit lisible, même après un redimensionnement à la poignée, qui ne descend plus sous cette largeur.
