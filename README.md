@@ -334,6 +334,11 @@ barre déjà affichée se masque tant que l'équipe sélectionnée ne le contien
   installé (case d'affichage, flèches ▲ ▼ pour l'ordre), et les boutons « Tous » / « Aucun ». Colonne **à gauche**
   par défaut, **à droite**, ou rangée **horizontale** au-dessus de la barre (option « Barre
   d'équipe : côté des boutons »).
+- **Boutons au survol** : la souris sur la barre fait apparaître deux petits boutons (à gauche du
+  cadenas ; au-dessus de l'icône en barre réduite). Le premier **réduit** la barre à l'icône ou la
+  **rétablit** (nom et liste) ; le second change la **disposition des boutons des modules** à chaque
+  clic : à gauche, à droite, horizontal, puis de nouveau à gauche. Ces deux réglages sont aussi en tête
+  de la petite fenêtre d'options (clic droit sur l'icône).
 - **Barre réduite** (option « Barre d'équipe : réduite à l'icône ») : seule l'**icône Polypode**
   reste, dans un cadre de la taille d'un bouton de module (nom, liste des personnages, croix et
   poignée masqués). Les boutons des modules sont alors **dessous en colonne** (à gauche, à
@@ -647,6 +652,7 @@ aliases (`/poly accounts`, `/poly remove-account`); debug messages stay in Frenc
 
 ## Version
 
+`2.22.0` : barre flottante : au survol, deux petits boutons pour réduire la barre à l'icône (ou la rétablir) et changer la disposition des boutons des modules (à gauche, à droite, horizontal) en un clic ; ces deux réglages passent en tête de la petite fenêtre d'options.
 `2.21.0` : hors mode solo, le personnage qui crée une équipe (champ « Nom de l'équipe ») en devient automatiquement membre et leader ; il peut ensuite s'en retirer.
 `2.20.0` : barre flottante d'équipe réservée aux membres : hors mode solo, une équipe ne peut être sortie en barre ou affichée que si le personnage connecté en fait partie (sinon message pour l'y ajouter) ; infobulle de la poignée et position partagée (Maj + clic) suivent la même règle.
 `2.19.0` : pour les modules : infobulle d'un bouton de module qui peut suivre le mode (interface manette ou souris), et texte commun « Clic droit : menu des actions ». Map, Suivi et Data adaptés à l'interface manette.

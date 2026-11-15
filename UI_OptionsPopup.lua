@@ -228,5 +228,15 @@ function P.ToggleOptionsPopup(owner, popup)
 	frame:SetPoint("TOPLEFT", owner, "BOTTOMLEFT", 0, -4)
 	frame:Show()
 	frame:Raise()
+	frame.items = items
 	P.SetListData(frame.panel, items)
+end
+
+-- Relit les réglages des petites fenêtres ouvertes (changés ailleurs : boutons de la barre).
+function P.RefreshOptionsPopups()
+	for _, frame in pairs(popups) do
+		if frame:IsShown() and frame.items then
+			P.SetListData(frame.panel, frame.items)
+		end
+	end
 end

@@ -30,6 +30,7 @@ local MAX_VISIBLE_ROWS = 8 -- hauteur automatique : au-delà, la liste défile
 local MIN_LIST_HEIGHT, MAX_LIST_HEIGHT = ROW_HEIGHT + 2 * LIST_PADDING, 600
 
 local bar, listPanel, toggleIcon, lockIcon, grip, closeButton, iconButton
+local hoverTools -- boutons « réduire » et « disposition », affichés au survol (BuildHoverTools)
 local listAbove -- liste dépliée au-dessus de la barre (trop près du bas de l'écran)
 
 local function Clamp(value, low, high)
@@ -366,6 +367,139 @@ end
 
 -- INTERFACE MANETTE (P.IsGamepadUI) : clic droit sur la barre ou sur son icône = menu de toutes
 -- ses actions (Alt / Maj + clic malaisés au curseur de la manette). À la souris, rien ne change.
+-- OUTILS AU SURVOL : deux petits boutons visibles seulement la souris sur la barre (ou sur eux) :
+-- réduire / agrandir (state.compact) et disposition des boutons des modules (moduleSide : gauche,
+-- droite, horizontal, puis gauche). Barre complète : à gauche du cadenas, le nom raccourci d'autant
+-- pendant le survol ; barre réduite : au-dessus de l'icône, ou à sa gauche si le haut de l'écran est
+-- trop près. Les changements passent par les réglages du panneau d'options (P.teamBarSettings,
+-- UI_Options.lua) pour que le panneau et la petite fenêtre d'options suivent.
+local TOOL_SIZE = 14
+local HOVER_REFRESH = 0.1 -- secondes entre deux vérifications du survol
+local NEXT_SIDE = { left = "right", right = "horizontal", horizontal = "left" }
+
+local function CurrentSide()
+	return NEXT_SIDE[P.charDb.teamBar.moduleSide] and P.charDb.teamBar.moduleSide or "left"
+end
+
+local function SideLabel(side)
+	if side == "right" then
+		return L["À droite"]
+	elseif side == "horizontal" then
+		return L["Horizontal"]
+	end
+	return L["À gauche"]
+end
+
+-- Change un réglage de la barre (compact, moduleSide) par son réglage du panneau s'il existe.
+local function SetBarOption(key, value)
+	local setting = P.teamBarSettings and P.teamBarSettings[key]
+	if setting then
+		setting:SetValue(value) -- son setter écrit P.charDb.teamBar et rafraîchit la barre
+	else
+		P.charDb.teamBar[key] = value
+		P.RefreshTeamBar()
+	end
+	if P.RefreshOptionsPopups then
+		P.RefreshOptionsPopups()
+	end
+end
+
+local function ToggleCompact()
+	SetBarOption("compact", not P.charDb.teamBar.compact)
+end
+
+local function CycleModuleSide()
+	SetBarOption("moduleSide", NEXT_SIDE[CurrentSide()])
+end
+
+-- Place les outils selon le mode de la barre ; le nom s'arrête avant eux quand ils sont affichés.
+local function LayoutHoverTools()
+	if not hoverTools then
+		return
+	end
+	local compact = P.charDb.teamBar.compact
+	hoverTools.compact:SetNormalTexture(compact and "Interface\\Buttons\\UI-Panel-BiggerButton-Up"
+		or "Interface\\Buttons\\UI-Panel-SmallerButton-Up")
+	hoverTools:ClearAllPoints()
+	if compact then
+		local top = bar:GetTop()
+		if top and top + TOOL_SIZE + 4 > UIParent:GetTop() then
+			hoverTools:SetPoint("RIGHT", bar, "LEFT", -2, 0)
+		else
+			hoverTools:SetPoint("BOTTOM", bar, "TOP", 0, 2)
+		end
+		bar.header:SetPoint("RIGHT", lockIcon, "LEFT", -2, 0)
+	else
+		hoverTools:SetPoint("RIGHT", lockIcon, "LEFT", -2, 0)
+		bar.header:SetPoint("RIGHT", hoverTools:IsShown() and hoverTools or lockIcon, "LEFT", -2, 0)
+	end
+end
+
+local function CreateToolButton(onClick, addLines)
+	local button = CreateFrame("Button", nil, hoverTools)
+	button:SetSize(TOOL_SIZE, TOOL_SIZE)
+	button:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square", "ADD")
+	button:SetScript("OnEnter", function(self)
+		GameTooltip:SetOwner(self, "ANCHOR_TOP")
+		addLines()
+		P.ShowTooltip()
+	end)
+	button:SetScript("OnLeave", GameTooltip_Hide)
+	button:SetScript("OnClick", function(self)
+		onClick()
+		if GameTooltip:IsOwned(self) then
+			self:GetScript("OnEnter")(self) -- infobulle mise à jour (nouvel état)
+		end
+	end)
+	return button
+end
+
+local function BuildHoverTools()
+	hoverTools = CreateFrame("Frame", nil, bar)
+	hoverTools:SetSize(2 * TOOL_SIZE + 2, TOOL_SIZE)
+	hoverTools:SetFrameLevel(bar:GetFrameLevel() + 12)
+	hoverTools:Hide()
+
+	hoverTools.compact = CreateToolButton(ToggleCompact, function()
+		local compact = P.charDb.teamBar.compact
+		GameTooltip:AddLine(compact and L["Barre complète"] or L["Réduire à l'icône"])
+		GameTooltip:AddLine(compact and L["Clic : afficher le nom et la liste"]
+			or L["Clic : ne garder que l'icône Polypode"], 1, 1, 1)
+	end)
+	hoverTools.compact:SetPoint("LEFT")
+
+	hoverTools.layout = CreateToolButton(CycleModuleSide, function()
+		local side = CurrentSide()
+		GameTooltip:AddLine(L["Boutons des modules : %s"]:format(SideLabel(side)))
+		GameTooltip:AddLine(L["Clic : passer à « %s »"]:format(SideLabel(NEXT_SIDE[side])), 1, 1, 1)
+	end)
+	hoverTools.layout:SetPoint("LEFT", hoverTools.compact, "RIGHT", 2, 0)
+	local icon = hoverTools.layout:CreateTexture(nil, "ARTWORK")
+	icon:SetAllPoints()
+	if not (icon.SetAtlas and icon:SetAtlas("common-icon-rotateright")) then
+		icon:SetTexture("Interface\\Buttons\\UI-RotationRight-Button-Up")
+	end
+
+	-- Veille du survol, sur un cadre à part (l'OnUpdate de la barre sert à P.StartTeamBarDrag) ;
+	-- enfant de la barre, il ne tourne que barre affichée. Marge de 4 pixels : passer de la barre
+	-- aux outils posés au-dessus de l'icône ne les fait pas disparaître.
+	local watcher = CreateFrame("Frame", nil, bar)
+	local sinceCheck = 0
+	watcher:SetScript("OnUpdate", function(_, elapsed)
+		sinceCheck = sinceCheck + elapsed
+		if sinceCheck < HOVER_REFRESH then
+			return
+		end
+		sinceCheck = 0
+		local over = not bar.dragging and (bar:IsMouseOver(4, -4, -4, 4) or hoverTools:IsMouseOver(4, -4, -4, 4))
+		if over ~= hoverTools:IsShown() then
+			hoverTools:SetShown(over)
+			LayoutHoverTools()
+		end
+	end)
+	P.ui.teamBarTools = hoverTools
+end
+
 local function ShowBarMenu(owner)
 	local state = P.charDb.teamBar
 	local solo = P.IsSoloMode()
@@ -385,10 +519,9 @@ local function ShowBarMenu(owner)
 			end)
 		end
 		root:CreateButton(state.locked and L["Libérer la barre"] or L["Figer la barre"], ToggleLocked)
-		root:CreateButton(state.compact and L["Barre complète"] or L["Réduire à l'icône"], function()
-			state.compact = not state.compact
-			P.RefreshTeamBar()
-		end)
+		root:CreateButton(state.compact and L["Barre complète"] or L["Réduire à l'icône"], ToggleCompact)
+		root:CreateButton(L["Boutons des modules : passer à « %s »"]:format(SideLabel(NEXT_SIDE[CurrentSide()])),
+			CycleModuleSide)
 		root:CreateButton(L["Options de Polypode..."], function()
 			if P.optionsPopup then
 				P.ToggleOptionsPopup(iconButton, P.optionsPopup)
@@ -775,6 +908,8 @@ local function Build()
 	moduleColumn = CreateFrame("Frame", nil, bar)
 	moduleColumn:Hide()
 
+	BuildHoverTools()
+
 	P.ui.teamBar = bar
 	P.ui.teamBarModules = moduleColumn
 	P.ui.teamBarList = listPanel
@@ -885,6 +1020,7 @@ function P.RefreshTeamBar()
 		grip:Hide()
 	end
 	LayoutModuleButtons()
+	LayoutHoverTools()
 	bar:Show()
 end
 

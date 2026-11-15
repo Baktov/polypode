@@ -814,6 +814,14 @@ function P.BuildOptions()
 		.. "Polypode, clic droit = options, glisser = déplacer, Alt + clic = figer. Réglage propre à ce "
 		.. "personnage."])
 
+	-- Repris par les boutons au survol de la barre (UI_TeamBar.lua), pour que le panneau suive.
+	P.teamBarSettings = { moduleSide = moduleSideSetting, compact = compactSetting }
+	-- Petite fenêtre d'options : ces deux réglages en tête (« réduite », puis « côté des boutons »).
+	local compactItem = table.remove(popupItems)
+	local sideItem = table.remove(popupItems)
+	table.insert(popupItems, 1, sideItem)
+	table.insert(popupItems, 1, compactItem)
+
 	Settings.RegisterAddOnCategory(category)
 	P.optionsCategory = category
 	P.optionsPopup = { key = "Polypode", title = L["Options de Polypode"], items = popupItems, category = category }

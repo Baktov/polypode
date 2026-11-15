@@ -315,6 +315,11 @@ does not contain it.
   small font; the click and the tooltip are the same as in the Polypode window (Photo: right-click =
   options). Column **on the left** by default, **on the right**, or **horizontal** row above the bar
   (option "Team bar: button side").
+- **Hover buttons**: with the mouse over the bar, two small buttons appear (left of the padlock; above
+  the icon on the reduced bar). The first one **reduces** the bar to the icon or **restores** it (name
+  and list); the second one changes the **layout of the module buttons** on each click: left, right,
+  horizontal, then left again. Both settings are also at the top of the small options window
+  (right-click on the icon).
 - **Reduced bar** (option "Team bar: reduced to the icon"): only the **Polypode icon** remains, in a
   frame the size of a module button (name, character list, close button and grip hidden). The module
   buttons are then **below in a column** (left, right), or **right of the icon in a row**
