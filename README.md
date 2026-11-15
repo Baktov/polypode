@@ -248,8 +248,9 @@ solo (720 × 320 par défaut) et une en mode solo (620 × 320) ; en changeant de
 la taille de ce mode. **Double-clic** sur sa barre de titre : retour à la taille par défaut du mode
 courant. Si la fenêtre est très réduite en hauteur, le contenu est simplement tronqué.
 La fenêtre **s'élargit** à l'ouverture et au changement de mode pour que toute sa barre de titre soit
-lisible (Options, Canal, Solo, voyant, boutons des modules, titre et croix), sans dépasser l'écran ;
-la poignée ne la rend pas plus étroite que cette largeur.
+lisible (Options, Canal, Solo, voyant, boutons des modules, titre et croix), sans dépasser l'écran.
+Rendue **plus étroite à la poignée**, elle garde votre choix (à part en mode solo et hors mode solo) ;
+le double-clic sur la barre de titre rétablit l'ajustement automatique.
 
 ---
 
@@ -653,6 +654,7 @@ aliases (`/poly accounts`, `/poly remove-account`); debug messages stay in Frenc
 
 ## Version
 
+`2.23.1` : fenêtre principale : elle peut de nouveau être rendue plus étroite que sa barre de titre à la poignée ; ce choix est gardé à part en mode solo et hors mode solo, jusqu'au double-clic sur la barre de titre.
 `2.23.0` : fenêtre principale : deux tailles mémorisées, une en mode solo et une hors mode solo (largeur et hauteur) ; au passage d'un mode à l'autre, la fenêtre reprend la taille de ce mode et s'élargit si besoin pour que toute la barre de titre soit lisible, même après un redimensionnement à la poignée, qui ne descend plus sous cette largeur.
 `2.22.0` : barre flottante : au survol, deux petits boutons pour réduire la barre à l'icône (ou la rétablir) et changer la disposition des boutons des modules (à gauche, à droite, horizontal) en un clic ; ces deux réglages passent en tête de la petite fenêtre d'options.
 `2.21.0` : hors mode solo, le personnage qui crée une équipe (champ « Nom de l'équipe ») en devient automatiquement membre et leader ; il peut ensuite s'en retirer.

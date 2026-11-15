@@ -1307,8 +1307,9 @@ end
 -- LARGEUR AJUSTÉE À LA BARRE DE TITRE : Options, Canal, Solo, voyant et boutons de gauche,
 -- titre centré, boutons de droite et croix doivent tenir sans se chevaucher. La fenêtre ouverte
 -- s'élargit à ce qu'il faut (jamais rétrécie, bornée à l'écran) et garde cette largeur pour le
--- mode courant ; c'est aussi la largeur minimale de la poignée (SetResizeBounds), recalculée à
--- chaque appel (ouverture, boutons changés, passage solo / multi).
+-- mode courant (ouverture, boutons changés, passage solo / multi). Exception, par mode : une
+-- largeur rendue plus étroite à la poignée (P.db.mainFrame.narrowWidth[clé]) est respectée
+-- jusqu'au double-clic sur la barre de titre ; élargie à la poignée, l'ajustement reprend.
 local TITLE_GAP = 12 -- écart minimal entre le titre centré et les boutons de chaque côté
 
 -- Largeur nécessaire, mesurée sur les éléments placés (nil si la fenêtre n'est pas encore placée).
@@ -1346,12 +1347,14 @@ FitTitleBar = function()
 		return
 	end
 	local key = WidthKey()
+	if P.db.mainFrame.narrowWidth[key] then
+		return -- plus étroite par choix de l'utilisateur, dans ce mode
+	end
 	local needed = TitleBarWidth()
 	if not needed then
 		return
 	end
 	needed = math.min(math.ceil(needed), UIParent:GetWidth() - 20)
-	f:SetResizeBounds(math.max(MIN_WIDTH, needed), MIN_HEIGHT)
 	if needed <= f:GetWidth() + 0.5 then
 		return
 	end
@@ -1678,7 +1681,11 @@ function P.BuildUI()
 	end)
 	grip:SetScript("OnMouseUp", function()
 		f:StopMovingOrSizing()
-		P.db.mainFrame[WidthKey()], P.db.mainFrame[HeightKey()] = f:GetSize() -- taille du mode courant
+		local key = WidthKey()
+		P.db.mainFrame[key], P.db.mainFrame[HeightKey()] = f:GetSize() -- taille du mode courant
+		-- Plus étroite que la barre de titre : choix gardé pour ce mode ; sinon ajustement automatique.
+		local needed = TitleBarWidth()
+		P.db.mainFrame.narrowWidth[key] = needed and f:GetWidth() + 0.5 < math.ceil(needed) or nil
 	end)
 
 	-- Double-clic sur la barre de titre : taille par défaut (largeur du mode courant, solo ou non),
@@ -1687,6 +1694,7 @@ function P.BuildUI()
 		local key, heightKey = WidthKey(), HeightKey()
 		P.db.mainFrame[key] = P.defaults.mainFrame[key]
 		P.db.mainFrame[heightKey] = P.defaults.mainFrame[heightKey]
+		P.db.mainFrame.narrowWidth[key] = nil -- de nouveau ajustée à la barre de titre
 		f:SetSize(P.db.mainFrame[key], P.db.mainFrame[heightKey])
 		FitTitleBar()
 	end)

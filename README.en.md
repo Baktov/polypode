@@ -238,7 +238,8 @@ and one in solo mode (620 × 320); when switching modes, the window takes back t
 short, the content is simply cut off.
 The window **widens** when opened and when switching modes so that its whole title bar is readable
 (Options, Channel, Solo, indicator, module buttons, title and close button), without going past the
-screen; the grip cannot make it narrower than that.
+screen. Made **narrower with the grip**, it keeps your choice (separately in solo mode and outside it);
+double-clicking the title bar brings the automatic adjustment back.
 
 ---
 
