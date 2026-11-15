@@ -328,6 +328,7 @@ P.AddTranslations(P.L, "enUS", {
 	["Glisser : sélectionner et afficher en barre flottante"] = "Drag: select and show as a floating bar",
 	["Barre flottante"] = "Floating bar",
 	["Glisser hors de la fenêtre : la barre flottante apparaît où vous lâchez."] = "Drag out of the window: the floating bar appears where you drop it.",
+	["Ajoutez ce personnage à l'équipe « %s » pour afficher sa barre flottante."] = "Add this character to the team \"%s\" to show its floating bar.",
 	["Clic : afficher la barre flottante"] = "Click: show the floating bar",
 	["Clic : masquer la barre flottante"] = "Click: hide the floating bar",
 	["Clic : sélectionner l'équipe et afficher sa barre flottante"] = "Click: select the team and show its floating bar",

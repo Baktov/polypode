@@ -790,11 +790,40 @@ local function Build()
 	RestorePosition()
 end
 
+-- Hors mode solo, une équipe n'est montrée en barre flottante que si le personnage joué en est
+-- membre : il doit s'y ajouter pour la sortir de la fenêtre ou l'afficher. Sans équipe : non.
+function P.CanShowTeamBar(teamName)
+	if P.IsSoloMode() then
+		return true
+	end
+	local members = teamName and P.GetTeamMembers(teamName)
+	return members ~= nil and members[P.GetCharKey()] == true
+end
+
+-- Message affiché quand la barre d'une équipe est refusée (aussi dans l'infobulle de la poignée).
+function P.TeamBarRefusal(teamName)
+	if not teamName then
+		return L["Sélectionnez une équipe"]
+	end
+	return L["Ajoutez ce personnage à l'équipe « %s » pour afficher sa barre flottante."]:format(teamName)
+end
+
+-- Vrai (et message d'erreur à l'écran) si l'équipe ne peut pas être montrée en barre ici.
+local function RefuseTeamBar(teamName)
+	if P.CanShowTeamBar(teamName) then
+		return false
+	end
+	UIErrorsFrame:AddMessage(P.TeamBarRefusal(teamName), 1, 0.1, 0.1)
+	return true
+end
+
 -- Met la barre à jour (équipe sélectionnée, membres, pliage) ; construite à la demande.
--- Appelé par P.RefreshUI et au login (barre laissée affichée à la déconnexion).
+-- Appelé par P.RefreshUI et au login (barre laissée affichée à la déconnexion). Équipe
+-- sélectionnée sans le personnage joué : barre masquée, l'état « affichée » gardé (elle revient
+-- en sélectionnant une équipe dont il est membre, ou en l'y ajoutant).
 function P.RefreshTeamBar()
 	local state = P.charDb and P.charDb.teamBar
-	if not state or not state[ShownKey()] then
+	if not state or not state[ShownKey()] or not P.CanShowTeamBar(P.GetSelectedTeam()) then
 		if bar then
 			bar:Hide()
 		end
@@ -868,6 +897,10 @@ function P.ApplyTeamBarLayout(teamName, layout)
 		P.Debug("Position de barre reçue ignorée : barre déjà affichée")
 		return
 	end
+	if not P.CanShowTeamBar(teamName) then
+		P.Debug("Position de barre reçue ignorée : personnage hors de l'équipe " .. tostring(teamName))
+		return
+	end
 	local screenWidth, screenHeight = UIParent:GetWidth(), UIParent:GetHeight()
 	state.point, state.relativePoint = "TOPLEFT", "BOTTOMLEFT"
 	state.x = layout.left / 100 * screenWidth
@@ -888,15 +921,19 @@ function P.ApplyTeamBarLayout(teamName, layout)
 	P.RefreshTeamBar()
 end
 
--- Barre affichée dans le mode courant (solo ou équipe).
+-- Barre affichée dans le mode courant (solo ou équipe) : hors mode solo, il faut aussi que le
+-- personnage joué soit membre de l'équipe sélectionnée (P.CanShowTeamBar).
 function P.IsTeamBarShown()
-	return P.charDb.teamBar[ShownKey()] == true
+	return P.charDb.teamBar[ShownKey()] == true and P.CanShowTeamBar(P.GetSelectedTeam())
 end
 
 -- Affiche ou masque la barre sans la glisser (clic sur la poignée d'une ligne, UI_Main.lua :
 -- souris et manette). Sans position mémorisée, elle se pose à droite de la fenêtre principale
 -- ouverte (gardée dans l'écran par SetClampedToScreen) et cette place est retenue.
 function P.SetTeamBarShown(shown)
+	if shown and RefuseTeamBar(P.GetSelectedTeam()) then
+		return
+	end
 	local state = P.charDb.teamBar
 	state[ShownKey()] = shown and true or false
 	P.RefreshTeamBar()
@@ -920,8 +957,12 @@ end
 -- et le suit jusqu'au relâchement du bouton, où sa position est mémorisée. Le relâchement est
 -- guetté par OnUpdate plutôt que par l'OnDragStop de la ligne d'origine, qui peut être
 -- recyclée par le rafraîchissement de la liste pendant le glisser. Barre figée : elle est
--- seulement (ré)affichée à sa place.
+-- seulement (ré)affichée à sa place. Refusé (message) si le personnage joué n'est pas membre de
+-- l'équipe sélectionnée (P.CanShowTeamBar) ; de même pour P.SetTeamBarShown(true).
 function P.StartTeamBarDrag()
+	if RefuseTeamBar(P.GetSelectedTeam()) then
+		return
+	end
 	P.charDb.teamBar[ShownKey()] = true
 	P.RefreshTeamBar()
 	if P.charDb.teamBar.locked then

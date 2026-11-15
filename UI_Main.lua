@@ -2072,6 +2072,10 @@ function P.BuildUI()
 			end,
 			tooltip = function(data)
 				local shownHere = data.name == selectedTeam and P.IsTeamBarShown()
+				if not P.CanShowTeamBar(data.name) then
+					-- Personnage joué hors de l'équipe : barre refusée (UI_TeamBar.lua).
+					return { L["Barre flottante"], "|cffff4040" .. P.TeamBarRefusal(data.name) .. "|r" }
+				end
 				return { L["Barre flottante"],
 					L["Glisser hors de la fenêtre : la barre flottante apparaît où vous lâchez."],
 					shownHere and L["Clic : masquer la barre flottante"]

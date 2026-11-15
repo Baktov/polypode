@@ -289,7 +289,10 @@ single character), uncheck it, or close the tip with its cross (several characte
 
 Small bar placed on the game screen, taken out of the main window by **dragging** a team from the
 "Teams" frame. It shows the name of the **selected team** and its number of characters, and follows
-the selection (click on another team, sync); "No team" if nothing is selected.
+the selection (click on another team, sync). Outside solo mode, only a team **the logged-in character
+belongs to** can be taken out as a bar or shown: otherwise a message asks you to add it first
+(right-click it in "Available characters"), and a bar already shown hides while the selected team
+does not contain it.
 
 - **Polypode icon** (far left, the same as the minimap button): a click opens or closes the Polypode
   main window; a **right-click** opens a **small options window** next to the icon (boxes, sliders

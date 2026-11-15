@@ -305,8 +305,10 @@ le choix : cocher la case (un seul personnage), la décocher, ou fermer la bulle
 
 Petite barre posée sur l'écran de jeu, sortie de la fenêtre principale en **glissant** une équipe
 du cadre « Équipes ». Elle affiche le nom de **l'équipe sélectionnée** et son nombre de
-personnages, et suit la sélection (clic sur une autre équipe, synchro) ; « Aucune équipe » si
-rien n'est sélectionné.
+personnages, et suit la sélection (clic sur une autre équipe, synchro). Hors mode solo, seule une
+équipe dont **le personnage connecté est membre** peut être sortie en barre ou affichée : sinon un
+message demande de l'y ajouter d'abord (clic droit sur lui dans « Personnages disponibles »), et une
+barre déjà affichée se masque tant que l'équipe sélectionnée ne le contient pas.
 
 - **Icône Polypode** (tout à gauche, la même que le bouton de minimap) : un clic ouvre ou ferme
   la fenêtre principale de Polypode ; un **clic droit** ouvre une **petite fenêtre d'options** à côté
@@ -644,6 +646,7 @@ aliases (`/poly accounts`, `/poly remove-account`); debug messages stay in Frenc
 
 ## Version
 
+`2.20.0` : barre flottante d'équipe réservée aux membres : hors mode solo, une équipe ne peut être sortie en barre ou affichée que si le personnage connecté en fait partie (sinon message pour l'y ajouter) ; infobulle de la poignée et position partagée (Maj + clic) suivent la même règle.
 `2.19.0` : pour les modules : infobulle d'un bouton de module qui peut suivre le mode (interface manette ou souris), et texte commun « Clic droit : menu des actions ». Map, Suivi et Data adaptés à l'interface manette.
 `2.18.0` : interface manette de Blizzard : le clic droit sur un personnage, un en-tête de compte, une équipe ou la barre flottante ouvre un menu de toutes ses actions (remplace Maj / Alt + clic et le double-clic), infobulles adaptées ; suppression d'une équipe depuis ce menu confirmée. Sans l'interface manette, rien ne change.
 `2.17.0` : barre flottante plus facile à trouver : poignée visible à droite des équipes (et de votre personnage en mode solo), à tirer hors de la fenêtre ou à cliquer pour afficher / masquer la barre sans glisser (manette) ; bulle d'aide sur la poignée tant que la barre n'a jamais servi sur ce personnage.

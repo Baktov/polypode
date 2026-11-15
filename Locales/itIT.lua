@@ -328,6 +328,7 @@ P.AddTranslations(P.L, "itIT", {
 	["Glisser : sélectionner et afficher en barre flottante"] = "Trascina: seleziona e mostra come barra mobile",
 	["Barre flottante"] = "Barra mobile",
 	["Glisser hors de la fenêtre : la barre flottante apparaît où vous lâchez."] = "Trascina fuori dalla finestra: la barra mobile appare dove la rilasci.",
+	["Ajoutez ce personnage à l'équipe « %s » pour afficher sa barre flottante."] = "Aggiungi questo personaggio alla squadra «%s» per mostrarne la barra mobile.",
 	["Clic : afficher la barre flottante"] = "Clic: mostra la barra mobile",
 	["Clic : masquer la barre flottante"] = "Clic: nascondi la barra mobile",
 	["Clic : sélectionner l'équipe et afficher sa barre flottante"] = "Clic: seleziona la squadra e mostra la sua barra mobile",

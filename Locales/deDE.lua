@@ -328,6 +328,7 @@ P.AddTranslations(P.L, "deDE", {
 	["Glisser : sélectionner et afficher en barre flottante"] = "Ziehen: auswählen und als schwebende Leiste anzeigen",
 	["Barre flottante"] = "Schwebende Leiste",
 	["Glisser hors de la fenêtre : la barre flottante apparaît où vous lâchez."] = "Ziehen aus dem Fenster: Die schwebende Leiste erscheint dort, wo du loslässt.",
+	["Ajoutez ce personnage à l'équipe « %s » pour afficher sa barre flottante."] = "Füge diesen Charakter dem Team »%s« hinzu, um seine schwebende Leiste anzuzeigen.",
 	["Clic : afficher la barre flottante"] = "Klick: schwebende Leiste anzeigen",
 	["Clic : masquer la barre flottante"] = "Klick: schwebende Leiste ausblenden",
 	["Clic : sélectionner l'équipe et afficher sa barre flottante"] = "Klick: Team auswählen und seine schwebende Leiste anzeigen",
