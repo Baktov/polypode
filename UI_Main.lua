@@ -1294,15 +1294,21 @@ end
 -- gardée à part, P.db.mainFrame.soloWidth). Le personnage joué se glisse hors de la liste pour
 -- devenir la barre flottante (UI_TeamBar.lua), avec la colonne des modules.
 
--- Clé de P.db.mainFrame où se garde la largeur de la fenêtre dans le mode courant.
+-- Clés de P.db.mainFrame où se gardent la largeur et la hauteur de la fenêtre dans le mode
+-- courant : deux tailles, solo et multi.
 local function WidthKey()
 	return P.IsSoloMode() and "soloWidth" or "width"
 end
 
+local function HeightKey()
+	return P.IsSoloMode() and "soloHeight" or "height"
+end
+
 -- LARGEUR AJUSTÉE À LA BARRE DE TITRE : Options, Canal, Solo, voyant et boutons de gauche,
--- titre centré, boutons de droite et croix doivent tenir sans se chevaucher. Tant que la largeur
--- du mode courant n'a pas été choisie à la poignée (P.db.mainFrame.manualWidth[clé]), la fenêtre
--- ouverte s'élargit à ce qu'il faut (jamais rétrécie, bornée à l'écran) et garde cette largeur.
+-- titre centré, boutons de droite et croix doivent tenir sans se chevaucher. La fenêtre ouverte
+-- s'élargit à ce qu'il faut (jamais rétrécie, bornée à l'écran) et garde cette largeur pour le
+-- mode courant ; c'est aussi la largeur minimale de la poignée (SetResizeBounds), recalculée à
+-- chaque appel (ouverture, boutons changés, passage solo / multi).
 local TITLE_GAP = 12 -- écart minimal entre le titre centré et les boutons de chaque côté
 
 -- Largeur nécessaire, mesurée sur les éléments placés (nil si la fenêtre n'est pas encore placée).
@@ -1340,14 +1346,12 @@ FitTitleBar = function()
 		return
 	end
 	local key = WidthKey()
-	if P.db.mainFrame.manualWidth[key] then
-		return
-	end
 	local needed = TitleBarWidth()
 	if not needed then
 		return
 	end
 	needed = math.min(math.ceil(needed), UIParent:GetWidth() - 20)
+	f:SetResizeBounds(math.max(MIN_WIDTH, needed), MIN_HEIGHT)
 	if needed <= f:GetWidth() + 0.5 then
 		return
 	end
@@ -1550,9 +1554,13 @@ local function ApplySoloLayout()
 	-- « Ajouter la cible » sert à composer des équipes : masqué en mode solo, la liste remonte.
 	ui.addTargetButton:SetShown(not solo)
 	ui.charPanel.SetListTop(solo and HEADER_HEIGHT or HEADER_HEIGHT + INPUT_HEIGHT)
-	ui.frame:SetWidth(math.max(P.db.mainFrame[WidthKey()] or P.db.mainFrame.width, MIN_WIDTH))
+	ui.frame:SetSize(math.max(P.db.mainFrame[WidthKey()] or P.db.mainFrame.width, MIN_WIDTH),
+		math.max(P.db.mainFrame[HeightKey()] or P.db.mainFrame.height, MIN_HEIGHT))
 	LayoutPanels()
-	LayoutTitleButtons()
+	LayoutTitleButtons() -- ajuste aussi la largeur à la barre de titre (FitTitleBar)
+	-- Boutons tout juste affichés ou masqués : leurs positions ne sont connues qu'à l'image
+	-- suivante, la largeur est alors mesurée de nouveau.
+	C_Timer.After(0, FitTitleBar)
 end
 
 -- Active / désactive le mode solo pour ce personnage (case de la fenêtre et panneau d'options).
@@ -1670,18 +1678,16 @@ function P.BuildUI()
 	end)
 	grip:SetScript("OnMouseUp", function()
 		f:StopMovingOrSizing()
-		P.db.mainFrame[WidthKey()], P.db.mainFrame.height = f:GetSize()
-		P.db.mainFrame.manualWidth[WidthKey()] = true -- largeur choisie : plus ajustée au titre
+		P.db.mainFrame[WidthKey()], P.db.mainFrame[HeightKey()] = f:GetSize() -- taille du mode courant
 	end)
 
 	-- Double-clic sur la barre de titre : taille par défaut (largeur du mode courant, solo ou non),
 	-- élargie si besoin pour toute la barre de titre.
 	P.EnableTitleDoubleClick(f, function()
-		local key = WidthKey()
+		local key, heightKey = WidthKey(), HeightKey()
 		P.db.mainFrame[key] = P.defaults.mainFrame[key]
-		P.db.mainFrame.height = P.defaults.mainFrame.height
-		P.db.mainFrame.manualWidth[key] = nil
-		f:SetSize(P.db.mainFrame[key], P.db.mainFrame.height)
+		P.db.mainFrame[heightKey] = P.defaults.mainFrame[heightKey]
+		f:SetSize(P.db.mainFrame[key], P.db.mainFrame[heightKey])
 		FitTitleBar()
 	end)
 

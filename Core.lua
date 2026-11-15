@@ -30,10 +30,12 @@ P.defaults = {
 	mainFrame = {
 		width = 720, -- taille de la fenêtre principale, mémorisée au redimensionnement
 		height = 320,
-		soloWidth = 620, -- largeur en mode solo (un seul cadre, cf. UI_Main.lua), mémorisée à part
-		-- [« width » | « soloWidth »] = true : largeur choisie à la poignée ; sinon la fenêtre
-		-- s'élargit à l'ouverture pour que toute sa barre de titre soit lisible (UI_Main.lua).
-		manualWidth = {},
+		-- Taille en mode solo (un seul cadre, cf. UI_Main.lua), mémorisée à part. Dans les deux
+		-- modes, la largeur n'est jamais inférieure à celle qu'il faut pour lire toute la barre de
+		-- titre (UI_Main.lua, FitTitleBar).
+		soloWidth = 620,
+		soloHeight = 320,
+		manualWidth = {}, -- ancien réglage (avant 2.23.0), plus lu
 	},
 	-- [nom] = { name, members = { [nom-royaume] = true }, leader = nom-royaume|nil,
 	--          updated = heure serveur de la dernière modification (synchro) }

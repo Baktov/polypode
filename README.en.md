@@ -232,12 +232,13 @@ The three lists scroll (mouse wheel or scroll bar), with no limit on their size;
 only shows when the list overflows the frame.
 
 The window is **resized** with the bottom-right corner grip; the three frames share the width
-equally and the size is remembered for the account (720 × 320 by default; **double-click** its title bar: back to the default size, solo mode width included). If the window is
-made very small, the content is simply cut off.
-As long as you have not chosen its width with the grip, the window **widens when opened** so that
-its whole title bar is readable (Options, Channel, Solo, indicator, module buttons, title and close
-button), in solo mode or not, without going past the screen; double-clicking the title bar brings
-this automatic setting back.
+equally. **Two sizes** are remembered for the account: one outside solo mode (720 × 320 by default)
+and one in solo mode (620 × 320); when switching modes, the window takes back that mode's size.
+**Double-click** its title bar: back to the current mode's default size. If the window is made very
+short, the content is simply cut off.
+The window **widens** when opened and when switching modes so that its whole title bar is readable
+(Options, Channel, Solo, indicator, module buttons, title and close button), without going past the
+screen; the grip cannot make it narrower than that.
 
 ---
 

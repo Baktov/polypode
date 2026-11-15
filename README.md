@@ -243,12 +243,13 @@ Les trois listes défilent (molette ou barre de défilement), sans limite de nom
 de défilement n'apparaît que si la liste déborde du cadre.
 
 La fenêtre se **redimensionne** par la poignée du coin bas-droit ; les trois cadres se
-partagent la largeur à parts égales et la taille est mémorisée pour le compte (720 × 320
-par défaut ; **double-clic** sur sa barre de titre : retour à la taille par défaut, largeur du mode solo comprise). Si la fenêtre est très réduite, le contenu est simplement tronqué.
-Tant que vous n'avez pas choisi sa largeur à la poignée, la fenêtre **s'élargit à l'ouverture**
-pour que toute sa barre de titre soit lisible (Options, Canal, Solo, voyant, boutons des modules,
-titre et croix), en mode solo comme hors mode solo, sans dépasser l'écran ; le double-clic sur la
-barre de titre rétablit ce réglage automatique.
+partagent la largeur à parts égales. **Deux tailles** sont mémorisées pour le compte : une hors mode
+solo (720 × 320 par défaut) et une en mode solo (620 × 320) ; en changeant de mode, la fenêtre reprend
+la taille de ce mode. **Double-clic** sur sa barre de titre : retour à la taille par défaut du mode
+courant. Si la fenêtre est très réduite en hauteur, le contenu est simplement tronqué.
+La fenêtre **s'élargit** à l'ouverture et au changement de mode pour que toute sa barre de titre soit
+lisible (Options, Canal, Solo, voyant, boutons des modules, titre et croix), sans dépasser l'écran ;
+la poignée ne la rend pas plus étroite que cette largeur.
 
 ---
 
@@ -286,7 +287,7 @@ le choix : cocher la case (un seul personnage), la décocher, ou fermer la bulle
 
 - La fenêtre ne garde que **Personnages disponibles**, sur toute sa largeur ; les cadres
   « Équipes » et « Personnages de l'équipe » sont masqués, et la fenêtre est un peu plus étroite
-  (620 pixels par défaut ; sa largeur en mode solo est gardée à part de la largeur normale).
+  (620 pixels par défaut ; sa taille en mode solo est gardée à part de la taille normale).
   Le titre de la fenêtre devient **Monopode**.
   Le bouton **Ajouter la cible** est masqué (il sert à composer des équipes) et la liste remonte
   à sa place.
@@ -652,6 +653,7 @@ aliases (`/poly accounts`, `/poly remove-account`); debug messages stay in Frenc
 
 ## Version
 
+`2.23.0` : fenêtre principale : deux tailles mémorisées, une en mode solo et une hors mode solo (largeur et hauteur) ; au passage d'un mode à l'autre, la fenêtre reprend la taille de ce mode et s'élargit si besoin pour que toute la barre de titre soit lisible, même après un redimensionnement à la poignée, qui ne descend plus sous cette largeur.
 `2.22.0` : barre flottante : au survol, deux petits boutons pour réduire la barre à l'icône (ou la rétablir) et changer la disposition des boutons des modules (à gauche, à droite, horizontal) en un clic ; ces deux réglages passent en tête de la petite fenêtre d'options.
 `2.21.0` : hors mode solo, le personnage qui crée une équipe (champ « Nom de l'équipe ») en devient automatiquement membre et leader ; il peut ensuite s'en retirer.
 `2.20.0` : barre flottante d'équipe réservée aux membres : hors mode solo, une équipe ne peut être sortie en barre ou affichée que si le personnage connecté en fait partie (sinon message pour l'y ajouter) ; infobulle de la poignée et position partagée (Maj + clic) suivent la même règle.
