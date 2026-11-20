@@ -1,4 +1,4 @@
--- Polypode: UI_Docking — fenêtres des modules en tiroir ou aimantées contre la fenêtre Polypode
+-- Polypode: UI_Docking — fenêtres des modules en tiroir, aimantées ou en fenêtre unique
 
 local P = Polypode
 local L = P.L
@@ -6,13 +6,19 @@ local L = P.L
 -- Une fenêtre de module s'inscrit par P.RegisterModuleWindow(fenêtre, clé). Selon
 -- P.db.windowPlacement (tout le compte, appliqué à la prochaine ouverture) :
 -- - "tiroir" (défaut) : à chaque ouverture, la fenêtre s'accole au bord droit de la fenêtre
---   Polypode (gauche s'il n'y a pas la place), haut contre haut, et la suit ; un seul tiroir ouvert
---   par côté ; glissée loin, elle se détache jusqu'à sa prochaine ouverture, glissée contre un bord
---   elle s'y raccroche ; fenêtre Polypode fermée : les tiroirs se ferment ;
+--   Polypode, haut contre haut, et la suit ; un seul tiroir ouvert par côté : côté droit, sinon
+--   gauche s'il est libre ou s'il n'y a pas la place à droite (DrawerSide) ;
+--   glissée loin, elle se détache jusqu'à sa prochaine ouverture, glissée contre un bord elle s'y
+--   raccroche ; fenêtre Polypode fermée : les tiroirs se ferment ;
 -- - "aimant" : glissée à moins de SNAP pixels d'un bord (droit, gauche, bas) de la fenêtre Polypode,
 --   elle s'y accroche (trait doré pendant le glisser) et la suit ; accroche gardée par module dans
 --   P.db.docking[clé] = { side, offset } et reprise à chaque ouverture ; fenêtre Polypode fermée :
 --   la fenêtre reste où elle est ;
+-- - "unique" : fenêtre unique ; les modules s'ouvrent l'un à la place de l'autre (un seul ouvert),
+--   tous au même endroit (P.db.windowUnique = { x, y } : coin haut-gauche, pixels d'écran, gardé
+--   quand on glisse la fenêtre ; d'abord la place du premier module ouvert), avec la colonne des
+--   boutons de modules (ceux de la barre de titre de la fenêtre Polypode) collée à son bord gauche
+--   (droit s'il n'y a pas la place) ; indépendant de la fenêtre Polypode ;
 -- - "libre" : aucune accroche.
 -- Fenêtre Polypode fermée à l'ouverture d'un module : il s'ouvre à sa place habituelle. Fenêtre
 -- protégée (boutons sécurisés) : jamais déplacée en combat.
@@ -23,6 +29,7 @@ local SNAP = 20 -- pixels d'écran
 P.WINDOW_PLACEMENT_CHOICES = {
 	{ "tiroir", L["Tiroir"] },
 	{ "aimant", L["Libre, avec aimant"] },
+	{ "unique", L["Fenêtre unique"] },
 	{ "libre", L["Libre"] },
 }
 
@@ -30,7 +37,7 @@ local windows = setmetatable({}, { __mode = "k" }) -- [fenêtre] = { key, side, 
 
 local function Placement()
 	local value = P.db and P.db.windowPlacement
-	if value == "aimant" or value == "libre" then
+	if value == "aimant" or value == "libre" or value == "unique" then
 		return value
 	end
 	return "tiroir"
@@ -65,7 +72,18 @@ local function Anchor(frame, main, side, offset)
 	end
 end
 
--- Côté du tiroir : droite s'il y a la place jusqu'au bord de l'écran, sinon gauche, sinon droite.
+-- Vrai si un autre tiroir ouvert occupe ce côté.
+local function SideTaken(frame, side)
+	for other, data in pairs(windows) do
+		if other ~= frame and data.side == side and other:IsShown() then
+			return true
+		end
+	end
+	return false
+end
+
+-- Côté du tiroir : un côté libre où il y a la place jusqu'au bord de l'écran (droite d'abord),
+-- sinon un côté où il y a la place (le tiroir qui l'occupe se refermera), sinon droite.
 local function DrawerSide(frame, main)
 	local left, right = Rect(main)
 	if not left then
@@ -73,7 +91,12 @@ local function DrawerSide(frame, main)
 	end
 	local width = frame:GetWidth() * frame:GetEffectiveScale()
 	local screen = UIParent:GetRight() * UIParent:GetEffectiveScale()
-	if right + width <= screen or left - width < 0 then
+	local roomRight, roomLeft = right + width <= screen, left - width >= 0
+	if roomRight and not SideTaken(frame, "RIGHT") then
+		return "RIGHT"
+	elseif roomLeft and not SideTaken(frame, "LEFT") then
+		return "LEFT"
+	elseif roomRight or not roomLeft then
 		return "RIGHT"
 	end
 	return "LEFT"
@@ -159,9 +182,178 @@ local function StopWatching()
 	guide:Hide()
 end
 
+-- FENÊTRE UNIQUE : colonne des boutons de modules, enfant de la fenêtre ouverte (elle bouge, se
+-- fond et se masque avec elle).
+local STRIP_BUTTON_WIDTH, STRIP_BUTTON_HEIGHT, STRIP_PAD = 36, 20, 4
+local strip, stripButtons = nil, {}
+local uniqueFrame -- fenêtre de module ouverte en mode « unique »
+
+-- Trois premiers caractères (UTF-8 entiers), comme la colonne de la barre d'équipe.
+local function ShortLabel(text)
+	local chars = {}
+	for char in tostring(text or ""):gmatch("[%z\1-\127\194-\244][\128-\191]*") do
+		chars[#chars + 1] = char
+		if #chars == 3 then
+			break
+		end
+	end
+	return table.concat(chars)
+end
+
+local function AccentColor()
+	if P.IsPolypodeTheme and P.IsPolypodeTheme() then
+		return P.GetThemeColor("accent")
+	end
+	return 1, 0.82, 0.2
+end
+
+local function PaintStrip()
+	if not strip then
+		return
+	end
+	local bg, border = { 0.05, 0.05, 0.06, 0.92 }, { 0.3, 0.3, 0.3, 1 }
+	if P.IsPolypodeTheme and P.IsPolypodeTheme() then
+		bg = { P.GetThemeColor("bg") }
+		border = { P.GetThemeColor("border") }
+	end
+	strip:SetBackdropColor(bg[1], bg[2], bg[3], bg[4] or 0.92)
+	strip:SetBackdropBorderColor(border[1], border[2], border[3], border[4] or 1)
+	local r, g, b = AccentColor()
+	for _, button in ipairs(stripButtons) do
+		button.mark:SetColorTexture(r, g, b, 1)
+	end
+end
+
+local function StripButton(index)
+	local button = stripButtons[index]
+	if button then
+		return button
+	end
+	button = CreateFrame("Button", nil, strip, "UIPanelButtonTemplate")
+	button:SetSize(STRIP_BUTTON_WIDTH, STRIP_BUTTON_HEIGHT)
+	button:SetNormalFontObject("GameFontNormalSmall")
+	button:SetHighlightFontObject("GameFontHighlightSmall")
+	button:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+	button:SetScript("OnClick", function(self, mouseButton)
+		local spec = self.spec
+		if spec and spec.onClick and (mouseButton ~= "RightButton" or spec.rightClick) then
+			spec.onClick(self, mouseButton)
+		end
+	end)
+	button:SetScript("OnEnter", function(self)
+		if not self.spec or not self.spec.tooltip or not P.TitleButtonTooltip then
+			return
+		end
+		GameTooltip:SetOwner(self, strip.side == "LEFT" and "ANCHOR_LEFT" or "ANCHOR_RIGHT")
+		for i, line in ipairs(P.TitleButtonTooltip(self.spec)) do
+			if i == 1 then
+				GameTooltip:AddLine(line)
+			else
+				GameTooltip:AddLine(line, 1, 1, 1, true)
+			end
+		end
+		P.ShowTooltip()
+	end)
+	button:SetScript("OnLeave", GameTooltip_Hide)
+	-- Module affiché : trait d'accent sur le bord de la colonne côté fenêtre.
+	button.mark = button:CreateTexture(nil, "OVERLAY")
+	button.mark:SetSize(2, STRIP_BUTTON_HEIGHT - 4)
+	if P.SkinButton then
+		P.SkinButton(button)
+	end
+	stripButtons[index] = button
+	return button
+end
+
+-- Boutons des modules affichés dans la barre de titre de la fenêtre Polypode, dans son ordre.
+local function StripSpecs()
+	local specs = {}
+	if not (P.OrderedButtonSpecs and P.GetWindowButtonOrder) then
+		return specs
+	end
+	for _, spec in ipairs(P.OrderedButtonSpecs(P.GetWindowButtonOrder())) do
+		if not P.IsWindowButtonShown or P.IsWindowButtonShown(spec) then
+			specs[#specs + 1] = spec
+		end
+	end
+	return specs
+end
+
+local function ShowStrip(frame, key)
+	if InCombatLockdown() and frame:IsProtected() then
+		return
+	end
+	if not strip then
+		strip = CreateFrame("Frame", nil, frame, "BackdropTemplate")
+		strip:SetBackdrop({ bgFile = "Interface\\Buttons\\WHITE8X8", edgeFile = "Interface\\Buttons\\WHITE8X8",
+			edgeSize = 1 })
+		if P.OnThemeChanged then
+			P.OnThemeChanged(PaintStrip)
+		end
+	end
+	strip:SetParent(frame)
+	strip:SetFrameLevel(frame:GetFrameLevel() + 20)
+	local specs = StripSpecs()
+	-- Colonne à gauche de la fenêtre, à droite s'il n'y a pas la place.
+	local width = STRIP_BUTTON_WIDTH + 2 * STRIP_PAD
+	local left = Rect(frame)
+	strip.side = (left and left < width * frame:GetEffectiveScale()) and "RIGHT" or "LEFT"
+	strip:ClearAllPoints()
+	if strip.side == "LEFT" then
+		strip:SetPoint("TOPRIGHT", frame, "TOPLEFT", -GAP, 0)
+	else
+		strip:SetPoint("TOPLEFT", frame, "TOPRIGHT", GAP, 0)
+	end
+	strip:SetSize(width, math.max(1, #specs) * (STRIP_BUTTON_HEIGHT + STRIP_PAD) + STRIP_PAD)
+	for index, spec in ipairs(specs) do
+		local button = StripButton(index)
+		button.spec = spec
+		button:SetText(ShortLabel(spec.text))
+		button:ClearAllPoints()
+		button:SetPoint("TOP", strip, "TOP", 0, -STRIP_PAD - (index - 1) * (STRIP_BUTTON_HEIGHT + STRIP_PAD))
+		button.mark:ClearAllPoints()
+		if strip.side == "LEFT" then
+			button.mark:SetPoint("LEFT", button, "RIGHT", 2, 0)
+		else
+			button.mark:SetPoint("RIGHT", button, "LEFT", -2, 0)
+		end
+		button.mark:SetShown(spec.moduleKey == key)
+		button:Show()
+	end
+	for index = #specs + 1, #stripButtons do
+		stripButtons[index]:Hide()
+		stripButtons[index].spec = nil
+	end
+	PaintStrip()
+	strip:Show()
+end
+
+-- Garde la place commune de la fenêtre unique (coin haut-gauche, pixels d'écran).
+local function SaveUniquePlace(frame)
+	local left, _, top = Rect(frame)
+	if left then
+		P.db.windowUnique = { x = left, y = top }
+	end
+end
+
+local function AnchorUnique(frame)
+	local place = P.db.windowUnique
+	if not place then
+		SaveUniquePlace(frame)
+		return
+	end
+	local scale = frame:GetEffectiveScale()
+	frame:ClearAllPoints()
+	frame:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", place.x / scale, place.y / scale)
+end
+
 local function OnDragStart(frame)
+	local data = windows[frame]
+	if data then
+		data.dragging = true
+	end
 	local main = Main()
-	if Placement() == "libre" or not main or not main:IsShown() or frame == main then
+	if Placement() == "libre" or Placement() == "unique" or not main or not main:IsShown() or frame == main then
 		return
 	end
 	watcher.frame = frame
@@ -171,6 +363,15 @@ end
 local function OnDragStop(frame)
 	StopWatching()
 	local data = windows[frame]
+	if data then
+		data.dragging = nil
+	end
+	if data and Placement() == "unique" then
+		if frame == uniqueFrame then
+			SaveUniquePlace(frame)
+		end
+		return
+	end
 	local main = Main()
 	if not data or Placement() == "libre" or not main or not main:IsShown() or not CanMove(frame) then
 		return
@@ -224,6 +425,21 @@ function P.RegisterModuleWindow(frame, moduleKey)
 	windows[frame] = { key = moduleKey or (frame.GetName and frame:GetName()) or tostring(frame) }
 	frame:HookScript("OnDragStart", OnDragStart)
 	frame:HookScript("OnDragStop", OnDragStop)
+	frame:HookScript("OnHide", function(self)
+		if self == uniqueFrame then
+			uniqueFrame = nil
+		end
+	end)
+	-- Fin d'un redimensionnement par la poignée (frame:StopMovingOrSizing(), qui laisse la fenêtre
+	-- ancrée à l'écran) : rattachée à la fenêtre Polypode. Le glisser (OnDragStop) a sa propre accroche.
+	if type(frame.StopMovingOrSizing) == "function" then
+		hooksecurefunc(frame, "StopMovingOrSizing", function(self)
+			local data = windows[self]
+			if data and not data.dragging then
+				P.RefreshDocking(self)
+			end
+		end)
+	end
 end
 
 -- Accroche une fenêtre inscrite à son ouverture (appelée par UI_Animation.lua avant l'animation) :
@@ -235,10 +451,29 @@ function P.ApplyDocking(frame)
 	end
 	data.side, data.offset = nil, nil
 	local main = HookMain()
+	local placement = Placement()
+	if placement == "unique" then
+		-- Fenêtre unique : indépendante de la fenêtre Polypode.
+		if not CanMove(frame) then
+			return
+		end
+		-- Un seul module ouvert : les autres se referment, celui-ci prend la place commune.
+		for other in pairs(windows) do
+			if other ~= frame and other:IsShown() and CanMove(other) then
+				other:Hide()
+			end
+		end
+		AnchorUnique(frame)
+		uniqueFrame = frame
+		ShowStrip(frame, data.key)
+		return
+	end
+	if strip and strip:GetParent() == frame then
+		strip:Hide()
+	end
 	if not main or not main:IsShown() or not CanMove(frame) then
 		return
 	end
-	local placement = Placement()
 	local side, offset
 	if placement == "tiroir" then
 		side, offset = DrawerSide(frame, main), 0
@@ -256,7 +491,7 @@ function P.ApplyDocking(frame)
 	if placement == "tiroir" then
 		-- Un seul tiroir ouvert par côté : l'autre se referme.
 		for other, otherData in pairs(windows) do
-			if other ~= frame and otherData.side == side and other:IsShown() then
+			if other ~= frame and otherData.side == side and other:IsShown() and CanMove(other) then
 				other:Hide()
 				otherData.side = nil
 			end
@@ -282,5 +517,8 @@ function P.RefreshDocking(frame)
 end
 
 function P.SetWindowPlacement(value)
-	P.db.windowPlacement = (value == "aimant" or value == "libre") and value or "tiroir"
+	P.db.windowPlacement = (value == "aimant" or value == "libre" or value == "unique") and value or "tiroir"
+	if strip and value ~= "unique" then
+		strip:Hide()
+	end
 end

@@ -417,12 +417,12 @@ function P.BuildOptions()
 		P.SetWindowPlacement
 	)
 	AddDropdown(placementSetting, P.WINDOW_PLACEMENT_CHOICES,
-		L["Place des fenêtres des modules autour de la fenêtre Polypode. Tiroir : un module s'ouvre "
-		.. "accolé à son bord droit (gauche s'il n'y a pas la place) et la suit, un seul par côté ; "
-		.. "glissé loin, il se détache jusqu'à sa prochaine ouverture. Libre, avec aimant : glissé contre "
-		.. "un bord de la fenêtre Polypode, un module s'y accroche, la suit et y revient à chaque "
-		.. "ouverture. Libre : aucune accroche. Fenêtre Polypode fermée : les modules s'ouvrent à leur "
-		.. "place habituelle. Pour tous vos personnages."])
+		L["Place des fenêtres des modules. Tiroir : un module s'ouvre accolé au bord droit de la fenêtre "
+		.. "Polypode (gauche s'il n'y a pas la place) et la suit, un seul par côté ; glissé loin, il se détache "
+		.. "jusqu'à sa prochaine ouverture. Libre, avec aimant : glissé contre un bord de la fenêtre Polypode, "
+		.. "un module s'y accroche, la suit et y revient à chaque ouverture. Fenêtre unique : un seul module "
+		.. "ouvert à la fois, toujours au même endroit, avec la colonne des modules sur le côté pour passer de "
+		.. "l'un à l'autre. Libre : aucune accroche. Pour tous vos personnages."])
 
 	-- Mode solo, en tête et en rouge (par personnage) : même réglage que la case « Solo » de la
 	-- fenêtre (P.SetSoloMode, UI_Main.lua).
