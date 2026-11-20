@@ -8,7 +8,8 @@ local L = P.L
 local extraCommands = {}
 
 -- Alias anglais des sous-commandes françaises de Polypode.
-local ALIASES = { accounts = "comptes", ["remove-account"] = "retirer-compte", language = "langue" }
+local ALIASES = { accounts = "comptes", ["remove-account"] = "retirer-compte", language = "langue",
+	["undo-merge"] = "annuler-fusion" }
 
 -- Mots acceptés par /poly langue → préférence (P.LANGUAGES, Locale.lua).
 local LANGUAGE_WORDS = {
@@ -39,6 +40,7 @@ local function PrintHelp()
 	print(L["  /poly options      — ouvrir le panneau d'options"])
 	print(L["  /poly comptes      — lister les autres comptes Battle.net autorisés"])
 	print(L["  /poly retirer-compte <n°> — retirer l'autorisation d'un compte"])
+	print(L["  /poly annuler-fusion — annuler la dernière fusion de deux fiches d'un personnage"])
 	print(L["  /poly debug        — activer/désactiver le mode debug"])
 	print("  /poly langue auto|fr|en|de|es|it|pt — langue de Polypode / Polypode language (/reload)")
 	for name, command in pairs(extraCommands) do
@@ -108,6 +110,14 @@ local function SlashHandler(msg)
 			print(L["Polypode : autorisation retirée pour le compte de %s."]:format(account.label))
 		else
 			print(L["Usage : /poly retirer-compte <n°> (numéro donné par /poly comptes)"])
+		end
+	elseif sub == "annuler-fusion" then
+		local ok, result = P.UndoLastMerge()
+		if ok then
+			P.RefreshUI()
+			print(L["Polypode : fusion annulée, %s rétabli."]:format(result))
+		else
+			print(result)
 		end
 	elseif sub == "debug" then
 		P.SetDebug(not P.debugEnabled)

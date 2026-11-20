@@ -252,6 +252,26 @@ lisible (Options, Canal, Solo, voyant, boutons des modules, titre et croix), san
 Rendue **plus étroite à la poignée**, elle garde votre choix (à part en mode solo et hors mode solo) ;
 le double-clic sur la barre de titre rétablit l'ajustement automatique.
 
+### Fiches en double (WoW Forever)
+
+Sur WoW Forever, un même personnage peut se retrouver deux fois (ou plus) dans « Personnages
+disponibles » : royaume qui change d'une session à l'autre, ou arrivé vide après une mise à jour du
+jeu. Polypode les reconnaît à leur **prénom et nom de famille** identiques (uniques par région) :
+
+- **à la connexion**, la fenêtre Polypode s'ouvre et une fenêtre propose de les fusionner
+  (« Problème de sauvegarde ou de mise à jour du jeu… »), un groupe après l'autre. **Oui** : les
+  autres fiches sont fusionnées dans la fiche gardée — le personnage joué, sinon celle rangée dans un
+  compte WoW, sinon la plus récente — qui reprend leurs équipes (et le rôle de leader) et leur compte
+  WoW s'il lui manque. **Non** : ce groupe n'est plus proposé à la connexion ;
+- une **icône d'alerte** reste devant chacune de ces fiches dans la liste ; **clic** : menu « Garder
+  cette fiche, fusionner… » (une autre fiche, ou toutes les autres s'il y en a plus de deux), avec la
+  même confirmation ;
+- `/poly annuler-fusion` annule la dernière fusion (toutes ses fiches) ; le groupe n'est alors plus
+  proposé à la connexion.
+
+Les données des modules (Data, Suivi…) de la fiche fusionnée ne sont pas effacées. Sur Retail, deux
+personnages de même prénom sur deux royaumes sont différents : rien n'est proposé.
+
 ---
 
 ## Importer des personnages
@@ -485,6 +505,7 @@ Polypode Suivi ; il peut être désactivé (il ne fait plus que le rappeler).
 | `/poly comptes` (ou `/poly accounts`) | Lister les autres comptes Battle.net autorisés (numérotés) |
 | `/poly retirer-compte <n°>` (ou `/poly remove-account <n°>`) | Retirer l'autorisation d'un compte (numéro donné par `/poly comptes`) |
 | `/poly langue auto\|fr\|en\|de\|es\|it\|pt` (ou `/poly language`) | Choisir la langue de Polypode et de ses modules (Auto = celle du jeu), appliquée après `/reload` ; sans argument, affiche le choix actuel |
+| `/poly annuler-fusion` (ou `/poly undo-merge`) | Annuler la dernière fusion de fiches en double (voir « Fiches en double ») |
 | `/poly debug` | Activer/désactiver les messages de debug (mémorisé pour ce personnage, comme la case du panneau d'options) |
 | `/poly` (sans argument) | Afficher l'aide |
 
@@ -684,6 +705,7 @@ aliases (`/poly accounts`, `/poly remove-account`); debug messages stay in Frenc
 
 ## Version
 
+`2.32.0` : WoW Forever : **fusion des fiches en double** d'un même personnage (même prénom et nom de famille) : proposée à la connexion (Oui / Non, Non retenu), icône devant ces fiches dans la liste pour fusionner plus tard (menu, plusieurs doublons possibles), équipes et compte WoW repris par la fiche gardée, `/poly annuler-fusion`.
 `2.31.2` : WoW Forever : depuis la mise à jour du jeu du 17/11/2026, le nom du royaume peut arriver vide ; Polypode reprend le royaume connu du personnage au lieu de créer un doublon « Prénom- » (même personnage affiché deux fois), et retire à la connexion les doublons déjà créés (avec leurs données dans les modules).
 `2.31.1` : colonne des boutons des modules (fenêtre Polypode et fenêtre unique) descendue de 10 pixels, sous l'ornement du coin de la fenêtre.
 `2.31.0` : option **Fenêtre : boutons des modules en colonne** : boutons des modules dans une colonne sur le côté gauche de la fenêtre Polypode, comme en fenêtre unique, pour une fenêtre plus étroite (titre à gauche ; tiroirs et aimant contre la colonne).

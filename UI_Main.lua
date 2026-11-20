@@ -2015,9 +2015,31 @@ function P.BuildUI()
 				hint,
 			})
 		end,
-		-- Personnages déconnectés légèrement grisés (connectés en tête, cf. RefreshUI).
+		-- Personnages déconnectés légèrement grisés (connectés en tête, cf. RefreshUI). Fiche d'un
+		-- doublon probable (UI_Duplicates.lua, 2.32.0) : icône devant le nom, clic = menu de fusion.
 		decorate = function(row, data)
 			row:SetAlpha(data.first and 1 or 0.55)
+			local duplicate = not data.header and data.key and P.GetDuplicatesOf and P.GetDuplicatesOf(data.key)
+			if duplicate and not row.mergeIcon then
+				local icon = CreateFrame("Button", nil, row)
+				icon:SetSize(14, 14)
+				icon:SetPoint("LEFT", 3, 0)
+				icon:SetNormalTexture("Interface\\DialogFrame\\UI-Dialog-Icon-AlertNew")
+				icon:SetHighlightTexture("Interface\\Buttons\\UI-Common-MouseHilight", "ADD")
+				icon:SetScript("OnClick", function(self)
+					P.ShowMergeMenu(self, self.key)
+				end)
+				icon:SetScript("OnEnter", function(self)
+					P.MergeIconTooltip(self, self.key)
+				end)
+				icon:SetScript("OnLeave", GameTooltip_Hide)
+				row.mergeIcon = icon
+			end
+			if row.mergeIcon then
+				row.mergeIcon.key = data.key
+				row.mergeIcon:SetShown(duplicate and true or false)
+			end
+			row.text:SetPoint("LEFT", duplicate and 20 or 4, 0)
 		end,
 		-- Mode solo : le personnage joué, glissé hors de la liste, devient la barre flottante.
 		onDragStart = function(data)

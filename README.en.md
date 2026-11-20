@@ -241,6 +241,27 @@ The window **widens** when opened and when switching modes so that its whole tit
 screen. Made **narrower with the grip**, it keeps your choice (separately in solo mode and outside it);
 double-clicking the title bar brings the automatic adjustment back.
 
+
+### Duplicate records (WoW Forever)
+
+On WoW Forever, the same character can show up twice (or more) in "Available characters": realm
+changing from one session to the next, or arriving empty after a game update. Polypode recognizes
+them by their identical **first name and surname** (unique per region):
+
+- **at login**, the Polypode window opens and a dialog offers to merge them ("Save or game update
+  problem..."), one group after another. **Yes**: the other records are merged into the kept one —
+  the character being played, otherwise the one filed under a WoW account, otherwise the most recent
+  — which takes over their teams (and the leader role) and their WoW account if it has none. **No**:
+  this group is no longer offered at login;
+- an **alert icon** stays in front of each of these records in the list; **click**: "Keep this
+  record, merge..." menu (another record, or all the others if there are more than two), with the
+  same confirmation;
+- `/poly undo-merge` undoes the last merge (all its records); the group is then no longer offered at
+  login.
+
+The modules' data (Data, Tracker...) of the merged record are not erased. On Retail, two characters
+with the same name on two realms are different: nothing is offered.
+
 ---
 
 ## Importing characters
@@ -461,6 +482,7 @@ of that).
 | `/poly accounts` (or `/poly comptes`) | List the other allowed Battle.net accounts (numbered) |
 | `/poly remove-account <no.>` (or `/poly retirer-compte <no.>`) | Remove an account's permission (number given by `/poly accounts`) |
 | `/poly language auto\|fr\|en\|de\|es\|it\|pt` (or `/poly langue`) | Choose the language of Polypode and its modules (Auto = the game's), applied after `/reload`; with no argument, shows the current choice |
+| `/poly undo-merge` (or `/poly annuler-fusion`) | Undo the last merge of duplicate records (see "Duplicate records") |
 | `/poly debug` | Turn debug messages on/off (remembered for this character, like the box of the options panel) |
 | `/poly` (no argument) | Show the help |
 

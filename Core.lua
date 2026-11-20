@@ -57,6 +57,11 @@ P.defaults = {
 	-- [nom-royaume] = { label = nom du compte | nil (aucun), updated = version }.
 	-- Versionné et synchronisé (message ACCT) ; label nil = pierre tombale du rangement.
 	accountLabels = {},
+	-- Groupes de doublons probables refusés à la connexion : [clés triées jointes par « | »] = true ;
+	-- dernière fusion, pour l'annuler : lastMerge = liste de { keep, from, entry, account, accountMoved,
+	-- teams }
+	-- (Core.lua, UI_Duplicates.lua).
+	duplicateIgnored = {},
 	-- Langue de Polypode et de ses modules : "auto" (langue du jeu) ou une langue de
 	-- P.LANGUAGES (Locale.lua) ; commune à tous les personnages, appliquée au chargement (/reload).
 	language = "auto",
@@ -701,7 +706,8 @@ end
 -- DONNÉES LIÉES À UN PERSONNAGE (point d'extension des addons compagnons) : chacun déclare ce
 -- qu'il garde d'un personnage, pour que sa suppression (Maj + clic dans « Personnages
 -- disponibles ») l'efface aussi. handler = { name, describe = fn(clé) → texte ou nil (rien de
--- gardé), remove = fn(clé, fromSync) } ; fromSync vrai quand la suppression vient d'un autre
+-- gardé), remove = fn(clé, fromSync), merge = fn(de, vers) facultatif (2.32.0, fusion de deux
+-- fiches d'un même personnage, P.MergeCharacters : reporter les données de « de » vers « vers ») } ; fromSync vrai quand la suppression vient d'un autre
 -- client (ne pas renvoyer ce que ce client propage déjà lui-même).
 local characterDataHandlers = {}
 
@@ -867,6 +873,210 @@ function P.MergeManualDuplicates(key)
 			P.Debug("Doublon " .. otherKey .. " remplacé par " .. key)
 		end
 	end
+end
+
+-- DOUBLONS PROBABLES (2.32.0, WoW Forever) : plusieurs fiches actives de même prénom et même nom de
+-- famille (noms uniques par région), nées d'un royaume qui change ou arrive vide (mise à jour du
+-- jeu, sauvegarde). Proposés à la fusion à la connexion (UI_Duplicates.lua) ; un groupe refusé
+-- (P.db.duplicateIgnored[id]) n'est plus proposé, la fusion reste possible depuis la liste. Sur
+-- Retail, même prénom sur deux royaumes = deux personnages : rien n'est proposé.
+
+-- Groupes de clés d'un même personnage (au moins deux), clés triées ; groupes triés.
+function P.GetDuplicateGroups()
+	local groups = {}
+	if not P.HasSurnames() then
+		return groups
+	end
+	local byPerson = {}
+	for key, entry in pairs(P.db.roster) do
+		if not entry.removed and entry.name and entry.surname and entry.surname ~= "" then
+			local id = entry.name .. "\031" .. entry.surname
+			byPerson[id] = byPerson[id] or {}
+			table.insert(byPerson[id], key)
+		end
+	end
+	for _, keys in pairs(byPerson) do
+		if #keys > 1 then
+			table.sort(keys)
+			groups[#groups + 1] = keys
+		end
+	end
+	table.sort(groups, function(a, b)
+		return a[1] < b[1]
+	end)
+	return groups
+end
+
+-- Groupe de doublons contenant key, ou nil.
+function P.GetDuplicatesOf(key)
+	for _, keys in ipairs(P.GetDuplicateGroups()) do
+		for _, other in ipairs(keys) do
+			if other == key then
+				return keys
+			end
+		end
+	end
+end
+
+-- Identifiant d'un groupe : ses clés triées ; un nouveau doublon fait un autre groupe (reproposé).
+local function GroupId(keys)
+	local sorted = {}
+	for i, key in ipairs(keys) do
+		sorted[i] = key
+	end
+	table.sort(sorted)
+	return table.concat(sorted, "|")
+end
+
+function P.IsDuplicateGroupIgnored(keys)
+	return P.db.duplicateIgnored[GroupId(keys)] == true
+end
+
+function P.IgnoreDuplicateGroup(keys)
+	P.db.duplicateIgnored[GroupId(keys)] = true
+end
+
+-- Fiche à garder par défaut : le personnage joué, sinon celle rangée dans un compte WoW, sinon la
+-- plus récemment vue.
+function P.DefaultMergeKeep(keys)
+	local own = P.GetCharKey()
+	local best, bestScore
+	for _, key in ipairs(keys) do
+		if key == own then
+			return key
+		end
+		local entry = P.db.roster[key]
+		local score = (P.GetCharacterAccount(key) and 1e12 or 0) + (entry and entry.lastSeen or 0)
+		if not bestScore or score > bestScore then
+			best, bestScore = key, score
+		end
+	end
+	return best
+end
+
+-- Fusionne la fiche fromKey dans keepKey : champs manquants recopiés (nom de famille, classe,
+-- compte Battle.net), niveau et dernière connexion les plus hauts, compte WoW nommé repris s'il
+-- manque, places dans les équipes et rôle de leader repris ; fromKey devient une pierre tombale
+-- synchronisée. Données des modules : handler.merge(de, vers) s'il existe, sinon laissées telles
+-- quelles (rien d'effacé). Renvoie true et la copie d'avant fusion (pour P.UndoLastMerge), ou
+-- false et un message.
+function P.MergeCharacters(keepKey, fromKey)
+	local keep, from = P.GetCharacter(keepKey), P.GetCharacter(fromKey)
+	if not keep or not from or keepKey == fromKey or not SamePerson(keep, from) then
+		return false, L["Fusion impossible : fiches absentes ou personnages différents."]
+	end
+	local backup = { keep = keepKey, from = fromKey, entry = CopyTable(from), teams = {},
+		account = P.GetCharacterAccount(fromKey) }
+	for _, field in ipairs({ "surname", "class", "token" }) do
+		if keep[field] == nil then
+			keep[field] = from[field]
+		end
+	end
+	keep.level = math.max(keep.level or 0, from.level or 0)
+	keep.lastSeen = math.max(keep.lastSeen or 0, from.lastSeen or 0)
+	if backup.account and not P.GetCharacterAccount(keepKey) then
+		P.SetCharacterAccount(keepKey, backup.account)
+		backup.accountMoved = true
+	end
+	for teamName, team in pairs(P.GetTeams()) do
+		if team.members and team.members[fromKey] then
+			backup.teams[teamName] = { leader = team.leader == fromKey, keepWasMember = team.members[keepKey] == true }
+			team.members[fromKey] = nil
+			team.members[keepKey] = true
+			if team.leader == fromKey then
+				team.leader = keepKey
+			end
+			TeamChanged(teamName)
+		end
+	end
+	if backup.account then
+		P.SetCharacterAccount(fromKey, nil)
+	end
+	from.removed = true
+	CharacterChanged(fromKey)
+	for _, handler in ipairs(characterDataHandlers) do
+		if handler.merge then
+			local ok, err = pcall(handler.merge, fromKey, keepKey)
+			if not ok then
+				P.Debug("Fusion des données de " .. fromKey .. " (" .. tostring(handler.name) .. ") : " .. tostring(err))
+			end
+		end
+	end
+	P.Debug("Fiche " .. fromKey .. " fusionnée dans " .. keepKey)
+	return true, backup
+end
+
+-- Fusionne dans keepKey toutes les autres fiches de keys ; P.db.lastMerge = liste des copies
+-- (annulées ensemble par P.UndoLastMerge). Renvoie le nombre de fiches fusionnées et les erreurs.
+function P.MergeCharacterGroup(keepKey, keys)
+	local backups, errors = {}, {}
+	for _, key in ipairs(keys) do
+		if key ~= keepKey then
+			local ok, result = P.MergeCharacters(keepKey, key)
+			if ok then
+				backups[#backups + 1] = result
+			else
+				errors[#errors + 1] = result
+			end
+		end
+	end
+	if #backups > 0 then
+		P.db.lastMerge = backups
+	end
+	return #backups, errors
+end
+
+-- Rétablit une fiche fusionnée (copie de P.MergeCharacters) : fiche, compte WoW et équipes.
+local function UndoMerge(backup)
+	local entry = P.db.roster[backup.from]
+	if not entry then
+		return
+	end
+	local tombstone = entry.updated
+	wipe(entry)
+	for field, value in pairs(backup.entry) do
+		entry[field] = value
+	end
+	entry.removed = nil
+	entry.updated = tombstone
+	CharacterChanged(backup.from) -- version plus récente que la pierre tombale
+	if backup.account then
+		P.SetCharacterAccount(backup.from, backup.account)
+		if backup.accountMoved then
+			P.SetCharacterAccount(backup.keep, nil)
+		end
+	end
+	for teamName, state in pairs(backup.teams) do
+		local team = P.GetTeams()[teamName]
+		if team and team.members then
+			team.members[backup.from] = true
+			if not state.keepWasMember then
+				team.members[backup.keep] = nil
+			end
+			if state.leader then
+				team.leader = backup.from
+			end
+			TeamChanged(teamName)
+		end
+	end
+end
+
+-- Annule la dernière fusion (/poly annuler-fusion), toutes ses fiches ; le groupe n'est plus
+-- proposé à la connexion. Renvoie true et les fiches rétablies (texte), ou false et un message.
+function P.UndoLastMerge()
+	local backups = P.db.lastMerge
+	if type(backups) ~= "table" or #backups == 0 then
+		return false, L["Aucune fusion à annuler."]
+	end
+	local keys, restored = { backups[1].keep }, {}
+	for i = #backups, 1, -1 do
+		UndoMerge(backups[i])
+		keys[#keys + 1] = backups[i].from
+		restored[#restored + 1] = backups[i].from
+	end
+	P.db.lastMerge = nil
+	P.IgnoreDuplicateGroup(keys)
+	return true, table.concat(restored, ", ")
 end
 
 -- Équipe active (ni absente ni supprimée), ou nil. Une équipe supprimée reste dans
