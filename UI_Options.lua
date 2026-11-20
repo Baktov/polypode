@@ -339,6 +339,55 @@ function P.BuildOptions()
 		.. "appliquée après /reload. / Language of Polypode and its modules (Auto: the game's), "
 		.. "for all your characters; applied after /reload.")
 
+	-- Apparence (tous les personnages, UI_Skin.lua) : thème après /reload, style et couleur par
+	-- module changés à chaud.
+	local themeSetting = Settings.RegisterProxySetting(
+		category,
+		"POLYPODE_THEME",
+		Settings.VarType.String,
+		L["Thème"],
+		"polypode",
+		function()
+			return P.db.theme
+		end,
+		P.SetThemePreference
+	)
+	AddDropdown(themeSetting, P.GetThemeChoices(),
+		L["Apparence des fenêtres de Polypode et de ses modules : thème Polypode (style au choix "
+		.. "ci-dessous), apparence native de WoW, ou celle d'EllesmereUI ou d'ElvUI s'ils sont "
+		.. "installés. Appliqué après /reload, pour tous vos personnages."])
+
+	local themeStyleSetting = Settings.RegisterProxySetting(
+		category,
+		"POLYPODE_THEME_STYLE",
+		Settings.VarType.String,
+		L["Style du thème Polypode"],
+		"chronique",
+		function()
+			return P.db.themeStyle
+		end,
+		P.SetThemeStyle
+	)
+	AddDropdown(themeStyleSetting, P.THEME_STYLE_CHOICES,
+		L["Chronique : bronze et or. Plat : ardoise mate, sobre. Fougère : vert mousse et or. "
+		.. "Appliqué tout de suite à toutes les fenêtres, avec le thème Polypode."])
+
+	local themeModuleColorSetting = Settings.RegisterProxySetting(
+		category,
+		"POLYPODE_THEME_MODULE_COLOR",
+		Settings.VarType.Boolean,
+		L["Style Plat : couleur par module"],
+		Settings.Default.True,
+		function()
+			return P.db.themeModuleColor
+		end,
+		P.SetThemeModuleColor
+	)
+	AddCheck(themeModuleColorSetting,
+		L["Style Plat : un trait de couleur en haut de chaque fenêtre et le survol des boutons disent "
+		.. "de quel module il s'agit (Histoire bronze, Data bleu, Suivi vert, Téléports violet, Map "
+		.. "orange...). Décochée : une seule couleur d'accent."])
+
 	-- Mode solo, en tête et en rouge (par personnage) : même réglage que la case « Solo » de la
 	-- fenêtre (P.SetSoloMode, UI_Main.lua).
 	local soloSetting = Settings.RegisterProxySetting(

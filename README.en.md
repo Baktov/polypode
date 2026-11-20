@@ -542,6 +542,9 @@ window):
 | Option | Default | Effect |
 |---|---|---|
 | **Langue / Language** (at the top) | Auto | Language of Polypode and its modules: Auto (the game's), Français, English, Deutsch, Español, Italiano or Português (Brasil); applied after `/reload` (see "Languages"). For **all your characters** |
+| Theme | Polypode | Polypode, Native WoW, EllesmereUI or ElvUI (those two if installed); applied after `/reload` (see "Appearance"). For **all your characters** |
+| Polypode theme style | Chronicle | Chronicle, Flat or Fern; applied at once to all windows (Polypode theme). For **all your characters** |
+| Flat style: color per module | Yes | Flat style: top line of the windows and button hover in the module's color; unchecked, a single accent color. For **all your characters** |
 | **Solo mode** (in red) | No | A single character: window reduced to "Available characters", floating bar of the current character, Quests hidden, Tracker on every character (see "Solo mode"). Same box as **Solo** in the window. **Per-character** setting |
 | Dedicated channel | empty | Optional: name of the chat channel shared by your accounts, useful with no group or shared guild (see How it works; the field's tooltip recalls it). Can also be changed in the main window. On the right, "Manage token list" button: list and revocation of the allowed accounts. For the whole account, synchronized between your clients |
 | Show minimap icon | Yes | Shows the Polypode button around the minimap |
@@ -572,16 +575,17 @@ window):
 
 ## Appearance
 
-The window adapts automatically to your interface, with nothing to set:
+**Theme** option (Options > AddOns > Polypode, for all your characters, applied after
+`/reload`): the look of the Polypode window and of its modules' windows.
 
-| Interface detected | Look |
+| Theme | Look |
 |---|---|
-| **EllesmereUI** | EllesmereUI style (background, border, title bar with centered title, inner frames, close buttons, including the close button of the floating team bar) following your theme. Can be turned off in EllesmereUI > Blizz UI Enhanced > Blizzard Window Skins > Third-Party Addons (requires the EllesmereUI Blizzard Skin module). |
-| **ElvUI** | ElvUI style (background, inner frames and close buttons). |
-| None | Generic dark background. |
+| **Polypode** (default) | Polypode's own look, in three styles (option **Polypode theme style**, applied at once): **Chronicle** (bronze and gold, double line and diamonds in the corners, like the Histoire website), **Flat** (matte slate, colored line at the top of each window; with **Flat style: color per module**, one color per module: History bronze, Data blue, Tracker green, Teleports purple, Map orange...) and **Fern** (moss green and gold). Windows, title band, inner frames, buttons, close buttons, checkboxes, edit boxes and scroll bars; dropdowns keep the WoW look for now. |
+| **Native WoW** | Generic dark background, WoW tooltip border. |
+| **EllesmereUI** (if installed) | EllesmereUI style (background, border, title bar with centered title, inner frames, close buttons, including the close button of the floating team bar) following your theme. The Polypode skin must also be on in EllesmereUI > Blizz UI Enhanced > Blizzard Window Skins > Third-Party Addons (EllesmereUI Blizzard Skin module). |
+| **ElvUI** (if installed) | ElvUI style (background, inner frames and close buttons). |
 
-If EllesmereUI and ElvUI are both loaded, EllesmereUI takes priority (unless you turned off the
-Polypode skin in its options).
+An EllesmereUI or ElvUI theme chosen while that addon is no longer loaded falls back to the Polypode theme.
 
 ---
 

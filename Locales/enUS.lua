@@ -406,4 +406,16 @@ P.AddTranslations(P.L, "enUS", {
 	["Aucun module installé"] = "No module installed",
 	["Clic : choisir un module à ouvrir"] = "Click: choose a module to open",
 	["Clic droit : options d'un module"] = "Right-click: options of a module",
+	-- UI_Skin.lua, UI_Options.lua : apparence (2.26.0)
+	["Natif WoW"] = "Native WoW",
+	["Chronique"] = "Chronicle",
+	["Plat"] = "Flat",
+	["Fougère"] = "Fern",
+	["Polypode : tapez /reload pour changer de thème."] = "Polypode: type /reload to change the theme.",
+	["Thème"] = "Theme",
+	["Apparence des fenêtres de Polypode et de ses modules : thème Polypode (style au choix ci-dessous), apparence native de WoW, ou celle d'EllesmereUI ou d'ElvUI s'ils sont installés. Appliqué après /reload, pour tous vos personnages."] = "Look of the windows of Polypode and its modules: Polypode theme (style chosen below), native WoW look, or that of EllesmereUI or ElvUI if installed. Applied after /reload, for all your characters.",
+	["Style du thème Polypode"] = "Polypode theme style",
+	["Chronique : bronze et or. Plat : ardoise mate, sobre. Fougère : vert mousse et or. Appliqué tout de suite à toutes les fenêtres, avec le thème Polypode."] = "Chronicle: bronze and gold. Flat: matte slate, plain. Fern: moss green and gold. Applied at once to all windows, with the Polypode theme.",
+	["Style Plat : couleur par module"] = "Flat style: color per module",
+	["Style Plat : un trait de couleur en haut de chaque fenêtre et le survol des boutons disent de quel module il s'agit (Histoire bronze, Data bleu, Suivi vert, Téléports violet, Map orange...). Décochée : une seule couleur d'accent."] = "Flat style: a colored line at the top of each window and the button hover tell which module it is (History bronze, Data blue, Tracker green, Teleports purple, Map orange...). Unchecked: a single accent color.",
 })

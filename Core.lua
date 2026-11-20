@@ -60,6 +60,12 @@ P.defaults = {
 	-- Langue de Polypode et de ses modules : "auto" (langue du jeu) ou une langue de
 	-- P.LANGUAGES (Locale.lua) ; commune à tous les personnages, appliquée au chargement (/reload).
 	language = "auto",
+	-- Apparence (UI_Skin.lua) : thème "polypode", "native", "ellesmere" ou "elvui" (après /reload) ;
+	-- style du thème Polypode "chronique", "plat" ou "fougere", et couleur par module (style Plat),
+	-- changés à chaud. Communs à tous les personnages.
+	theme = "polypode",
+	themeStyle = "chronique",
+	themeModuleColor = true,
 }
 
 -- Par personnage : réglages propres à une fenêtre de multibox (et à l'abri du fichier de
