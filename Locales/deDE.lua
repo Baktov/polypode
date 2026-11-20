@@ -425,4 +425,10 @@ P.AddTranslations(P.L, "deDE", {
 	["Aucune"] = "Keine",
 	["Animation des fenêtres"] = "Fensteranimation",
 	["Ouverture et fermeture des fenêtres de Polypode et de ses modules, avec tous les thèmes. Sortie du bouton : la fenêtre grandit depuis le bouton cliqué et y retourne. Fondu et glissement : elle apparaît en descendant un peu. Dépliage : elle se déplie vers le bas. Aucune : immédiat. Appliqué tout de suite, pour tous vos personnages."] = "Öffnen und Schließen der Fenster von Polypode und seinen Modulen, mit allen Themen. Aus der Schaltfläche: Das Fenster wächst aus der angeklickten Schaltfläche und kehrt dorthin zurück. Ein- und Ausblenden: Es erscheint und gleitet dabei leicht nach unten. Aufklappen: Es klappt nach unten auf. Keine: sofort. Wirkt sofort, für alle Ihre Charaktere.",
+	-- UI_Docking.lua, UI_Options.lua : placement des fenêtres (2.28.0)
+	["Tiroir"] = "Schublade",
+	["Libre, avec aimant"] = "Frei, mit Magnet",
+	["Libre"] = "Frei",
+	["Placement des fenêtres"] = "Fensterplatzierung",
+	["Place des fenêtres des modules autour de la fenêtre Polypode. Tiroir : un module s'ouvre accolé à son bord droit (gauche s'il n'y a pas la place) et la suit, un seul par côté ; glissé loin, il se détache jusqu'à sa prochaine ouverture. Libre, avec aimant : glissé contre un bord de la fenêtre Polypode, un module s'y accroche, la suit et y revient à chaque ouverture. Libre : aucune accroche. Fenêtre Polypode fermée : les modules s'ouvrent à leur place habituelle. Pour tous vos personnages."] = "Platz der Modulfenster um das Polypode-Fenster. Schublade: Ein Modul öffnet sich an dessen rechtem Rand (links, wenn kein Platz ist) und folgt ihm, eines pro Seite; weggezogen löst es sich bis zum nächsten Öffnen. Frei, mit Magnet: An einen Rand des Polypode-Fensters gezogen, haftet ein Modul dort, folgt ihm und kehrt bei jedem Öffnen dorthin zurück. Frei: kein Anhaften. Polypode-Fenster geschlossen: Module öffnen sich an ihrem gewohnten Platz. Für alle Ihre Charaktere.",
 })

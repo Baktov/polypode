@@ -405,6 +405,25 @@ function P.BuildOptions()
 		.. "glissement : elle apparaît en descendant un peu. Dépliage : elle se déplie vers le bas. "
 		.. "Aucune : immédiat. Appliqué tout de suite, pour tous vos personnages."])
 
+	local placementSetting = Settings.RegisterProxySetting(
+		category,
+		"POLYPODE_WINDOW_PLACEMENT",
+		Settings.VarType.String,
+		L["Placement des fenêtres"],
+		"tiroir",
+		function()
+			return P.db.windowPlacement
+		end,
+		P.SetWindowPlacement
+	)
+	AddDropdown(placementSetting, P.WINDOW_PLACEMENT_CHOICES,
+		L["Place des fenêtres des modules autour de la fenêtre Polypode. Tiroir : un module s'ouvre "
+		.. "accolé à son bord droit (gauche s'il n'y a pas la place) et la suit, un seul par côté ; "
+		.. "glissé loin, il se détache jusqu'à sa prochaine ouverture. Libre, avec aimant : glissé contre "
+		.. "un bord de la fenêtre Polypode, un module s'y accroche, la suit et y revient à chaque "
+		.. "ouverture. Libre : aucune accroche. Fenêtre Polypode fermée : les modules s'ouvrent à leur "
+		.. "place habituelle. Pour tous vos personnages."])
+
 	-- Mode solo, en tête et en rouge (par personnage) : même réglage que la case « Solo » de la
 	-- fenêtre (P.SetSoloMode, UI_Main.lua).
 	local soloSetting = Settings.RegisterProxySetting(

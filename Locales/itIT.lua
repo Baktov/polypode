@@ -425,4 +425,10 @@ P.AddTranslations(P.L, "itIT", {
 	["Aucune"] = "Nessuna",
 	["Animation des fenêtres"] = "Animazione delle finestre",
 	["Ouverture et fermeture des fenêtres de Polypode et de ses modules, avec tous les thèmes. Sortie du bouton : la fenêtre grandit depuis le bouton cliqué et y retourne. Fondu et glissement : elle apparaît en descendant un peu. Dépliage : elle se déplie vers le bas. Aucune : immédiat. Appliqué tout de suite, pour tous vos personnages."] = "Apertura e chiusura delle finestre di Polypode e dei suoi moduli, con tutti i temi. Dal pulsante: la finestra cresce dal pulsante cliccato e vi ritorna. Dissolvenza e scorrimento: appare scendendo un po'. Apertura a tendina: si apre verso il basso. Nessuna: immediato. Applicato subito, per tutti i tuoi personaggi.",
+	-- UI_Docking.lua, UI_Options.lua : placement des fenêtres (2.28.0)
+	["Tiroir"] = "Cassetto",
+	["Libre, avec aimant"] = "Libero, con magnete",
+	["Libre"] = "Libero",
+	["Placement des fenêtres"] = "Posizione delle finestre",
+	["Place des fenêtres des modules autour de la fenêtre Polypode. Tiroir : un module s'ouvre accolé à son bord droit (gauche s'il n'y a pas la place) et la suit, un seul par côté ; glissé loin, il se détache jusqu'à sa prochaine ouverture. Libre, avec aimant : glissé contre un bord de la fenêtre Polypode, un module s'y accroche, la suit et y revient à chaque ouverture. Libre : aucune accroche. Fenêtre Polypode fermée : les modules s'ouvrent à leur place habituelle. Pour tous vos personnages."] = "Posizione delle finestre dei moduli attorno alla finestra di Polypode. Cassetto: un modulo si apre accostato al suo bordo destro (sinistro se non c'è spazio) e la segue, uno per lato; trascinato lontano, si stacca fino alla prossima apertura. Libero, con magnete: trascinato contro un bordo della finestra di Polypode, un modulo vi si aggancia, la segue e vi torna a ogni apertura. Libero: nessun aggancio. Finestra di Polypode chiusa: i moduli si aprono al solito posto. Per tutti i tuoi personaggi.",
 })

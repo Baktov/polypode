@@ -425,4 +425,10 @@ P.AddTranslations(P.L, "ptBR", {
 	["Aucune"] = "Nenhuma",
 	["Animation des fenêtres"] = "Animação das janelas",
 	["Ouverture et fermeture des fenêtres de Polypode et de ses modules, avec tous les thèmes. Sortie du bouton : la fenêtre grandit depuis le bouton cliqué et y retourne. Fondu et glissement : elle apparaît en descendant un peu. Dépliage : elle se déplie vers le bas. Aucune : immédiat. Appliqué tout de suite, pour tous vos personnages."] = "Abertura e fechamento das janelas do Polypode e de seus módulos, com todos os temas. Saindo do botão: a janela cresce a partir do botão clicado e volta para ele. Esmaecer e deslizar: ela aparece descendo um pouco. Desdobrar: ela se desdobra para baixo. Nenhuma: imediato. Aplicado na hora, para todos os seus personagens.",
+	-- UI_Docking.lua, UI_Options.lua : placement des fenêtres (2.28.0)
+	["Tiroir"] = "Gaveta",
+	["Libre, avec aimant"] = "Livre, com ímã",
+	["Libre"] = "Livre",
+	["Placement des fenêtres"] = "Posição das janelas",
+	["Place des fenêtres des modules autour de la fenêtre Polypode. Tiroir : un module s'ouvre accolé à son bord droit (gauche s'il n'y a pas la place) et la suit, un seul par côté ; glissé loin, il se détache jusqu'à sa prochaine ouverture. Libre, avec aimant : glissé contre un bord de la fenêtre Polypode, un module s'y accroche, la suit et y revient à chaque ouverture. Libre : aucune accroche. Fenêtre Polypode fermée : les modules s'ouvrent à leur place habituelle. Pour tous vos personnages."] = "Lugar das janelas dos módulos em volta da janela do Polypode. Gaveta: um módulo abre encostado à borda direita dela (esquerda se não houver espaço) e a acompanha, um por lado; arrastado para longe, ele se solta até a próxima abertura. Livre, com ímã: arrastado contra uma borda da janela do Polypode, um módulo gruda nela, a acompanha e volta para lá a cada abertura. Livre: sem grudar. Janela do Polypode fechada: os módulos abrem no lugar de sempre. Para todos os seus personagens.",
 })

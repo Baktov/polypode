@@ -68,6 +68,10 @@ P.defaults = {
 	themeModuleColor = true,
 	-- Animation des fenêtres (UI_Animation.lua) : "bouton", "fondu", "depli" ou "aucune", tout thème.
 	windowAnimation = "bouton",
+	-- Placement des fenêtres des modules (UI_Docking.lua) : "tiroir", "aimant" ou "libre" ;
+	-- accroches gardées en mode aimant : docking[clé du module] = { side, offset }.
+	windowPlacement = "tiroir",
+	docking = {},
 }
 
 -- Par personnage : réglages propres à une fenêtre de multibox (et à l'abri du fichier de

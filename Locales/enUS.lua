@@ -425,4 +425,10 @@ P.AddTranslations(P.L, "enUS", {
 	["Aucune"] = "None",
 	["Animation des fenêtres"] = "Window animation",
 	["Ouverture et fermeture des fenêtres de Polypode et de ses modules, avec tous les thèmes. Sortie du bouton : la fenêtre grandit depuis le bouton cliqué et y retourne. Fondu et glissement : elle apparaît en descendant un peu. Dépliage : elle se déplie vers le bas. Aucune : immédiat. Appliqué tout de suite, pour tous vos personnages."] = "Opening and closing of the windows of Polypode and its modules, with every theme. From the button: the window grows from the clicked button and returns to it. Fade and slide: it appears while sliding down a little. Unfold: it unfolds downward. None: immediate. Applied at once, for all your characters.",
+	-- UI_Docking.lua, UI_Options.lua : placement des fenêtres (2.28.0)
+	["Tiroir"] = "Drawer",
+	["Libre, avec aimant"] = "Free, with magnet",
+	["Libre"] = "Free",
+	["Placement des fenêtres"] = "Window placement",
+	["Place des fenêtres des modules autour de la fenêtre Polypode. Tiroir : un module s'ouvre accolé à son bord droit (gauche s'il n'y a pas la place) et la suit, un seul par côté ; glissé loin, il se détache jusqu'à sa prochaine ouverture. Libre, avec aimant : glissé contre un bord de la fenêtre Polypode, un module s'y accroche, la suit et y revient à chaque ouverture. Libre : aucune accroche. Fenêtre Polypode fermée : les modules s'ouvrent à leur place habituelle. Pour tous vos personnages."] = "Where module windows go around the Polypode window. Drawer: a module opens against its right edge (left if there is no room) and follows it, one per side; dragged away, it comes loose until it is opened again. Free, with magnet: dragged against an edge of the Polypode window, a module sticks to it, follows it and goes back there each time it opens. Free: no sticking. Polypode window closed: modules open at their usual place. For all your characters.",
 })

@@ -11,6 +11,8 @@ local L = P.L
 -- - "fondu" : apparaît en descendant de 8 px, disparaît en fondu ;
 -- - "depli" : se déplie vers le bas depuis son bord haut, se replie à la fermeture ;
 -- - "aucune" : affichage et masquage immédiats.
+-- Fenêtre ouverte en tiroir (UI_Docking.lua, P.GetDrawerSide) : elle glisse depuis le bord de la
+-- fenêtre Polypode et y rentre (DRAWER_SLIDE px), sauf avec « aucune ».
 -- Ouverture : accroche OnShow. Fermeture : méthode Hide de la fenêtre remplacée (Échap, croix,
 -- boutons) ; masquée vraiment à la fin de l'animation, alpha rétabli. Show pendant la fermeture
 -- l'annule. Fenêtre protégée (boutons sécurisés, ex. Téléports) : jamais animée.
@@ -18,6 +20,8 @@ local L = P.L
 local OPEN_TIME = { bouton = 0.18, fondu = 0.15, depli = 0.2 }
 local CLOSE_TIME = 0.12
 local SLIDE = 8 -- px, fondu
+local DRAWER_SLIDE = 30 -- px, tiroir
+local DRAWER_OFFSET = { RIGHT = { -DRAWER_SLIDE, 0 }, LEFT = { DRAWER_SLIDE, 0 }, BOTTOM = { 0, DRAWER_SLIDE } }
 
 P.WINDOW_ANIMATION_CHOICES = {
 	{ "bouton", L["Sortie du bouton"] },
@@ -96,6 +100,27 @@ local function AddScale(group, duration, smoothing)
 	group.scale = scale
 end
 
+-- Tiroir : groupe joué à l'envers à l'ouverture (part du bord de la fenêtre Polypode, alpha 0),
+-- à l'endroit à la fermeture.
+local function DrawerGroup(frame, data, side, closing)
+	return Group(frame, data, "tiroir" .. side .. (closing and ":close" or ":open"), function(group)
+		local duration = closing and CLOSE_TIME or OPEN_TIME.bouton
+		AddAlpha(group, duration, "IN")
+		local move = group:CreateAnimation("Translation")
+		move:SetOffset(DRAWER_OFFSET[side][1], DRAWER_OFFSET[side][2])
+		move:SetDuration(duration)
+		move:SetSmoothing("IN")
+		if closing then
+			group:SetToFinalAlpha(true)
+			group:SetScript("OnFinished", function()
+				data.closing = nil
+				data.realHide(frame)
+				frame:SetAlpha(data.alpha or 1)
+			end)
+		end
+	end)
+end
+
 local function OpenGroup(frame, data, kind)
 	return Group(frame, data, kind .. ":open", function(group)
 		if kind == "fondu" then
@@ -136,8 +161,22 @@ local function Open(frame, data)
 	if data.closing then
 		return
 	end
+	-- Accroche en tiroir ou à l'aimant d'abord (UI_Docking.lua), même sans animation.
+	local side = P.ApplyDocking and P.ApplyDocking(frame)
 	local kind = Kind()
 	if not kind or not CanAnimate(frame) then
+		return
+	end
+	if side and P.GetDrawerSide(frame) then
+		data.origin = nil
+		local group = DrawerGroup(frame, data, side)
+		group.alpha:SetFromAlpha(frame:GetAlpha())
+		group.alpha:SetToAlpha(0)
+		if data.opening then
+			data.opening:Stop()
+		end
+		data.opening = group
+		group:Play(true)
 		return
 	end
 	local originX, originY
@@ -185,6 +224,15 @@ local function Close(frame, data)
 		data.opening = nil
 	end
 	data.alpha = frame:GetAlpha()
+	local side = P.GetDrawerSide and P.GetDrawerSide(frame)
+	if side then
+		local group = DrawerGroup(frame, data, side, true)
+		group.alpha:SetFromAlpha(data.alpha)
+		group.alpha:SetToAlpha(0)
+		data.closing = group
+		group:Play()
+		return
+	end
 	local group = CloseGroup(frame, data, kind)
 	group.alpha:SetFromAlpha(data.alpha)
 	group.alpha:SetToAlpha(0)

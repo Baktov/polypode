@@ -425,4 +425,10 @@ P.AddTranslations(P.L, "esES", {
 	["Aucune"] = "Ninguna",
 	["Animation des fenêtres"] = "Animación de las ventanas",
 	["Ouverture et fermeture des fenêtres de Polypode et de ses modules, avec tous les thèmes. Sortie du bouton : la fenêtre grandit depuis le bouton cliqué et y retourne. Fondu et glissement : elle apparaît en descendant un peu. Dépliage : elle se déplie vers le bas. Aucune : immédiat. Appliqué tout de suite, pour tous vos personnages."] = "Apertura y cierre de las ventanas de Polypode y sus módulos, con todos los temas. Desde el botón: la ventana crece desde el botón pulsado y vuelve a él. Fundido y deslizamiento: aparece bajando un poco. Despliegue: se despliega hacia abajo. Ninguna: inmediato. Se aplica al instante, para todos tus personajes.",
+	-- UI_Docking.lua, UI_Options.lua : placement des fenêtres (2.28.0)
+	["Tiroir"] = "Cajón",
+	["Libre, avec aimant"] = "Libre, con imán",
+	["Libre"] = "Libre",
+	["Placement des fenêtres"] = "Colocación de las ventanas",
+	["Place des fenêtres des modules autour de la fenêtre Polypode. Tiroir : un module s'ouvre accolé à son bord droit (gauche s'il n'y a pas la place) et la suit, un seul par côté ; glissé loin, il se détache jusqu'à sa prochaine ouverture. Libre, avec aimant : glissé contre un bord de la fenêtre Polypode, un module s'y accroche, la suit et y revient à chaque ouverture. Libre : aucune accroche. Fenêtre Polypode fermée : les modules s'ouvrent à leur place habituelle. Pour tous vos personnages."] = "Lugar de las ventanas de los módulos alrededor de la ventana de Polypode. Cajón: un módulo se abre pegado a su borde derecho (izquierdo si no hay sitio) y la sigue, uno por lado; arrastrado lejos, se suelta hasta que se vuelva a abrir. Libre, con imán: arrastrado contra un borde de la ventana de Polypode, un módulo se pega, la sigue y vuelve ahí cada vez que se abre. Libre: sin pegarse. Ventana de Polypode cerrada: los módulos se abren en su sitio habitual. Para todos tus personajes.",
 })
