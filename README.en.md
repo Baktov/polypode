@@ -259,7 +259,7 @@ them by their identical **first name and surname** (unique per region):
 - `/poly undo-merge` undoes the last merge (all its records); the group is then no longer offered at
   login.
 
-The modules' data (Data, Tracker...) of the merged record are not erased. On Retail, two characters
+The modules move their data to the kept record (Data: most recent sections; Tracker: most recent information and quest log; Map: position; Profiles: profiles filed under it); an older module keeps the other record's data without erasing it. The record of the character being played is never merged into another one. On Retail, two characters
 with the same name on two realms are different: nothing is offered.
 
 ---

@@ -139,22 +139,28 @@ function P.CheckDuplicatesAtLogin()
 end
 
 -- Menu de fusion manuelle d'une fiche (icône de la liste) : garder celle-ci et fusionner une autre
--- fiche du groupe, ou toutes les autres.
+-- fiche du groupe, ou toutes les autres. La fiche du personnage joué n'est jamais fusionnée dans
+-- une autre : garder une autre fiche que la sienne n'est proposé que pour les fiches restantes.
 function P.ShowMergeMenu(owner, key)
 	local keys = P.GetDuplicatesOf(key)
 	if not keys then
 		return
 	end
+	local own = P.GetCharKey()
+	local hasOwn = false
+	for _, other in ipairs(keys) do
+		hasOwn = hasOwn or other == own
+	end
 	MenuUtil.CreateContextMenu(owner, function(_, root)
 		root:CreateTitle(L["Doublons possibles"])
 		for _, other in ipairs(keys) do
-			if other ~= key then
+			if other ~= key and other ~= own then
 				root:CreateButton(L["Garder %s, fusionner %s"]:format(Label(key), Label(other)), function()
 					Ask({ key, other }, key, false)
 				end)
 			end
 		end
-		if #keys > 2 then
+		if #keys > 2 and (key == own or not hasOwn) then
 			root:CreateButton(L["Garder %s, fusionner les %d autres"]:format(Label(key), #keys - 1), function()
 				Ask(keys, key, false)
 			end)

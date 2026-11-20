@@ -962,7 +962,7 @@ end
 -- false et un message.
 function P.MergeCharacters(keepKey, fromKey)
 	local keep, from = P.GetCharacter(keepKey), P.GetCharacter(fromKey)
-	if not keep or not from or keepKey == fromKey or not SamePerson(keep, from) then
+	if not keep or not from or keepKey == fromKey or fromKey == P.GetCharKey() or not SamePerson(keep, from) then
 		return false, L["Fusion impossible : fiches absentes ou personnages différents."]
 	end
 	local backup = { keep = keepKey, from = fromKey, entry = CopyTable(from), teams = {},

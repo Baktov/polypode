@@ -269,7 +269,7 @@ jeu. Polypode les reconnaît à leur **prénom et nom de famille** identiques (u
 - `/poly annuler-fusion` annule la dernière fusion (toutes ses fiches) ; le groupe n'est alors plus
   proposé à la connexion.
 
-Les données des modules (Data, Suivi…) de la fiche fusionnée ne sont pas effacées. Sur Retail, deux
+Les modules reportent leurs données sur la fiche gardée (Data : sections les plus récentes ; Suivi : informations et journal de quêtes les plus récents ; Map : position ; Profils : profils rangés sous elle) ; un module trop ancien garde celles de l'autre fiche sans les effacer. La fiche du personnage joué n'est jamais fusionnée dans une autre. Sur Retail, deux
 personnages de même prénom sur deux royaumes sont différents : rien n'est proposé.
 
 ---
@@ -705,6 +705,7 @@ aliases (`/poly accounts`, `/poly remove-account`); debug messages stay in Frenc
 
 ## Version
 
+`2.32.1` : fusion des fiches en double : la fiche du personnage joué n'est jamais fusionnée dans une autre (menu de l'icône) ; les modules reportent leurs données sur la fiche gardée (Data 2.16, Suivi 2.20, Map 1.14, Profil 3.12).
 `2.32.0` : WoW Forever : **fusion des fiches en double** d'un même personnage (même prénom et nom de famille) : proposée à la connexion (Oui / Non, Non retenu), icône devant ces fiches dans la liste pour fusionner plus tard (menu, plusieurs doublons possibles), équipes et compte WoW repris par la fiche gardée, `/poly annuler-fusion`.
 `2.31.2` : WoW Forever : depuis la mise à jour du jeu du 17/11/2026, le nom du royaume peut arriver vide ; Polypode reprend le royaume connu du personnage au lieu de créer un doublon « Prénom- » (même personnage affiché deux fois), et retire à la connexion les doublons déjà créés (avec leurs données dans les modules).
 `2.31.1` : colonne des boutons des modules (fenêtre Polypode et fenêtre unique) descendue de 10 pixels, sous l'ornement du coin de la fenêtre.
