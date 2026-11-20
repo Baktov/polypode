@@ -351,6 +351,8 @@ P.AddTranslations(P.L, "esES", {
 	["Fenêtre : bouton %s"] = "Ventana: botón %s",
 	["Barre d'équipe : bouton %s"] = "Barra de equipo: botón %s",
 	["Fenêtre : boutons des modules (affichage, côté, ordre)"] = "Ventana: botones de módulos (visualización, lado, orden)",
+	["Fenêtre : boutons des modules en colonne"] = "Ventana: botones de módulos en columna",
+	["Range les boutons des modules dans une colonne collée au bord gauche de la fenêtre Polypode (droit s'il n'y a pas la place), comme en fenêtre unique, au lieu de sa barre de titre : la fenêtre peut être bien plus étroite. Le titre se place alors à gauche. Les choix d'affichage et d'ordre des boutons s'appliquent à la colonne. Pour tous vos personnages."] = "Coloca los botones de los módulos en una columna pegada al borde izquierdo de la ventana de Polypode (derecho si no hay sitio), como en la ventana única, en lugar de su barra de título: la ventana puede ser mucho más estrecha. El título pasa entonces a la izquierda. Las opciones de visualización y orden de los botones se aplican a la columna. Para todos tus personajes.",
 	["Barre d'équipe : boutons des modules (affichage, ordre)"] = "Barra de equipo: botones de módulos (visualización, orden)",
 	["Côté du titre"] = "Lado del título",
 	["Place le bouton à gauche du titre de la fenêtre (après « Solo ») ou à droite (vers la croix). Clic pour changer."] = "Coloca el botón a la izquierda del título de la ventana (tras «Solo») o a la derecha (hacia la cruz). Clic para cambiar.",

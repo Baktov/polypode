@@ -1172,10 +1172,32 @@ end
 
 local FitTitleBar -- largeur ajustée à la barre de titre (défini plus bas, après WidthKey)
 
+-- Titre de la fenêtre : centré (ancre d'origine, posée par le skin), ou, boutons des modules en
+-- colonne (P.IsWindowButtonColumn), juste après le voyant de synchro, pour que la fenêtre puisse
+-- être étroite (un titre centré demande la même place des deux côtés).
+local titlePoint
+
+local function PlaceTitle(column)
+	local title = ui.frame.TitleText
+	if not titlePoint then
+		titlePoint = { title:GetPoint(1) }
+	end
+	title:ClearAllPoints()
+	local anchor = ui.syncStatus or ui.soloCheck
+	if column and anchor then
+		title:SetPoint("LEFT", anchor, "RIGHT", 12, 0)
+	else
+		title:SetPoint(unpack(titlePoint))
+	end
+end
+
 -- Place les boutons affichés de droite à gauche depuis la croix (ceux de spec.left de gauche à
 -- droite après le libellé « Solo »), sans trou pour les masqués (mode solo, ou décochés dans
--- les options : P.IsWindowButtonShown).
+-- les options : P.IsWindowButtonShown). Boutons en colonne (P.IsWindowButtonColumn) : tous
+-- masqués, la colonne de UI_Docking.lua les remplace.
 local function LayoutTitleButtons()
+	local column = P.IsWindowButtonColumn and P.IsWindowButtonColumn()
+	PlaceTitle(column)
 	local previousLeft = ui.syncStatus
 		or ui.soloCheck and (ui.soloCheck.Text or ui.soloCheck.text or ui.soloCheck)
 	local leftGap = 10 -- après le libellé « Solo », puis 4 entre deux boutons
@@ -1189,7 +1211,7 @@ local function LayoutTitleButtons()
 	local rightSide = {}
 	for _, spec in ipairs(P.OrderedButtonSpecs(P.GetWindowButtonOrder())) do
 		local button = buttonBySpec[spec]
-		if button and P.IsWindowButtonShown(spec) then
+		if button and not column and P.IsWindowButtonShown(spec) then
 			button:Show()
 			button:ClearAllPoints()
 			if P.IsWindowButtonLeft(spec) and previousLeft then
@@ -1204,6 +1226,9 @@ local function LayoutTitleButtons()
 	for index = #rightSide, 1, -1 do
 		rightSide[index]:SetPoint("RIGHT", previous, "LEFT", -4, 0)
 		previous = rightSide[index]
+	end
+	if P.RefreshMainColumn then
+		P.RefreshMainColumn()
 	end
 	FitTitleBar() -- boutons ajoutés, masqués ou changés de côté : la fenêtre suit si besoin
 end
@@ -1304,6 +1329,17 @@ local function HeightKey()
 	return P.IsSoloMode() and "soloHeight" or "height"
 end
 
+-- Largeur par défaut (double-clic sur la barre de titre) : plus étroite avec les boutons des
+-- modules en colonne ; la fenêtre s'élargit de toute façon à ce que demande la barre de titre.
+local COLUMN_DEFAULT_WIDTH = { width = 600, soloWidth = 500 }
+
+local function DefaultWidth(key)
+	if P.IsWindowButtonColumn and P.IsWindowButtonColumn() then
+		return COLUMN_DEFAULT_WIDTH[key]
+	end
+	return P.defaults.mainFrame[key]
+end
+
 -- LARGEUR AJUSTÉE À LA BARRE DE TITRE : Options, Canal, Solo, voyant et boutons de gauche,
 -- titre centré, boutons de droite et croix doivent tenir sans se chevaucher. La fenêtre ouverte
 -- s'élargit à ce qu'il faut (jamais rétrécie, bornée à l'écran) et garde cette largeur pour le
@@ -1336,6 +1372,14 @@ local function TitleBarWidth()
 		if region and region:IsShown() then
 			leftEnd = math.max(leftEnd, region:GetRight() or leftEnd)
 		end
+	end
+	if P.IsWindowButtonColumn and P.IsWindowButtonColumn() then
+		-- Titre placé après les éléments de gauche (PlaceTitle), puis la croix.
+		local titleRight = f.TitleText:GetRight()
+		if not titleRight then
+			return nil
+		end
+		return math.max(titleRight, leftEnd) - frameLeft + TITLE_GAP + frameRight - rightStart
 	end
 	local side = math.max(leftEnd - frameLeft, frameRight - rightStart)
 	return 2 * (side + TITLE_GAP) + f.TitleText:GetStringWidth()
@@ -1566,6 +1610,20 @@ local function ApplySoloLayout()
 	C_Timer.After(0, FitTitleBar)
 end
 
+-- Boutons des modules en colonne sur le côté de la fenêtre Polypode (vrai) ou dans sa barre de
+-- titre (faux), pour tout le compte : largeurs par défaut du nouveau choix (solo et multi), largeurs
+-- rétrécies à la poignée oubliées.
+function P.SetWindowButtonColumn(value)
+	P.db.windowButtonColumn = value and true or false
+	for _, key in ipairs({ "width", "soloWidth" }) do
+		P.db.mainFrame[key] = DefaultWidth(key)
+		P.db.mainFrame.narrowWidth[key] = nil
+	end
+	if ui.frame then
+		ApplySoloLayout() -- taille, cadres, boutons, colonne et titre
+	end
+end
+
 -- Active / désactive le mode solo pour ce personnage (case de la fenêtre et panneau d'options).
 function P.SetSoloMode(enabled)
 	P.charDb.soloMode = enabled and true or false
@@ -1692,7 +1750,7 @@ function P.BuildUI()
 	-- élargie si besoin pour toute la barre de titre.
 	P.EnableTitleDoubleClick(f, function()
 		local key, heightKey = WidthKey(), HeightKey()
-		P.db.mainFrame[key] = P.defaults.mainFrame[key]
+		P.db.mainFrame[key] = DefaultWidth(key)
 		P.db.mainFrame[heightKey] = P.defaults.mainFrame[heightKey]
 		P.db.mainFrame.narrowWidth[key] = nil -- de nouveau ajustée à la barre de titre
 		f:SetSize(P.db.mainFrame[key], P.db.mainFrame[heightKey])

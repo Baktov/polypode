@@ -351,6 +351,8 @@ P.AddTranslations(P.L, "deDE", {
 	["Fenêtre : bouton %s"] = "Fenster: Schaltfläche %s",
 	["Barre d'équipe : bouton %s"] = "Teamleiste: Schaltfläche %s",
 	["Fenêtre : boutons des modules (affichage, côté, ordre)"] = "Fenster: Modulschaltflächen (Anzeige, Seite, Reihenfolge)",
+	["Fenêtre : boutons des modules en colonne"] = "Fenster: Modulschaltflächen in einer Spalte",
+	["Range les boutons des modules dans une colonne collée au bord gauche de la fenêtre Polypode (droit s'il n'y a pas la place), comme en fenêtre unique, au lieu de sa barre de titre : la fenêtre peut être bien plus étroite. Le titre se place alors à gauche. Les choix d'affichage et d'ordre des boutons s'appliquent à la colonne. Pour tous vos personnages."] = "Ordnet die Modulschaltflächen in einer Spalte am linken Rand des Polypode-Fensters an (rechts, wenn kein Platz ist), wie beim einzelnen Fenster, statt in seiner Titelleiste: Das Fenster kann viel schmaler sein. Der Titel rückt dann nach links. Die Auswahl zu Anzeige und Reihenfolge der Schaltflächen gilt für die Spalte. Für alle Ihre Charaktere.",
 	["Barre d'équipe : boutons des modules (affichage, ordre)"] = "Teamleiste: Modulschaltflächen (Anzeige, Reihenfolge)",
 	["Côté du titre"] = "Seite des Titels",
 	["Place le bouton à gauche du titre de la fenêtre (après « Solo ») ou à droite (vers la croix). Clic pour changer."] = "Platziert die Schaltfläche links vom Fenstertitel (nach „Solo“) oder rechts davon (zum Schließen-Kreuz hin). Klick zum Wechseln.",

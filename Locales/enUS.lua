@@ -351,6 +351,8 @@ P.AddTranslations(P.L, "enUS", {
 	["Fenêtre : bouton %s"] = "Window: %s button",
 	["Barre d'équipe : bouton %s"] = "Team bar: %s button",
 	["Fenêtre : boutons des modules (affichage, côté, ordre)"] = "Window: module buttons (display, side, order)",
+	["Fenêtre : boutons des modules en colonne"] = "Window: module buttons in a column",
+	["Range les boutons des modules dans une colonne collée au bord gauche de la fenêtre Polypode (droit s'il n'y a pas la place), comme en fenêtre unique, au lieu de sa barre de titre : la fenêtre peut être bien plus étroite. Le titre se place alors à gauche. Les choix d'affichage et d'ordre des boutons s'appliquent à la colonne. Pour tous vos personnages."] = "Puts the module buttons in a column against the left edge of the Polypode window (right if there is no room), as in single window mode, instead of its title bar: the window can be much narrower. The title then moves to the left. The display and order choices of the buttons apply to the column. For all your characters.",
 	["Barre d'équipe : boutons des modules (affichage, ordre)"] = "Team bar: module buttons (display, order)",
 	["Côté du titre"] = "Side of the title",
 	["Place le bouton à gauche du titre de la fenêtre (après « Solo ») ou à droite (vers la croix). Clic pour changer."] = "Places the button left of the window title (after \"Solo\") or right of it (towards the close button). Click to change.",

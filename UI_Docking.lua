@@ -61,12 +61,36 @@ local function Rect(frame)
 	return left * scale, right * scale, top * scale, bottom * scale
 end
 
+-- Colonne des boutons de modules (plus bas) : dimensions, et celle de la fenêtre Polypode.
+local STRIP_BUTTON_WIDTH, STRIP_BUTTON_HEIGHT, STRIP_PAD = 36, 20, 4
+local STRIP_WIDTH = STRIP_BUTTON_WIDTH + 2 * STRIP_PAD
+local mainColumn
+
+-- Largeur (unités de la fenêtre Polypode) que sa colonne ajoute de ce côté : les fenêtres
+-- accrochées de ce côté se placent contre la colonne.
+local function ColumnExtra(side)
+	if mainColumn and mainColumn:IsShown() and mainColumn.side == side then
+		return STRIP_WIDTH + GAP
+	end
+	return 0
+end
+
+-- Rectangle de la fenêtre Polypode, colonne comprise.
+local function MainRect(main)
+	local left, right, top, bottom = Rect(main)
+	if not left then
+		return
+	end
+	local scale = main:GetEffectiveScale()
+	return left - ColumnExtra("LEFT") * scale, right + ColumnExtra("RIGHT") * scale, top, bottom
+end
+
 local function Anchor(frame, main, side, offset)
 	frame:ClearAllPoints()
 	if side == "RIGHT" then
-		frame:SetPoint("TOPLEFT", main, "TOPRIGHT", GAP, offset)
+		frame:SetPoint("TOPLEFT", main, "TOPRIGHT", GAP + ColumnExtra("RIGHT"), offset)
 	elseif side == "LEFT" then
-		frame:SetPoint("TOPRIGHT", main, "TOPLEFT", -GAP, offset)
+		frame:SetPoint("TOPRIGHT", main, "TOPLEFT", -GAP - ColumnExtra("LEFT"), offset)
 	else
 		frame:SetPoint("TOPLEFT", main, "BOTTOMLEFT", offset, -GAP)
 	end
@@ -85,7 +109,7 @@ end
 -- Côté du tiroir : un côté libre où il y a la place jusqu'au bord de l'écran (droite d'abord),
 -- sinon un côté où il y a la place (le tiroir qui l'occupe se refermera), sinon droite.
 local function DrawerSide(frame, main)
-	local left, right = Rect(main)
+	local left, right = MainRect(main)
 	if not left then
 		return "RIGHT"
 	end
@@ -106,7 +130,7 @@ end
 -- la fenêtre), haut ou gauche alignés s'ils sont proches ; sinon nil.
 local function Snap(frame, main)
 	local fl, fr, ft, fb = Rect(frame)
-	local ml, mr, mt, mb = Rect(main)
+	local ml, mr, mt, mb = MainRect(main)
 	if not (fl and ml) then
 		return
 	end
@@ -139,7 +163,7 @@ guide.line:SetAllPoints()
 
 local function ShowGuide(frame, main, side)
 	local fl, fr, ft, fb = Rect(frame)
-	local ml, mr, mt, mb = Rect(main)
+	local ml, mr, mt, mb = MainRect(main)
 	local scale = UIParent:GetEffectiveScale()
 	guide:ClearAllPoints()
 	if side == "BOTTOM" then
@@ -182,10 +206,11 @@ local function StopWatching()
 	guide:Hide()
 end
 
--- FENÊTRE UNIQUE : colonne des boutons de modules, enfant de la fenêtre ouverte (elle bouge, se
--- fond et se masque avec elle).
-local STRIP_BUTTON_WIDTH, STRIP_BUTTON_HEIGHT, STRIP_PAD = 36, 20, 4
-local strip, stripButtons = nil, {}
+-- COLONNE DES BOUTONS DE MODULES : enfant de la fenêtre qui la porte (elle bouge, se fond et se
+-- masque avec elle). Deux colonnes : celle de la fenêtre unique (déplacée de module en module) et
+-- celle de la fenêtre Polypode (option « boutons en colonne », P.IsWindowButtonColumn).
+local strips = {} -- colonnes créées (repeintes au changement de style)
+local uniqueStrip
 local uniqueFrame -- fenêtre de module ouverte en mode « unique »
 
 -- Trois premiers caractères (UTF-8 entiers), comme la colonne de la barre d'équipe.
@@ -207,25 +232,36 @@ local function AccentColor()
 	return 1, 0.82, 0.2
 end
 
-local function PaintStrip()
-	if not strip then
-		return
-	end
+local function PaintStrips()
 	local bg, border = { 0.05, 0.05, 0.06, 0.92 }, { 0.3, 0.3, 0.3, 1 }
 	if P.IsPolypodeTheme and P.IsPolypodeTheme() then
 		bg = { P.GetThemeColor("bg") }
 		border = { P.GetThemeColor("border") }
 	end
-	strip:SetBackdropColor(bg[1], bg[2], bg[3], bg[4] or 0.92)
-	strip:SetBackdropBorderColor(border[1], border[2], border[3], border[4] or 1)
 	local r, g, b = AccentColor()
-	for _, button in ipairs(stripButtons) do
-		button.mark:SetColorTexture(r, g, b, 1)
+	for _, strip in ipairs(strips) do
+		strip:SetBackdropColor(bg[1], bg[2], bg[3], bg[4] or 0.92)
+		strip:SetBackdropBorderColor(border[1], border[2], border[3], border[4] or 1)
+		for _, button in ipairs(strip.buttons) do
+			button.mark:SetColorTexture(r, g, b, 1)
+		end
 	end
 end
 
-local function StripButton(index)
-	local button = stripButtons[index]
+local function NewStrip(parent)
+	local strip = CreateFrame("Frame", nil, parent, "BackdropTemplate")
+	strip:SetBackdrop({ bgFile = "Interface\\Buttons\\WHITE8X8", edgeFile = "Interface\\Buttons\\WHITE8X8",
+		edgeSize = 1 })
+	strip.buttons = {}
+	if #strips == 0 and P.OnThemeChanged then
+		P.OnThemeChanged(PaintStrips)
+	end
+	strips[#strips + 1] = strip
+	return strip
+end
+
+local function StripButton(strip, index)
+	local button = strip.buttons[index]
 	if button then
 		return button
 	end
@@ -261,7 +297,7 @@ local function StripButton(index)
 	if P.SkinButton then
 		P.SkinButton(button)
 	end
-	stripButtons[index] = button
+	strip.buttons[index] = button
 	return button
 end
 
@@ -279,34 +315,23 @@ local function StripSpecs()
 	return specs
 end
 
-local function ShowStrip(frame, key)
-	if InCombatLockdown() and frame:IsProtected() then
-		return
-	end
-	if not strip then
-		strip = CreateFrame("Frame", nil, frame, "BackdropTemplate")
-		strip:SetBackdrop({ bgFile = "Interface\\Buttons\\WHITE8X8", edgeFile = "Interface\\Buttons\\WHITE8X8",
-			edgeSize = 1 })
-		if P.OnThemeChanged then
-			P.OnThemeChanged(PaintStrip)
-		end
-	end
+-- Place la colonne strip contre la fenêtre frame : à gauche, à droite s'il n'y a pas la place
+-- jusqu'au bord de l'écran ; trait d'accent sur le bouton du module key (nil : aucun).
+local function LayoutStrip(strip, frame, key)
 	strip:SetParent(frame)
 	strip:SetFrameLevel(frame:GetFrameLevel() + 20)
 	local specs = StripSpecs()
-	-- Colonne à gauche de la fenêtre, à droite s'il n'y a pas la place.
-	local width = STRIP_BUTTON_WIDTH + 2 * STRIP_PAD
 	local left = Rect(frame)
-	strip.side = (left and left < width * frame:GetEffectiveScale()) and "RIGHT" or "LEFT"
+	strip.side = (left and left < STRIP_WIDTH * frame:GetEffectiveScale()) and "RIGHT" or "LEFT"
 	strip:ClearAllPoints()
 	if strip.side == "LEFT" then
 		strip:SetPoint("TOPRIGHT", frame, "TOPLEFT", -GAP, 0)
 	else
 		strip:SetPoint("TOPLEFT", frame, "TOPRIGHT", GAP, 0)
 	end
-	strip:SetSize(width, math.max(1, #specs) * (STRIP_BUTTON_HEIGHT + STRIP_PAD) + STRIP_PAD)
+	strip:SetSize(STRIP_WIDTH, math.max(1, #specs) * (STRIP_BUTTON_HEIGHT + STRIP_PAD) + STRIP_PAD)
 	for index, spec in ipairs(specs) do
-		local button = StripButton(index)
+		local button = StripButton(strip, index)
 		button.spec = spec
 		button:SetText(ShortLabel(spec.text))
 		button:ClearAllPoints()
@@ -317,15 +342,54 @@ local function ShowStrip(frame, key)
 		else
 			button.mark:SetPoint("RIGHT", button, "LEFT", -2, 0)
 		end
-		button.mark:SetShown(spec.moduleKey == key)
+		button.mark:SetShown(key ~= nil and spec.moduleKey == key)
 		button:Show()
 	end
-	for index = #specs + 1, #stripButtons do
-		stripButtons[index]:Hide()
-		stripButtons[index].spec = nil
+	for index = #specs + 1, #strip.buttons do
+		strip.buttons[index]:Hide()
+		strip.buttons[index].spec = nil
 	end
-	PaintStrip()
+	PaintStrips()
 	strip:Show()
+end
+
+local function ShowStrip(frame, key)
+	if InCombatLockdown() and frame:IsProtected() then
+		return
+	end
+	uniqueStrip = uniqueStrip or NewStrip(frame)
+	LayoutStrip(uniqueStrip, frame, key)
+end
+
+-- Vrai si les boutons des modules de la fenêtre Polypode sont en colonne sur son côté plutôt que
+-- dans sa barre de titre (P.db.windowButtonColumn, tout le compte, comme la taille de la fenêtre).
+function P.IsWindowButtonColumn()
+	return P.db and P.db.windowButtonColumn == true
+end
+
+-- Affiche, replace ou masque la colonne de la fenêtre Polypode (appelée par UI_Main.lua quand les
+-- boutons changent, et à la fin d'un déplacement de la fenêtre) ; les fenêtres accrochées suivent.
+function P.RefreshMainColumn()
+	local main = Main()
+	if not main then
+		return
+	end
+	if not P.IsWindowButtonColumn() then
+		if mainColumn then
+			mainColumn:Hide()
+		end
+	else
+		if not mainColumn then
+			mainColumn = NewStrip(main)
+			main:HookScript("OnDragStop", P.RefreshMainColumn)
+		end
+		LayoutStrip(mainColumn, main, nil)
+	end
+	for frame in pairs(windows) do
+		if frame:IsShown() then
+			P.RefreshDocking(frame)
+		end
+	end
 end
 
 -- Garde la place commune de la fenêtre unique (coin haut-gauche, pixels d'écran).
@@ -468,8 +532,8 @@ function P.ApplyDocking(frame)
 		ShowStrip(frame, data.key)
 		return
 	end
-	if strip and strip:GetParent() == frame then
-		strip:Hide()
+	if uniqueStrip and uniqueStrip:GetParent() == frame then
+		uniqueStrip:Hide()
 	end
 	if not main or not main:IsShown() or not CanMove(frame) then
 		return
@@ -518,7 +582,7 @@ end
 
 function P.SetWindowPlacement(value)
 	P.db.windowPlacement = (value == "aimant" or value == "libre" or value == "unique") and value or "tiroir"
-	if strip and value ~= "unique" then
-		strip:Hide()
+	if uniqueStrip and value ~= "unique" then
+		uniqueStrip:Hide()
 	end
 end

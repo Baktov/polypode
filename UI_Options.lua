@@ -696,6 +696,23 @@ function P.BuildOptions()
 		tooltip = L["Affiche le bouton « %s » dans la barre de titre de la fenêtre Polypode. Réglage "
 			.. "propre à ce personnage."],
 	})
+	-- Boutons des modules en colonne sur le côté de la fenêtre (tout le compte, UI_Docking.lua).
+	local columnSetting = Settings.RegisterProxySetting(
+		category,
+		"POLYPODE_WINDOW_BUTTON_COLUMN",
+		Settings.VarType.Boolean,
+		L["Fenêtre : boutons des modules en colonne"],
+		Settings.Default.False,
+		function()
+			return P.db.windowButtonColumn == true
+		end,
+		P.SetWindowButtonColumn
+	)
+	AddCheck(columnSetting,
+		L["Range les boutons des modules dans une colonne collée au bord gauche de la fenêtre Polypode "
+		.. "(droit s'il n'y a pas la place), comme en fenêtre unique, au lieu de sa barre de titre : la "
+		.. "fenêtre peut être bien plus étroite. Le titre se place alors à gauche. Les choix d'affichage "
+		.. "et d'ordre des boutons s'appliquent à la colonne. Pour tous vos personnages."])
 	-- Import d'une liste de personnages (fenêtre UI_Import.lua, aussi par /poly import).
 	if CreateSettingsButtonInitializer then
 		layout:AddInitializer(CreateSettingsButtonInitializer(L["Importer des personnages"], L["Importer"],

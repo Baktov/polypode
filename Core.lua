@@ -72,6 +72,9 @@ P.defaults = {
 	-- accroches gardées en mode aimant : docking[clé du module] = { side, offset }.
 	windowPlacement = "tiroir",
 	docking = {},
+	-- Boutons des modules de la fenêtre Polypode en colonne sur son côté plutôt que dans sa barre
+	-- de titre (UI_Docking.lua, UI_Main.lua) : fenêtre plus étroite.
+	windowButtonColumn = false,
 }
 
 -- Par personnage : réglages propres à une fenêtre de multibox (et à l'abri du fichier de

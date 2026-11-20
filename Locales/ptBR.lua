@@ -351,6 +351,8 @@ P.AddTranslations(P.L, "ptBR", {
 	["Fenêtre : bouton %s"] = "Janela: botão %s",
 	["Barre d'équipe : bouton %s"] = "Barra da equipe: botão %s",
 	["Fenêtre : boutons des modules (affichage, côté, ordre)"] = "Janela: botões de módulos (exibição, lado, ordem)",
+	["Fenêtre : boutons des modules en colonne"] = "Janela: botões de módulos em coluna",
+	["Range les boutons des modules dans une colonne collée au bord gauche de la fenêtre Polypode (droit s'il n'y a pas la place), comme en fenêtre unique, au lieu de sa barre de titre : la fenêtre peut être bien plus étroite. Le titre se place alors à gauche. Les choix d'affichage et d'ordre des boutons s'appliquent à la colonne. Pour tous vos personnages."] = "Coloca os botões dos módulos numa coluna encostada à borda esquerda da janela do Polypode (direita se não houver espaço), como na janela única, em vez da barra de título: a janela pode ficar bem mais estreita. O título passa então para a esquerda. As escolhas de exibição e ordem dos botões valem para a coluna. Para todos os seus personagens.",
 	["Barre d'équipe : boutons des modules (affichage, ordre)"] = "Barra da equipe: botões de módulos (exibição, ordem)",
 	["Côté du titre"] = "Lado do título",
 	["Place le bouton à gauche du titre de la fenêtre (après « Solo ») ou à droite (vers la croix). Clic pour changer."] = "Coloca o botão à esquerda do título da janela (após \"Solo\") ou à direita (em direção ao X). Clique para mudar.",
