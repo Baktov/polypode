@@ -677,6 +677,7 @@ aliases (`/poly accounts`, `/poly remove-account`); debug messages stay in Frenc
 
 ## Version
 
+`2.26.1` : infobulles plus hautes et moins larges : les longues descriptions sont coupées en lignes d'environ 60 caractères (Polypode et ses modules).
 `2.26.0` : **thème Polypode** (option **Thème** : Polypode, Natif WoW, EllesmereUI ou ElvUI, après `/reload`) en trois styles changés à chaud : **Chronique** (bronze et or, par défaut), **Plat** (couleur par module en option) et **Fougère** ; fenêtres, cadres, boutons, croix, cases, champs et barres de défilement de Polypode et de ses modules. Avec EllesmereUI ou ElvUI, choisir leur thème pour retrouver leur skin.
 `2.25.0` : **barres de données** : sources LibDataBroker « Polypode Team » (équipe, connectés / membres, leader ; personnage joué en mode solo ; clics : inviter, fenêtre, barre flottante), « Polypode Modules » (menu pour ouvrir un module ou ses options) et un raccourci par module, pour EllesmereUI DataBars, ElvUI, Titan Panel...
 `2.24.0` : pour les modules : la petite fenêtre d'options peut porter des boutons d'action (utilisé par Map pour copier une disposition).

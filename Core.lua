@@ -385,17 +385,62 @@ function P.ColorClicks(text)
 	return table.concat(out)
 end
 
+-- Longueur de ligne des infobulles (caractères visibles) : au-delà, la ligne est coupée entre deux
+-- mots, pour une infobulle plus haute que large (2.26.1 ; sans cela, une longue description
+-- pouvait s'étaler sur toute la largeur de l'écran).
+local TOOLTIP_LINE_CHARS = 60
+
+-- Caractères visibles d'un texte (codes couleur |cAARRGGBB et |r retirés).
+local function VisibleLength(text)
+	local plain = text:gsub("|c%x%x%x%x%x%x%x%x", ""):gsub("|r", "")
+	return strlenutf8(plain)
+end
+
+-- Coupe un texte en lignes d'au plus TOOLTIP_LINE_CHARS caractères visibles, entre deux mots
+-- (sauts de ligne existants gardés ; un mot plus long reste entier).
+local function WrapTooltipText(text)
+	if VisibleLength(text) <= TOOLTIP_LINE_CHARS then
+		return text
+	end
+	local paragraphs = {}
+	for paragraph in (text:gsub("|n", "\n") .. "\n"):gmatch("(.-)\n") do
+		local lines, current = {}, ""
+		for word in paragraph:gmatch("%S+") do
+			local candidate = current == "" and word or (current .. " " .. word)
+			if current ~= "" and VisibleLength(candidate) > TOOLTIP_LINE_CHARS then
+				lines[#lines + 1] = current
+				current = word
+			else
+				current = candidate
+			end
+		end
+		lines[#lines + 1] = current
+		paragraphs[#paragraphs + 1] = table.concat(lines, "\n")
+	end
+	return table.concat(paragraphs, "\n")
+end
+
 function P.ShowTooltip(tooltip)
 	tooltip = tooltip or GameTooltip
 	local name = tooltip:GetName()
 	for line = 1, name and tooltip:NumLines() or 0 do
+		local right = _G[name .. "TextRight" .. line]
+		local twoColumns = right and right:IsShown() and (right:GetText() or "") ~= ""
 		for _, side in ipairs({ "Left", "Right" }) do
 			local fontString = _G[name .. "Text" .. side .. line]
 			local text = fontString and fontString:GetText()
 			if text and not (issecretvalue and issecretvalue(text)) then
 				local ok, colored = pcall(P.ColorClicks, text)
-				if ok and colored ~= text then
-					fontString:SetText(colored)
+				local result = ok and colored or text
+				-- Ligne seule (pas de colonne de droite) : coupée en lignes de longueur standard.
+				if side == "Left" and not twoColumns then
+					local wrapped, value = pcall(WrapTooltipText, result)
+					if wrapped then
+						result = value
+					end
+				end
+				if result ~= text then
+					fontString:SetText(result)
 				end
 			end
 		end
