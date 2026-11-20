@@ -544,6 +544,7 @@ window):
 | **Langue / Language** (at the top) | Auto | Language of Polypode and its modules: Auto (the game's), Français, English, Deutsch, Español, Italiano or Português (Brasil); applied after `/reload` (see "Languages"). For **all your characters** |
 | Theme | Polypode | Polypode, Native WoW, EllesmereUI or ElvUI (those two if installed); applied after `/reload` (see "Appearance"). For **all your characters** |
 | Polypode theme style | Chronicle | Chronicle, Flat or Fern; applied at once to all windows (Polypode theme). For **all your characters** |
+| Window animation | From the button | From the button, Fade and slide, Unfold or None; applied at once (see "Appearance"). For **all your characters** |
 | Flat style: color per module | Yes | Flat style: top line of the windows and button hover in the module's color; unchecked, a single accent color. For **all your characters** |
 | **Solo mode** (in red) | No | A single character: window reduced to "Available characters", floating bar of the current character, Quests hidden, Tracker on every character (see "Solo mode"). Same box as **Solo** in the window. **Per-character** setting |
 | Dedicated channel | empty | Optional: name of the chat channel shared by your accounts, useful with no group or shared guild (see How it works; the field's tooltip recalls it). Can also be changed in the main window. On the right, "Manage token list" button: list and revocation of the allowed accounts. For the whole account, synchronized between your clients |
@@ -586,6 +587,8 @@ window):
 | **ElvUI** (if installed) | ElvUI style (background, inner frames and close buttons). |
 
 An EllesmereUI or ElvUI theme chosen while that addon is no longer loaded falls back to the Polypode theme.
+
+**Window animation** option (with every theme, applied at once): opening and closing of the windows of Polypode and its modules. **From the button** (default): the window grows from the button clicked to open it and returns to it when closed (opened by a key binding or a command: fade); **Fade and slide**: it appears while sliding down a few pixels; **Unfold**: it unfolds downward; **None**: immediate. Under 0.2 s to open, 0.12 s to close. The Teleports window (secure buttons) is never animated.
 
 ---
 

@@ -388,6 +388,23 @@ function P.BuildOptions()
 		.. "de quel module il s'agit (Histoire bronze, Data bleu, Suivi vert, Téléports violet, Map "
 		.. "orange...). Décochée : une seule couleur d'accent."])
 
+	local animationSetting = Settings.RegisterProxySetting(
+		category,
+		"POLYPODE_WINDOW_ANIMATION",
+		Settings.VarType.String,
+		L["Animation des fenêtres"],
+		"bouton",
+		function()
+			return P.db.windowAnimation
+		end,
+		P.SetWindowAnimation
+	)
+	AddDropdown(animationSetting, P.WINDOW_ANIMATION_CHOICES,
+		L["Ouverture et fermeture des fenêtres de Polypode et de ses modules, avec tous les thèmes. "
+		.. "Sortie du bouton : la fenêtre grandit depuis le bouton cliqué et y retourne. Fondu et "
+		.. "glissement : elle apparaît en descendant un peu. Dépliage : elle se déplie vers le bas. "
+		.. "Aucune : immédiat. Appliqué tout de suite, pour tous vos personnages."])
+
 	-- Mode solo, en tête et en rouge (par personnage) : même réglage que la case « Solo » de la
 	-- fenêtre (P.SetSoloMode, UI_Main.lua).
 	local soloSetting = Settings.RegisterProxySetting(

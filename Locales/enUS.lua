@@ -418,4 +418,11 @@ P.AddTranslations(P.L, "enUS", {
 	["Chronique : bronze et or. Plat : ardoise mate, sobre. Fougère : vert mousse et or. Appliqué tout de suite à toutes les fenêtres, avec le thème Polypode."] = "Chronicle: bronze and gold. Flat: matte slate, plain. Fern: moss green and gold. Applied at once to all windows, with the Polypode theme.",
 	["Style Plat : couleur par module"] = "Flat style: color per module",
 	["Style Plat : un trait de couleur en haut de chaque fenêtre et le survol des boutons disent de quel module il s'agit (Histoire bronze, Data bleu, Suivi vert, Téléports violet, Map orange...). Décochée : une seule couleur d'accent."] = "Flat style: a colored line at the top of each window and the button hover tell which module it is (History bronze, Data blue, Tracker green, Teleports purple, Map orange...). Unchecked: a single accent color.",
+	-- UI_Animation.lua, UI_Options.lua : animation des fenêtres (2.27.0)
+	["Sortie du bouton"] = "From the button",
+	["Fondu et glissement"] = "Fade and slide",
+	["Dépliage"] = "Unfold",
+	["Aucune"] = "None",
+	["Animation des fenêtres"] = "Window animation",
+	["Ouverture et fermeture des fenêtres de Polypode et de ses modules, avec tous les thèmes. Sortie du bouton : la fenêtre grandit depuis le bouton cliqué et y retourne. Fondu et glissement : elle apparaît en descendant un peu. Dépliage : elle se déplie vers le bas. Aucune : immédiat. Appliqué tout de suite, pour tous vos personnages."] = "Opening and closing of the windows of Polypode and its modules, with every theme. From the button: the window grows from the clicked button and returns to it. Fade and slide: it appears while sliding down a little. Unfold: it unfolds downward. None: immediate. Applied at once, for all your characters.",
 })

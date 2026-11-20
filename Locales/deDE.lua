@@ -418,4 +418,11 @@ P.AddTranslations(P.L, "deDE", {
 	["Chronique : bronze et or. Plat : ardoise mate, sobre. Fougère : vert mousse et or. Appliqué tout de suite à toutes les fenêtres, avec le thème Polypode."] = "Chronik: Bronze und Gold. Flach: mattes Schiefergrau, schlicht. Farn: Moosgrün und Gold. Wirkt sofort auf alle Fenster, mit dem Polypode-Thema.",
 	["Style Plat : couleur par module"] = "Flacher Stil: Farbe pro Modul",
 	["Style Plat : un trait de couleur en haut de chaque fenêtre et le survol des boutons disent de quel module il s'agit (Histoire bronze, Data bleu, Suivi vert, Téléports violet, Map orange...). Décochée : une seule couleur d'accent."] = "Flacher Stil: eine farbige Linie oben an jedem Fenster und der Mauszeiger über den Schaltflächen zeigen, um welches Modul es sich handelt (Chronik bronze, Data blau, Tracker grün, Teleporter violett, Karte orange...). Deaktiviert: eine einzige Akzentfarbe.",
+	-- UI_Animation.lua, UI_Options.lua : animation des fenêtres (2.27.0)
+	["Sortie du bouton"] = "Aus der Schaltfläche",
+	["Fondu et glissement"] = "Ein- und Ausblenden",
+	["Dépliage"] = "Aufklappen",
+	["Aucune"] = "Keine",
+	["Animation des fenêtres"] = "Fensteranimation",
+	["Ouverture et fermeture des fenêtres de Polypode et de ses modules, avec tous les thèmes. Sortie du bouton : la fenêtre grandit depuis le bouton cliqué et y retourne. Fondu et glissement : elle apparaît en descendant un peu. Dépliage : elle se déplie vers le bas. Aucune : immédiat. Appliqué tout de suite, pour tous vos personnages."] = "Öffnen und Schließen der Fenster von Polypode und seinen Modulen, mit allen Themen. Aus der Schaltfläche: Das Fenster wächst aus der angeklickten Schaltfläche und kehrt dorthin zurück. Ein- und Ausblenden: Es erscheint und gleitet dabei leicht nach unten. Aufklappen: Es klappt nach unten auf. Keine: sofort. Wirkt sofort, für alle Ihre Charaktere.",
 })

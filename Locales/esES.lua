@@ -418,4 +418,11 @@ P.AddTranslations(P.L, "esES", {
 	["Chronique : bronze et or. Plat : ardoise mate, sobre. Fougère : vert mousse et or. Appliqué tout de suite à toutes les fenêtres, avec le thème Polypode."] = "Crónica: bronce y oro. Plano: pizarra mate, sobrio. Helecho: verde musgo y oro. Se aplica al instante a todas las ventanas, con el tema Polypode.",
 	["Style Plat : couleur par module"] = "Estilo plano: color por módulo",
 	["Style Plat : un trait de couleur en haut de chaque fenêtre et le survol des boutons disent de quel module il s'agit (Histoire bronze, Data bleu, Suivi vert, Téléports violet, Map orange...). Décochée : une seule couleur d'accent."] = "Estilo plano: una línea de color en la parte superior de cada ventana y el resaltado de los botones indican de qué módulo se trata (Historia bronce, Data azul, Seguimiento verde, Teletransportes violeta, Mapa naranja...). Desmarcada: un solo color de acento.",
+	-- UI_Animation.lua, UI_Options.lua : animation des fenêtres (2.27.0)
+	["Sortie du bouton"] = "Desde el botón",
+	["Fondu et glissement"] = "Fundido y deslizamiento",
+	["Dépliage"] = "Despliegue",
+	["Aucune"] = "Ninguna",
+	["Animation des fenêtres"] = "Animación de las ventanas",
+	["Ouverture et fermeture des fenêtres de Polypode et de ses modules, avec tous les thèmes. Sortie du bouton : la fenêtre grandit depuis le bouton cliqué et y retourne. Fondu et glissement : elle apparaît en descendant un peu. Dépliage : elle se déplie vers le bas. Aucune : immédiat. Appliqué tout de suite, pour tous vos personnages."] = "Apertura y cierre de las ventanas de Polypode y sus módulos, con todos los temas. Desde el botón: la ventana crece desde el botón pulsado y vuelve a él. Fundido y deslizamiento: aparece bajando un poco. Despliegue: se despliega hacia abajo. Ninguna: inmediato. Se aplica al instante, para todos tus personajes.",
 })

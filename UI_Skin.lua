@@ -569,6 +569,7 @@ end
 -- moduleKey (facultatif) : module de la fenêtre, pour sa couleur d'accent (sinon tiré de son nom).
 function P.SkinFrame(frame, moduleKey)
 	KeepOnTop(frame)
+	P.SetupWindowAnimation(frame) -- UI_Animation.lua : ouverture et fermeture animées, tout thème
 	local theme = ActiveTheme()
 	if theme == "polypode" then
 		Skin("frame", frame, moduleKey or ModuleFromName(frame))

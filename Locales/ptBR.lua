@@ -418,4 +418,11 @@ P.AddTranslations(P.L, "ptBR", {
 	["Chronique : bronze et or. Plat : ardoise mate, sobre. Fougère : vert mousse et or. Appliqué tout de suite à toutes les fenêtres, avec le thème Polypode."] = "Crônica: bronze e ouro. Plano: ardósia fosca, sóbrio. Samambaia: verde musgo e ouro. Aplicado na hora a todas as janelas, com o tema Polypode.",
 	["Style Plat : couleur par module"] = "Estilo plano: cor por módulo",
 	["Style Plat : un trait de couleur en haut de chaque fenêtre et le survol des boutons disent de quel module il s'agit (Histoire bronze, Data bleu, Suivi vert, Téléports violet, Map orange...). Décochée : une seule couleur d'accent."] = "Estilo plano: uma linha colorida no topo de cada janela e o destaque dos botões indicam de qual módulo se trata (Histórico bronze, Data azul, Acompanhamento verde, Teleportes roxo, Mapa laranja...). Desmarcada: uma única cor de destaque.",
+	-- UI_Animation.lua, UI_Options.lua : animation des fenêtres (2.27.0)
+	["Sortie du bouton"] = "Saindo do botão",
+	["Fondu et glissement"] = "Esmaecer e deslizar",
+	["Dépliage"] = "Desdobrar",
+	["Aucune"] = "Nenhuma",
+	["Animation des fenêtres"] = "Animação das janelas",
+	["Ouverture et fermeture des fenêtres de Polypode et de ses modules, avec tous les thèmes. Sortie du bouton : la fenêtre grandit depuis le bouton cliqué et y retourne. Fondu et glissement : elle apparaît en descendant un peu. Dépliage : elle se déplie vers le bas. Aucune : immédiat. Appliqué tout de suite, pour tous vos personnages."] = "Abertura e fechamento das janelas do Polypode e de seus módulos, com todos os temas. Saindo do botão: a janela cresce a partir do botão clicado e volta para ele. Esmaecer e deslizar: ela aparece descendo um pouco. Desdobrar: ela se desdobra para baixo. Nenhuma: imediato. Aplicado na hora, para todos os seus personagens.",
 })

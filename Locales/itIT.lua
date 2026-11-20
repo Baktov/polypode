@@ -418,4 +418,11 @@ P.AddTranslations(P.L, "itIT", {
 	["Chronique : bronze et or. Plat : ardoise mate, sobre. Fougère : vert mousse et or. Appliqué tout de suite à toutes les fenêtres, avec le thème Polypode."] = "Cronaca: bronzo e oro. Piatto: ardesia opaca, sobrio. Felce: verde muschio e oro. Applicato subito a tutte le finestre, con il tema Polypode.",
 	["Style Plat : couleur par module"] = "Stile piatto: colore per modulo",
 	["Style Plat : un trait de couleur en haut de chaque fenêtre et le survol des boutons disent de quel module il s'agit (Histoire bronze, Data bleu, Suivi vert, Téléports violet, Map orange...). Décochée : une seule couleur d'accent."] = "Stile piatto: una linea colorata in cima a ogni finestra e l'evidenziazione dei pulsanti indicano di quale modulo si tratta (Storia bronzo, Data blu, Monitoraggio verde, Teletrasporti viola, Mappa arancione...). Non spuntata: un solo colore d'accento.",
+	-- UI_Animation.lua, UI_Options.lua : animation des fenêtres (2.27.0)
+	["Sortie du bouton"] = "Dal pulsante",
+	["Fondu et glissement"] = "Dissolvenza e scorrimento",
+	["Dépliage"] = "Apertura a tendina",
+	["Aucune"] = "Nessuna",
+	["Animation des fenêtres"] = "Animazione delle finestre",
+	["Ouverture et fermeture des fenêtres de Polypode et de ses modules, avec tous les thèmes. Sortie du bouton : la fenêtre grandit depuis le bouton cliqué et y retourne. Fondu et glissement : elle apparaît en descendant un peu. Dépliage : elle se déplie vers le bas. Aucune : immédiat. Appliqué tout de suite, pour tous vos personnages."] = "Apertura e chiusura delle finestre di Polypode e dei suoi moduli, con tutti i temi. Dal pulsante: la finestra cresce dal pulsante cliccato e vi ritorna. Dissolvenza e scorrimento: appare scendendo un po'. Apertura a tendina: si apre verso il basso. Nessuna: immediato. Applicato subito, per tutti i tuoi personaggi.",
 })

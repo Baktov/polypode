@@ -66,6 +66,8 @@ P.defaults = {
 	theme = "polypode",
 	themeStyle = "chronique",
 	themeModuleColor = true,
+	-- Animation des fenêtres (UI_Animation.lua) : "bouton", "fondu", "depli" ou "aucune", tout thème.
+	windowAnimation = "bouton",
 }
 
 -- Par personnage : réglages propres à une fenêtre de multibox (et à l'abri du fichier de

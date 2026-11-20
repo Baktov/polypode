@@ -570,6 +570,7 @@ fenêtre principale) :
 | **Langue / Language** (en tête) | Auto | Langue de Polypode et de ses modules : Auto (celle du jeu), Français, English, Deutsch, Español, Italiano ou Português (Brasil) ; appliquée après `/reload` (voir « Langues »). Pour **tous vos personnages** |
 | Thème | Polypode | Polypode, Natif WoW, EllesmereUI ou ElvUI (ces deux-là s'ils sont installés) ; appliqué après `/reload` (voir « Apparence »). Pour **tous vos personnages** |
 | Style du thème Polypode | Chronique | Chronique, Plat ou Fougère ; appliqué tout de suite à toutes les fenêtres (thème Polypode). Pour **tous vos personnages** |
+| Animation des fenêtres | Sortie du bouton | Sortie du bouton, Fondu et glissement, Dépliage ou Aucune ; appliquée tout de suite (voir « Apparence »). Pour **tous vos personnages** |
 | Style Plat : couleur par module | Oui | Style Plat : trait du haut des fenêtres et survol des boutons à la couleur du module ; décochée, une seule couleur d'accent. Pour **tous vos personnages** |
 | **Mode solo** (en rouge) | Non | Un seul personnage : fenêtre réduite à « Personnages disponibles », barre flottante du personnage joué, Quêtes masqué, Suivi sur tous les personnages (voir « Mode solo »). Même case que **Solo** dans la fenêtre. Réglage **par personnage** |
 | Canal dédié | vide | Optionnel : nom du canal de discussion commun à vos comptes, utile sans groupe ni guilde commune (voir Fonctionnement ; l'infobulle du champ le rappelle). Aussi modifiable dans la fenêtre principale. À droite, bouton « Gestion liste token » : liste et révocation des comptes autorisés. Pour tout le compte, synchronisé entre vos clients |
@@ -614,6 +615,8 @@ Option **Thème** (Options → AddOns → Polypode, pour tous vos personnages, a
 | **ElvUI** (s'il est installé) | Style ElvUI (fond, cadres intérieurs et boutons de fermeture). |
 
 Un thème EllesmereUI ou ElvUI choisi alors que l'addon n'est plus chargé revient au thème Polypode.
+
+Option **Animation des fenêtres** (avec tous les thèmes, appliquée tout de suite) : ouverture et fermeture des fenêtres de Polypode et de ses modules. **Sortie du bouton** (défaut) : la fenêtre grandit depuis le bouton cliqué pour l'ouvrir et y retourne à la fermeture (ouverte par un raccourci ou une commande : fondu) ; **Fondu et glissement** : elle apparaît en descendant de quelques pixels ; **Dépliage** : elle se déplie vers le bas ; **Aucune** : immédiat. Moins de 0,2 s à l'ouverture, 0,12 s à la fermeture. La fenêtre Téléports (boutons sécurisés) n'est jamais animée.
 
 ---
 
@@ -677,6 +680,7 @@ aliases (`/poly accounts`, `/poly remove-account`); debug messages stay in Frenc
 
 ## Version
 
+`2.27.0` : **animation des fenêtres** (option **Animation des fenêtres**, tous les thèmes) : sortie du bouton cliqué (défaut), fondu et glissement, dépliage ou aucune, à l'ouverture et à la fermeture des fenêtres de Polypode et de ses modules.
 `2.26.1` : infobulles plus hautes et moins larges : les longues descriptions sont coupées en lignes d'environ 60 caractères (Polypode et ses modules).
 `2.26.0` : **thème Polypode** (option **Thème** : Polypode, Natif WoW, EllesmereUI ou ElvUI, après `/reload`) en trois styles changés à chaud : **Chronique** (bronze et or, par défaut), **Plat** (couleur par module en option) et **Fougère** ; fenêtres, cadres, boutons, croix, cases, champs et barres de défilement de Polypode et de ses modules. Avec EllesmereUI ou ElvUI, choisir leur thème pour retrouver leur skin.
 `2.25.0` : **barres de données** : sources LibDataBroker « Polypode Team » (équipe, connectés / membres, leader ; personnage joué en mode solo ; clics : inviter, fenêtre, barre flottante), « Polypode Modules » (menu pour ouvrir un module ou ses options) et un raccourci par module, pour EllesmereUI DataBars, ElvUI, Titan Panel...
