@@ -64,6 +64,9 @@ end
 -- Colonne des boutons de modules (plus bas) : dimensions, et celle de la fenêtre Polypode.
 local STRIP_BUTTON_WIDTH, STRIP_BUTTON_HEIGHT, STRIP_PAD = 36, 20, 4
 local STRIP_WIDTH = STRIP_BUTTON_WIDTH + 2 * STRIP_PAD
+-- Colonne descendue sous le coin de la fenêtre (ornement en losange du style Chronique, qui
+-- dépasse de 7 pixels).
+local STRIP_TOP = -10
 local mainColumn
 
 -- Largeur (unités de la fenêtre Polypode) que sa colonne ajoute de ce côté : les fenêtres
@@ -325,9 +328,9 @@ local function LayoutStrip(strip, frame, key)
 	strip.side = (left and left < STRIP_WIDTH * frame:GetEffectiveScale()) and "RIGHT" or "LEFT"
 	strip:ClearAllPoints()
 	if strip.side == "LEFT" then
-		strip:SetPoint("TOPRIGHT", frame, "TOPLEFT", -GAP, 0)
+		strip:SetPoint("TOPRIGHT", frame, "TOPLEFT", -GAP, STRIP_TOP)
 	else
-		strip:SetPoint("TOPLEFT", frame, "TOPRIGHT", GAP, 0)
+		strip:SetPoint("TOPLEFT", frame, "TOPRIGHT", GAP, STRIP_TOP)
 	end
 	strip:SetSize(STRIP_WIDTH, math.max(1, #specs) * (STRIP_BUTTON_HEIGHT + STRIP_PAD) + STRIP_PAD)
 	for index, spec in ipairs(specs) do
