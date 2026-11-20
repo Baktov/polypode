@@ -346,16 +346,17 @@ function P.BuildOptions()
 		"POLYPODE_THEME",
 		Settings.VarType.String,
 		L["Thème"],
-		"polypode",
+		"auto",
 		function()
 			return P.db.theme
 		end,
 		P.SetThemePreference
 	)
 	AddDropdown(themeSetting, P.GetThemeChoices(),
-		L["Apparence des fenêtres de Polypode et de ses modules : thème Polypode (style au choix "
-		.. "ci-dessous), apparence native de WoW, ou celle d'EllesmereUI ou d'ElvUI s'ils sont "
-		.. "installés. Appliqué après /reload, pour tous vos personnages."])
+		L["Apparence des fenêtres de Polypode et de ses modules. Automatique (défaut) : celle "
+		.. "d'EllesmereUI ou d'ElvUI s'ils sont chargés sur ce personnage, sinon le thème Polypode. "
+		.. "Ou au choix : thème Polypode (style ci-dessous), apparence native de WoW, EllesmereUI ou "
+		.. "ElvUI s'ils sont installés. Appliqué après /reload, pour tous vos personnages."])
 
 	local themeStyleSetting = Settings.RegisterProxySetting(
 		category,
@@ -702,7 +703,7 @@ function P.BuildOptions()
 		"POLYPODE_WINDOW_BUTTON_COLUMN",
 		Settings.VarType.Boolean,
 		L["Fenêtre : boutons des modules en colonne"],
-		Settings.Default.False,
+		Settings.Default.True,
 		function()
 			return P.db.windowButtonColumn == true
 		end,

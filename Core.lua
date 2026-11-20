@@ -28,12 +28,13 @@ P.defaults = {
 		hide = false, -- true : bouton masqué (/poly minimap ou panneau d'options)
 	},
 	mainFrame = {
-		width = 720, -- taille de la fenêtre principale, mémorisée au redimensionnement
+		width = 600, -- taille de la fenêtre principale, mémorisée au redimensionnement (boutons
+		-- des modules en colonne par défaut ; dans la barre de titre : 720 et 620, UI_Main.lua)
 		height = 320,
 		-- Taille en mode solo (un seul cadre, cf. UI_Main.lua), mémorisée à part. Dans les deux
 		-- modes, la fenêtre s'élargit pour que toute la barre de titre soit lisible (UI_Main.lua,
 		-- FitTitleBar), sauf si elle a été rendue plus étroite à la poignée dans ce mode.
-		soloWidth = 620,
+		soloWidth = 500,
 		soloHeight = 320,
 		-- [« width » | « soloWidth »] = true : largeur rendue plus étroite que la barre de titre à la
 		-- poignée, respectée (plus d'élargissement) jusqu'au double-clic sur la barre de titre.
@@ -68,7 +69,7 @@ P.defaults = {
 	-- Apparence (UI_Skin.lua) : thème "polypode", "native", "ellesmere" ou "elvui" (après /reload) ;
 	-- style du thème Polypode "chronique", "plat" ou "fougere", et couleur par module (style Plat),
 	-- changés à chaud. Communs à tous les personnages.
-	theme = "polypode",
+	theme = "auto",
 	themeStyle = "chronique",
 	themeModuleColor = true,
 	-- Animation des fenêtres (UI_Animation.lua) : "bouton", "fondu", "depli" ou "aucune", tout thème.
@@ -79,7 +80,7 @@ P.defaults = {
 	docking = {},
 	-- Boutons des modules de la fenêtre Polypode en colonne sur son côté plutôt que dans sa barre
 	-- de titre (UI_Docking.lua, UI_Main.lua) : fenêtre plus étroite.
-	windowButtonColumn = false,
+	windowButtonColumn = true, -- défaut depuis 2.33.0
 }
 
 -- Par personnage : réglages propres à une fenêtre de multibox (et à l'abri du fichier de
@@ -196,6 +197,26 @@ function P.InitDB()
 	if P.charDb.autoSelectGossipQuest ~= nil then
 		P.charDb.autoSelectGossip = P.charDb.autoSelectGossipQuest
 		P.charDb.autoSelectGossipQuest = nil
+	end
+
+	-- Nouveaux défauts de 2.33.0, repris une fois (P.db.defaults233) : thème « auto » au lieu du
+	-- « polypode » écrit par défaut depuis 2.26.0, boutons des modules en colonne (défaut faux en
+	-- 2.31.0), et largeurs restées aux anciens défauts (720 / 620) ramenées à celles de la colonne.
+	if not P.db.defaults233 then
+		P.db.defaults233 = true
+		if P.db.theme == "polypode" then
+			P.db.theme = "auto"
+		end
+		if not P.db.windowButtonColumn then
+			P.db.windowButtonColumn = true
+			if P.db.mainFrame.width == 720 then
+				P.db.mainFrame.width = 600
+			end
+			if P.db.mainFrame.soloWidth == 620 then
+				P.db.mainFrame.soloWidth = 500
+			end
+			wipe(P.db.mainFrame.narrowWidth)
+		end
 	end
 
 	P.debugEnabled = P.charDb.debug

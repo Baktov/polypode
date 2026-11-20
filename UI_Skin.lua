@@ -4,7 +4,9 @@ local P = Polypode
 local L = P.L
 
 -- THÈMES (P.db.theme, choisi dans les options, appliqué après /reload) :
--- - "polypode" (défaut) : apparence propre à Polypode, en trois styles (P.db.themeStyle :
+-- - "auto" (défaut, 2.33.0) : EllesmereUI ou ElvUI s'ils sont chargés sur ce personnage, sinon
+--   "polypode" (style par défaut Chronique) ;
+-- - "polypode" : apparence propre à Polypode, en trois styles (P.db.themeStyle :
 --   Chronique, Plat, Fougère), changés à chaud ; style Plat : couleur d'accent par module
 --   (P.db.themeModuleColor) ;
 -- - "native" : apparence générique de WoW posée par chaque fenêtre (bordure d'infobulle) ;
@@ -98,7 +100,16 @@ local function ActiveTheme()
 	if activeTheme then
 		return activeTheme
 	end
-	local wanted = P.db and P.db.theme or "polypode"
+	local wanted = P.db and P.db.theme or "auto"
+	if wanted == "auto" then
+		if EllesmereUI and EllesmereUI.RegisterSkin then
+			wanted = "ellesmere"
+		elseif ElvUI then
+			wanted = "elvui"
+		else
+			wanted = "polypode"
+		end
+	end
 	if wanted == "ellesmere" and not (EllesmereUI and EllesmereUI.RegisterSkin) then
 		wanted = "polypode"
 	elseif wanted == "elvui" and not ElvUI then
@@ -617,7 +628,7 @@ end
 
 -- Choix du panneau d'options : { valeur, libellé } (EllesmereUI et ElvUI seulement s'ils sont chargés).
 function P.GetThemeChoices()
-	local choices = { { "polypode", "Polypode" }, { "native", L["Natif WoW"] } }
+	local choices = { { "auto", L["Automatique"] }, { "polypode", "Polypode" }, { "native", L["Natif WoW"] } }
 	if EllesmereUI and EllesmereUI.RegisterSkin then
 		choices[#choices + 1] = { "ellesmere", "EllesmereUI" }
 	end

@@ -1331,13 +1331,14 @@ end
 
 -- Largeur par défaut (double-clic sur la barre de titre) : plus étroite avec les boutons des
 -- modules en colonne ; la fenêtre s'élargit de toute façon à ce que demande la barre de titre.
-local COLUMN_DEFAULT_WIDTH = { width = 600, soloWidth = 500 }
+local COLUMN_DEFAULT_WIDTH = { width = 600, soloWidth = 500 } -- = P.defaults.mainFrame (Core.lua)
+local TITLE_DEFAULT_WIDTH = { width = 720, soloWidth = 620 }
 
 local function DefaultWidth(key)
 	if P.IsWindowButtonColumn and P.IsWindowButtonColumn() then
 		return COLUMN_DEFAULT_WIDTH[key]
 	end
-	return P.defaults.mainFrame[key]
+	return TITLE_DEFAULT_WIDTH[key]
 end
 
 -- LARGEUR AJUSTÉE À LA BARRE DE TITRE : Options, Canal, Solo, voyant et boutons de gauche,
