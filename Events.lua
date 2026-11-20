@@ -78,6 +78,7 @@ frame:SetScript("OnEvent", function(self, event, ...)
 	elseif event == "PLAYER_LOGIN" then
 		local key = P.AddCharacter()
 		P.RegisterComm()
+		P.RemoveEmptyRealmCharacters() -- doublons dus au royaume vide de WoW Forever (Core.lua)
 		self:RegisterEvent("CHAT_MSG_ADDON")
 		P.SayHello()
 		P.BuildMinimapButton()

@@ -45,7 +45,7 @@ local lastGroupSize = 0
 -- Clé « Nom-Royaume » sans espaces ni tirets dans le royaume (le royaume de UnitName n'en a pas).
 local function NormalizeKey(key)
 	local name, realm = strsplit("-", key, 2)
-	return name .. "-" .. ((realm or GetRealmName()):gsub("[%s%-]", ""))
+	return name .. "-" .. ((realm or P.GetPlayerRealm()):gsub("[%s%-]", ""))
 end
 
 local function OwnKey()

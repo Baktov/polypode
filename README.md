@@ -684,6 +684,7 @@ aliases (`/poly accounts`, `/poly remove-account`); debug messages stay in Frenc
 
 ## Version
 
+`2.31.2` : WoW Forever : depuis la mise à jour du jeu du 17/11/2026, le nom du royaume peut arriver vide ; Polypode reprend le royaume connu du personnage au lieu de créer un doublon « Prénom- » (même personnage affiché deux fois), et retire à la connexion les doublons déjà créés (avec leurs données dans les modules).
 `2.31.1` : colonne des boutons des modules (fenêtre Polypode et fenêtre unique) descendue de 10 pixels, sous l'ornement du coin de la fenêtre.
 `2.31.0` : option **Fenêtre : boutons des modules en colonne** : boutons des modules dans une colonne sur le côté gauche de la fenêtre Polypode, comme en fenêtre unique, pour une fenêtre plus étroite (titre à gauche ; tiroirs et aimant contre la colonne).
 `2.30.0` : thème Polypode : **listes déroulantes** habillées (bouton plat à chevron, bordure d'accent au survol, menu ouvert sur fond et bordure du style), dans Polypode et ses modules (Data, Photo, Suivi, petite fenêtre d'options).

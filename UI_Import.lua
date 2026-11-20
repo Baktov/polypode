@@ -23,7 +23,7 @@ local function ParseLine(line)
 	key = strtrim(key or "")
 	local name, realm = key:match("^([^%-%s]+)%-(.+)$")
 	if not name then
-		name, realm = key:match("^([^%-%s]+)$"), GetRealmName()
+		name, realm = key:match("^([^%-%s]+)$"), P.GetPlayerRealm()
 	end
 	if not name then
 		return nil

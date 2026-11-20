@@ -254,7 +254,7 @@ function P.SayHello(kind, channel, target)
 	local level = UnitLevel("player")
 	local _, _, surname = P.UnitNameParts("player")
 	P.Broadcast(string.format("%s:%s:%s:%s:%s:%d:%s", kind or "HELLO", token,
-		UnitName("player"), GetRealmName(), class, level, surname or ""), channel, target)
+		UnitName("player"), P.GetPlayerRealm(), class, level, surname or ""), channel, target)
 end
 
 -- DÉCOUVERTE PAR CHUCHOTEMENT : sans canal dédié, groupe ni guilde (GetBroadcastChannel nil),
@@ -384,7 +384,7 @@ local function ResolveTargets(target, extraKeys)
 			targets[FullName(P.GetTargetName({ name = name, realm = realm or "" }))] = true
 		end
 	end
-	targets[FullName(P.GetTargetName({ name = UnitName("player"), realm = GetRealmName() }))] = nil
+	targets[FullName(P.GetTargetName({ name = UnitName("player"), realm = P.GetPlayerRealm() }))] = nil
 	return targets
 end
 
@@ -505,7 +505,7 @@ local function BuildStatusMessage(token)
 	local s = LocalStatus()
 	return string.format("STATUS:%s:%d:%d:%s:%s:%s:%s:%s:%s:%s:%s", token, s.level, s.ilvl,
 		s.race or "", s.spec or "", s.guild or "", s.xp or "", s.durability or "", UnitName("player"),
-		GetRealmName(), s.zone or "")
+		P.GetPlayerRealm(), s.zone or "")
 end
 
 -- Envoie l'état du personnage : à target (rencontre), sinon aux clients connectés s'il a
@@ -546,6 +546,7 @@ end
 
 local function OnStatusMessage(rest)
 	local level, ilvl, race, spec, guild, xp, durability, name, realm, zone = strsplit(":", rest or "", 10)
+	realm = name and P.ResolveRealm(name, realm) -- royaume vide de WoW Forever (Core.lua)
 	if not name or name == "" or not realm or realm == "" then
 		return
 	end
@@ -1181,6 +1182,7 @@ function P.OnSyncMessage(message, channel, sender)
 	if not name or not realm then
 		return
 	end
+	realm = P.ResolveRealm(name, realm, surname) -- royaume vide de WoW Forever (Core.lua)
 
 	-- Nos propres messages nous reviennent : rien à faire.
 	if P.GetCharKey(name, realm) == P.GetCharKey() then

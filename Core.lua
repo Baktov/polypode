@@ -196,9 +196,59 @@ function P.InitDB()
 	P.debugEnabled = P.charDb.debug
 end
 
+-- ROYAUME VIDE : depuis la mise à jour de WoW Forever du 17/11/2026 (1.60.1), GetRealmName()
+-- peut renvoyer "" (vu le 20/11/2026, aussi chez d'autres addons) ; la clé « Prénom- » faisait
+-- alors un doublon du personnage. Royaume repris de la fiche du roster de même prénom (et même nom
+-- de famille s'il est connu), s'il n'y en a qu'une avec un royaume.
+local function KnownRealm(name, surname)
+	if not (P.db and P.db.roster and name) then
+		return nil
+	end
+	local found
+	for _, entry in pairs(P.db.roster) do
+		if entry.name == name and not entry.removed and entry.realm and entry.realm ~= ""
+			and (not surname or surname == "" or not entry.surname or entry.surname == surname) then
+			if found and found ~= entry.realm then
+				return nil -- plusieurs royaumes possibles : on ne choisit pas
+			end
+			found = entry.realm
+		end
+	end
+	return found
+end
+
+-- Royaume du personnage joué : GetRealmName(), gardé dans P.charDb.realm ; s'il est vide, le
+-- dernier gardé, sinon KnownRealm, sinon "".
+function P.GetPlayerRealm()
+	local realm = GetRealmName()
+	if realm and realm ~= "" then
+		if P.charDb then
+			P.charDb.realm = realm
+		end
+		return realm
+	end
+	if P.charDb and P.charDb.realm and P.charDb.realm ~= "" then
+		return P.charDb.realm
+	end
+	local _, second = UnitName("player")
+	realm = KnownRealm(UnitName("player"), P.HasSurnames() and second or nil)
+	if realm and P.charDb then
+		P.charDb.realm = realm
+	end
+	return realm or ""
+end
+
+-- Royaume d'une annonce reçue, vide chez un client touché par le même défaut : repris du roster.
+function P.ResolveRealm(name, realm, surname)
+	if realm and realm ~= "" then
+		return realm
+	end
+	return KnownRealm(name, surname) or realm or ""
+end
+
 function P.GetCharKey(name, realm)
 	name = name or UnitName("player")
-	realm = realm or GetRealmName()
+	realm = realm or P.GetPlayerRealm()
 	return name .. "-" .. realm
 end
 
@@ -506,8 +556,11 @@ end
 -- lister les personnages d'un compte autorisé).
 -- surname : nom de famille (WoW Forever), s'il est connu.
 function P.AddCharacter(name, realm, class, level, token, surname)
+	if name then
+		realm = P.ResolveRealm(name, realm, surname)
+	end
 	name = name or UnitName("player")
-	realm = realm or GetRealmName()
+	realm = realm or P.GetPlayerRealm()
 	local key = P.GetCharKey(name, realm)
 
 	P.db.roster[key] = P.db.roster[key] or {}
@@ -579,7 +632,7 @@ local function UnitRealm(unit)
 			realm = unitRealm
 		end
 	end
-	local own = GetRealmName()
+	local own = P.GetPlayerRealm()
 	if not realm then
 		return own
 	end
@@ -682,6 +735,22 @@ local function RemoveCharacterData(key, fromSync)
 		if not ok then
 			P.Debug("Suppression des données de " .. key .. " (" .. tostring(handler.name) .. ") : " .. tostring(err))
 		end
+	end
+end
+
+-- Retire les fiches au royaume vide (doublons « Prénom- », voir KnownRealm), avec les données
+-- des modules, sauf la nôtre si notre royaume reste introuvable. Appelée à la connexion.
+function P.RemoveEmptyRealmCharacters()
+	local own = P.GetCharKey()
+	local keys = {}
+	for key, entry in pairs(P.db.roster) do
+		if entry.realm == "" and not entry.removed and key ~= own then
+			keys[#keys + 1] = key
+		end
+	end
+	for _, key in ipairs(keys) do
+		P.RemoveCharacter(key)
+		P.Debug("Doublon au royaume vide retiré : " .. key)
 	end
 end
 
@@ -1309,7 +1378,7 @@ function P.GetTargetName(entry)
 			return P.JoinSurname(entry.name, surname)
 		end
 	end
-	if entry.realm == GetRealmName() then
+	if entry.realm == P.GetPlayerRealm() then
 		return entry.name
 	end
 	return entry.name .. "-" .. (entry.realm:gsub("[%s%-]", ""))
@@ -1325,7 +1394,11 @@ function P.FullName(name)
 		return first and P.JoinSurname(first, surname) or name
 	end
 	if not name:find("-", 1, true) then
-		return name .. "-" .. (GetNormalizedRealmName() or "")
+		local realm = GetNormalizedRealmName and GetNormalizedRealmName() or ""
+		if realm == "" then
+			realm = P.GetPlayerRealm():gsub("[%s%-]", "")
+		end
+		return name .. "-" .. realm
 	end
 	return name
 end
@@ -1354,7 +1427,7 @@ local function UnitMatchesEntry(entry, name, realm, surname)
 	if P.HasSurnames() and surname and entry.surname then
 		return surname == entry.surname
 	end
-	return ((realm or GetRealmName()):gsub("%s", "")) == ((entry.realm or ""):gsub("%s", ""))
+	return ((realm or P.GetPlayerRealm()):gsub("%s", "")) == ((entry.realm or ""):gsub("%s", ""))
 end
 
 -- Prénom, royaume et nom de famille lisibles d'une unité, ou nil (nom secret, unité vide).
