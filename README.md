@@ -610,7 +610,7 @@ Option **Thème** (Options → AddOns → Polypode, pour tous vos personnages, a
 
 | Thème | Rendu |
 |---|---|
-| **Polypode** (défaut) | Apparence propre à Polypode, en trois styles au choix (option **Style du thème Polypode**, appliquée tout de suite) : **Chronique** (bronze et or, double filet et losanges aux coins, comme le site Histoire), **Plat** (ardoise mate, trait de couleur en haut de chaque fenêtre ; avec **Style Plat : couleur par module**, une couleur par module : Histoire bronze, Data bleu, Suivi vert, Téléports violet, Map orange…) et **Fougère** (vert mousse et or). Fenêtres, bandeau de titre, cadres intérieurs, boutons, croix, cases à cocher, champs de saisie et barres de défilement ; les listes déroulantes gardent pour l'instant l'apparence de WoW. |
+| **Polypode** (défaut) | Apparence propre à Polypode, en trois styles au choix (option **Style du thème Polypode**, appliquée tout de suite) : **Chronique** (bronze et or, double filet et losanges aux coins, comme le site Histoire), **Plat** (ardoise mate, trait de couleur en haut de chaque fenêtre ; avec **Style Plat : couleur par module**, une couleur par module : Histoire bronze, Data bleu, Suivi vert, Téléports violet, Map orange…) et **Fougère** (vert mousse et or). Fenêtres, bandeau de titre, cadres intérieurs, boutons, croix, cases à cocher, champs de saisie, barres de défilement et listes déroulantes (bouton plat à chevron, menu ouvert aux couleurs du style) de Polypode et de ses modules ; le panneau d'options de WoW garde son apparence. |
 | **Natif WoW** | Fond sombre générique, bordure d'infobulle de WoW. |
 | **EllesmereUI** (s'il est installé) | Style EllesmereUI (fond, bordure, barre de titre avec titre centré, cadres intérieurs, boutons de fermeture — y compris la croix de la barre flottante d'équipe) selon votre thème. Le skin de Polypode doit aussi être actif dans EllesmereUI → Blizz UI Enhanced → Blizzard Window Skins → Third-Party Addons (module EllesmereUI Blizzard Skin). |
 | **ElvUI** (s'il est installé) | Style ElvUI (fond, cadres intérieurs et boutons de fermeture). |
@@ -683,6 +683,7 @@ aliases (`/poly accounts`, `/poly remove-account`); debug messages stay in Frenc
 
 ## Version
 
+`2.30.0` : thème Polypode : **listes déroulantes** habillées (bouton plat à chevron, bordure d'accent au survol, menu ouvert sur fond et bordure du style), dans Polypode et ses modules (Data, Photo, Suivi, petite fenêtre d'options).
 `2.29.0` : placement **Fenêtre unique** (un module à la fois, au même endroit, colonne des modules sur le côté) ; tiroir : un deuxième module s'ouvre au bord gauche au lieu de fermer le premier ; redimensionner une fenêtre accrochée la garde accrochée (sans appel du module).
 `2.28.0` : **placement des fenêtres** (option **Placement des fenêtres**) : tiroir contre la fenêtre Polypode (défaut, glisse depuis son bord), libre avec aimant (accroche gardée), ou libre ; pour les modules qui le demandent (Histoire d'abord).
 `2.27.0` : **animation des fenêtres** (option **Animation des fenêtres**, tous les thèmes) : sortie du bouton cliqué (défaut), fondu et glissement, dépliage ou aucune, à l'ouverture et à la fermeture des fenêtres de Polypode et de ses modules.

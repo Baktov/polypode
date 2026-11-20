@@ -424,6 +424,112 @@ function PAINT.edit(editBox, data)
 	data.back:SetBackdropBorderColor(unpack(s.border))
 end
 
+-- Menu ouvert d'une liste déroulante : fond plat et bordure du style sous le menu de Blizzard, dont
+-- la texture de fond (atlas MENU_ATLAS) est rendue invisible le temps de l'ouverture puis rétablie
+-- (les menus et leurs textures sont réutilisés par le jeu pour ses propres listes).
+local MENU_ATLAS = "common-dropdown-bg"
+local menuBack, menuHidden
+local function RestoreMenu()
+	if menuHidden then
+		menuHidden:SetAlpha(menuHidden.polypodeAlpha or 1)
+		menuHidden = nil
+	end
+	if menuBack then
+		menuBack:Hide()
+	end
+end
+
+local function SkinOpenMenu(dropdown)
+	local menu = dropdown.menu
+	if not menu or not skinned[dropdown] then
+		return
+	end
+	if not menuHidden then
+		for _, region in ipairs({ menu:GetRegions() }) do
+			if region.GetAtlas and region:GetAtlas() == MENU_ATLAS then
+				region.polypodeAlpha = region:GetAlpha()
+				region:SetAlpha(0)
+				menuHidden = region
+				break
+			end
+		end
+	end
+	if not menuBack then
+		menuBack = CreateFrame("Frame", nil, UIParent, "BackdropTemplate")
+		menuBack:SetBackdrop(FLAT)
+	end
+	local s = Style()
+	menuBack:SetBackdropColor(s.bg[1], s.bg[2], s.bg[3], 0.97)
+	menuBack:SetBackdropBorderColor(unpack(s.border))
+	menuBack:SetFrameStrata(menu:GetFrameStrata())
+	menuBack:SetFrameLevel(math.max(0, menu:GetFrameLevel() - 1))
+	menuBack:ClearAllPoints()
+	menuBack:SetPoint("TOPLEFT", menu, "TOPLEFT", 2, 0)
+	menuBack:SetPoint("BOTTOMRIGHT", menu, "BOTTOMRIGHT", -2, 6)
+	menuBack:Show()
+end
+
+-- Liste déroulante (WowStyle1DropdownTemplate) : bouton plat comme les boutons texte, chevron à deux
+-- traits, texte du style ; menu ouvert habillé par SkinOpenMenu.
+function PAINT.dropdown(dropdown, data)
+	local s = Style()
+	if not data.ready then
+		data.ready = true
+		HideTextures(dropdown, { "Background", "Arrow" })
+		EnsureBackdrop(dropdown)
+		dropdown:SetBackdrop(FLAT)
+		-- Chevron vers le bas : deux traits qui se rejoignent en bas.
+		data.chevron = {}
+		for index, angle in ipairs({ -45, 45 }) do
+			local line = dropdown:CreateTexture(nil, "OVERLAY")
+			line:SetTexture(WHITE)
+			line:SetSize(6, 1.5)
+			line:SetPoint("CENTER", dropdown, "RIGHT", -12 + (index == 1 and -1.6 or 1.6), 0)
+			Rotate(line, angle)
+			data.chevron[index] = line
+		end
+		local function Repaint(self)
+			if skinned[self] then
+				PAINT.dropdown(self, skinned[self])
+			end
+		end
+		-- Le modèle recolore le texte et change la flèche à chaque état (survol, clic, désactivé).
+		if type(dropdown.OnButtonStateChanged) == "function" then
+			hooksecurefunc(dropdown, "OnButtonStateChanged", Repaint)
+		end
+		dropdown:HookScript("OnEnable", Repaint)
+		dropdown:HookScript("OnDisable", Repaint)
+		if dropdown.RegisterCallback and DropdownButtonMixin and DropdownButtonMixin.Event then
+			dropdown:RegisterCallback(DropdownButtonMixin.Event.OnMenuOpen, function(self)
+				SkinOpenMenu(self)
+				Repaint(self)
+				-- Mise en page du menu parfois achevée à l'image suivante.
+				C_Timer.After(0, function()
+					SkinOpenMenu(self)
+				end)
+			end)
+			dropdown:RegisterCallback(DropdownButtonMixin.Event.OnMenuClose, function(self)
+				RestoreMenu()
+				Repaint(self)
+			end)
+		end
+	end
+	local enabled = dropdown:IsEnabled()
+	local over = dropdown.IsOver and dropdown:IsOver()
+	local open = dropdown.IsMenuOpen and dropdown:IsMenuOpen()
+	local background = ((over or open) and enabled) and s.buttonHover or s.button
+	dropdown:SetBackdropColor(unpack(background))
+	local border = ((over or open) and enabled) and Accent(ModuleOf(dropdown)) or s.border
+	dropdown:SetBackdropBorderColor(border[1], border[2], border[3], enabled and border[4] or 0.5)
+	if dropdown.Text then
+		dropdown.Text:SetTextColor(unpack(enabled and s.text or s.muted))
+	end
+	local chevron = enabled and ((over or open) and s.title or s.muted) or s.muted
+	for _, line in ipairs(data.chevron) do
+		line:SetColorTexture(chevron[1], chevron[2], chevron[3], enabled and 1 or 0.5)
+	end
+end
+
 -- Barre de défilement (MinimalScrollBar) : curseur à la couleur d'accent, rail et flèches teintés.
 function PAINT.scroll(scrollBar)
 	local s = Style()
@@ -683,10 +789,14 @@ function P.SkinEditBox(editBox)
 end
 
 -- Skinne une liste déroulante Blizzard (WowStyle1DropdownTemplate) : cadre plat et flèche du
--- skin. width : largeur imposée par ElvUI (défaut : largeur actuelle). Thème Polypode : apparence
--- de WoW gardée pour l'instant.
+-- skin. width : largeur imposée par ElvUI (défaut : largeur actuelle). Thème Polypode : bouton plat
+-- et menu ouvert aux couleurs du style (PAINT.dropdown).
 function P.SkinDropdown(dropdown, width)
 	local theme = ActiveTheme()
+	if theme == "polypode" then
+		Skin("dropdown", dropdown)
+		return
+	end
 	local eui = theme == "ellesmere" and GetEUISkin()
 	if eui then
 		eui.Dropdown(dropdown)
