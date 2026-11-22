@@ -465,7 +465,7 @@ Polypode Suivi ; il peut être désactivé (il ne fait plus que le rappeler).
   `/poly histoire`, journal chronologique commun de tous vos personnages (connexions, équipe
   groupée, gouffres, donjons, clés M+, boss de raid, hauts faits, niveaux, niveau d'objet), par
   année, mois et jour repliables ou en frise chronologique (jour, semaine, mois), échangé entre
-  vos clients ; sur WoW Forever, vue **Stats** : statistiques de tous les personnages relevées
+  vos clients ; vue **Stats** : statistiques de tous les personnages relevées
   chaque jour, graphique de leur évolution au survol ; export des mois anciens vers une
   archive (à installer sur chaque personnage, avec Polypode Histoire Archive).
 - **Polypode Profil** (https://github.com/Baktov/polypode-profil) : bouton **Profils** et
