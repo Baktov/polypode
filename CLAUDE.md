@@ -39,7 +39,7 @@ n'ajoute une fonctionnalité que si elle sert directement cet objectif.
   DataStore, messages `DATA` / `DATAV` / `DATAREQ` à lui) et **Polypode Profil** (`../Polypode_Profil`,
   https://github.com/Baktov/polypode-profil : chaînes d'export du mode Édition, des talents, de la transmogrification, des titres, des ensembles d'équipement, des options de WoW, des raccourcis, des fenêtres de discussion, de la liste des addons et des addons,
   messages `PROF` / `PROFV` / `PROFREQ` à lui) et **Polypode Histoire** (`../Polypode_Histoire`,
-  https://github.com/Baktov/polypode-histoire : journal chronologique commun des personnages, message `HIST` à lui ;
+  https://github.com/Baktov/polypode-histoire : journal chronologique commun des personnages et, sur WoW Forever, statistiques relevées chaque jour (vue Stats, 1.24.0), message `HIST` à lui ;
   utilise aussi `P.GetTeams` et `P.FindGroupUnit`) et **Polypode Map** (`../Polypode_Map`,
   https://github.com/Baktov/polypode-map : petite carte de zone permanente, messages `MAPPOS` / `MAPPING` / `MAPPROF` (dispositions partagées, 1.13.0) à lui ; **Polypode facultatif** depuis 1.12.0 (`OptionalDeps`, appels gardés) : une évolution de l'API qu'il utilise ne doit pas le rendre obligatoire ;
   utilise aussi `P.FindGroupUnit`, `P.GetTargetName`, `P.IsCharacterOnline`, `P.GetTeamLeader`) et **Polypode Teleport**
