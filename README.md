@@ -707,6 +707,7 @@ aliases (`/poly accounts`, `/poly remove-account`); debug messages stay in Frenc
 
 ## Version
 
+`2.34.0` : chaque personnage garde son identifiant WoW (GUID) dans ses réglages par personnage, à la connexion : le **Lanceur Multibox** s'en sert pour présélectionner le bon personnage au lancement d'un client. Rien ne change en jeu.
 `2.33.0` : nouveaux défauts : thème **Automatique** (EllesmereUI ou ElvUI s'ils sont chargés sur le personnage, sinon le thème Polypode en style Chronique) et **boutons des modules en colonne** à gauche de la fenêtre (largeurs par défaut 600 / 500) ; repris une fois sur une installation existante (thème Polypode laissé par défaut → Automatique, boutons dans la barre de titre → colonne, largeurs restées à 720 / 620 → 600 / 500).
 `2.32.1` : fusion des fiches en double : la fiche du personnage joué n'est jamais fusionnée dans une autre (menu de l'icône) ; les modules reportent leurs données sur la fiche gardée (Data 2.16, Suivi 2.20, Map 1.14, Profil 3.12).
 `2.32.0` : WoW Forever : **fusion des fiches en double** d'un même personnage (même prénom et nom de famille) : proposée à la connexion (Oui / Non, Non retenu), icône devant ces fiches dans la liste pour fusionner plus tard (menu, plusieurs doublons possibles), équipes et compte WoW repris par la fiche gardée, `/poly annuler-fusion`.

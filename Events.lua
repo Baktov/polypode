@@ -77,6 +77,9 @@ frame:SetScript("OnEvent", function(self, event, ...)
 		end
 	elseif event == "PLAYER_LOGIN" then
 		local key = P.AddCharacter()
+		-- Identifiant du personnage (« Player-1315-0D4371B6 ») gardé dans ses SavedVariables par personnage :
+		-- lu hors jeu par le Lanceur Multibox pour présélectionner ce personnage (character-list-order.txt).
+		P.charDb.guid = UnitGUID("player")
 		P.RegisterComm()
 		P.RemoveEmptyRealmCharacters() -- doublons dus au royaume vide de WoW Forever (Core.lua)
 		P.CheckDuplicatesAtLogin() -- autres doublons probables : fusion proposée (UI_Duplicates.lua)

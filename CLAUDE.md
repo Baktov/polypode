@@ -114,7 +114,7 @@ en tête de chaque fichier). Ex. `P.db` (= `PolypodeDB`), `P.charDb` (= `Polypod
 3. **Les fonctions locales** restent locales à leur fichier (`local function ...`).
 4. **SavedVariables account-wide** → `P.db` (= `PolypodeDB`).
 5. **SavedVariables per-character** → `P.charDb` (= `PolypodeCharDB`). Ces fichiers ne sont **pas** partagés
-   entre comptes : y mettre les réglages propres à une fenêtre (ex. `soloMode`, `soloChosen`, `barTipDone`, `debug` via `P.SetDebug`, `selectedTeam`, `assistStartAttack`, `autoAcceptQuest`, `autoValidateQuest`, `autoSelectGossip`, `autoSkipCinematic`, `autoTaxi`, `autoEnterInstance`, `sentVolume`, `followLeaderSound`, `autoGroup`, `groupByAccount`, `collapsedAccounts`, `followAlert`, `teamBar`).
+   entre comptes : y mettre les réglages propres à une fenêtre (ex. `soloMode`, `soloChosen`, `barTipDone`, `debug` via `P.SetDebug`, `selectedTeam`, `assistStartAttack`, `autoAcceptQuest`, `autoValidateQuest`, `autoSelectGossip`, `autoSkipCinematic`, `autoTaxi`, `autoEnterInstance`, `sentVolume`, `followLeaderSound`, `autoGroup`, `groupByAccount`, `collapsedAccounts`, `followAlert`, `teamBar`, `guid` — `UnitGUID("player")` écrit à `PLAYER_LOGIN` (Events.lua, 2.34.0), lu hors jeu par le Lanceur Multibox (`C:\PROJETS\Lanceur_Multibox`) pour retrouver le rang du personnage dans `WTF\Account\<compte>\character-list-order.txt` ; ne pas le renommer).
 6. **Pas de `print()`** en production — utiliser `P.Debug(msg)`, qui respecte `P.debugEnabled`.
 7. **Messages de sync** : toujours via `P.Broadcast` / `P.WhisperOnline` (préfixes dérivés de `P.SYNC_PREFIX`, reconnus par `P.IsSyncPrefix`), jamais de préfixe en dur ailleurs.
 8. **UI** : frames créées avec `CreateFrame`, toutes référencées dans `P.ui.*`.
